@@ -272,8 +272,49 @@ export function clearTbcCache() {
   _cachedProducts = null;
   _cachedCategories = null;
 }
+
+export async function deleteProduct(id) {
+  if (!id) return false;
+  try {
+    await deleteDoc(doc(db, 'products', id));
+    clearTbcCache();
+    return true;
+  } catch (err) {
+    console.error('[TBC] deleteProduct error:', err);
+    throw err;
+  }
+}
+
+export async function purgeMockProducts() {
+  try {
+    const snap = await getDocs(collection(db, 'products'));
+    let deletedCount = 0;
+    for (const d of snap.docs) {
+      const data = d.data();
+      const name = String(data.name || '').toLowerCase();
+      if (
+        name.includes('test') ||
+        name.includes('mock') ||
+        name.includes('ethereal white co-ord') ||
+        data.isMock === true ||
+        data.showInEcom === false
+      ) {
+        await deleteDoc(doc(db, 'products', d.id));
+        deletedCount++;
+      }
+    }
+    clearTbcCache();
+    return deletedCount;
+  } catch (e) {
+    console.error('[TBC] purgeMockProducts error:', e);
+    throw e;
+  }
+}
+
 if (typeof window !== 'undefined') {
   window.clearTbcCache = clearTbcCache;
+  window.deleteProduct = deleteProduct;
+  window.purgeMockProducts = purgeMockProducts;
 }
 
 /**
