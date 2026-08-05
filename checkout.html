@@ -35,31 +35,31 @@
     .step-done { background-color: #10b981; color: #fff; border-color: #10b981; }
   </style>
 </head>
-<body class="bg-background text-on-surface font-sans antialiased min-h-screen">
+<body class="bg-background text-on-surface font-sans antialiased min-h-screen sm:h-screen overflow-y-auto sm:overflow-hidden flex flex-col justify-between">
 
 <!-- Header -->
 <header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-black/5">
-  <div class="max-w-screen-xl mx-auto h-16 px-4 md:px-8 flex items-center justify-between">
-    <a href="cart" aria-label="Back" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-black/10 transition-colors">
-      <span class="material-symbols-outlined text-[22px]">arrow_back</span>
+  <div class="max-w-screen-xl mx-auto h-14 sm:h-16 px-4 md:px-8 flex items-center justify-between">
+    <a href="cart" aria-label="Back" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-black/10 transition-colors">
+      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">arrow_back</span>
     </a>
 
     <a href="home" class="flex items-center gap-3">
-      <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
-      <span class="font-bold tracking-[0.15em] text-sm uppercase text-primary">CHECKOUT</span>
+      <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-7 sm:h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+      <span class="font-bold tracking-[0.15em] text-xs sm:text-sm uppercase text-primary">CHECKOUT</span>
     </a>
 
-    <div class="flex items-center gap-1 text-emerald-600 font-semibold text-xs uppercase">
-      <span class="material-symbols-outlined text-[16px]">lock</span>
+    <div class="flex items-center gap-1 text-emerald-600 font-semibold text-[11px] sm:text-xs uppercase">
+      <span class="material-symbols-outlined text-[15px] sm:text-[16px]">lock</span>
       <span>256-Bit SSL</span>
     </div>
   </div>
 </header>
 
-<main class="pt-24 md:pt-28 pb-24 max-w-2xl mx-auto px-4">
+<main class="pt-16 sm:pt-20 pb-24 sm:pb-20 max-w-2xl mx-auto px-4 w-full flex-1 flex flex-col justify-start">
   
   <!-- 4 STEP PROGRESS INDICATOR BAR (FULL SCREEN FLOW) -->
-  <div class="mb-4 border-b border-black/10 pb-3">
+  <div class="mb-3 sm:mb-4 border-b border-black/10 pb-2.5">
     <div class="flex items-center justify-between relative">
       <!-- Connecting Line (Middle-aligned through the center of 32px step badges) -->
       <div class="absolute left-6 right-6 top-[16px] -translate-y-1/2 h-0.5 bg-neutral-200 z-0">
