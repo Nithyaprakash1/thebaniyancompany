@@ -1122,7 +1122,7 @@
 <!-- Dynamic Product Detail Integration Module -->
 <script type="module">
   import tbcCart from './js/cart-store.js';
-  import { getProductById, getProducts, getRelatedProducts, formatMoney, createInvoice, getCompany, COMPANY_ID } from './js/products-service.js';
+  import { getProductById, subscribeToProduct, getProducts, getRelatedProducts, formatMoney, createInvoice, getCompany, COMPANY_ID } from './js/products-service.js';
   import { db, collection, doc, setDoc, getDoc, serverTimestamp } from './js/firebase-config.js';
 
   // Make cart accessible globally
@@ -1272,6 +1272,16 @@
       // CRITICAL: write to window so inline <script> functions can read it
       window.currentProductData = { ...product, price, imageUrls: images };
       window.currentSelectedVariant = (Array.isArray(product.variants) && product.variants.find(v => (v.stock?.main ?? 0) > 0)) || product.variants?.[0] || null;
+
+      // Subscribe to real-time live stock & availability updates from Firestore
+      subscribeToProduct(product.id, (liveProduct) => {
+        if (!liveProduct) return;
+        window.currentProductData = { ...window.currentProductData, ...liveProduct };
+        let liveStock = Number(window.currentSelectedVariant?.stock?.main ?? window.currentSelectedVariant?.stock ?? liveProduct.availableStock ?? 999);
+        if (typeof window.updateStockUI === 'function') {
+          window.updateStockUI(liveStock);
+        }
+      });
 
       // Hide shimmer, show product
       document.getElementById('product-skeleton')?.classList.add('hidden');

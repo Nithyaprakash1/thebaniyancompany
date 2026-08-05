@@ -440,9 +440,75 @@ export async function getRelatedProducts(product, max = 4) {
     return all
       .filter(p => p.id !== product.id && p.category === product.category && p.showInEcom !== false)
       .slice(0, max);
+}
+
+/**
+ * Real-time live listener for a single product's stock & availability with instant local cache sync.
+ * @param {string} id
+ * @param {Function} onUpdate
+ * @returns {Function} Unsubscribe function
+ */
+export function subscribeToProduct(id, onUpdate) {
+  if (!id) return () => {};
+
+  // Instant local cache hit
+  const cache = getLocalCache('tbc_cache_products');
+  if (cache?.data && Array.isArray(cache.data)) {
+    const cachedMatch = cache.data.find(p => p.id === id || p.productId === id);
+    if (cachedMatch) onUpdate(cachedMatch);
+  }
+
+  try {
+    const docRef = doc(db, 'products', id);
+    return onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const liveProd = normalizeProduct(docSnap.id, docSnap.data());
+        
+        // Update local cache
+        const currentCache = getLocalCache('tbc_cache_products')?.data || [];
+        const idx = currentCache.findIndex(p => p.id === id || p.productId === id);
+        if (idx > -1) currentCache[idx] = liveProd;
+        else currentCache.push(liveProd);
+        setLocalCache('tbc_cache_products', currentCache);
+
+        onUpdate(liveProd);
+      }
+    }, (err) => {
+      console.warn('[TBC] subscribeToProduct error:', err);
+    });
   } catch (err) {
-    console.error('[TBC] getRelatedProducts error:', err);
-    return [];
+    console.error('[TBC] subscribeToProduct exception:', err);
+    return () => {};
+  }
+}
+
+/**
+ * Real-time live listener for all store products' stock & availability.
+ * @param {Function} onUpdate
+ * @returns {Function} Unsubscribe function
+ */
+export function subscribeToProducts(onUpdate) {
+  const cache = getLocalCache('tbc_cache_products');
+  if (cache?.data && Array.isArray(cache.data)) {
+    onUpdate(cache.data);
+  }
+
+  try {
+    const ref = collection(db, 'products');
+    return onSnapshot(ref, (snapshot) => {
+      const normalized = snapshot.docs
+        .map(d => normalizeProduct(d.id, d.data()))
+        .filter(p => p.id && p.showInEcom !== false);
+
+      _cachedProducts = normalized;
+      setLocalCache('tbc_cache_products', normalized);
+      onUpdate(normalized);
+    }, (err) => {
+      console.warn('[TBC] subscribeToProducts warning:', err);
+    });
+  } catch (err) {
+    console.error('[TBC] subscribeToProducts error:', err);
+    return () => {};
   }
 }
 

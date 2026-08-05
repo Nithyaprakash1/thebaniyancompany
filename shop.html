@@ -743,7 +743,7 @@
 <!-- Dynamic Products Integration -->
 <script type="module">
   import tbcCart from './js/cart-store.js';
-  import { getProducts, getCategories, getCompany } from './js/products-service.js';
+  import { getProducts, subscribeToProducts, getCategories, getCompany } from './js/products-service.js';
   import { toggleWishlistItem, hasWishlistItem } from './js/wishlist-store.js';
 
   getCompany().then(comp => {
@@ -763,6 +763,23 @@
       icon.classList.toggle('text-error', active);
     }
   };
+
+  function renderStoreCatalog(products) {
+    const grid = document.getElementById('product-grid');
+    if (!grid) return;
+    window._allProductNames = products.map(p => p.name).filter(Boolean);
+
+    if (products.length > 0) {
+      const cards = products.map(p => {
+        try { return renderProductCard(p); }
+        catch(err) { console.warn('[TBC] Card render error for', p.id, err); return ''; }
+      }).join('');
+      grid.innerHTML = cards || '<div class="col-span-full py-16 text-center text-secondary">No products to display.</div>';
+      if (typeof applyAdvancedFilters === 'function') applyAdvancedFilters();
+    } else {
+      grid.innerHTML = '<div class="col-span-full py-16 text-center text-secondary">No products available.</div>';
+    }
+  }
 
   // Safe helpers — never throw even on malformed data
   function safePrice(p) {
@@ -881,14 +898,10 @@
   document.addEventListener('DOMContentLoaded', async () => {
     tbcCart.updateCartBadges();
 
-    const grid      = document.getElementById('product-grid');
     const filterBar = document.getElementById('shop-category-filters');
 
     try {
-      const [products, categories] = await Promise.all([getProducts(), getCategories()]);
-
-      // Store product names for autocomplete
-      window._allProductNames = products.map(p => p.name).filter(Boolean);
+      const categories = await getCategories();
 
       // Build category filter pills (Sorted in Ascending Order A-Z)
       if (filterBar && categories.length > 0) {
@@ -902,22 +915,13 @@
           pills;
       }
 
-      // Render products
-      if (grid) {
-        if (products.length > 0) {
-          const cards = products.map(p => {
-            try { return renderProductCard(p); }
-            catch(err) { console.warn('[TBC] Card render error for', p.id, err); return ''; }
-          }).join('');
-          grid.innerHTML = cards || '<div class="col-span-full py-16 text-center text-secondary">No products to display.</div>';
-          if (typeof applyAdvancedFilters === 'function') applyAdvancedFilters();
-        } else {
-          grid.innerHTML = '<div class="col-span-full py-16 text-center text-secondary">No products available.</div>';
-        }
-      }
-
+      // Real-time live subscription for products, stock quantity & out-of-stock badges
+      subscribeToProducts((liveProducts) => {
+        renderStoreCatalog(liveProducts);
+      });
     } catch (e) {
       console.error('[TBC] Shop load error:', e);
+      const grid = document.getElementById('product-grid');
       if (grid) grid.innerHTML = `<div class="col-span-full py-16 text-center text-red-500">Error: ${e.message}</div>`;
     } finally {
       const loader = document.getElementById('loading-screen');
