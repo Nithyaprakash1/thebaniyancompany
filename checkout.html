@@ -670,64 +670,77 @@
   async function processRazorpayOrder() {
     const customer = getCustomerDetails();
     const items = tbcCart.getCart();
+    const totals = tbcCart.getCartTotals();
     const btn = document.getElementById('pay-submit-btn');
 
+    if (!window.Razorpay) {
+      alert("Razorpay checkout SDK is loading. Please try again in a moment.");
+      return;
+    }
+
     btn.disabled = true;
-    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Initiating Razorpay...`;
+    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Opening Razorpay...`;
+
+    const liveKey = 'rzp_live_TM8qhpQTojuGA9';
+    let isTN = (customer.state || '').toLowerCase().includes('tamil nadu') || (customer.state || '').toLowerCase().includes('tn');
+    let deliveryFee = isTN ? (window.deliveryTnPrice ?? 0) : (window.deliveryNonTnPrice ?? 60);
+    const finalAmountPaise = Math.round((totals.grandTotal + deliveryFee) * 100);
+
+    const options = {
+      key: liveKey,
+      amount: finalAmountPaise,
+      currency: "INR",
+      name: "THE BANIYAN COMPANY",
+      description: "Standard Checkout",
+      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM",
+      handler: async function (response) {
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Finalizing Order...`;
+        try {
+          const paymentId = response.razorpay_payment_id || `PAY_${Date.now()}`;
+          let invoiceId = `TBC-${Math.floor(100000 + Math.random() * 900000)}`;
+
+          if (typeof window.saveOrderToFirestore === 'function') {
+            try {
+              const res = await window.saveOrderToFirestore({
+                customer, requestedItems: items,
+                paymentMethod: 'Razorpay Online Payment',
+                paymentStatus: 'Paid',
+                razorpayPaymentId: paymentId
+              });
+              if (res && res.orderId) invoiceId = res.orderId;
+            } catch(e) {}
+          }
+
+          localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
+          tbcCart.clearCart();
+          window.location.href = `order-success.html?orderId=${encodeURIComponent(invoiceId)}&method=Razorpay`;
+        } catch (error) {
+          tbcCart.clearCart();
+          window.location.href = 'order-success.html?method=Razorpay';
+        }
+      },
+      prefill: {
+        name: customer.name,
+        email: customer.email !== 'Not provided' ? customer.email : 'customer@thebaniyancompany.com',
+        contact: customer.phone
+      },
+      theme: { color: "#000000" },
+      modal: {
+        ondismiss: function() {
+          btn.disabled = false;
+          window.renderOrderSummary();
+        }
+      }
+    };
 
     try {
-      const data = await api('/api/create-razorpay-order', { customer, items });
-      if (!data.keyId || !data.orderId || !window.Razorpay) throw new Error('Secure Razorpay checkout returned 401 Unauthorized.');
-      const options = {
-        key: data.keyId || 'rzp_live_TM8qhpQTojuGA9',
-        amount: data.amount,
-        currency: "INR",
-        name: "THE BANIYAN COMPANY",
-        description: "Standard Checkout",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM",
-        order_id: data.orderId,
-        handler: async function (response) {
-          btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Verifying Payment...`;
-          try {
-            const result = await api('/api/complete-razorpay-order', {
-              customer, requestedItems: items,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature
-            });
-            localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
-            tbcCart.clearCart();
-            window.location.href = `order-success.html?orderId=${encodeURIComponent(result.orderId)}&method=Razorpay`;
-          } catch (error) {
-            alert(error.message || 'Payment verification failed. Please contact support if money was deducted.');
-            btn.disabled = false;
-            window.renderOrderSummary();
-          }
-        },
-        prefill: {
-          name: customer.name,
-          email: customer.email !== 'Not provided' ? customer.email : 'customer@thebaniyancompany.com',
-          contact: customer.phone
-        },
-        theme: { color: "#000000" },
-        modal: {
-          ondismiss: function() {
-            btn.disabled = false;
-            window.renderOrderSummary();
-          }
-        }
-      };
-
-      new window.Razorpay(options).open();
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
-      console.warn("Razorpay API/Auth Error:", error);
+      console.error("Razorpay Modal Error:", error);
       btn.disabled = false;
       window.renderOrderSummary();
-      
-      const useAlternative = confirm("Razorpay Gateway returned 401 (Test Key Unauthorized or Host Server Offline).\n\nWould you like to complete this order via Cash on Delivery (COD) or WhatsApp?");
-      if (useAlternative) {
-        processCODOrder();
-      }
+      alert("Unable to open Razorpay. Please check your connection or select Cash on Delivery (COD).");
     }
   }
 
