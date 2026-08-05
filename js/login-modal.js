@@ -14,8 +14,7 @@
       }
     } catch(e){}
 
-    if (profile && profile.name && profile.phone && profile.phone.replace(/\D/g, '').length >= 10) {
-      if (typeof onSuccess === 'function') onSuccess(profile);
+    if (profile && profile.name && profile.phone && String(profile.phone).replace(/\D/g, '').length >= 10) {
       return true;
     }
 
