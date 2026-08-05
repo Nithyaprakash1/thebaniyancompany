@@ -325,7 +325,7 @@ if (typeof window !== 'undefined') {
 export async function getCategories(companyId = COMPANY_ID) {
   const cache = getLocalCache('tbc_cache_categories');
   if (cache?.data && cache.data.length > 0) {
-    _cachedCategories = cache.data;
+    _cachedCategories = [...cache.data].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     return _cachedCategories;
   }
 
@@ -338,7 +338,8 @@ async function revalidateCategories(companyId = COMPANY_ID) {
     const snapshot = await getDocs(ref);
     const normalized = snapshot.docs
       .map(d => normalizeCategory(d.id, d.data()))
-      .filter(c => c.id && (!companyId || c.companyId === companyId || true));
+      .filter(c => c.id && (!companyId || c.companyId === companyId || true))
+      .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
     if (normalized.length > 0) {
       _cachedCategories = normalized;

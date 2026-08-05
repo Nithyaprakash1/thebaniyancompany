@@ -890,9 +890,10 @@
       // Store product names for autocomplete
       window._allProductNames = products.map(p => p.name).filter(Boolean);
 
-      // Build category filter pills
+      // Build category filter pills (Sorted in Ascending Order A-Z)
       if (filterBar && categories.length > 0) {
-        const pills = categories.map(c =>
+        const sortedCats = [...categories].sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+        const pills = sortedCats.map(c =>
           `<button onclick="filterCategory('${String(c.name).toLowerCase().replace(/'/g, "\\'").replace(/"/g, '&quot;')}', this)"
                    class="filter-btn px-5 py-2 rounded-full text-xs font-semibold transition-all">${c.name}</button>`
         ).join('');
