@@ -221,8 +221,16 @@
               <div class="banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-3">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Slide 1</span>
                 <div>
-                  <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video URL</label>
-                  <input type="url" class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="https://...">
+                  <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video (URL or Gallery Upload — 1MB Limit)</label>
+                  <div class="space-y-1.5">
+                    <input type="text" class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="https://... or upload below">
+                    <div class="flex items-center gap-2">
+                      <input type="file" accept="image/*" onchange="window.handleGalleryUpload(this, '.ctrl-banner-url')" class="hidden" id="banner-file-picker-1">
+                      <label for="banner-file-picker-1" class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all shadow-sm">
+                        <span class="material-symbols-outlined text-[13px]">photo_library</span> Upload from Gallery (1MB Max)
+                      </label>
+                    </div>
+                  </div>
                 </div>
                 <div>
                   <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Headline</label>
@@ -256,8 +264,16 @@
               <input type="text" id="ctrl-store-name" placeholder="THE BANIYAN COMPANY" class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none font-semibold">
             </div>
             <div>
-              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Company Logo Image URL</label>
-              <input type="url" id="ctrl-store-logo" placeholder="https://..." class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none">
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Company Logo Image (URL or Gallery Upload — 1MB Limit)</label>
+              <div class="space-y-2">
+                <input type="url" id="ctrl-store-logo" placeholder="https://... or upload below" class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none">
+                <div class="flex items-center gap-2">
+                  <input type="file" id="logo-file-picker" accept="image/*" onchange="window.handleGalleryUpload(this, '#ctrl-store-logo')" class="hidden">
+                  <label for="logo-file-picker" class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm">
+                    <span class="material-symbols-outlined text-[15px]">photo_library</span> Upload Logo from Gallery (1MB Max)
+                  </label>
+                </div>
+              </div>
             </div>
             <div>
               <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">WhatsApp Support Number</label>
@@ -371,6 +387,33 @@
 
   const COMPANY_ID = 'thebaniyancompany';
 
+  // Upload thumbnail from device gallery with strict 1MB size limit check
+  window.handleGalleryUpload = function(fileInput, targetSelector) {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+
+    const MAX_MB = 1;
+    const MAX_BYTES = MAX_MB * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      alert(`⚠️ File size is ${(file.size / (1024 * 1024)).toFixed(2)} MB, which exceeds the ${MAX_MB}MB limit.\nPlease select an image under 1MB.`);
+      fileInput.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      const container = fileInput.closest('.banner-slide-box') || fileInput.closest('div.space-y-2') || fileInput.closest('form');
+      const target = container ? container.querySelector(targetSelector || 'input[type="url"], input[type="text"]') : document.querySelector(targetSelector);
+      if (target) {
+        target.value = dataUrl;
+        target.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      alert(`✓ Image successfully uploaded from gallery! (Size: ${(file.size / 1024).toFixed(1)} KB — within 1MB limit)`);
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Toggle label helper
   window.updateToggleLabel = function(checkboxEl, pillId) {
     const pill = document.getElementById(pillId);
@@ -448,8 +491,16 @@
         <button type="button" onclick="this.closest('.banner-slide-box').remove()" class="text-rose-500 text-xs font-bold uppercase">Remove</button>
       </div>
       <div>
-        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video URL</label>
-        <input type="url" class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="https://...">
+        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video (URL or Gallery Upload — 1MB Limit)</label>
+        <div class="space-y-1.5">
+          <input type="text" class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="https://... or upload below">
+          <div class="flex items-center gap-2">
+            <input type="file" accept="image/*" onchange="window.handleGalleryUpload(this, '.ctrl-banner-url')" class="hidden" id="banner-file-picker-${idx}">
+            <label for="banner-file-picker-${idx}" class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all shadow-sm">
+              <span class="material-symbols-outlined text-[13px]">photo_library</span> Upload from Gallery (1MB Max)
+            </label>
+          </div>
+        </div>
       </div>
       <div>
         <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Headline</label>
