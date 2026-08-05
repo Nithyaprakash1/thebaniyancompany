@@ -678,7 +678,7 @@
       const data = await api('/api/create-razorpay-order', { customer, items });
       if (!data.keyId || !data.orderId || !window.Razorpay) throw new Error('Secure Razorpay checkout returned 401 Unauthorized.');
       const options = {
-        key: data.keyId,
+        key: data.keyId || 'rzp_live_TLKPum9INJJYbt',
         amount: data.amount,
         currency: "INR",
         name: "THE BANIYAN COMPANY",
