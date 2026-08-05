@@ -547,6 +547,28 @@
     }
   }
 
+  function loadAndInitProfile(user = null) {
+    const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+    const phone = localStorage.getItem('tbc_customer_phone') || stored.phone || user?.phoneNumber || '';
+    const cleanPhone = String(phone).replace(/\D/g, '').slice(-10);
+    const name = stored.name || user?.displayName || (user?.email ? user.email.split('@')[0] : '') || (cleanPhone ? `Customer (${cleanPhone})` : 'Valued Customer');
+    const email = stored.email || user?.email || (cleanPhone ? `+91 ${cleanPhone}` : 'customer@thebaniyancompany.com');
+
+    const nameEl = document.getElementById('profile-name');
+    const emailEl = document.getElementById('profile-email');
+    const avatarEl = document.getElementById('profile-avatar');
+
+    if (nameEl) nameEl.textContent = name;
+    if (emailEl) emailEl.textContent = cleanPhone ? `📱 +91 ${cleanPhone} · ${email}` : email;
+    if (avatarEl) avatarEl.textContent = (name || 'U').charAt(0).toUpperCase();
+
+    if (cleanPhone) {
+      subscribeToCustomerOrders(cleanPhone, (liveOrders) => {
+        renderCustomerOrders(liveOrders);
+      });
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', async () => {
     // Load Wishlist count
     try {
@@ -558,27 +580,11 @@
       if (wishNavEl) wishNavEl.textContent = wishList.length > 0 ? `${wishList.length} saved items` : 'Saved items';
     } catch (e) {}
 
-    onAuthStateChanged(auth, async (user) => {
-      const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
-      const name = user?.displayName || stored.name || (user?.email ? user.email.split('@')[0] : '');
-      const email = user?.email || stored.email || 'customer@thebaniyancompany.com';
-      const phone = stored.phone || localStorage.getItem('tbc_customer_phone') || '';
+    // Instant load from localStorage
+    loadAndInitProfile();
 
-      const nameEl = document.getElementById('profile-name');
-      const emailEl = document.getElementById('profile-email');
-      const avatarEl = document.getElementById('profile-avatar');
-
-      if (nameEl && name) nameEl.textContent = name;
-      if (emailEl && email) emailEl.textContent = email;
-      if (avatarEl) avatarEl.textContent = (name || email || 'U').charAt(0).toUpperCase();
-
-      // Instant cache load & real-time live customer orders listener from Firestore
-      const searchPhone = phone || (user?.phoneNumber || '');
-      if (searchPhone) {
-        subscribeToCustomerOrders(searchPhone, (liveOrders) => {
-          renderCustomerOrders(liveOrders);
-        });
-      }
+    onAuthStateChanged(auth, (user) => {
+      if (user) loadAndInitProfile(user);
     });
   });
 
