@@ -1021,23 +1021,31 @@
     }, 2500);
   };
 
-  // Direct Navigation to checkout.html on Buy Now
   window.buyNowDirect = function() {
     const product = window.currentProductData;
     
-    // Auto-select first variant if none selected yet
+    // Auto-select first color & size buttons if available
+    const firstColor = document.querySelector('.color-btn');
+    if (firstColor && !window.currentSelectedColor) {
+      window.currentSelectedColor = firstColor.getAttribute('data-color') || firstColor.textContent.trim();
+      window._colorSelected = true;
+    }
+    const firstSize = document.querySelector('.size-btn');
+    if (firstSize && !window.currentSelectedSize) {
+      window.currentSelectedSize = firstSize.getAttribute('data-size') || firstSize.textContent.trim();
+      window._sizeSelected = true;
+    }
+
     if (!window.currentSelectedVariant && product?.variants?.length) {
       const inStockVariant = product.variants.find(v => (v.stock?.main ?? v.stock ?? 0) > 0) || product.variants[0];
       if (inStockVariant) {
         window.currentSelectedVariant = inStockVariant;
-        window.currentSelectedColor = inStockVariant.color || 'Default';
-        window.currentSelectedSize = inStockVariant.size || 'Standard';
+        if (!window.currentSelectedColor) window.currentSelectedColor = inStockVariant.color || 'Default';
+        if (!window.currentSelectedSize) window.currentSelectedSize = inStockVariant.size || 'Standard';
         window._colorSelected = true;
         window._sizeSelected = true;
       }
     }
-
-    if (!window.validateVariantSelections()) return;
 
     let stock = 999;
     if (window.currentSelectedVariant) {
@@ -1049,7 +1057,8 @@
     }
 
     if (!isNaN(stock) && stock <= 0) {
-      showToast('⚠️ This product is out of stock!');
+      if (typeof showToast === 'function') showToast('⚠️ This product is out of stock!');
+      else alert('This product is out of stock!');
       return;
     }
 
@@ -1523,22 +1532,6 @@
       });
     }
   };
-
-  // ── Show pre-fill banner if profile exists when modal opens ───────────────
-  const _origOpenCheckout = window.openCheckoutModal;
-  window.openCheckoutModal = function() {
-    _origOpenCheckout && _origOpenCheckout();
-    const saved = loadSavedProfile();
-    const banner = document.getElementById('prefill-banner');
-    if (saved && saved.name && banner) {
-      document.getElementById('prefill-name-text').textContent = `Welcome back, ${saved.name.split(' ')[0]}! 👋`;
-      // Inject banner into step-1 at top
-      const step1 = document.getElementById('m-step-1');
-      if (step1 && !step1.contains(banner)) step1.insertBefore(banner, step1.firstChild);
-      banner.classList.remove('hidden');
-    }
-  };
-  window.buyNowDirect = window.openCheckoutModal;
 </script>
 
 <!-- Nav Interceptor removed – using clean URLs via vercel.json -->
