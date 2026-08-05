@@ -657,6 +657,14 @@ export async function decrementStockForOrder(items = [], branchId = BRANCH_ID) {
 export async function getCustomerOrders(phoneNumber) {
   if (!phoneNumber) return [];
   const cleanPhone = String(phoneNumber).replace(/\D/g, '');
+  if (!cleanPhone) return [];
+
+  // Check instant cache
+  const cacheKey = `tbc_cache_user_orders_${cleanPhone}`;
+  const cache = getLocalCache(cacheKey);
+  if (cache?.data && Array.isArray(cache.data)) {
+    return cache.data;
+  }
 
   try {
     const q        = query(
@@ -673,11 +681,62 @@ export async function getCustomerOrders(phoneNumber) {
       orders      = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
-    return orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    const sorted = orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    setLocalCache(cacheKey, sorted);
+    return sorted;
 
   } catch (err) {
     console.error('[TBC] getCustomerOrders error:', err);
-    return [];
+    return cache?.data || [];
+  }
+}
+
+/**
+ * Real-time live listener for customer order updates with zero-latency caching.
+ * @param {string} phoneNumber
+ * @param {Function} onUpdate
+ * @returns {Function} Unsubscribe function
+ */
+export function subscribeToCustomerOrders(phoneNumber, onUpdate) {
+  if (!phoneNumber) {
+    onUpdate([]);
+    return () => {};
+  }
+  const cleanPhone = String(phoneNumber).replace(/\D/g, '');
+  if (!cleanPhone) {
+    onUpdate([]);
+    return () => {};
+  }
+
+  const cacheKey = `tbc_cache_user_orders_${cleanPhone}`;
+  const cache = getLocalCache(cacheKey);
+  if (cache?.data && Array.isArray(cache.data)) {
+    onUpdate(cache.data);
+  }
+
+  try {
+    const q = query(collection(db, 'invoices'), where('customerPhoneNumber', '==', cleanPhone));
+    return onSnapshot(q, (snapshot) => {
+      let orders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (orders.length === 0) {
+        // Retry fallback query
+        getDocs(query(collection(db, 'invoices'), where('customerPhone', '==', cleanPhone))).then(snap2 => {
+          orders = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+          orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+          setLocalCache(cacheKey, orders);
+          onUpdate(orders);
+        }).catch(() => {});
+      } else {
+        orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        setLocalCache(cacheKey, orders);
+        onUpdate(orders);
+      }
+    }, (err) => {
+      console.warn('[TBC] subscribeToCustomerOrders listener warning:', err);
+    });
+  } catch (err) {
+    console.error('[TBC] subscribeToCustomerOrders error:', err);
+    return () => {};
   }
 }
 
