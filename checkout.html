@@ -730,9 +730,11 @@
     btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Opening Razorpay...`;
 
     const liveKey = 'rzp_live_TM8qhpQTojuGA9';
-    let isTN = (customer.state || '').toLowerCase().includes('tamil nadu') || (customer.state || '').toLowerCase().includes('tn');
-    let deliveryFee = isTN ? (window.deliveryTnPrice ?? 0) : (window.deliveryNonTnPrice ?? 60);
-    const finalAmountPaise = Math.round((totals.grandTotal + deliveryFee) * 100);
+    const stateStr = (customer.state || document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
+    const isTN = stateStr.toLowerCase().includes('tamil nadu') || stateStr.toLowerCase().includes('tn');
+    const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+    const finalTotal = totals.grandTotal + deliveryFee;
+    const finalAmountPaise = Math.round(finalTotal * 100);
 
     const options = {
       key: liveKey,

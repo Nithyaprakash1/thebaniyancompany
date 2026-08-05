@@ -603,12 +603,22 @@ export async function createInvoice(orderData) {
   try {
     const docRef   = await addDoc(collection(db, 'invoices'), payload);
     console.info(`[TBC] Invoice created: ${docRef.id}`);
-    return { success: true, invoiceId: docRef.id };
+
+    // Automatically decrement product & variant stock atomically in Firestore
+    try {
+      if (Array.isArray(payload.items) && payload.items.length > 0) {
+        await decrementStockForOrder(payload.items);
+      }
+    } catch (stockErr) {
+      console.warn('[TBC] Stock decrement notice:', stockErr);
+    }
+
+    return { success: true, invoiceId: docRef.id, orderId: docRef.id };
   } catch (err) {
     console.error('[TBC] createInvoice error:', err);
     // Return a local fallback ID so UI can still show an order confirmation
     const fallbackId = `TBC-${Date.now()}`;
-    return { success: false, invoiceId: fallbackId, error: err.message };
+    return { success: false, invoiceId: fallbackId, orderId: fallbackId, error: err.message };
   }
 }
 
