@@ -348,6 +348,32 @@
     }
   }
 
+  function autoPrefillCustomerProfile() {
+    try {
+      const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+      const phone = localStorage.getItem('tbc_customer_phone') || stored.phone || '';
+
+      const nameEl = document.getElementById('cust-name');
+      const phoneEl = document.getElementById('cust-phone');
+      const addrEl = document.getElementById('cust-address');
+      const landmarkEl = document.getElementById('cust-landmark');
+      const stateEl = document.getElementById('cust-state');
+      const cityEl = document.getElementById('cust-city');
+      const pinEl = document.getElementById('cust-pincode');
+
+      if (nameEl && stored.name) nameEl.value = stored.name;
+      if (phoneEl && phone) phoneEl.value = phone.replace(/\D/g, '').slice(-10);
+      if (addrEl && stored.address) addrEl.value = stored.address;
+      if (landmarkEl && stored.landmark) landmarkEl.value = stored.landmark;
+      if (stateEl && stored.state) {
+        stateEl.value = stored.state;
+        if (typeof window.handleStateChange === 'function') window.handleStateChange(stored.state);
+      }
+      if (cityEl && stored.city) cityEl.value = stored.city;
+      if (pinEl && stored.pincode) pinEl.value = stored.pincode;
+    } catch(e) {}
+  }
+
   window.goToStep1 = function() {
     ['step-1-panel','step-2-panel','step-3-panel','step-4-panel'].forEach((id, i) => {
       const el = document.getElementById(id);
@@ -371,10 +397,17 @@
       alert("Please enter your Full Name.");
       return;
     }
-    if (!phone || phone.length !== 10) {
+    if (!phone || phone.replace(/\D/g, '').length !== 10) {
       alert("Phone number must be exactly 10 digits.");
       return;
     }
+
+    try {
+      const current = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+      localStorage.setItem('tbc_user_profile', JSON.stringify({ ...current, name, phone: phone.replace(/\D/g, '').slice(-10) }));
+      localStorage.setItem('tbc_customer_phone', phone.replace(/\D/g, '').slice(-10));
+    } catch(e) {}
+
     ['step-1-panel','step-2-panel','step-3-panel','step-4-panel'].forEach((id, i) => {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('hidden', i !== 1);
@@ -395,6 +428,7 @@
     const city = document.getElementById('cust-city').value.trim();
     const state = document.getElementById('cust-state').value.trim();
     const pin = document.getElementById('cust-pincode').value.trim();
+    const landmark = document.getElementById('cust-landmark')?.value.trim() || '';
 
     if (!addr || !city || !state) {
       alert("Please fill in all mandatory delivery address fields.");
@@ -404,6 +438,19 @@
       alert("Pincode must be exactly 6 digits.");
       return;
     }
+
+    try {
+      const current = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+      localStorage.setItem('tbc_user_profile', JSON.stringify({
+        ...current,
+        address: addr,
+        landmark,
+        city,
+        state,
+        pincode: pin
+      }));
+    } catch(e) {}
+
     ['step-1-panel','step-2-panel','step-3-panel','step-4-panel'].forEach((id, i) => {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('hidden', i !== 2);
@@ -437,8 +484,9 @@
     updateActionBar(4);
   };
 
-  // Initialize Action Bar for Step 1
+  // Initialize Action Bar & auto-prefill customer profile from LocalStorage
   updateActionBar(1);
+  autoPrefillCustomerProfile();
 
   let deliveryTnPrice = 0;
   let deliveryNonTnPrice = 60;

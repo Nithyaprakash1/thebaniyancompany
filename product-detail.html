@@ -30,6 +30,7 @@
       }
     }
   </script>
+  <script src="./js/login-modal.js"></script>
   <style>
     @layer base {
       html, body {
@@ -943,30 +944,13 @@
     }, 2500);
   }
 
-  window.checkCustomerLogin = function() {
-    const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
-    const phone = localStorage.getItem('tbc_customer_phone') || stored.phone;
-    if (!stored.name || !phone || phone.replace(/\D/g, '').length < 10) {
-      const name = prompt("Login Required 📱\n\nPlease enter your Full Name before adding to bag or buying:");
-      if (!name || !name.trim()) {
-        alert("Full Name is mandatory to login & proceed.");
-        return false;
-      }
-      const num = prompt("Login Required 📱\n\nPlease enter your 10-Digit Mobile Number:");
-      const cleanNum = (num || '').replace(/\D/g, '').slice(-10);
-      if (!cleanNum || cleanNum.length < 10) {
-        alert("A valid 10-digit mobile number is mandatory to login.");
-        return false;
-      }
-      localStorage.setItem('tbc_user_profile', JSON.stringify({ name: name.trim(), phone: cleanNum }));
-      localStorage.setItem('tbc_customer_phone', cleanNum);
-    }
-    return true;
+  window.checkCustomerLogin = function(cb) {
+    return window.checkCustomerAuth(cb);
   };
 
   // Add to Bag with green highlight animation & multi-add support
   window.addToCart = function() {
-    if (!window.checkCustomerLogin()) return;
+    if (!window.checkCustomerAuth(() => window.addToCart())) return;
     if (!window.validateVariantSelections()) return;
     const product = window.currentProductData;
     if (!product) { showToast('Loading...'); return; }
@@ -1044,7 +1028,7 @@
   };
 
   window.buyNowDirect = function() {
-    if (!window.checkCustomerLogin()) return;
+    if (!window.checkCustomerAuth(() => window.buyNowDirect())) return;
     const product = window.currentProductData;
     
     // Auto-select first color & size buttons if available
