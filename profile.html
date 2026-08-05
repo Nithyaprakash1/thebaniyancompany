@@ -513,8 +513,8 @@
         const img = firstItem.image || firstItem.imageUrl || 'https://placehold.co/200x250/f0f0f0/999?text=Order';
         const itemCount = (o.items || []).reduce((acc, i) => acc + (i.qty || i.quantity || 1), 0);
         const dateStr = o.createdAt?.seconds 
-          ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-          : 'Recently';
+          ? new Date(o.createdAt.seconds * 1000).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+          : (o.orderDateStr || 'Recently');
         
         const isDelivered = o.status === 'Delivered';
         const badgeClass = isDelivered 
@@ -529,7 +529,7 @@
                 <div class="min-w-0">
                   <span class="text-[10px] font-extrabold uppercase tracking-wider text-secondary">#${o.id}</span>
                   <h4 class="font-bold text-xs text-primary truncate mt-0.5">${firstItem.name || 'Merchandise Package'}</h4>
-                  <p class="text-[11px] text-secondary mt-0.5">${dateStr} · ${itemCount} Item${itemCount > 1 ? 's' : ''}</p>
+                  <p class="text-[11px] font-medium text-slate-500 mt-0.5">📅 ${dateStr} · ${itemCount} Item${itemCount > 1 ? 's' : ''}</p>
                 </div>
               </div>
               <span class="${badgeClass} px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider border select-none flex-shrink-0">

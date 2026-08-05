@@ -72,6 +72,10 @@
     <!-- Info Grid -->
     <div class="grid grid-cols-2 gap-4 text-left bg-surface-container/50 p-4 rounded-2xl text-xs border border-black/5">
       <div>
+        <span class="text-secondary font-medium uppercase block text-[10px]">Order Date &amp; Time</span>
+        <span class="font-bold text-primary" id="display-order-datetime">Loading...</span>
+      </div>
+      <div>
         <span class="text-secondary font-medium uppercase block text-[10px]">Payment Method</span>
         <span class="font-bold text-primary" id="display-method">Online Payment (UPI / Card)</span>
       </div>
@@ -82,10 +86,6 @@
       <div>
         <span class="text-secondary font-medium uppercase block text-[10px]">Estimated Delivery</span>
         <span class="font-bold text-primary">2–4 Business Days</span>
-      </div>
-      <div>
-        <span class="text-secondary font-medium uppercase block text-[10px]">Support</span>
-        <span class="font-bold text-primary">+91 8110061611</span>
       </div>
     </div>
 
@@ -188,6 +188,14 @@
     const methodEl = document.getElementById('display-method');
     const statusEl = document.getElementById('display-status');
     const badgeEl = document.getElementById('payment-badge');
+
+    const dateEl = document.getElementById('display-order-datetime');
+    if (dateEl) {
+      dateEl.textContent = new Date().toLocaleString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      });
+    }
 
     if (idEl) idEl.textContent = orderId.startsWith('#') ? orderId : `#${orderId}`;
 
