@@ -342,7 +342,7 @@
           Back
         </button>
         <button type="button" id="pay-submit-btn" onclick="submitFinalOrder()" class="w-2/3 bg-black hover:bg-neutral-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2">
-          Pay Now &amp; Complete Order 🔒 <span class="material-symbols-outlined text-[18px]">lock</span>
+          Pay Now 🔒 <span class="material-symbols-outlined text-[18px]">lock</span>
         </button>
       `;
     }
@@ -587,30 +587,31 @@
 
     const payBtn = document.getElementById('pay-submit-btn');
     if (payBtn) {
-      payBtn.innerHTML = `Complete Order: ₹${grandTotal.toLocaleString('en-IN')} <span class="material-symbols-outlined text-[18px]">lock</span>`;
+      payBtn.innerHTML = `Pay Now: ₹${grandTotal.toLocaleString('en-IN')} <span class="material-symbols-outlined text-[18px]">lock</span>`;
     }
   };
 
   window.getCustomerDetails = function() {
-    let state = document.getElementById('cust-state').value.trim();
-    let city = document.getElementById('cust-city').value.trim();
-    if (state === 'Other State') {
-      const custom = document.getElementById('cust-other-state')?.value.trim();
-      if (custom) state = custom;
+    let state = document.getElementById('cust-state')?.value.trim() || 'Tamil Nadu';
+    if (state.toLowerCase().includes('tamil nadu') || state.toLowerCase().includes('tn')) {
+      state = 'Tamil Nadu';
     }
+    
+    let city = document.getElementById('cust-city')?.value.trim() || 'Coimbatore';
     if (city === 'Other City') {
       const custom = document.getElementById('cust-other-city')?.value.trim();
       if (custom) city = custom;
     }
+
     return {
-      name: document.getElementById('cust-name').value.trim(),
-      phone: document.getElementById('cust-phone').value.trim(),
-      email: (document.getElementById('cust-email')?.value || '').trim() || 'Not provided',
-      address: document.getElementById('cust-address').value.trim(),
-      landmark: (document.getElementById('cust-landmark')?.value || '').trim() || 'None',
+      name: document.getElementById('cust-name')?.value.trim() || '',
+      phone: document.getElementById('cust-phone')?.value.trim() || '',
+      email: (document.getElementById('cust-email')?.value || '').trim() || 'customer@thebaniyancompany.com',
+      address: document.getElementById('cust-address')?.value.trim() || '',
+      landmark: document.getElementById('cust-landmark')?.value.trim() || '',
       city: city,
       state: state,
-      pincode: document.getElementById('cust-pincode').value.trim()
+      pincode: document.getElementById('cust-pincode')?.value.trim() || ''
     };
   };
 
@@ -678,7 +679,7 @@
       const data = await api('/api/create-razorpay-order', { customer, items });
       if (!data.keyId || !data.orderId || !window.Razorpay) throw new Error('Secure Razorpay checkout returned 401 Unauthorized.');
       const options = {
-        key: data.keyId || 'rzp_live_TLKPum9INJJYbt',
+        key: data.keyId || 'rzp_live_TM8qhpQTojuGA9',
         amount: data.amount,
         currency: "INR",
         name: "THE BANIYAN COMPANY",
