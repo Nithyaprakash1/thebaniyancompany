@@ -440,6 +440,10 @@ export async function getRelatedProducts(product, max = 4) {
     return all
       .filter(p => p.id !== product.id && p.category === product.category && p.showInEcom !== false)
       .slice(0, max);
+  } catch (err) {
+    console.error('[TBC] getRelatedProducts error:', err);
+    return [];
+  }
 }
 
 /**
