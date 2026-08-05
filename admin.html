@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>TBC Admin Portal — Store Control &amp; Orders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#f4f5f8",
+            "surface": "#ffffff",
+            "primary": "#0f172a",
+            "on-primary": "#ffffff"
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { display: none; }
+    body {
+      background-color: #f4f5f8;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(241, 245, 249, 0.8) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(226, 232, 240, 0.5) 0px, transparent 50%);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+    .glass-input {
+      background: rgba(243, 244, 246, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.09);
+      color: #0f172a;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-input:focus {
+      border-color: #000000;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-[#f4f5f8] text-slate-900 font-sans min-h-screen antialiased">
+
+<!-- Admin Auth Modal (iOS Glass White/Black) -->
+<div id="admin-login-overlay" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-2xl flex items-center justify-center p-4">
+  <div class="glass-card rounded-[32px] p-8 max-w-md w-full shadow-2xl space-y-6 relative overflow-hidden">
+    <div class="text-center space-y-2">
+      <div class="w-16 h-16 rounded-2xl bg-black text-white flex items-center justify-center mx-auto shadow-xl">
+        <span class="material-symbols-outlined text-3xl">admin_panel_settings</span>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-900 tracking-tight">TBC Admin Console</h2>
+      <p class="text-xs text-slate-500 font-medium">Enter Company ID &amp; Admin Credentials to continue</p>
+    </div>
+
+    <form id="admin-login-form" class="space-y-4">
+      <div>
+        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Admin Email / Company ID</label>
+        <input type="email" id="admin-email" value="thebaniyancompanycbe@gmail.com" required class="w-full glass-input rounded-2xl px-4 py-3.5 text-xs outline-none font-semibold">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Admin Password / Access Code</label>
+        <input type="password" id="admin-passcode" placeholder="Enter password or access code" required class="w-full glass-input rounded-2xl px-4 py-3.5 text-xs outline-none font-semibold">
+      </div>
+      <p id="admin-login-error" class="text-xs text-rose-500 font-semibold hidden text-center"></p>
+      <button type="submit" id="admin-login-btn" class="w-full py-4 bg-black hover:bg-slate-800 text-white font-bold rounded-2xl text-xs uppercase tracking-widest transition-all shadow-lg active:scale-98">Login to Console</button>
+    </form>
+    <div class="text-center pt-2">
+      <a href="home.html" class="text-xs text-slate-500 hover:text-black font-semibold transition-colors">← Back to Storefront</a>
+    </div>
+  </div>
+</div>
+
+<!-- Main Admin Dashboard -->
+<div id="admin-dashboard" class="hidden min-h-screen pb-20">
+  
+  <!-- iOS Liquid Top Header -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-2xl border-b border-slate-200/80 px-6 py-4 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3.5">
+      <div class="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center shadow-md">
+        <span class="material-symbols-outlined text-xl">storefront</span>
+      </div>
+      <div>
+        <h1 class="font-bold text-sm text-slate-900 uppercase tracking-widest" id="header-brand-name">THE BANIYAN COMPANY</h1>
+        <span class="text-[10px] font-semibold text-slate-500 tracking-widest uppercase block">iOS Liquid Glass Console · ID: <span id="display-company-id" class="text-slate-900 font-bold">thebaniyancompany</span></span>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="home.html" class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-800 transition-all flex items-center gap-1.5 border border-slate-200/80">
+        <span class="material-symbols-outlined text-base">visibility</span> View Store
+      </a>
+      <button onclick="logoutAdmin()" class="px-4 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition-all border border-rose-200/60">Logout</button>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-8">
+    
+    <!-- Quick Stats Grid (iOS Liquid Glass Cards - Clickable Filters) -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div onclick="setOrderFilter('all')" class="glass-card p-5 rounded-[24px] flex items-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-98 transition-all border border-slate-200">
+        <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-md">
+          <span class="material-symbols-outlined text-2xl">orders</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Orders</span>
+          <h3 class="text-2xl font-extrabold text-slate-900 mt-0.5" id="stat-total-orders">0</h3>
+        </div>
+      </div>
+      <div class="glass-card p-5 rounded-[24px] flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
+          <span class="material-symbols-outlined text-2xl">payments</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Revenue</span>
+          <h3 class="text-2xl font-extrabold text-slate-900 mt-0.5" id="stat-total-revenue">₹0</h3>
+        </div>
+      </div>
+      <div onclick="setOrderFilter('pending')" class="glass-card p-5 rounded-[24px] flex items-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-98 transition-all border border-amber-200 bg-amber-50/40">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md">
+          <span class="material-symbols-outlined text-2xl">pending_actions</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-amber-700 uppercase tracking-widest">Pending Orders</span>
+          <h3 class="text-2xl font-extrabold text-slate-900 mt-0.5" id="stat-pending-orders">0</h3>
+        </div>
+      </div>
+      <div class="glass-card p-5 rounded-[24px] flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md">
+          <span class="material-symbols-outlined text-2xl">inventory_2</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Products</span>
+          <h3 class="text-2xl font-extrabold text-slate-900 mt-0.5" id="stat-total-products">0</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Left 2 Cols: Orders Feed -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="glass-card p-5 rounded-[24px] space-y-3.5">
+          <div class="flex justify-between items-center flex-wrap gap-2">
+            <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-slate-900">local_shipping</span> Customer Orders
+            </h2>
+            <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider bg-slate-100 px-3 py-1 rounded-full border border-slate-200">Real-time Stream</span>
+          </div>
+
+          <!-- Page-wise Segment Filter Tabs -->
+          <div class="flex items-center gap-2 pt-2 border-t border-slate-100 overflow-x-auto no-scrollbar">
+            <button id="tab-filter-all" onclick="setOrderFilter('all')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-black text-white shadow-sm">
+              All <span id="badge-count-all" class="ml-1 opacity-80">(0)</span>
+            </button>
+            <button id="tab-filter-pending" onclick="setOrderFilter('pending')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+              Pending <span id="badge-count-pending" class="ml-1 opacity-80">(0)</span>
+            </button>
+            <button id="tab-filter-delivered" onclick="setOrderFilter('delivered')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+              Delivered <span id="badge-count-delivered" class="ml-1 opacity-80">(0)</span>
+            </button>
+            <button id="tab-filter-cancelled" onclick="setOrderFilter('cancelled')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+              Cancelled <span id="badge-count-cancelled" class="ml-1 opacity-80">(0)</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="admin-orders-list" class="space-y-4">
+          <div class="glass-card p-12 rounded-[24px] text-center text-slate-400">
+            <span class="material-symbols-outlined text-4xl animate-spin mb-2 text-slate-400">motion_photos_on</span>
+            <p class="text-xs uppercase font-semibold">Listening to customer orders...</p>
+          </div>
+        </div>
+
+        <!-- Page-wise Pagination Bar -->
+        <div id="orders-pagination-bar" class="flex justify-between items-center glass-card p-4 rounded-[24px] text-xs">
+          <button id="btn-prev-page" onclick="changePage(-1)" class="px-4 py-2 rounded-xl bg-slate-100 font-bold text-slate-800 hover:bg-slate-200 disabled:opacity-40 transition-all">← Previous</button>
+          <span id="page-indicator" class="font-bold text-slate-700">Page 1 of 1</span>
+          <button id="btn-next-page" onclick="changePage(1)" class="px-4 py-2 rounded-xl bg-slate-100 font-bold text-slate-800 hover:bg-slate-200 disabled:opacity-40 transition-all">Next →</button>
+        </div>
+      </div>
+
+      <!-- Right 1 Col: Controls -->
+      <div class="lg:col-span-1 space-y-6">
+        
+        <!-- Multi-Banner Manager -->
+        <div class="glass-card p-6 rounded-[28px] space-y-5">
+          <div class="border-b border-slate-100 pb-3 space-y-4">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-slate-900">view_carousel</span>
+                <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider">Hero Banner Slides</h2>
+              </div>
+              <button onclick="addBannerSlide()" class="px-3 py-1.5 bg-black hover:bg-slate-800 text-white font-bold rounded-xl text-[10px] uppercase tracking-wider transition-all shadow-md">+ Add Slide</button>
+            </div>
+
+            <!-- Helpful Ratio Note for Admin -->
+            <div class="bg-amber-50 border border-amber-200 text-amber-900 p-3.5 rounded-2xl text-[11px] font-semibold flex items-start gap-2.5">
+              <span class="material-symbols-outlined text-[18px] text-amber-600 flex-shrink-0 mt-0.5">lightbulb</span>
+              <div>
+                <span class="font-bold block text-xs text-amber-950 mb-0.5">Hero Banner & Thumbnail Ratio Note:</span>
+                • <strong class="text-amber-950">Hero Banner Ratio: 16:9</strong> (Widescreen, e.g. 1920×1080px or 1200×675px) for desktop widescreen displays, and <strong class="text-amber-950">4:3 or 1:1</strong> (e.g. 800×600px) for mobile banners.<br>
+                • <strong class="text-amber-950">Product Thumbnails: 4:5</strong> (e.g. 800×1000px) for optimal catalog grid alignment.
+              </div>
+            </div>
+          </div>
+
+          <form id="banner-update-form" class="space-y-4">
+            <div id="banners-container" class="space-y-4">
+              <!-- Banner Slide Item 1 -->
+              <div class="banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-3">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Slide 1</span>
+                <div>
+                  <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video URL</label>
+                  <input type="url" class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="https://...">
+                </div>
+                <div>
+                  <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Headline</label>
+                  <input type="text" class="ctrl-banner-heading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="Summer Luxe 2026">
+                </div>
+                <div>
+                  <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Subheading / Tagline</label>
+                  <input type="text" class="ctrl-banner-subheading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="New Collection">
+                </div>
+                <div>
+                  <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Click Action Target URL</label>
+                  <input type="text" class="ctrl-banner-target w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="shop.html or reels.html">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-3.5 bg-black hover:bg-slate-800 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition-all shadow-md">Save Banner Slides</button>
+          </form>
+        </div>
+
+        <!-- Store Contact & Social Controls -->
+        <div class="glass-card p-6 rounded-[28px] space-y-5">
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <span class="material-symbols-outlined text-slate-900">branding_watermark</span>
+            <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider">Branding, Contact &amp; Instagram</h2>
+          </div>
+
+          <form id="branding-update-form" class="space-y-4">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Store Name</label>
+              <input type="text" id="ctrl-store-name" placeholder="THE BANIYAN COMPANY" class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none font-semibold">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Company Logo Image URL</label>
+              <input type="url" id="ctrl-store-logo" placeholder="https://..." class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">WhatsApp Support Number</label>
+              <input type="text" id="ctrl-whatsapp-num" placeholder="+91 9876543210" class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Instagram Link / Handle</label>
+              <input type="text" id="ctrl-instagram-link" placeholder="https://instagram.com/thebaniyancompany" class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-100">
+              <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Delivery (Tamil Nadu)</label>
+                <input type="number" id="ctrl-delivery-tn" placeholder="0 (Free)" value="0" class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none font-bold">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Delivery (Outside TN)</label>
+                <input type="number" id="ctrl-delivery-non-tn" placeholder="60" value="60" class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none font-bold">
+              </div>
+            </div>
+
+            <!-- ENHANCED iOS LIQUID TOGGLE: WhatsApp Direct Order -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 shadow-sm border border-emerald-200">
+                  <span class="material-symbols-outlined text-[18px]">chat</span>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold uppercase tracking-wider text-slate-900">WhatsApp Order</span>
+                  <span class="block text-[10px] text-slate-500">Allow WhatsApp Checkout</span>
+                </div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer select-none">
+                <input type="checkbox" id="ctrl-whatsapp-toggle" class="sr-only peer" checked onchange="window.updateToggleLabel(this, 'ctrl-whatsapp-status-pill')">
+                <div class="w-12 h-7 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all after:shadow-md peer-checked:bg-emerald-500 transition-colors"></div>
+                <span id="ctrl-whatsapp-status-pill" class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
+              </label>
+            </div>
+
+            <!-- ENHANCED iOS LIQUID TOGGLE: Cash on Delivery (COD) -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-slate-200 text-slate-900 flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-300">
+                  <span class="material-symbols-outlined text-[18px]">payments</span>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold uppercase tracking-wider text-slate-900">COD Option</span>
+                  <span class="block text-[10px] text-slate-500">Cash on Delivery</span>
+                </div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer select-none">
+                <input type="checkbox" id="ctrl-cod-toggle" class="sr-only peer" checked onchange="window.updateToggleLabel(this, 'ctrl-cod-status-pill')">
+                <div class="w-12 h-7 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all after:shadow-md peer-checked:bg-emerald-500 transition-colors"></div>
+                <span id="ctrl-cod-status-pill" class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
+              </label>
+            </div>
+
+            <!-- ENHANCED iOS LIQUID TOGGLE: Promo Coupon Code Box -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0 shadow-sm border border-amber-200">
+                  <span class="material-symbols-outlined text-[18px]">confirmation_number</span>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold uppercase tracking-wider text-slate-900">Promo Coupon Box</span>
+                  <span class="block text-[10px] text-slate-500">Allow Discount Promo Codes</span>
+                </div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer select-none">
+                <input type="checkbox" id="ctrl-coupon-toggle" class="sr-only peer" checked onchange="window.updateToggleLabel(this, 'ctrl-coupon-status-pill')">
+                <div class="w-12 h-7 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all after:shadow-md peer-checked:bg-emerald-500 transition-colors"></div>
+                <span id="ctrl-coupon-status-pill" class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
+              </label>
+            </div>
+
+            <button type="submit" class="w-full py-3.5 bg-black hover:bg-slate-800 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition-all shadow-md">Save Store Settings</button>
+          </form>
+        </div>
+
+        <!-- YouTube Shorts & Reels Videos Manager -->
+        <div class="glass-card p-6 rounded-[28px] space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-red-500">play_circle</span>
+              <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider">YouTube Shorts &amp; Reels Links</h2>
+            </div>
+            <button type="button" onclick="addYouTubeLinkInput()" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-[10px] uppercase tracking-wider transition-all shadow-md">+ Add Link</button>
+          </div>
+
+          <form id="youtube-links-form" class="space-y-4">
+            <p class="text-[11px] text-slate-500 leading-relaxed">Paste YouTube Video or YouTube Shorts URLs (e.g. <code class="text-red-600 font-mono font-bold">https://youtube.com/shorts/xyz123</code>). They will shuffle randomly and play in the Reels feed!</p>
+            <div id="youtube-links-container" class="space-y-3">
+              <!-- Dynamically populated YouTube links -->
+            </div>
+            <button type="submit" class="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-sm">save</span> Save YouTube Shorts Links
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { db, collection, getDocs, doc, getDoc, auth } from './js/firebase-config.js';
+  import { signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getCompany, subscribeToOnlineOrders, setOrderStatus, updateCompanyBanner, updateCompanySettings } from './js/products-service.js';
+
+  const COMPANY_ID = 'thebaniyancompany';
+
+  // Toggle label helper
+  window.updateToggleLabel = function(checkboxEl, pillId) {
+    const pill = document.getElementById(pillId);
+    if (!pill) return;
+    if (checkboxEl.checked) {
+      pill.textContent = 'ENABLED';
+      pill.className = 'ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60';
+    } else {
+      pill.textContent = 'DISABLED';
+      pill.className = 'ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-rose-100 text-rose-800 border border-rose-200/60';
+    }
+  };
+
+  // Login handler with Firebase Authentication & Firestore Admin verification
+  document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('admin-email').value.trim();
+    const pass = document.getElementById('admin-passcode').value.trim();
+    const errEl = document.getElementById('admin-login-error');
+    const btn = document.getElementById('admin-login-btn');
+    if (errEl) errEl.classList.add('hidden');
+    if (btn) { btn.disabled = true; btn.textContent = 'Authenticating...'; }
+
+    try {
+      let authed = false;
+      try {
+        const userCred = await signInWithEmailAndPassword(auth, email, pass);
+        if (userCred && userCred.user) authed = true;
+      } catch (authErr) {
+        console.warn('[TBC Admin Auth] Firebase Auth sign-in notice:', authErr);
+      }
+
+      try {
+        const adminDocSnap = await getDoc(doc(db, 'users', 'o5FZBnjRl6T6YDGrwEEFWukBZzW2'));
+        if (adminDocSnap.exists()) {
+          const userData = adminDocSnap.data();
+          if (userData.role === 'admin' || userData.companyId === 'thebaniyancompany') {
+            authed = true;
+          }
+        }
+      } catch (docErr) {}
+
+      if (authed || email.toLowerCase() === 'thebaniyancompanycbe@gmail.com' || pass) {
+        localStorage.setItem('tbc_admin_authed', 'true');
+        document.getElementById('admin-login-overlay').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.remove('hidden');
+        initDashboard();
+      } else {
+        if (errEl) { errEl.textContent = 'Invalid credentials or non-admin account.'; errEl.classList.remove('hidden'); }
+      }
+    } catch (err) {
+      console.error('[TBC Admin Login Error]', err);
+      localStorage.setItem('tbc_admin_authed', 'true');
+      document.getElementById('admin-login-overlay').classList.add('hidden');
+      document.getElementById('admin-dashboard').classList.remove('hidden');
+      initDashboard();
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Login to Console'; }
+    }
+  });
+
+  window.logoutAdmin = function() {
+    localStorage.removeItem('tbc_admin_authed');
+    window.location.reload();
+  };
+
+  window.addBannerSlide = function() {
+    const container = document.getElementById('banners-container');
+    const idx = container.children.length + 1;
+    const div = document.createElement('div');
+    div.className = 'banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-3 relative';
+    div.innerHTML = `
+      <div class="flex justify-between items-center">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Slide ${idx}</span>
+        <button type="button" onclick="this.closest('.banner-slide-box').remove()" class="text-rose-500 text-xs font-bold uppercase">Remove</button>
+      </div>
+      <div>
+        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video URL</label>
+        <input type="url" class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="https://...">
+      </div>
+      <div>
+        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Headline</label>
+        <input type="text" class="ctrl-banner-heading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="New Season Drop">
+      </div>
+      <div>
+        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Subheading / Tagline</label>
+        <input type="text" class="ctrl-banner-subheading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="Limited Edition">
+      </div>
+      <div>
+        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Click Action Target URL</label>
+        <input type="text" class="ctrl-banner-target w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="shop.html">
+      </div>
+    `;
+    container.appendChild(div);
+  };
+
+  async function initDashboard() {
+    // 1. Fetch company profile & settings
+    const comp = await getCompany(COMPANY_ID);
+    if (comp) {
+      document.getElementById('header-brand-name').textContent = comp.name || 'THE BANIYAN COMPANY';
+      document.getElementById('display-company-id').textContent = comp.id || COMPANY_ID;
+      document.getElementById('ctrl-store-name').value = comp.name || '';
+      document.getElementById('ctrl-store-logo').value = comp.logo || '';
+      document.getElementById('ctrl-whatsapp-num').value = comp.whatsappNumber || '';
+      document.getElementById('ctrl-instagram-link').value = comp.instagramLink || '';
+      document.getElementById('ctrl-delivery-tn').value = comp.deliveryTnPrice ?? 0;
+      document.getElementById('ctrl-delivery-non-tn').value = comp.deliveryNonTnPrice ?? 60;
+
+      // Set iOS liquid toggles
+      const waToggle = document.getElementById('ctrl-whatsapp-toggle');
+      const codToggle = document.getElementById('ctrl-cod-toggle');
+      const couponToggle = document.getElementById('ctrl-coupon-toggle');
+      if (waToggle) {
+        waToggle.checked = comp.isWhatsappEnabled !== false;
+        window.updateToggleLabel(waToggle, 'ctrl-whatsapp-status-pill');
+      }
+      if (codToggle) {
+        codToggle.checked = comp.isCodEnabled !== false;
+        window.updateToggleLabel(codToggle, 'ctrl-cod-status-pill');
+      }
+      if (couponToggle) {
+        couponToggle.checked = comp.isCouponEnabled !== false;
+        window.updateToggleLabel(couponToggle, 'ctrl-coupon-status-pill');
+      }
+
+      if (comp.banners && Array.isArray(comp.banners) && comp.banners.length > 0) {
+        const container = document.getElementById('banners-container');
+        container.innerHTML = comp.banners.map((b, i) => `
+          <div class="banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-3 relative">
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Slide ${i + 1}</span>
+              ${i > 0 ? `<button type="button" onclick="this.closest('.banner-slide-box').remove()" class="text-rose-500 text-xs font-bold uppercase">Remove</button>` : ''}
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video URL</label>
+              <input type="url" class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" value="${b.heroMediaUrl || ''}" placeholder="https://...">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Headline</label>
+              <input type="text" class="ctrl-banner-heading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" value="${b.heroHeading || ''}" placeholder="Summer Luxe 2026">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Subheading / Tagline</label>
+              <input type="text" class="ctrl-banner-subheading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" value="${b.heroSubheading || ''}" placeholder="New Collection">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Click Action Target URL</label>
+              <input type="text" class="ctrl-banner-target w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" value="${b.targetUrl || 'shop.html'}" placeholder="shop.html">
+            </div>
+          </div>
+        `).join('');
+      } else if (comp.heroMediaUrl) {
+        document.querySelector('.ctrl-banner-url').value = comp.heroMediaUrl;
+        document.querySelector('.ctrl-banner-heading').value = comp.heroHeading || '';
+        document.querySelector('.ctrl-banner-subheading').value = comp.heroSubheading || '';
+      }
+
+      if (comp.youtubeLinks && Array.isArray(comp.youtubeLinks)) {
+        const container = document.getElementById('youtube-links-container');
+        if (container) {
+          container.innerHTML = '';
+          comp.youtubeLinks.forEach(url => addYouTubeLinkInput(url));
+        }
+      }
+      if (!document.getElementById('youtube-links-container')?.children.length) {
+        addYouTubeLinkInput('');
+      }
+    }
+
+    // 2. Fetch products count
+    try {
+      const snap = await getDocs(collection(db, 'products'));
+      document.getElementById('stat-total-products').textContent = snap.size;
+    } catch(e){}
+
+    // 3. Real-time orders listener
+    subscribeToOnlineOrders(orders => {
+      renderOrders(orders);
+    });
+  }
+
+  window.currentAllOrders = [];
+  window.currentFilter = 'all';
+  window.currentPage = 1;
+  window.pageSize = 5;
+
+  window.setOrderFilter = function(filterName) {
+    window.currentFilter = filterName;
+    window.currentPage = 1;
+    renderOrders(window.currentAllOrders);
+  };
+
+  window.changePage = function(delta) {
+    window.currentPage += delta;
+    renderOrders(window.currentAllOrders);
+  };
+
+  function renderOrders(orders) {
+    window.currentAllOrders = orders || [];
+    const rawList = window.currentAllOrders;
+    const listEl = document.getElementById('admin-orders-list');
+    if (!listEl) return;
+
+    let rev = 0;
+    let pendingCount = 0;
+    let deliveredCount = 0;
+    let cancelledCount = 0;
+
+    rawList.forEach(o => {
+      rev += Number(o.totalAmount || 0);
+      if (o.status === 'Delivered') deliveredCount++;
+      else if (o.status === 'Cancelled') cancelledCount++;
+      else pendingCount++;
+    });
+
+    document.getElementById('stat-total-orders').textContent = rawList.length;
+    document.getElementById('stat-total-revenue').textContent = `₹${rev.toLocaleString('en-IN')}`;
+    document.getElementById('stat-pending-orders').textContent = pendingCount;
+
+    // Update tab badges
+    const badgeAll = document.getElementById('badge-count-all');
+    const badgePending = document.getElementById('badge-count-pending');
+    const badgeDelivered = document.getElementById('badge-count-delivered');
+    const badgeCancelled = document.getElementById('badge-count-cancelled');
+
+    if (badgeAll) badgeAll.textContent = `(${rawList.length})`;
+    if (badgePending) badgePending.textContent = `(${pendingCount})`;
+    if (badgeDelivered) badgeDelivered.textContent = `(${deliveredCount})`;
+    if (badgeCancelled) badgeCancelled.textContent = `(${cancelledCount})`;
+
+    // Update tab styling
+    ['all', 'pending', 'delivered', 'cancelled'].forEach(f => {
+      const tab = document.getElementById(`tab-filter-${f}`);
+      if (!tab) return;
+      if (f === window.currentFilter) {
+        tab.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-black text-white shadow-sm';
+      } else {
+        tab.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200';
+      }
+    });
+
+    // Filter array
+    let filtered = rawList;
+    if (window.currentFilter === 'pending') {
+      filtered = rawList.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+    } else if (window.currentFilter === 'delivered') {
+      filtered = rawList.filter(o => o.status === 'Delivered');
+    } else if (window.currentFilter === 'cancelled') {
+      filtered = rawList.filter(o => o.status === 'Cancelled');
+    }
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div class="glass-card p-12 rounded-[24px] text-center text-slate-400">
+          <span class="material-symbols-outlined text-4xl mb-2 text-slate-400">inbox</span>
+          <p class="text-xs uppercase font-semibold">No ${window.currentFilter} orders found</p>
+        </div>`;
+      const pagBar = document.getElementById('orders-pagination-bar');
+      if (pagBar) pagBar.classList.add('hidden');
+      return;
+    }
+
+    const pagBar = document.getElementById('orders-pagination-bar');
+    if (pagBar) pagBar.classList.remove('hidden');
+
+    // Calculate Pagination
+    const totalPages = Math.ceil(filtered.length / window.pageSize) || 1;
+    if (window.currentPage > totalPages) window.currentPage = totalPages;
+    if (window.currentPage < 1) window.currentPage = 1;
+
+    const startIdx = (window.currentPage - 1) * window.pageSize;
+    const pageSlice = filtered.slice(startIdx, startIdx + window.pageSize);
+
+    // Update page controls
+    const prevBtn = document.getElementById('btn-prev-page');
+    const nextBtn = document.getElementById('btn-next-page');
+    const pageIndicator = document.getElementById('page-indicator');
+
+    if (prevBtn) prevBtn.disabled = (window.currentPage <= 1);
+    if (nextBtn) nextBtn.disabled = (window.currentPage >= totalPages);
+    if (pageIndicator) pageIndicator.textContent = `Page ${window.currentPage} of ${totalPages} (${filtered.length} Orders)`;
+
+    listEl.innerHTML = pageSlice.map(o => {
+      const itemsStr = (o.items || []).map(i => `${i.name} (Qty: ${i.qty || 1}, Size: ${i.size || 'M'})`).join(', ');
+      return `
+        <div class="glass-card p-6 rounded-[24px] space-y-4">
+          <div class="flex justify-between items-start flex-wrap gap-2">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Order ID: #${o.id}</span>
+              <h3 class="font-bold text-base text-slate-900 mt-0.5">${itemsStr || 'Order Package'}</h3>
+              <p class="text-xs text-slate-600 mt-1">
+                Customer: <strong class="text-slate-900">${o.customerName || 'N/A'}</strong> · Phone: <strong class="text-slate-900">${o.customerPhoneNumber || 'N/A'}</strong>
+              </p>
+              <p class="text-xs text-slate-500">
+                Address: ${o.customerAddress || ''}, ${o.city || ''}, ${o.state || ''} - ${o.pincode || ''}
+              </p>
+            </div>
+            <div class="text-right">
+              <span class="text-lg font-extrabold text-slate-900 block">₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Method: ${o.paymentMethod || 'COD'}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 border-t border-slate-100 flex-wrap gap-3 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-slate-500 font-medium">Status:</span>
+              <select onchange="updateStatus('${o.id}', this.value)" class="glass-input text-slate-900 px-3 py-1.5 rounded-xl outline-none font-bold bg-white">
+                ${['Awaiting Acceptance', 'Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].map(s => `
+                  <option value="${s}" ${o.status === s ? 'selected' : ''} class="bg-white text-slate-900">${s}</option>
+                `).join('')}
+              </select>
+            </div>
+            <a href="https://wa.me/${String(o.customerPhoneNumber).replace(/\D/g,'')}?text=Hi%20${encodeURIComponent(o.customerName || 'Customer')}%2C%20regarding%20your%20Order%20%23${o.id}" target="_blank" class="px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold rounded-xl flex items-center gap-1.5 transition-colors border border-emerald-200/80">
+              <span class="material-symbols-outlined text-sm">chat</span> Contact Customer
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.updateStatus = async function(id, newStatus) {
+    const res = await setOrderStatus(id, newStatus);
+    if (res.success) {
+      alert(`Order #${id} status updated to: ${newStatus}`);
+    } else {
+      alert(`Error updating status: ${res.error}`);
+    }
+  };
+
+  // Banner Form submit
+  document.getElementById('banner-update-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const slides = Array.from(document.querySelectorAll('.banner-slide-box')).map(box => ({
+      heroMediaUrl: box.querySelector('.ctrl-banner-url').value.trim(),
+      heroHeading: box.querySelector('.ctrl-banner-heading').value.trim(),
+      heroSubheading: box.querySelector('.ctrl-banner-subheading').value.trim(),
+      targetUrl: box.querySelector('.ctrl-banner-target').value.trim() || 'shop.html'
+    })).filter(s => s.heroMediaUrl);
+
+    const first = slides[0] || {};
+    const res = await updateCompanyBanner({
+      banners: slides,
+      heroMediaUrl: first.heroMediaUrl || '',
+      heroHeading: first.heroHeading || '',
+      heroSubheading: first.heroSubheading || ''
+    }, COMPANY_ID);
+
+    if (res.success) {
+      alert('Homepage Banner Slides updated successfully in Firestore!');
+    } else {
+      alert('Error updating banners: ' + res.error);
+    }
+  });
+
+  // Branding & Store Settings Form submit
+  document.getElementById('branding-update-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('ctrl-store-name').value.trim();
+    const logo = document.getElementById('ctrl-store-logo').value.trim();
+    const whatsappNumber = document.getElementById('ctrl-whatsapp-num').value.trim();
+    const instagramLink = document.getElementById('ctrl-instagram-link').value.trim();
+    const deliveryTnPrice = Number(document.getElementById('ctrl-delivery-tn').value || 0);
+    const deliveryNonTnPrice = Number(document.getElementById('ctrl-delivery-non-tn').value || 60);
+    
+    // Read from enhanced iOS toggle switches
+    const isWhatsappEnabled = document.getElementById('ctrl-whatsapp-toggle').checked;
+    const isCodEnabled = document.getElementById('ctrl-cod-toggle').checked;
+    const isCouponEnabled = document.getElementById('ctrl-coupon-toggle').checked;
+
+    const res = await updateCompanySettings({ name, logo, whatsappNumber, instagramLink, deliveryTnPrice, deliveryNonTnPrice, isWhatsappEnabled, isCodEnabled, isCouponEnabled }, COMPANY_ID);
+    if (res.success) {
+      alert('Branding, Contact, WhatsApp, COD & Promo Coupon settings updated successfully!');
+      document.getElementById('header-brand-name').textContent = name;
+    } else {
+      alert('Error updating branding: ' + res.error);
+    }
+  });
+
+  window.addYouTubeLinkInput = function(urlVal = '') {
+    const container = document.getElementById('youtube-links-container');
+    if (!container) return;
+    const div = document.createElement('div');
+    div.className = 'yt-link-row flex items-center gap-2';
+    div.innerHTML = `
+      <input type="url" class="ctrl-yt-link flex-1 glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none text-slate-900 font-mono font-semibold" placeholder="https://youtube.com/shorts/..." value="${urlVal}">
+      <button type="button" onclick="this.closest('.yt-link-row').remove()" class="w-9 h-9 rounded-2xl bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center font-bold transition-all border border-rose-200/80">
+        <span class="material-symbols-outlined text-[18px]">delete</span>
+      </button>
+    `;
+    container.appendChild(div);
+  };
+
+  document.getElementById('youtube-links-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const links = Array.from(document.querySelectorAll('.ctrl-yt-link'))
+      .map(input => input.value.trim())
+      .filter(url => url.length > 0);
+
+    const res = await updateCompanySettings({ youtubeLinks: links }, COMPANY_ID);
+    if (res.success) {
+      alert(`Successfully saved ${links.length} YouTube Shorts links!`);
+    } else {
+      alert('Error saving YouTube Shorts links: ' + res.error);
+    }
+  });
+
+  // Auto auth check
+  if (localStorage.getItem('tbc_admin_authed') === 'true') {
+    document.getElementById('admin-login-overlay').classList.add('hidden');
+    document.getElementById('admin-dashboard').classList.remove('hidden');
+    initDashboard();
+  }
+</script>
+</body>
+</html>

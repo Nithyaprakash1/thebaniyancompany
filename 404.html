@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Page Not Found</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    // Attempt to rewrite the path without .html if present
+    const url = new URL(window.location.href);
+    const path = url.pathname.replace(/\.html$/i, '');
+    // redirect to the same path (clean URL) if a matching file exists
+    fetch(path + '.html', { method: 'HEAD' })
+      .then(res => {
+        if (res.ok) {
+          window.location.replace(path);
+        } else {
+          // fallback to a simple home redirect
+          window.location.replace('/');
+        }
+      })
+      .catch(() => window.location.replace('/'));
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>

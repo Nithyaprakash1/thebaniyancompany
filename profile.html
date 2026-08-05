@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>My Account — THE BANIYAN COMPANY</title>
+  <meta name="description" content="Sleek, mobile-optimized user account profile screen for THE BANIYAN COMPANY.">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#f8f9fa",
+            "on-surface": "#121212",
+            "primary": "#000000",
+            "on-primary": "#ffffff",
+            "secondary": "#666666",
+            "surface-container": "#eeeeee",
+            "error": "#dc2626"
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    @layer base { body { -webkit-tap-highlight-color: transparent; } }
+    ::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    #loading-screen {
+      position: fixed; inset: 0; background: #121212; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    #loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .loading-bar { width: 140px; height: 3px; background: #333; border-radius: 999px; overflow: hidden; position: relative; }
+    .loading-bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #fbbf24, transparent); animation: shimmer 1.2s infinite; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased pb-20">
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <div class="flex flex-col items-center gap-4">
+    <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+    <span class="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-400">THE BANIYAN COMPANY</span>
+    <div class="loading-bar"></div>
+  </div>
+</div>
+
+<!-- SECTION 1: HEADER & QUICK STATS (DARK THEME TOP SECTION #121212) -->
+<div class="bg-[#121212] text-white pt-safe pb-8 px-4 md:px-8 shadow-xl rounded-b-[2.5rem]">
+  <div class="max-w-2xl mx-auto space-y-6 pt-4">
+    
+    <!-- Top Bar with Logo & Wishlist/Cart Icons -->
+    <div class="flex items-center justify-between pb-2 border-b border-white/10">
+      <a href="home" class="flex items-center gap-2.5">
+        <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+        <span class="font-bold tracking-[0.15em] text-xs text-white uppercase">THE BANIYAN COMPANY</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <a href="whislist" aria-label="Wishlist" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+          <span class="material-symbols-outlined text-[20px] text-white">favorite_border</span>
+        </a>
+        <a href="cart" aria-label="Cart" class="relative w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+          <span class="material-symbols-outlined text-[20px] text-white">shopping_bag</span>
+          <span class="cart-badge-count absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm">0</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- User Info Header -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <!-- Circular Avatar with User Initial -->
+        <div id="profile-avatar" class="w-14 h-14 rounded-full bg-amber-500 text-black font-extrabold text-xl flex items-center justify-center shadow-lg border-2 border-amber-300/40 select-none flex-shrink-0">
+          U
+        </div>
+        <div>
+          <h1 id="profile-name" class="text-xl font-extrabold text-white tracking-tight">Guest User</h1>
+          <p id="profile-email" class="text-xs text-neutral-400 font-medium">guest@thebaniyancompany.com</p>
+        </div>
+      </div>
+      <button onclick="openEditModal()" aria-label="Edit Profile" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+        <span class="material-symbols-outlined text-[18px]">edit</span>
+      </button>
+    </div>
+
+    <!-- Quick Stats Card (3 Key Metrics Horizontally) -->
+    <div class="bg-[#1e1e1e] p-4 rounded-2xl border border-white/10 flex items-center justify-between text-center divide-x divide-white/10 shadow-inner">
+      <div class="flex-1 px-2">
+        <span id="stat-orders-count" class="block text-xl font-extrabold text-white">0</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Orders</span>
+      </div>
+      <div class="flex-1 px-2">
+        <span id="stat-wishlist-count" class="block text-xl font-extrabold text-white">0</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Wishlist</span>
+      </div>
+      <div class="flex-1 px-2">
+        <span id="stat-saved-amount" class="block text-xl font-extrabold text-amber-400">₹0</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Saved</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MAIN CONTENT CONTAINER -->
+<main class="max-w-2xl mx-auto px-4 md:px-8 mt-6 space-y-6">
+
+  <!-- SECTION 2: RECENT ORDERS SECTION -->
+  <div class="space-y-3">
+    <div class="flex items-center justify-between px-1">
+      <h2 class="text-lg font-extrabold text-primary flex items-center gap-2">
+        Recent Orders 📦
+      </h2>
+      <a href="#orders-list" onclick="scrollToOrders()" class="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-0.5">
+        View all <span class="text-sm">→</span>
+      </a>
+    </div>
+
+    <!-- Active Recent Order Cards Container -->
+    <div id="recent-orders-container" class="space-y-3">
+      <!-- Fallback Skeleton / Empty State -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-black/5 text-center flex flex-col items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[36px] text-neutral-300">inventory_2</span>
+        <p class="text-xs font-bold text-primary">No recent orders yet</p>
+        <p class="text-[11px] text-secondary">Your active purchases and live tracking will show here.</p>
+        <a href="shop" class="mt-1 bg-black text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider">Start Shopping</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: ACCOUNT NAVIGATION LINKS LIST -->
+  <div class="space-y-2">
+    <h3 class="text-xs font-bold uppercase tracking-wider text-secondary px-1">Account &amp; Activity</h3>
+    <div class="bg-white rounded-2xl shadow-sm border border-black/10 overflow-hidden divide-y divide-black/5">
+      
+      <!-- Menu Item 1: My Orders -->
+      <a href="#orders" onclick="scrollToOrders()" class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
+        <div class="flex items-center gap-3.5">
+          <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+          </div>
+          <span class="text-xs font-bold text-primary">My Orders</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-secondary">
+          <span id="nav-order-status" class="text-xs font-semibold text-amber-600">0 active</span>
+          <span class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+        </div>
+      </a>
+
+      <!-- Menu Item 2: Wishlist -->
+      <a href="whislist" class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
+        <div class="flex items-center gap-3.5">
+          <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">favorite</span>
+          </div>
+          <span class="text-xs font-bold text-primary">Wishlist</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-secondary">
+          <span id="nav-wishlist-status" class="text-xs font-semibold">Saved items</span>
+          <span class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+        </div>
+      </a>
+
+      <!-- Menu Item 3: Saved Addresses -->
+      <button onclick="openAddressModal()" class="w-full text-left flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
+        <div class="flex items-center gap-3.5">
+          <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">location_on</span>
+          </div>
+          <span class="text-xs font-bold text-primary">Saved Addresses</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-secondary">
+          <span id="nav-address-status" class="text-xs font-semibold">1 address</span>
+          <span class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+        </div>
+      </button>
+
+      <!-- Menu Item 4: Notifications -->
+      <button onclick="showNotificationToast()" class="w-full text-left flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
+        <div class="flex items-center gap-3.5">
+          <div class="w-9 h-9 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">notifications</span>
+          </div>
+          <span class="text-xs font-bold text-primary">Notifications</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-secondary">
+          <span class="text-xs font-semibold text-emerald-600">Updates Active</span>
+          <span class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+        </div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- SECTION 5: CUSTOMER SUPPORT SECTION -->
+  <div class="bg-slate-100 p-5 rounded-2xl space-y-3.5 border border-black/5">
+    <div class="flex items-center justify-between">
+      <h3 class="text-xs font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[18px] text-amber-600">headset_mic</span> Customer Support
+      </h3>
+      <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">24/7 Assistance</span>
+    </div>
+
+    <!-- 2x2 Grid of White Rounded Action Buttons with Colorful Icons -->
+    <div class="grid grid-cols-2 gap-3">
+      
+      <!-- WhatsApp -->
+      <a href="https://wa.me/918110061911?text=Hi%20TBC%20Support%2C%20I%20need%20assistance" target="_blank" class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
+        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 fill-[#25D366]" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
+        </div>
+        <div>
+          <span class="block text-xs font-bold text-primary">WhatsApp</span>
+          <span class="text-[10px] text-secondary">Instant Chat</span>
+        </div>
+      </a>
+
+      <!-- Call Us -->
+      <a href="tel:+918110061611" class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
+        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-[18px]">call</span>
+        </div>
+        <div>
+          <span class="block text-xs font-bold text-primary">Call Us</span>
+          <span class="text-[10px] text-secondary">Direct Line</span>
+        </div>
+      </a>
+
+      <!-- Email -->
+      <a href="mailto:thebaniyancompanycbe@gmail.com" class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
+        <div class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-[18px]">mail</span>
+        </div>
+        <div>
+          <span class="block text-xs font-bold text-primary">Email</span>
+          <span class="text-[10px] text-secondary">Send Mail</span>
+        </div>
+      </a>
+
+      <!-- FAQ -->
+      <a href="faqs" class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
+        <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-[18px]">help</span>
+        </div>
+        <div>
+          <span class="block text-xs font-bold text-primary">FAQ</span>
+          <span class="text-[10px] text-secondary">Quick Answers</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- SECTION 6: FOOTER ACTIONS (CENTERED RED SIGN OUT BUTTON) -->
+  <div class="pt-2 text-center">
+    <button onclick="handleAuthAction()" class="w-full py-3.5 bg-rose-50 text-rose-600 font-bold text-xs uppercase tracking-wider rounded-2xl hover:bg-rose-100 transition-colors flex items-center justify-center gap-2 border border-rose-200">
+      <span class="material-symbols-outlined text-[18px]">logout</span> Sign Out
+    </button>
+  </div>
+
+</main>
+
+<!-- EDIT PERSONAL DETAILS MODAL -->
+<div id="edit-profile-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
+  <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
+    <div class="flex justify-between items-center pb-3 border-b border-black/10">
+      <h3 class="font-bold text-base text-primary">Edit Personal Details</h3>
+      <button onclick="closeEditModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-secondary">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+    <form onsubmit="event.preventDefault(); saveProfileDetails();" class="space-y-3">
+      <div>
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Full Name</label>
+        <input id="modal-field-name" type="text" required class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Email Address</label>
+        <input id="modal-field-email" type="email" required class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Phone Number</label>
+        <input id="modal-field-phone" type="tel" maxlength="10" placeholder="10-digit mobile" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Shipping Address</label>
+        <textarea id="modal-field-address" rows="2" placeholder="Full house address & landmark" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black resize-none"></textarea>
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button type="button" onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 font-bold text-xs text-primary rounded-xl">Cancel</button>
+        <button type="submit" class="flex-1 py-3 bg-black font-bold text-xs text-white rounded-xl shadow-md">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- VIEW ORDER DETAILS MODAL -->
+<div id="view-order-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
+  <div class="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative space-y-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center pb-3 border-b border-black/10">
+      <div>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-secondary">Order Invoice</span>
+        <h3 class="font-bold text-lg text-primary" id="modal-order-id">#Order</h3>
+      </div>
+      <button onclick="closeOrderModal()" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:text-black">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- Order Status & Method -->
+    <div class="bg-surface-container/60 p-4 rounded-2xl flex justify-between items-center text-xs">
+      <div>
+        <span class="text-secondary uppercase block text-[10px] font-bold">Payment Method</span>
+        <span class="font-bold text-primary" id="modal-order-method">Razorpay</span>
+      </div>
+      <div class="text-right">
+        <span class="text-secondary uppercase block text-[10px] font-bold">Order Status</span>
+        <span class="font-bold text-emerald-600 uppercase" id="modal-order-status">Confirmed</span>
+      </div>
+    </div>
+
+    <!-- Purchased Items List -->
+    <div>
+      <h4 class="text-xs font-bold uppercase tracking-wider text-secondary mb-2">Purchased Items</h4>
+      <div id="modal-order-items" class="space-y-2.5">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Shipping Address -->
+    <div class="bg-surface-container/40 p-4 rounded-2xl space-y-1 text-xs border border-black/5">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-secondary block">Delivery Address</span>
+      <p class="font-semibold text-primary" id="modal-order-customer">Customer Name</p>
+      <p class="text-secondary" id="modal-order-address">Address details</p>
+      <p class="text-secondary" id="modal-order-phone">Phone number</p>
+    </div>
+
+    <!-- Pricing Summary -->
+    <div class="bg-surface-container/60 p-4 rounded-2xl space-y-2 text-xs">
+      <div class="flex justify-between text-secondary">
+        <span>Delivery Charge</span>
+        <span class="font-bold text-emerald-600">FREE</span>
+      </div>
+      <div class="flex justify-between font-bold text-sm text-primary pt-2 border-t border-black/10">
+        <span>Total Amount</span>
+        <span id="modal-order-total" class="text-base text-black">₹0</span>
+      </div>
+    </div>
+
+    <div class="flex gap-3 pt-2">
+      <a id="modal-whatsapp-link" href="#" target="_blank" class="flex-1 bg-[#25D366] text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md">
+        Track on WhatsApp
+      </a>
+      <button onclick="closeOrderModal()" class="px-5 py-3.5 bg-surface-container text-primary rounded-xl font-bold text-xs uppercase hover:bg-black/10 transition-colors">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: FIXED BOTTOM NAVIGATION BAR -->
+<div class="fixed bottom-[5px] left-1/2 -translate-x-1/2 z-50 max-w-lg w-[92%] sm:w-auto">
+  <nav class="bg-black/90 backdrop-blur-xl text-white rounded-full px-6 py-3 shadow-2xl border border-white/15 flex items-center justify-between gap-5 md:gap-8">
+    <a href="home" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">home</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Home</span>
+    </a>
+    <a href="reels" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">video_library</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Reels</span>
+    </a>
+    <a href="shop" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">grid_view</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Shop</span>
+    </a>
+    <a href="cart" class="relative flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+      <span class="cart-badge-count absolute -top-1 right-2.5 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm border border-black">0</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Cart</span>
+    </a>
+    <a href="profile" class="flex flex-col items-center gap-0.5 text-white font-bold transition-transform active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">person</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Profile</span>
+    </a>
+  </nav>
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    document.getElementById('loading-screen').classList.add('hidden');
+  });
+
+  function scrollToOrders() {
+    const el = document.getElementById('recent-orders-container');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function openEditModal() {
+    const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+    document.getElementById('modal-field-name').value = stored.name || document.getElementById('profile-name').textContent || '';
+    document.getElementById('modal-field-email').value = stored.email || document.getElementById('profile-email').textContent || '';
+    document.getElementById('modal-field-phone').value = stored.phone || localStorage.getItem('tbc_customer_phone') || '';
+    document.getElementById('modal-field-address').value = stored.address || '';
+    
+    const m = document.getElementById('edit-profile-modal');
+    if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+  }
+
+  function closeEditModal() {
+    const m = document.getElementById('edit-profile-modal');
+    if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+  }
+
+  function saveProfileDetails() {
+    const name = document.getElementById('modal-field-name').value.trim();
+    const email = document.getElementById('modal-field-email').value.trim();
+    const phone = document.getElementById('modal-field-phone').value.trim();
+    const address = document.getElementById('modal-field-address').value.trim();
+
+    const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+    stored.name = name;
+    stored.email = email;
+    stored.phone = phone;
+    stored.address = address;
+
+    localStorage.setItem('tbc_user_profile', JSON.stringify(stored));
+    if (phone) localStorage.setItem('tbc_customer_phone', phone);
+    if (email) localStorage.setItem('tbc_customer_email', email);
+
+    document.getElementById('profile-name').textContent = name || 'Valued Customer';
+    document.getElementById('profile-email').textContent = email || 'customer@thebaniyancompany.com';
+    document.getElementById('profile-avatar').textContent = (name || 'U').charAt(0).toUpperCase();
+
+    closeEditModal();
+    alert('Profile details updated successfully!');
+  }
+
+  function openAddressModal() {
+    openEditModal();
+  }
+
+  function showNotificationToast() {
+    alert('🔔 Order and promotional notification alerts are active for your account!');
+  }
+</script>
+
+<!-- Dynamic Firebase Auth & Orders Integration -->
+<script type="module">
+  import { auth } from './js/firebase-config.js';
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getCustomerOrders, getCompany } from './js/products-service.js';
+
+  getCompany().then(comp => {
+    if (comp?.logo) {
+      const el = document.getElementById('nav-company-logo');
+      if (el) el.src = comp.logo;
+      const lEl = document.getElementById('loading-company-logo');
+      if (lEl) lEl.src = comp.logo;
+    }
+  }).catch(() => {});
+
+  window.handleAuthAction = function() {
+    const isLogged = auth.currentUser || localStorage.getItem('tbc_user_profile');
+    if (isLogged) {
+      signOut(auth).catch(() => {});
+      localStorage.removeItem('tbc_user_profile');
+      localStorage.removeItem('tbc_customer_phone');
+      localStorage.removeItem('tbc_customer_email');
+      alert('Signed out successfully.');
+      window.location.href = 'index.html';
+    } else {
+      window.location.href = 'index.html';
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Load Wishlist count
+    try {
+      const rawWish = localStorage.getItem('tbc_wishlist_items');
+      const wishList = rawWish ? JSON.parse(rawWish) : [];
+      const wishCountEl = document.getElementById('stat-wishlist-count');
+      const wishNavEl = document.getElementById('nav-wishlist-status');
+      if (wishCountEl) wishCountEl.textContent = wishList.length > 0 ? `${wishList.length} Item${wishList.length > 1 ? 's' : ''}` : '0 Items';
+      if (wishNavEl) wishNavEl.textContent = wishList.length > 0 ? `${wishList.length} saved items` : 'Saved items';
+    } catch (e) {}
+
+    onAuthStateChanged(auth, async (user) => {
+      const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+      const name = user?.displayName || stored.name || (user?.email ? user.email.split('@')[0] : '');
+      const email = user?.email || stored.email || 'customer@thebaniyancompany.com';
+      const phone = stored.phone || localStorage.getItem('tbc_customer_phone') || '';
+
+      const nameEl = document.getElementById('profile-name');
+      const emailEl = document.getElementById('profile-email');
+      const avatarEl = document.getElementById('profile-avatar');
+
+      if (nameEl && name) nameEl.textContent = name;
+      if (emailEl && email) emailEl.textContent = email;
+      if (avatarEl) avatarEl.textContent = (name || email || 'U').charAt(0).toUpperCase();
+
+      // Fetch live customer orders from Firestore
+      const searchPhone = phone || (user?.phoneNumber || '');
+      if (searchPhone) {
+        try {
+          const liveOrders = await getCustomerOrders(searchPhone);
+          window.currentCustomerOrders = liveOrders;
+
+          const container = document.getElementById('recent-orders-container');
+          const statOrdersEl = document.getElementById('stat-orders-count');
+          const navOrderStatusEl = document.getElementById('nav-order-status');
+          const statSavedEl = document.getElementById('stat-saved-amount');
+
+          if (statOrdersEl) statOrdersEl.textContent = liveOrders.length;
+          if (navOrderStatusEl) navOrderStatusEl.textContent = `${liveOrders.length} active`;
+
+          // Calculate real dynamic savings from orders (mrp/originalPrice - price)
+          let totalSaved = 0;
+          liveOrders.forEach(o => {
+            (o.items || []).forEach(i => {
+              const orig = Number(i.originalPrice || i.mrp || 0);
+              const sel = Number(i.price || 0);
+              const qty = Number(i.qty || i.quantity || 1);
+              if (orig > sel) {
+                totalSaved += (orig - sel) * qty;
+              }
+            });
+            if (o.discountAmount) totalSaved += Number(o.discountAmount);
+          });
+          if (statSavedEl) statSavedEl.textContent = `₹${totalSaved.toLocaleString('en-IN')}`;
+
+          if (container && liveOrders.length > 0) {
+            container.innerHTML = liveOrders.map(o => {
+              const firstItem = (o.items && o.items[0]) || {};
+              const img = firstItem.image || firstItem.imageUrl || 'https://placehold.co/200x250/f0f0f0/999?text=Order';
+              const itemCount = (o.items || []).reduce((acc, i) => acc + (i.qty || i.quantity || 1), 0);
+              const dateStr = o.createdAt?.seconds 
+                ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                : 'Recently';
+              
+              const isDelivered = o.status === 'Delivered';
+              const badgeClass = isDelivered 
+                ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                : 'bg-amber-100 text-amber-800 border-amber-200';
+
+              return `
+                <div onclick="viewOrderDetails('${o.id}')" class="bg-white p-4 rounded-2xl shadow-sm border border-black/5 hover:border-black/20 transition-all cursor-pointer space-y-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <img src="${img}" alt="Order item" class="w-14 h-16 object-cover rounded-xl bg-slate-100 border border-black/5 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f0f0f0/999?text=Order'">
+                      <div class="min-w-0">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-secondary">#${o.id}</span>
+                        <h4 class="font-bold text-xs text-primary truncate mt-0.5">${firstItem.name || 'Merchandise Package'}</h4>
+                        <p class="text-[11px] text-secondary mt-0.5">${dateStr} · ${itemCount} Item${itemCount > 1 ? 's' : ''}</p>
+                      </div>
+                    </div>
+                    <span class="${badgeClass} px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider border select-none flex-shrink-0">
+                      ${o.status || 'In Transit'}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center justify-between pt-2 border-t border-black/5 text-xs">
+                    <span class="text-amber-600 font-bold text-[11px] flex items-center gap-0.5">View details →</span>
+                    <span class="font-extrabold text-sm text-primary">₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+        } catch (e) {
+          console.error('[TBC] Live orders load error:', e);
+        }
+      }
+    });
+  });
+
+  window.viewOrderDetails = function(id) {
+    const o = (window.currentCustomerOrders || []).find(item => item.id === id);
+    if (!o) return;
+
+    const modalId = document.getElementById('modal-order-id');
+    if (modalId) modalId.textContent = `#${o.id}`;
+
+    const modalMethod = document.getElementById('modal-order-method');
+    if (modalMethod) modalMethod.textContent = String(o.paymentMethod || 'Razorpay').toUpperCase();
+
+    const modalStatus = document.getElementById('modal-order-status');
+    if (modalStatus) modalStatus.textContent = o.status || 'Confirmed';
+
+    const modalCust = document.getElementById('modal-order-customer');
+    if (modalCust) modalCust.textContent = o.customerName || 'Valued Customer';
+
+    const modalPhone = document.getElementById('modal-order-phone');
+    if (modalPhone) modalPhone.textContent = o.customerPhoneNumber ? `Phone: +91 ${o.customerPhoneNumber}` : '';
+
+    const modalAddr = document.getElementById('modal-order-address');
+    if (modalAddr) modalAddr.textContent = `${o.customerAddress || ''}, ${o.city || ''}, ${o.state || ''} - ${o.pincode || ''}`;
+
+    const modalTotal = document.getElementById('modal-order-total');
+    if (modalTotal) modalTotal.textContent = `₹${(o.totalAmount || 0).toLocaleString('en-IN')}`;
+
+    const modalWa = document.getElementById('modal-whatsapp-link');
+    if (modalWa) modalWa.href = `https://wa.me/918110061911?text=Hi%20TBC%20Support%2C%20tracking%20update%20for%20Order%20%23${o.id}`;
+
+    const itemsContainer = document.getElementById('modal-order-items');
+    if (itemsContainer) {
+      const items = o.items || [];
+      if (items.length === 0) {
+        itemsContainer.innerHTML = `<p class="text-xs text-secondary">Standard merchandise order package</p>`;
+      } else {
+        itemsContainer.innerHTML = items.map(item => `
+          <div class="bg-surface-container/60 p-3 rounded-xl flex items-center gap-3">
+            <img src="${item.image || item.imageUrl || 'https://placehold.co/200x250/f0f0f0/999?text=Item'}" alt="${item.name || 'Product'}" class="w-12 h-14 object-cover rounded-lg border border-black/10 bg-white flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f0f0f0/999?text=Item'">
+            <div class="flex-1 min-w-0">
+              <h5 class="font-bold text-xs text-primary truncate">${item.name || 'Product'}</h5>
+              <p class="text-[10px] text-secondary font-medium mt-0.5">Size: ${item.size || 'M'} | Qty: ${item.qty || item.quantity || 1}</p>
+              <p class="text-xs font-bold text-primary mt-1">₹${Number(item.price || 0).toLocaleString('en-IN')}</p>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    const modal = document.getElementById('view-order-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  };
+
+  window.closeOrderModal = function() {
+    const modal = document.getElementById('view-order-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  };
+</script>
+
+<!-- Nav Interceptor -->
+<script>
+  document.addEventListener('click', function(e) {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('//')) return;
+    const page = href.split('?')[0];
+    if (!page.endsWith('.html')) return;
+    if (page === 'loading.html') return;
+    e.preventDefault();
+    window.location.href = 'loading.html?next=' + encodeURIComponent(href);
+  });
+</script>
+</body>
+</html>

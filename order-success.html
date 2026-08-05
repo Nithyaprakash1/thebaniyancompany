@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Order Confirmed — THE BANIYAN COMPANY</title>
+  <meta name="description" content="Thank you for your order at THE BANIYAN COMPANY. Your order has been placed successfully.">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#f9f9f9",
+            "on-surface": "#1b1b1b",
+            "primary": "#000000",
+            "on-primary": "#ffffff",
+            "secondary": "#5e5e5e",
+            "surface-container": "#eeeeee"
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes popCheck {
+      0% { transform: scale(0.6); opacity: 0; }
+      70% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop { animation: popCheck 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased min-h-screen">
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-black/5">
+  <div class="max-w-screen-xl mx-auto h-16 px-4 md:px-8 flex items-center justify-between">
+    <a href="home" class="flex items-center gap-3">
+      <img alt="THE BANIYAN COMPANY Logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM">
+      <span class="font-bold tracking-[0.15em] text-sm uppercase text-primary">THE BANIYAN COMPANY</span>
+    </a>
+    <a href="home" class="text-xs font-bold uppercase tracking-wider text-primary underline">Return to Store</a>
+  </div>
+</header>
+
+<main class="pt-28 pb-24 max-w-xl mx-auto px-4 text-center">
+  
+  <div class="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-black/5 space-y-6">
+    
+    <!-- Success Icon Badge -->
+    <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner animate-pop">
+      <span class="material-symbols-outlined text-[44px]">check_circle</span>
+    </div>
+
+    <div>
+      <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest block" id="payment-badge">Order Confirmed</span>
+      <h1 class="text-3xl font-bold text-primary mt-1">Thank You For Your Order!</h1>
+      <p class="text-xs text-secondary mt-2">We have received your order and are preparing your package for dispatch.</p>
+    </div>
+
+    <!-- Order Reference Pill -->
+    <div class="bg-surface-container py-3 px-6 rounded-2xl w-fit mx-auto">
+      <span class="text-xs text-secondary uppercase font-semibold">Order Reference Number</span>
+      <p class="text-lg font-bold text-primary tracking-wider mt-0.5" id="display-order-id">#TBC-889120</p>
+    </div>
+
+    <!-- Info Grid -->
+    <div class="grid grid-cols-2 gap-4 text-left bg-surface-container/50 p-4 rounded-2xl text-xs border border-black/5">
+      <div>
+        <span class="text-secondary font-medium uppercase block text-[10px]">Payment Method</span>
+        <span class="font-bold text-primary" id="display-method">Online Payment (UPI / Card)</span>
+      </div>
+      <div>
+        <span class="text-secondary font-medium uppercase block text-[10px]">Payment Status</span>
+        <span class="font-bold text-emerald-600" id="display-status">Paid</span>
+      </div>
+      <div>
+        <span class="text-secondary font-medium uppercase block text-[10px]">Estimated Delivery</span>
+        <span class="font-bold text-primary">2–4 Business Days</span>
+      </div>
+      <div>
+        <span class="text-secondary font-medium uppercase block text-[10px]">Support</span>
+        <span class="font-bold text-primary">+91 8110061611</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="space-y-3 pt-2">
+      <button onclick="downloadPDFInvoice()" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all shadow-md">
+        <span class="material-symbols-outlined text-[18px]">download</span> Download Invoice (PDF)
+      </button>
+      <a href="profile" class="block w-full bg-primary text-on-primary py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity shadow-md">
+        View Order in Profile &amp; Track
+      </a>
+      <a href="https://wa.me/918110061911?text=Hello%20THE%20BANIYAN%20COMPANY%20Support%2C%20I%20just%20placed%20an%20order%20and%20would%20like%20updates." target="_blank" class="block w-full bg-[#25D366] text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
+        Get Order Updates on WhatsApp (8110061911)
+      </a>
+      <a href="shop" class="block w-full bg-surface-container text-on-surface py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-black/10 transition-colors">
+        Continue Shopping
+      </a>
+    </div>
+
+  </div>
+
+  
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+  window.downloadPDFInvoice = function() {
+    const orderId = document.getElementById('display-order-id')?.textContent || '#TBC-ORDER';
+    const method = document.getElementById('display-method')?.textContent || 'Razorpay Online';
+    const status = document.getElementById('display-status')?.textContent || 'Paid';
+
+    const invoiceEl = document.createElement('div');
+    invoiceEl.style.padding = '32px';
+    invoiceEl.style.fontFamily = 'Inter, sans-serif';
+    invoiceEl.style.color = '#000000';
+    invoiceEl.style.background = '#ffffff';
+    invoiceEl.innerHTML = `
+      <div style="display:flex; justify-between; align-items:center; border-bottom:2px solid #000; padding-bottom:16px; margin-bottom:24px;">
+        <div>
+          <h1 style="font-size:22px; font-weight:800; letter-spacing:2px; margin:0;">THE BANIYAN COMPANY</h1>
+          <p style="font-size:11px; color:#555; margin:4px 0 0 0;">Official Order Tax Invoice</p>
+        </div>
+        <div style="text-align:right;">
+          <span style="font-size:16px; font-weight:800;">${orderId}</span>
+          <p style="font-size:11px; color:#555; margin:4px 0 0 0;">Date: ${new Date().toLocaleDateString('en-IN')}</p>
+        </div>
+      </div>
+
+      <div style="background:#f4f4f5; padding:16px; border-radius:12px; margin-bottom:24px; font-size:12px; line-height:1.7;">
+        <p style="margin:0;"><strong>Seller:</strong> THE BANIYAN COMPANY, Coimbatore, Tamil Nadu</p>
+        <p style="margin:0;"><strong>Payment Method:</strong> ${method}</p>
+        <p style="margin:0;"><strong>Payment Status:</strong> ${status}</p>
+        <p style="margin:0;"><strong>Dispatch Timeline:</strong> 2–4 Business Days</p>
+        <p style="margin:0;"><strong>Customer Support:</strong> +91 8110061611</p>
+      </div>
+
+      <table style="width:100%; border-collapse:collapse; margin-bottom:24px; font-size:12px;">
+        <thead>
+          <tr style="background:#000; color:#fff; text-align:left;">
+            <th style="padding:10px 12px;">Item Description</th>
+            <th style="padding:10px 12px;">Qty</th>
+            <th style="padding:10px 12px; text-align:right;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #e4e4e7;">
+            <td style="padding:12px;">Merchandise Package Order (${orderId})</td>
+            <td style="padding:12px;">1</td>
+            <td style="padding:12px; text-align:right; font-weight:bold;">${status}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="text-align:center; border-top:1px solid #e4e4e7; padding-top:16px; font-size:11px; color:#71717a;">
+        <p style="margin:0;">Thank you for shopping with THE BANIYAN COMPANY!</p>
+        <p style="margin:4px 0 0 0;">This is a computer-generated tax invoice document.</p>
+      </div>
+    `;
+
+    const opt = {
+      margin:       0.4,
+      filename:     `TBC-Invoice-${orderId.replace('#','')}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    if (typeof html2pdf !== 'undefined') {
+      html2pdf().set(opt).from(invoiceEl).save();
+    } else {
+      const printWin = window.open('', '', 'width=800,height=900');
+      printWin.document.write('<html><head><title>Tax Invoice</title></head><body>' + invoiceEl.innerHTML + '</body></html>');
+      printWin.document.close();
+      printWin.print();
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId') || `TBC-${Math.floor(100000 + Math.random() * 900000)}`;
+    const method = params.get('method') || 'Razorpay';
+
+    const idEl = document.getElementById('display-order-id');
+    const methodEl = document.getElementById('display-method');
+    const statusEl = document.getElementById('display-status');
+    const badgeEl = document.getElementById('payment-badge');
+
+    if (idEl) idEl.textContent = orderId.startsWith('#') ? orderId : `#${orderId}`;
+
+    if (method === 'COD') {
+      if (methodEl) methodEl.textContent = 'Cash on Delivery (COD)';
+      if (statusEl) {
+        statusEl.textContent = 'Pending (Pay on Delivery)';
+        statusEl.className = 'font-bold text-amber-600';
+      }
+      if (badgeEl) badgeEl.textContent = 'Order Placed (COD)';
+    } else if (method === 'WhatsApp') {
+      if (methodEl) methodEl.textContent = 'WhatsApp Order';
+      if (statusEl) {
+        statusEl.textContent = 'Pending confirmation';
+        statusEl.className = 'font-bold text-amber-600';
+      }
+      if (badgeEl) badgeEl.textContent = 'Order received on WhatsApp';
+    } else {
+      if (methodEl) methodEl.textContent = 'Online Payment (UPI / Card / NetBanking)';
+      if (statusEl) {
+        statusEl.textContent = 'Paid';
+        statusEl.className = 'font-bold text-emerald-600';
+      }
+      if (badgeEl) badgeEl.textContent = 'Payment Received & Order Confirmed';
+    }
+  });
+</script>
+
+</body>
+</html>

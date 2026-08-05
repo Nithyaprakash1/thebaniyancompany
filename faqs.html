@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FAQs — THE BANIYAN COMPANY</title>
+  <meta name="description" content="Frequently asked questions about orders, sizing, payments, shipping and returns at THE BANIYAN COMPANY.">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#f9f9f9",
+            "on-surface": "#1b1b1b",
+            "primary": "#000000",
+            "on-primary": "#ffffff",
+            "secondary": "#5e5e5e",
+            "surface": "#f9f9f9",
+            "surface-container": "#eeeeee",
+            "surface-container-low": "#f3f3f3",
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { display: none; }
+    html, body { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.25s; }
+    .faq-item.open .faq-answer { max-height: 400px; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-icon { transition: transform 0.3s ease; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased">
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+  <div class="max-w-screen-xl mx-auto h-16 px-4 md:px-8 flex items-center gap-4">
+    <a href="home" aria-label="Back" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors">
+      <span class="material-symbols-outlined text-on-surface text-[22px]">arrow_back</span>
+    </a>
+    <a href="home" class="flex items-center gap-3">
+      <img alt="THE BANIYAN COMPANY Logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM">
+      <span class="font-bold tracking-[0.15em] text-sm text-primary uppercase hidden sm:inline-block">THE BANIYAN COMPANY</span>
+    </a>
+  </div>
+</header>
+
+<main class="pt-16 pb-28 min-h-screen bg-background">
+
+  <!-- Page Banner -->
+  <div class="bg-black text-white px-6 py-14 text-center">
+    <span class="material-symbols-outlined text-[44px] mb-4 block opacity-80">help</span>
+    <h1 class="text-3xl md:text-4xl font-bold tracking-tight mb-2">Frequently Asked Questions</h1>
+    <p class="text-white/60 text-sm max-w-md mx-auto">Quick answers to the most common questions from our customers.</p>
+  </div>
+
+  <!-- FAQ Categories -->
+  <div class="max-w-2xl mx-auto px-4 md:px-8 py-12 space-y-10">
+
+    <!-- Orders -->
+    <div>
+      <h2 class="text-xs font-bold uppercase tracking-widest text-secondary mb-4">Orders & Payments</h2>
+      <div class="space-y-3">
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">How do I place an order?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">Browse our collections on the Shop page, select your size and colour, then tap "Buy Now" or "Add to Cart." Proceed to checkout, fill in your details, and complete payment via Razorpay.</p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">What payment methods do you accept?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">We accept all major UPI apps (GPay, PhonePe, Paytm), credit and debit cards (Visa, Mastercard, Rupay), net banking, and EMI options — all processed securely via Razorpay.</p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">Can I cancel my order after placing it?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">Orders can be cancelled within 1 hour of placement. After that, they are sent to fulfilment. Please contact us immediately via WhatsApp or email if you wish to cancel.</p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">Is my payment information safe?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">Yes. All transactions are processed through Razorpay with 256-bit SSL encryption. We do not store your card or banking details on our servers.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sizing -->
+    <div>
+      <h2 class="text-xs font-bold uppercase tracking-widest text-secondary mb-4">Sizing & Products</h2>
+      <div class="space-y-3">
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">How do I find the right size?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">Each product page includes a detailed size chart with chest, waist, and length measurements. We recommend measuring yourself and comparing with our chart for the best fit. If in doubt, size up.</p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">What fabrics do you use?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">We use only premium materials — Supima cotton, pure linen, luxury knit, and hand-selected blended fabrics. Each product description lists the exact fabric composition for your reference.</p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">Are the colours accurate in photos?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">We shoot all products under consistent studio lighting for accuracy. However, slight colour variation may occur due to monitor calibration differences. If you're unsure, check our reels for a truer-to-life representation.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Shipping & Returns -->
+    <div>
+      <h2 class="text-xs font-bold uppercase tracking-widest text-secondary mb-4">Shipping & Returns</h2>
+      <div class="space-y-3">
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">How long does delivery take?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">Standard delivery takes 4–7 business days across India. Express delivery (2–3 days) is available for select pin codes. You can view our full <a href="shipping" class="text-primary underline underline-offset-2">Shipping Policy</a> for details.</p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">Can I return or exchange a product?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">Yes! Returns and exchanges are accepted within 7 days of delivery on unused items with tags intact. Visit our <a href="return" class="text-primary underline underline-offset-2">Return Policy</a> page for the full process.</p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left group">
+            <span class="font-semibold text-sm text-on-surface">How do I track my order?</span>
+            <span class="material-symbols-outlined text-[20px] faq-icon text-secondary">add</span>
+          </button>
+          <div class="faq-answer">
+            <p class="text-sm text-secondary px-5 pb-5 leading-relaxed">Once dispatched, you'll receive an SMS and email with a tracking link. You can also check your order status anytime in the <a href="profile" class="text-primary underline underline-offset-2">My Orders</a> section of your profile.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="bg-black text-white rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div>
+        <h3 class="font-bold text-sm mb-1">Didn't find your answer?</h3>
+        <p class="text-white/60 text-xs">We're happy to help via WhatsApp or email.</p>
+      </div>
+      <div class="flex gap-3">
+        <a href="https://api.whatsapp.com/send?phone=919999999999" target="_blank" class="bg-[#25D366] text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity whitespace-nowrap flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp
+        </a>
+        <a href="email" class="bg-white text-black px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity whitespace-nowrap">Email Us</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+
+
+<!-- Bottom Nav -->
+<div class="fixed bottom-[5px] left-1/2 -translate-x-1/2 z-50 max-w-lg w-[95%] sm:w-auto">
+  <nav class="bg-black/90 backdrop-blur-xl text-white rounded-full px-6 py-3 shadow-2xl border border-white/15 flex items-center justify-between gap-5 md:gap-8">
+    <a href="home" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">home</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Home</span>
+    </a>
+    <a href="reels" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">video_library</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Reels</span>
+    </a>
+    <a href="shop?focus=search" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">search</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Search</span>
+    </a>
+    <a href="shop" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">grid_view</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Shop</span>
+    </a>
+    <a href="cart" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Cart</span>
+    </a>
+  </nav>
+</div>
+
+<!-- Scripts -->
+<script>
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('//')) return;
+    const page = href.split('?')[0];
+    if (!page.endsWith('.html')) return;
+    if (page === 'loading.html') return;
+    e.preventDefault();
+    window.location.href = 'loading.html?next=' + encodeURIComponent(page);
+  });
+</script>
+</body>
+</html>

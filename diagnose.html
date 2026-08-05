@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TBC Data Diagnostic</title>
+  <style>
+    body { font-family: monospace; background: #0f172a; color: #f8fafc; padding: 2rem; }
+    h1 { color: #4ade80; }
+    .ok { color: #4ade80; }
+    .err { color: #f87171; }
+    .warn { color: #fbbf24; }
+    pre { background: #1e293b; padding: 1rem; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+    .section { margin: 20px 0; border-left: 3px solid #444; padding-left: 16px; }
+  </style>
+</head>
+<body>
+  <h1>⚡ TBC Diagnostic</h1>
+  <p class="warn">Open browser console (F12) for full details. Results will appear below...</p>
+  <div id="output"></div>
+
+  <script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      query,
+      where,
+      limit
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const output = document.getElementById('output');
+    function log(msg, cls = '') {
+      const div = document.createElement('div');
+      div.className = cls;
+      div.innerHTML = msg;
+      output.appendChild(div);
+      console.log(msg);
+    }
+    function section(title) {
+      const div = document.createElement('div');
+      div.className = 'section';
+      div.innerHTML = `<strong>${title}</strong>`;
+      output.appendChild(div);
+      return div;
+    }
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC_uFXsHvXc3sYgq5fDhHMU4aQd-RNpWMQ",
+      authDomain: "shoespot1-56237783-59577.firebaseapp.com",
+      databaseURL: "https://shoespot1-56237783-59577-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "shoespot1-56237783-59577",
+      storageBucket: "shoespot1-56237783-59577.firebasestorage.app",
+      messagingSenderId: "700646716884",
+      appId: "1:700646716884:web:5779e725bb44bfdbc11241"
+    };
+
+    log('⚡ Initializing Firebase...', 'warn');
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    const db = getFirestore(app);
+    log('✅ Firebase initialized — Project: <b>shoespot1-56237783-59577</b>', 'ok');
+
+    // Test 1: Raw fetch all products (no filter)
+    const s1 = section('TEST 1: Fetch ALL products (no companyId filter)');
+    try {
+      const snap = await getDocs(collection(db, 'products'));
+      if (snap.empty) {
+        s1.innerHTML += `<br><span class="warn">⚠ Collection "products" is EMPTY or access DENIED (no docs returned)</span>`;
+      } else {
+        s1.innerHTML += `<br><span class="ok">✅ Found ${snap.size} product(s)</span>`;
+        snap.docs.slice(0, 3).forEach(d => {
+          const data = d.data();
+          s1.innerHTML += `<pre>ID: ${d.id}\ncompanyId: ${data.companyId || 'MISSING'}\nname: ${data.name || 'MISSING'}\ncategory: ${data.category || 'MISSING'}\nvariants count: ${(data.variants||[]).length}\nimageUrls: ${JSON.stringify(data.imageUrls || []).substring(0,80)}</pre>`;
+        });
+      }
+    } catch (e) {
+      s1.innerHTML += `<br><span class="err">❌ ERROR: ${e.code} — ${e.message}</span>`;
+      if (e.code === 'permission-denied') {
+        s1.innerHTML += `<br><span class="err">👉 FIX: Your Firestore Security Rules are blocking reads. Go to Firebase Console → Firestore → Rules and set: <br><pre>rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /{document=**} {\n      allow read: if true;\n    }\n  }\n}</pre></span>`;
+      }
+    }
+
+    // Test 2: Filter by companyId
+    const s2 = section('TEST 2: Fetch products WHERE companyId == "thebaniyancompany"');
+    try {
+      const q = query(collection(db, 'products'), where('companyId', '==', 'thebaniyancompany'), limit(5));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        s2.innerHTML += `<br><span class="warn">⚠ No products with companyId == "thebaniyancompany" found! Check the companyId field value in Firestore.</span>`;
+      } else {
+        s2.innerHTML += `<br><span class="ok">✅ Found ${snap.size} product(s) with companyId filter</span>`;
+        snap.docs.forEach(d => {
+          const data = d.data();
+          s2.innerHTML += `<pre>ID: ${d.id}\nname: ${data.name}\ncompanyId: ${data.companyId}</pre>`;
+        });
+      }
+    } catch (e) {
+      s2.innerHTML += `<br><span class="err">❌ ERROR: ${e.code} — ${e.message}</span>`;
+    }
+
+    // Test 3: Fetch categories
+    const s3 = section('TEST 3: Fetch ALL categories');
+    try {
+      const snap = await getDocs(collection(db, 'categories'));
+      if (snap.empty) {
+        s3.innerHTML += `<br><span class="warn">⚠ Collection "categories" is EMPTY or access DENIED</span>`;
+      } else {
+        s3.innerHTML += `<br><span class="ok">✅ Found ${snap.size} category(s)</span>`;
+        snap.docs.forEach(d => {
+          const data = d.data();
+          s3.innerHTML += `<pre>ID: ${d.id}\nname: ${data.name}\ncompanyId: ${data.companyId || 'MISSING'}\nimageUrl: ${data.imageUrl || 'none'}\nicon: ${data.icon || 'none'}</pre>`;
+        });
+      }
+    } catch (e) {
+      s3.innerHTML += `<br><span class="err">❌ ERROR: ${e.code} — ${e.message}</span>`;
+    }
+
+    log('<br>🏁 Diagnostic complete. Share these results to fix the issue.', 'ok');
+  </script>
+</body>
+</html>

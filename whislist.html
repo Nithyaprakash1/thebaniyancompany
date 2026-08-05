@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Wishlist — THE BANIYAN COMPANY</title>
+  <meta name="description" content="Your saved luxury items at THE BANIYAN COMPANY.">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#f9f9f9",
+            "on-surface": "#1b1b1b",
+            "primary": "#000000",
+            "on-primary": "#ffffff",
+            "secondary": "#5e5e5e",
+            "surface-container": "#eeeeee",
+            "surface-container-low": "#f3f3f3"
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    @layer base { body { -webkit-tap-highlight-color: transparent; } }
+    ::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    #loading-screen {
+      position: fixed; inset: 0; background: #f9f9f9; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .loading-bar { width: 140px; height: 3px; background: #e2e2e2; border-radius: 999px; overflow: hidden; position: relative; }
+    .loading-bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #000, transparent); animation: shimmer 1.2s infinite; }
+
+    /* Liquid Pop Animation */
+    @keyframes liquidPop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.45) rotate(-12deg); filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.7)); }
+      70% { transform: scale(0.85) rotate(6deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .animate-liquid-pop {
+      animation: liquidPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased">
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <div class="flex flex-col items-center gap-4">
+    <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+    <span class="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">THE BANIYAN COMPANY</span>
+    <div class="loading-bar"></div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+  <div class="max-w-screen-xl mx-auto h-16 px-4 md:px-8 flex items-center justify-between">
+    <a href="whislist" aria-label="Wishlist" class="w-10 h-10 rounded-full flex items-center justify-center bg-black/5 text-primary">
+      <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+    </a>
+
+    <a href="home" class="flex items-center gap-3">
+      <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-9 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+      <span class="font-bold tracking-[0.15em] text-sm md:text-base text-primary uppercase hidden sm:inline-block">THE BANIYAN COMPANY</span>
+    </a>
+
+    <div class="flex items-center gap-2">
+      <a href="shop?focus=search" aria-label="Search" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors">
+        <span class="material-symbols-outlined text-[22px]">search</span>
+      </a>
+      <!-- Profile Dropdown -->
+      <div class="relative">
+        <button onclick="toggleProfileDropdown(event)" aria-label="Profile Menu" class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary hover:opacity-90 transition-opacity focus:outline-none shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">person</span>
+        </button>
+        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-black/10 py-2 z-50">
+          <a href="profile" class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-black/5 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">person</span> My Profile
+          </a>
+          <a href="whislist" class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-black/5 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">favorite</span> Wishlist
+          </a>
+          <a href="profile#orders" class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-black/5 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">local_shipping</span> My Orders
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="pt-20 pb-28 md:pb-20 bg-background min-h-screen">
+  <div class="max-w-screen-xl mx-auto px-4 md:px-8">
+    
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-primary tracking-tight">Your Wishlist</h1>
+      <p class="text-sm text-secondary mt-1" id="wishlist-count">4 items saved for your next look</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center">
+      <div class="w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mb-4 text-secondary">
+        <span class="material-symbols-outlined text-[36px]">favorite_border</span>
+      </div>
+      <h2 class="text-xl font-bold text-primary mb-2">Your wishlist is empty</h2>
+      <p class="text-sm text-secondary max-w-xs mb-6">Looks Like you haven't added anything yet. Start exploring!</p>
+      <a href="shop" class="bg-primary text-on-primary px-8 py-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase">Explore Collection</a>
+    </div>
+
+    <!-- Wishlist Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6" id="wishlist-grid">
+      
+      <!-- Wishlist Item 1 -->
+      <div id="item-1" class="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all">
+        <div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-surface-container">
+          <img alt="Noir Editorial Blazer" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmMc6t81D85qcK88-AoEaixZdCckjEijh7L0klxGRZykEiyLhBlGEVyUxy8quhm3CXbnsR1fHGNR8x4LCBhCZv6yD_WEjpxv5lwA4dVABOMD4ny_cV9cL8zVZx0416FNHrn8XgrOowm71KGGibilhYlu0Xtc24lN5-9hE7GjuPaznFEIydGIgqu2KqFRL4BOBPAOGw1UAkLsaAiLV3UTrI2T4dLOcCXKnD9JOt824w69wt48rA9iKFaeA9iEnZKpiHIKa_nv1QdUR2">
+          <button onclick="removeWishlistItem('item-1')" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-red-500 shadow-sm">
+            <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+          </button>
+        </div>
+        <span class="text-[11px] text-secondary uppercase font-semibold">Blazers</span>
+        <h3 class="font-semibold text-sm text-on-surface truncate">Noir Editorial Blazer</h3>
+        <span class="font-bold text-base text-primary mt-1 block">₹4,499</span>
+        <a href="cart" class="w-full mt-3 bg-primary text-on-primary py-2 rounded-lg font-semibold text-xs uppercase tracking-wider block text-center hover:opacity-90 transition-opacity">Add to Bag</a>
+      </div>
+
+      <!-- Wishlist Item 2 -->
+      <div id="item-2" class="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all">
+        <div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-surface-container">
+          <img alt="Scarlet Drama Dress" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiht_triT3pSEHmJ_tQLWcfUaB8ljMq7MPq6C1xSRJg1f3TM7n5cHR1g1uhoeF8dIbladQKySQflPvTruAA1XGkxXoPFeOiSZUMuRb7wQsFmJGc7_2R3ILzTrTOAN9mkLQoNjSTzGWYpAjxHmTOYdyNuP3ky-CrO0q2ZGZgexzfo7kvIFGSiDXEP48RGuHBPxIwryLjwgVdvrTC1PpLI5RYXwDf4VBERj4Dcfist4OBTOLrCmEPS7COCsUfI-nlSh200oFJAgM8Oq7">
+          <button onclick="removeWishlistItem('item-2')" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-red-500 shadow-sm">
+            <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+          </button>
+        </div>
+        <span class="text-[11px] text-secondary uppercase font-semibold">Dresses</span>
+        <h3 class="font-semibold text-sm text-on-surface truncate">Scarlet Drama Dress</h3>
+        <span class="font-bold text-base text-primary mt-1 block">₹2,899</span>
+        <a href="cart" class="w-full mt-3 bg-primary text-on-primary py-2 rounded-lg font-semibold text-xs uppercase tracking-wider block text-center hover:opacity-90 transition-opacity">Add to Bag</a>
+      </div>
+
+      <!-- Wishlist Item 3 -->
+      <div id="item-3" class="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all">
+        <div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-surface-container">
+          <img alt="Cloud Oversized Hoodie" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAphJxmESW7pwQ4vzU8hjz9sgNwlHkW9fE4sRcuCfYWriyVhQW4GXzHSL81k25Av-h9L4pd7cFxPFNdBv7x031NobyDkLh8ay5H7LW_NTNr_Ubk7Lay0XHry3zOCFTPWSkFP4QF0z2UVE8NpwBihn3mQtr5MpqplafKkoDGRKOXfRMtRhMwaZObsaJ58B0b2AG_Tq7RKK6vk3Y6bd9DXVW3paxZY4KIgyUJ1NF7HGaCN2A56F1j4u1J2YOT8VRdtP4N_AW_1NSZAGHB">
+          <button onclick="removeWishlistItem('item-3')" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-red-500 shadow-sm">
+            <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+          </button>
+        </div>
+        <span class="text-[11px] text-secondary uppercase font-semibold">Hoodies</span>
+        <h3 class="font-semibold text-sm text-on-surface truncate">Cloud Oversized Hoodie</h3>
+        <span class="font-bold text-base text-primary mt-1 block">₹2,399</span>
+        <a href="cart" class="w-full mt-3 bg-primary text-on-primary py-2 rounded-lg font-semibold text-xs uppercase tracking-wider block text-center hover:opacity-90 transition-opacity">Add to Bag</a>
+      </div>
+
+      <!-- Wishlist Item 4 -->
+      <div id="item-4" class="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all">
+        <div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-surface-container">
+          <img alt="Ethereal White Co-ord" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAi4Q5I3A76btm1NUlV9ptockZBC308TGHEYI8pkUJe_lLh1nDa09-qjzkhVwuzUilTJ2CilbQXl4PpEImzsFuFAoC1pq5H9gfliVnDcwkcc_2WX8gNYI1ccLACFkiCGBPKSf4RH0p2vHn1bJ36gAiPWL3f-hS6m7gl-3bqKA_UPL71gOyRTd6E6CTuE8pHUMRmXxRRZQ7dXli9yDBHnc9pojhp4FSJSYt0a6sMzVd0ysCGFG6JmMNyDlfA9phcPaECu-ucIVdrADxX">
+          <button onclick="removeWishlistItem('item-4')" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-red-500 shadow-sm">
+            <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+          </button>
+        </div>
+        <span class="text-[11px] text-secondary uppercase font-semibold">Co-ords</span>
+        <h3 class="font-semibold text-sm text-on-surface truncate">Ethereal White Co-ord</h3>
+        <span class="font-bold text-base text-primary mt-1 block">₹3,299</span>
+        <a href="cart" class="w-full mt-3 bg-primary text-on-primary py-2 rounded-lg font-semibold text-xs uppercase tracking-wider block text-center hover:opacity-90 transition-opacity">Add to Bag</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+
+
+<!-- Floating Pill Rounded Bottom Navigation Bar -->
+<div class="fixed bottom-[5px] left-1/2 -translate-x-1/2 z-50 max-w-lg w-[92%] sm:w-auto">
+  <nav class="bg-black/90 backdrop-blur-xl text-white rounded-full px-8 py-3 shadow-2xl border border-white/15 flex items-center justify-between gap-8 md:gap-12">
+    <a href="home" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">home</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Home</span>
+    </a>
+    <a href="reels" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">video_library</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Reels</span>
+    </a>
+    <a href="shop" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">grid_view</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Shop</span>
+    </a>
+    <a href="cart" class="relative flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+      <span class="cart-badge-count absolute -top-1 right-2.5 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm border border-black">0</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Cart</span>
+    </a>
+    <a href="profile" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">person</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Profile</span>
+    </a>
+  </nav>
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    const ls = document.getElementById('loading-screen');
+    if (ls) ls.classList.add('hidden');
+  });
+
+  function removeWishlistItem(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.opacity = '0';
+      el.style.transform = 'scale(0.9)';
+      setTimeout(() => {
+        el.remove();
+        const remaining = document.querySelectorAll('#wishlist-grid > div').length;
+        document.getElementById('wishlist-count').innerText = `${remaining} items saved for your next look`;
+        if (remaining === 0) {
+          document.getElementById('wishlist-grid').classList.add('hidden');
+          document.getElementById('empty-state').classList.remove('hidden');
+          document.getElementById('empty-state').classList.add('flex');
+        }
+      }, 300);
+    }
+  }
+
+  function toggleProfileDropdown(e) {
+    e.stopPropagation();
+    const dropdown = document.getElementById('profile-dropdown');
+    dropdown.classList.toggle('hidden');
+  }
+  document.addEventListener('click', () => {
+    const d = document.getElementById('profile-dropdown');
+    if (d && !d.classList.contains('hidden')) d.classList.add('hidden');
+  });
+</script>
+
+<!-- Nav Interceptor: route all internal page links through loading.html -->
+<script>
+  document.addEventListener('click', function(e) {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('//')) return;
+    const page = href.split('?')[0];
+    if (!page.endsWith('.html')) return;
+    if (page === 'loading.html') return;
+    e.preventDefault();
+    window.location.href = 'loading.html?next=' + encodeURIComponent(page);
+  });
+</script>
+<script type="module">
+  import { getProducts, formatMoney, getCompany } from './js/products-service.js';
+  import { getWishlistIds, removeWishlistItem as removeStoredItem } from './js/wishlist-store.js';
+
+  getCompany().then(comp => {
+    if (comp?.logo) {
+      const el = document.getElementById('nav-company-logo');
+      if (el) el.src = comp.logo;
+      const lEl = document.getElementById('loading-company-logo');
+      if (lEl) lEl.src = comp.logo;
+    }
+  }).catch(() => {});
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
+  document.addEventListener('DOMContentLoaded', async () => {
+    const grid = document.getElementById('wishlist-grid');
+    const empty = document.getElementById('empty-state');
+    const count = document.getElementById('wishlist-count');
+    const render = async () => {
+      const ids = getWishlistIds();
+      const products = (await getProducts()).filter(product => ids.includes(product.id));
+      if (count) count.textContent = `${products.length} item${products.length === 1 ? '' : 's'} saved for your next look`;
+      if (grid) grid.innerHTML = products.map(product => {
+        const imgUrl = (Array.isArray(product.imageUrls) && product.imageUrls[0]) || product.imageUrl || product.image || 'https://placehold.co/400x500/f0f0f0/999?text=No+Image';
+        return `<div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-black/5 flex flex-col justify-between"><a href="product-detail?id=${encodeURIComponent(product.id)}" class="block"><div class="aspect-[3/4] overflow-hidden bg-surface-container"><img class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" src="${esc(imgUrl)}" alt="${esc(product.name)}" onerror="this.src='https://placehold.co/400x500/f0f0f0/999?text=No+Image'"></div><div class="p-3"><span class="text-[10px] text-secondary uppercase font-bold">${esc(product.category || 'COLLECTION')}</span><h3 class="font-semibold text-sm text-on-surface truncate mt-0.5">${esc(product.name)}</h3><span class="font-bold text-sm text-primary mt-1 block">${formatMoney(product.price)}</span></div></a><button onclick="window.removeSavedProduct('${product.id}')" class="w-full py-2.5 text-xs font-bold text-rose-600 bg-neutral-50 hover:bg-rose-50 border-t border-black/5 transition-colors">Remove</button></div>`;
+      }).join('');
+      grid?.classList.toggle('hidden', !products.length);
+      empty?.classList.toggle('hidden', Boolean(products.length));
+      empty?.classList.toggle('flex', !products.length);
+    };
+    window.removeSavedProduct = async id => { removeStoredItem(id); await render(); };
+    await render();
+  });
+</script>
+</body>
+</html>

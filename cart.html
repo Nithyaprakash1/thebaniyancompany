@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Shopping Bag — THE BANIYAN COMPANY</title>
+  <meta name="description" content="Your shopping bag at THE BANIYAN COMPANY. Review your selected premium basics and proceed to checkout.">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#f9f9f9",
+            "on-surface": "#1b1b1b",
+            "primary": "#000000",
+            "on-primary": "#ffffff",
+            "secondary": "#5e5e5e",
+            "surface-container": "#eeeeee",
+            "surface-container-low": "#f3f3f3"
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    @layer base { body { -webkit-tap-highlight-color: transparent; } }
+    ::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    #loading-screen {
+      position: fixed; inset: 0; background: #f9f9f9; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .loading-bar { width: 140px; height: 3px; background: #e2e2e2; border-radius: 999px; overflow: hidden; position: relative; }
+    .loading-bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #000, transparent); animation: shimmer 1.2s infinite; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased">
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <div class="flex flex-col items-center gap-4">
+    <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+    <span class="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">THE BANIYAN COMPANY</span>
+    <div class="loading-bar"></div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+  <div class="max-w-screen-xl mx-auto h-16 px-4 md:px-8 flex items-center justify-between">
+    <a href="whislist" aria-label="Wishlist" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors">
+      <span class="material-symbols-outlined text-[22px]">favorite_border</span>
+    </a>
+
+    <a href="home" class="flex items-center gap-3">
+      <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-9 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+      <span class="font-bold tracking-[0.15em] text-sm md:text-base text-primary uppercase hidden sm:inline-block">THE BANIYAN COMPANY</span>
+    </a>
+
+    <div class="flex items-center gap-3">
+      <a href="shop.html?focus=search" aria-label="Search" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors">
+        <span class="material-symbols-outlined text-[22px]">search</span>
+      </a>
+      <!-- Profile Dropdown -->
+      <div class="relative">
+        <button onclick="toggleProfileDropdown(event)" aria-label="Profile Menu" class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary hover:opacity-90 transition-opacity focus:outline-none shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">person</span>
+        </button>
+        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-black/10 py-2 z-50">
+          <a href="profile" class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-black/5 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">person</span> My Profile
+          </a>
+          <a href="whislist" class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-black/5 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">favorite</span> Wishlist
+          </a>
+          <a href="profile#orders" class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-black/5 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">local_shipping</span> My Orders
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="pt-20 pb-28 md:pb-20 bg-background min-h-screen">
+  <div class="max-w-screen-xl mx-auto px-4 md:px-8">
+    
+    <div class="flex justify-between items-end mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-primary tracking-tight">Shopping Bag 🛍️</h1>
+        <p class="text-sm text-secondary mt-1" id="bag-count">3 Items in your selection</p>
+      </div>
+    </div>
+
+    <!-- Empty Cart State -->
+    <div id="empty-cart" class="hidden flex-col items-center justify-center py-20 text-center">
+      <div class="w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mb-4 text-secondary">
+        <span class="material-symbols-outlined text-[36px]">shopping_bag</span>
+      </div>
+      <h2 class="text-xl font-bold text-primary mb-2">Your bag is empty 🛍️</h2>
+      <p class="text-sm text-secondary max-w-xs mb-6">Looks like you haven't added anything yet. Start exploring!</p>
+      <a href="shop" class="bg-primary text-on-primary px-8 py-3.5 rounded-xl font-semibold text-xs tracking-wider uppercase shadow-md">Start Shopping 🚀</a>
+    </div>
+
+    <!-- Cart Layout Grid -->
+    <div id="cart-content" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Cart Items List -->
+      <div class="lg:col-span-2 space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Order Summary Column -->
+      <div class="lg:col-span-1">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-black/10 sticky top-24 space-y-5">
+          <div class="flex items-center justify-between border-b border-black/10 pb-4">
+            <h2 class="font-bold text-sm uppercase tracking-wider text-primary">Order Summary 🧾</h2>
+            <span class="text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">Express Delivery 🚚</span>
+          </div>
+
+          <div class="space-y-3.5 text-xs">
+            <div class="flex justify-between items-center text-secondary">
+              <span>Items Subtotal 📦</span>
+              <span id="subtotal" class="text-on-surface font-bold text-sm">₹0</span>
+            </div>
+            <div class="flex justify-between items-center text-secondary">
+              <span>Express Shipping 🚚</span>
+              <span class="text-emerald-700 font-extrabold text-xs uppercase bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">FREE 🎉</span>
+            </div>
+            <div id="tax-row" class="flex justify-between items-center text-secondary pb-3.5 border-b border-black/10 hidden">
+              <span>Estimated Taxes (GST) 🧾</span>
+              <span id="tax" class="text-on-surface font-semibold text-xs">₹0</span>
+            </div>
+            <div class="flex justify-between items-center text-base font-extrabold text-primary pt-1">
+              <span>Total Amount 💰</span>
+              <span id="total" class="text-lg text-black">₹0</span>
+            </div>
+          </div>
+
+          <button onclick="proceedToCheckout()" class="w-full bg-black text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-neutral-800 transition-all shadow-lg hidden lg:flex items-center justify-center gap-2">
+            Proceed to Checkout ⚡ <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+          
+          <div class="flex items-center justify-center gap-2 text-secondary text-[11px] pt-1">
+            <span class="material-symbols-outlined text-[16px] text-emerald-600">lock</span>
+            <span class="font-semibold">🔒 256-Bit SSL Encrypted Checkout</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- FIXED BOTTOM CHECKOUT BAR (Mobile Sticky at Bottom) -->
+<div id="cart-fixed-checkout-bar" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 max-w-xl w-[94%] bg-white/95 backdrop-blur-2xl border border-black/15 rounded-2xl p-3.5 shadow-2xl flex lg:hidden items-center justify-between gap-4">
+  <div>
+    <span class="text-[10px] font-bold text-secondary uppercase tracking-wider block">Total Payable</span>
+    <span id="fixed-cart-total" class="font-extrabold text-base text-primary">₹0</span>
+  </div>
+  <button onclick="proceedToCheckout()" class="flex-1 bg-black hover:bg-neutral-800 text-white py-3.5 px-5 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 transition-all active:scale-98">
+    Proceed to Checkout ⚡ <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+  </button>
+</div>
+
+<!-- Floating Pill Rounded Bottom Navigation Bar -->
+<div class="fixed bottom-[5px] left-1/2 -translate-x-1/2 z-50 max-w-lg w-[95%] sm:w-auto">
+  <nav class="bg-black/90 backdrop-blur-xl text-white rounded-full px-6 py-3 shadow-2xl border border-white/15 flex items-center justify-between gap-5 md:gap-8">
+    <a href="home" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">home</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Home</span>
+    </a>
+    <a href="reels" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">video_library</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Reels</span>
+    </a>
+    <a href="shop" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">grid_view</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Shop</span>
+    </a>
+    <a href="cart" class="relative flex flex-col items-center gap-0.5 text-white font-bold transition-transform active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+      <span class="cart-badge-count absolute -top-1 right-2.5 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm border border-black">0</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Cart</span>
+    </a>
+    <a href="profile" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">person</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Profile</span>
+    </a>
+  </nav>
+</div>
+
+<script type="module">
+  import tbcCart from './js/cart-store.js';
+  import { getCompany } from './js/products-service.js';
+
+  getCompany().then(comp => {
+    if (comp?.logo) {
+      const el = document.getElementById('nav-company-logo');
+      if (el) el.src = comp.logo;
+      const lEl = document.getElementById('loading-company-logo');
+      if (lEl) lEl.src = comp.logo;
+    }
+  }).catch(() => {});
+
+  window.renderCartUI = function() {
+    const items = tbcCart.getCart();
+    const totals = tbcCart.getCartTotals();
+    const bagCount = document.getElementById('bag-count');
+    const emptyCart = document.getElementById('empty-cart');
+    const cartContent = document.getElementById('cart-content');
+    const itemsContainer = document.querySelector('#cart-content .lg\\:col-span-2');
+    const subtotalEl = document.getElementById('subtotal');
+    const taxEl = document.getElementById('tax');
+    const taxRowEl = document.getElementById('tax-row');
+    const totalEl = document.getElementById('total');
+    const fixedTotalEl = document.getElementById('fixed-cart-total');
+    const fixedBarEl = document.getElementById('cart-fixed-checkout-bar');
+
+    if (bagCount) bagCount.textContent = `${totals.itemCount} Item${totals.itemCount !== 1 ? 's' : ''} in your selection`;
+
+    if (items.length === 0) {
+      if (cartContent) cartContent.classList.add('hidden');
+      if (emptyCart) {
+        emptyCart.classList.remove('hidden');
+        emptyCart.classList.add('flex');
+      }
+      if (fixedBarEl) fixedBarEl.classList.add('hidden');
+      if (subtotalEl) subtotalEl.textContent = '₹0';
+      if (taxEl) taxEl.textContent = '₹0';
+      if (totalEl) totalEl.textContent = '₹0';
+      if (fixedTotalEl) fixedTotalEl.textContent = '₹0';
+      return;
+    }
+
+    if (emptyCart) emptyCart.classList.add('hidden');
+    if (cartContent) {
+      cartContent.classList.remove('hidden');
+      cartContent.classList.add('grid');
+    }
+
+    if (itemsContainer) {
+      itemsContainer.innerHTML = items.map((item) => `
+        <div id="cart-item-${item.cartItemId}" class="flex gap-4 p-4 bg-white rounded-2xl shadow-sm border border-black/5 items-center">
+          <img class="w-24 h-28 object-cover rounded-xl bg-surface-container flex-shrink-0" alt="${item.name}" src="${item.image || item.imageUrl || (item.imageUrls && item.imageUrls[0]) || 'https://placehold.co/400x500/f0f0f0/999?text=No+Image'}" onerror="this.src='https://placehold.co/400x500/f0f0f0/999?text=No+Image'">
+          <div class="flex flex-col justify-between flex-1 min-w-0">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold text-base text-primary truncate">${item.name}</h3>
+                <p class="text-xs text-secondary mt-0.5">Size: ${item.size} | Color: ${item.color}</p>
+              </div>
+              <button onclick="window.removeCartItem('${item.cartItemId}')" class="text-secondary hover:text-error transition-colors p-1">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+            <div class="flex justify-between items-center mt-4">
+              <div class="flex items-center bg-surface-container rounded-lg px-2 py-1 gap-3">
+                <button onclick="window.changeQty('${item.cartItemId}', ${item.quantity - 1})" class="w-6 h-6 flex items-center justify-center font-bold text-sm text-primary hover:bg-white rounded">-</button>
+                <span class="text-sm font-semibold w-4 text-center">${item.quantity}</span>
+                <button onclick="window.changeQty('${item.cartItemId}', ${item.quantity + 1})" class="w-6 h-6 flex items-center justify-center font-bold text-sm text-primary hover:bg-white rounded">+</button>
+              </div>
+              <span class="font-bold text-base text-primary">₹${(item.price * item.quantity).toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    if (subtotalEl) subtotalEl.textContent = `₹${totals.subtotal.toLocaleString()}`;
+    if (taxEl) taxEl.textContent = `₹${totals.tax.toLocaleString()}`;
+
+    if (taxRowEl) {
+      if (totals.isGstEnabled && totals.tax > 0) {
+        taxRowEl.classList.remove('hidden');
+        taxRowEl.style.display = 'flex';
+      } else {
+        taxRowEl.classList.add('hidden');
+        taxRowEl.style.display = 'none';
+      }
+    }
+
+    if (totalEl) totalEl.textContent = `₹${totals.grandTotal.toLocaleString()}`;
+    if (fixedTotalEl) fixedTotalEl.textContent = `₹${totals.grandTotal.toLocaleString()}`;
+    if (fixedBarEl) {
+      if (items.length === 0) fixedBarEl.classList.add('hidden');
+      else fixedBarEl.classList.remove('hidden');
+    }
+  };
+
+  window.changeQty = function(cartItemId, newQty) {
+    try {
+      tbcCart.updateQuantity(cartItemId, newQty);
+      window.renderCartUI();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  window.removeCartItem = function(cartItemId) {
+    tbcCart.removeFromCart(cartItemId);
+    window.renderCartUI();
+  };
+
+  window.proceedToCheckout = function() {
+    if (tbcCart.getCart().length === 0) {
+      alert("Your shopping bag is empty!");
+      return;
+    }
+    window.location.href = 'checkout.html';
+  };
+
+  window.toggleProfileDropdown = function(e) {
+    if (e) e.stopPropagation();
+    const dropdown = document.getElementById('profile-dropdown');
+    if (dropdown) dropdown.classList.toggle('hidden');
+  };
+
+  import { getCompany } from './js/products-service.js';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const loader = document.getElementById('loading-screen');
+    if (loader) loader.classList.add('hidden');
+    window.renderCartUI();
+
+    getCompany().then(comp => {
+      if (comp && comp.isCouponEnabled !== undefined) {
+        const couponWrappers = document.querySelectorAll('.coupon-box-wrapper, #coupon-box-wrapper');
+        couponWrappers.forEach(el => {
+          if (comp.isCouponEnabled === false) {
+            el.classList.add('hidden');
+          } else {
+            el.classList.remove('hidden');
+          }
+        });
+      }
+    }).catch(() => {});
+  });
+</script>
+
+<!-- Nav Interceptor: route all internal page links through loading.html -->
+<script>
+  document.addEventListener('click', function(e) {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('//')) return;
+    const page = href.split('?')[0];
+    if (!page.endsWith('.html')) return;
+    if (page === 'loading.html') return;
+    e.preventDefault();
+    window.location.href = 'loading.html?next=' + encodeURIComponent(href);
+  });
+</script>
+</body>
+</html>

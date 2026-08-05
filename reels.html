@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Reels — THE BANIYAN COMPANY</title>
+  <meta name="description" content="Shop live fashion feeds and reels from THE BANIYAN COMPANY.">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#000000",
+            "on-surface": "#ffffff",
+            "primary": "#ffffff",
+            "on-primary": "#000000",
+            "secondary": "#a0a0a0",
+            "error": "#e11d48"
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      background: #000000;
+      color: #fff;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Shimmer Skeleton Loader for Images & Video Placeholders */
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .shimmer {
+      background: linear-gradient(90deg, #121212 25%, #2a2a2a 50%, #121212 75%) !important;
+      background-size: 200% 100% !important;
+      animation: shimmer 1.5s infinite linear !important;
+    }
+    .shimmer-light {
+      background: linear-gradient(90deg, #f1f5f9 25%, #cbd5e1 50%, #f1f5f9 75%) !important;
+      background-size: 200% 100% !important;
+      animation: shimmer 1.5s infinite linear !important;
+    }
+
+    /* Hardware-Accelerated 60fps Snap Container */
+    .reels-feed {
+      height: 100vh;
+      height: 100dvh;
+      width: 100vw;
+      width: 100dvw;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      position: relative;
+      will-change: scroll-position;
+      transform: translateZ(0);
+    }
+    .reel-card {
+      height: 100vh;
+      height: 100dvh;
+      width: 100vw;
+      width: 100dvw;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      will-change: transform;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Liquid Pop Animation */
+    @keyframes liquidPop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.45) rotate(-12deg); filter: drop-shadow(0 0 12px rgba(225, 29, 72, 0.8)); }
+      70% { transform: scale(0.85) rotate(6deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .animate-liquid-pop {
+      animation: liquidPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Mute Indicator Animation */
+    @keyframes fadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(1.5); }
+    }
+    .mute-toast {
+      animation: fadeOut 0.8s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-black text-white antialiased">
+
+<!-- Floating Top Header Bar -->
+<header class="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-8 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-auto pt-[max(1rem,env(safe-area-inset-top))]">
+  <div class="flex items-center gap-3">
+    <a href="home" aria-label="Back to Home" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all">
+      <span class="material-symbols-outlined text-[22px]">arrow_back</span>
+    </a>
+    <div class="flex items-center gap-2">
+      <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='https://placehold.co/200x200/ffffff/000000?text=TBC'">
+      <span class="font-bold tracking-[0.2em] text-xs uppercase text-white hidden sm:inline-block">Reels</span>
+    </div>
+  </div>
+</header>
+
+<!-- Main Reels Feed -->
+<main class="reels-feed" id="reels-container">
+  <div class="h-[100dvh] w-full flex flex-col items-center justify-center text-center gap-3">
+    <span class="material-symbols-outlined animate-spin text-4xl text-white/60">motion_photos_on</span>
+    <p class="text-xs uppercase tracking-widest font-semibold text-white/60">Loading Reels...</p>
+  </div>
+</main>
+
+<!-- Floating Bottom Pill Navigation Bar -->
+<div class="fixed bottom-[5px] left-1/2 -translate-x-1/2 z-50 max-w-lg w-[92%] sm:w-auto mb-[env(safe-area-inset-bottom)]">
+  <nav class="bg-black/90 backdrop-blur-xl text-white rounded-full px-6 py-3 shadow-2xl border border-white/20 flex items-center justify-between gap-5 md:gap-8">
+    <a href="home" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">home</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Home</span>
+    </a>
+    <a href="reels" class="flex flex-col items-center gap-0.5 text-white font-bold transition-transform active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">video_library</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Reels</span>
+    </a>
+    <a href="shop" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">grid_view</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Shop</span>
+    </a>
+    <a href="cart" class="relative flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+      <span class="cart-badge-count absolute -top-1 right-2.5 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm border border-black">0</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Cart</span>
+    </a>
+    <a href="profile" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">person</span>
+      <span class="text-[10px] font-semibold tracking-wider uppercase">Profile</span>
+    </a>
+  </nav>
+</div>
+
+<!-- Share Options Drawer Modal -->
+<div id="share-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-end md:items-center justify-center p-4">
+  <div class="bg-neutral-900 border border-white/10 rounded-3xl p-6 max-w-sm w-full space-y-5">
+    <div class="flex justify-between items-center pb-3 border-b border-white/10">
+      <h3 class="font-bold text-sm uppercase tracking-wider text-white">Share Reel</h3>
+      <button onclick="closeShareModal()" class="text-white/60 hover:text-white">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+    <div class="grid grid-cols-3 gap-4 py-2">
+      <button onclick="copyReelLink()" class="flex flex-col items-center gap-2 group">
+        <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform"><span class="material-symbols-outlined text-[28px]">link</span></div>
+        <span class="text-[11px] font-semibold text-white/80">Copy Link</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let isGlobalMuted = true;
+
+  // ──────────────── AUDIO MGMT ────────────────
+  function toggleAudioGlobal() {
+    isGlobalMuted = !isGlobalMuted;
+    const icon = document.getElementById('audio-icon');
+    icon.innerText = isGlobalMuted ? 'volume_off' : 'volume_up';
+    
+    document.querySelectorAll('video').forEach(vid => {
+      vid.muted = isGlobalMuted;
+    });
+
+    // Visual Toast
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/60 backdrop-blur-xl p-6 rounded-full z-[100] mute-toast pointer-events-none';
+    toast.innerHTML = `<span class="material-symbols-outlined text-white text-4xl">${isGlobalMuted ? 'volume_off' : 'volume_up'}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 800);
+  }
+
+  function togglePlayPause(video) {
+    if (video.paused) video.play();
+    else video.pause();
+  }
+
+  // ──────────────── SOCIAL ACTIONS ────────────────
+  function toggleLike(btn, countId) {
+    const box = btn.querySelector('.like-btn-box');
+    const icon = box.querySelector('span');
+    
+    box.classList.remove('animate-liquid-pop');
+    void box.offsetWidth; 
+    box.classList.add('animate-liquid-pop');
+
+    if (box.classList.contains('text-red-500')) {
+      box.classList.remove('text-red-500', 'bg-red-500/20');
+      box.classList.add('text-white');
+      icon.style.fontVariationSettings = "'FILL' 0";
+    } else {
+      box.classList.remove('text-white');
+      box.classList.add('text-red-500', 'bg-red-500/20');
+      icon.style.fontVariationSettings = "'FILL' 1";
+    }
+  }
+
+  function shareReel(title) {
+    document.getElementById('share-modal').classList.remove('hidden');
+    document.getElementById('share-modal').classList.add('flex');
+  }
+
+  function closeShareModal() {
+    document.getElementById('share-modal').classList.add('hidden');
+    document.getElementById('share-modal').classList.remove('flex');
+  }
+
+  function copyReelLink() {
+    closeShareModal();
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-16 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-3 rounded-full text-xs font-bold uppercase z-50 flex items-center gap-2';
+    toast.innerHTML = 'Link copied!';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  }
+
+  function openComments(title) {
+    document.getElementById('modal-title').innerText = `Comments · ${title}`;
+    document.getElementById('comments-modal').classList.remove('hidden');
+    document.getElementById('comments-modal').classList.add('flex');
+  }
+
+  function closeComments() {
+    document.getElementById('comments-modal').classList.add('hidden');
+    document.getElementById('comments-modal').classList.remove('flex');
+  }
+
+  function postComment() {
+    const input = document.getElementById('comment-input');
+    if (input.value.trim()) {
+      alert('Comment posted!');
+      input.value = '';
+      closeComments();
+    }
+  }
+</script>
+
+<!-- Nav Interceptor -->
+<script>
+  document.addEventListener('click', function(e) {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('http')) return;
+    if (href.endsWith('.html') && href !== 'loading.html') {
+      e.preventDefault();
+      window.location.href = 'loading.html?next=' + encodeURIComponent(href);
+    }
+  });
+</script>
+
+<script type="module">
+  import { getProducts, getCompany, formatMoney } from './js/products-service.js';
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
+
+  function extractYouTubeId(url) {
+    if (!url || typeof url !== 'string') return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2] && match[2].length === 11) ? match[2] : null;
+  }
+
+  function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const [products, company] = await Promise.all([getProducts(), getCompany()]);
+      const feed = document.getElementById('reels-container');
+      if (!feed) return;
+
+      const youtubeLinks = (company && Array.isArray(company.youtubeLinks)) ? company.youtubeLinks : [];
+      
+      // Build YouTube Short reel items
+      const ytReels = youtubeLinks.map((ytUrl, i) => {
+        const ytId = extractYouTubeId(ytUrl);
+        const assocProduct = (products && products.length > 0) ? products[i % products.length] : null;
+        return {
+          id: assocProduct ? assocProduct.id : `yt-short-${i}`,
+          name: assocProduct ? assocProduct.name : 'Exclusive Streetwear Drop',
+          category: 'YouTube Shorts',
+          youtubeUrl: ytUrl,
+          youtubeId: ytId,
+          imageUrls: [ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (assocProduct?.imageUrls?.[0] || '')],
+          price: assocProduct ? assocProduct.price : 1499,
+          originalPrice: assocProduct ? assocProduct.originalPrice : 2499,
+          description: assocProduct ? assocProduct.description : 'Watch our latest YouTube Short & shop the drop live!'
+        };
+      });
+
+      // Combine products and YouTube Shorts
+      let allReelItems = [...(products || [])];
+      
+      // Attach youtubeId to products if their videoUrl/youtubeUrl has one
+      allReelItems = allReelItems.map(p => {
+        const ytId = extractYouTubeId(p.youtubeUrl || p.videoUrl);
+        return ytId ? { ...p, youtubeId: ytId } : p;
+      });
+
+      // Merge standalone YouTube Shorts links from admin
+      if (ytReels.length > 0) {
+        allReelItems = [...allReelItems, ...ytReels];
+      }
+
+      if (!allReelItems || allReelItems.length === 0) {
+        feed.innerHTML = `
+          <div class="h-screen w-full flex items-center justify-center text-center p-8">
+            <p class="text-secondary text-sm">No reels available right now.</p>
+          </div>`;
+        return;
+      }
+
+      // Randomly shuffle reels like YouTube Shorts!
+      const shuffledReels = shuffleArray(allReelItems);
+
+      const companyName   = company?.name || 'THE BANIYAN COMPANY';
+      const companyHandle = company?.handle || '@thebaniyancompany';
+      const companyLogo   = company?.logo || '';
+
+      // Update header logo / name if element exists
+      const logoEl = document.getElementById('nav-company-logo');
+      if (logoEl && companyLogo) logoEl.src = companyLogo;
+      const headerBrand = document.querySelector('header .font-bold.tracking-\\[0\\.2em\\]');
+      if (headerBrand) headerBrand.textContent = companyName;
+
+  window.handleReelDoubleTap = function(card, idx) {
+    const btn = card.querySelector('.like-btn-box');
+    if (btn && !btn.classList.contains('text-red-500')) {
+      const btnParent = btn.closest('button');
+      if (btnParent && typeof toggleLike === 'function') {
+        toggleLike(btnParent, `like-count-dyn-${idx}`);
+      }
+    }
+
+    // Floating heart animation in center
+    const heart = document.createElement('div');
+    heart.className = 'absolute inset-0 flex items-center justify-center pointer-events-none z-40 animate-liquid-pop';
+    heart.innerHTML = '<span class="material-symbols-outlined text-red-500 text-7xl drop-shadow-2xl" style="font-variation-settings: \'FILL\' 1;">favorite</span>';
+    card.appendChild(heart);
+    setTimeout(() => heart.remove(), 800);
+  };
+
+  function renderReelList(list) {
+    return list.map((product, idx) => {
+      const image = (product.imageUrls && product.imageUrls[0]) ? product.imageUrls[0] : 'https://placehold.co/600x900/000/fff?text=TBC';
+      const price = product.price || (product.variants && product.variants[0] ? product.variants[0].price : 0);
+      const origPrice = product.originalPrice;
+      const discountBadge = origPrice && origPrice > price
+        ? `<span class="bg-error text-on-error px-2 py-0.5 rounded text-[10px] font-bold">-${Math.round(((origPrice - price) / origPrice) * 100)}%</span>`
+        : (product.discount ? `<span class="bg-error text-on-error px-2 py-0.5 rounded text-[10px] font-bold">${esc(product.discount)}</span>` : '');
+
+      const logoMarkup = companyLogo
+        ? `<img src="${companyLogo}" class="w-full h-full object-cover rounded-full">`
+        : `<div class="w-full h-full rounded-full bg-white text-black font-bold flex items-center justify-center border border-white/40 shadow-md">${companyName.charAt(0)}</div>`;
+
+      const ytId = product.youtubeId || extractYouTubeId(product.youtubeUrl || product.videoUrl);
+      const isMp4 = product.videoUrl && product.videoUrl.endsWith('.mp4');
+
+      let mediaMarkup = '';
+      if (ytId) {
+        mediaMarkup = `
+          <div class="reel-media-holder w-full h-full relative overflow-hidden bg-black flex items-center justify-center pointer-events-none"
+               data-ytid="${esc(ytId)}" data-bgimg="${esc(image)}">
+            <img class="w-full h-full object-cover shimmer" src="${esc(image)}" alt="${esc(product.name)}" onload="this.classList.remove('shimmer')">
+          </div>`;
+      } else if (isMp4) {
+        mediaMarkup = `
+          <div class="reel-media-holder w-full h-full relative overflow-hidden bg-black flex items-center justify-center pointer-events-none"
+               data-mp4="${esc(product.videoUrl)}" data-bgimg="${esc(image)}">
+            <video class="reel-video w-full h-full object-cover" src="${esc(product.videoUrl)}" autoplay loop muted playsinline></video>
+          </div>`;
+      } else {
+        mediaMarkup = `
+          <div class="w-full h-full relative overflow-hidden bg-black flex items-center justify-center pointer-events-none">
+            <img class="reel-video w-full h-full object-cover shimmer" src="${esc(image)}" alt="${esc(product.name)}" onload="this.classList.remove('shimmer')">
+          </div>`;
+      }
+
+      return `
+        <div class="reel-card relative select-none" data-idx="${idx}" ondblclick="handleReelDoubleTap(this, ${idx})">
+          ${mediaMarkup}
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 pointer-events-none z-10"></div>
+
+          <!-- Right Action Sidebar (ONLY Like, Share, Thumbnail) -->
+          <div class="absolute right-4 bottom-20 md:bottom-24 md:right-8 flex flex-col items-center gap-5 z-30 pb-[env(safe-area-inset-bottom)]">
+            <!-- Like Button (Without Count Text) -->
+            <button onclick="toggleLike(this)" class="flex flex-col items-center group" aria-label="Like">
+              <div class="like-btn-box w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-[24px]">favorite</span>
+              </div>
+            </button>
+
+            <!-- Share Button -->
+            <button onclick="shareReel('${esc(product.name).replace(/'/g, "\\'")}')" class="flex flex-col items-center group" aria-label="Share">
+              <div class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-[24px]">send</span>
+              </div>
+              <span class="text-[10px] font-semibold mt-1 text-white">Share</span>
+            </button>
+
+            <!-- Product Thumbnail -->
+            <a href="product-detail?id=${encodeURIComponent(product.id)}" class="w-12 h-12 rounded-xl border-2 border-white/80 overflow-hidden shadow-lg hover:scale-105 transition-transform mt-1 bg-neutral-900">
+              <img class="w-full h-full object-cover shimmer" alt="${esc(product.name)}" src="${esc(image)}" onload="this.classList.remove('shimmer')">
+            </a>
+          </div>
+
+          <!-- Bottom Reel Info (Positioned cleanly above bottom navbar) -->
+          <div class="absolute bottom-20 md:bottom-24 left-4 right-20 md:left-8 max-w-md z-30 space-y-2 pb-[env(safe-area-inset-bottom)]">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full overflow-hidden border border-white/40 shadow-md">
+                ${logoMarkup}
+              </div>
+              <div class="flex flex-col">
+                <span class="text-white font-semibold text-sm flex items-center gap-1">
+                  ${companyHandle}
+                  <svg class="w-4 h-4 fill-[#1DA1F2]" viewBox="0 0 24 24"><path d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.66.26-1.04.2-2.13-.17-3.14s-1.11-1.83-2.07-2.36c-.91-.5-1.98-.7-3.02-.57-1.06-1.32-2.6-2.14-4.31-2.14-1.71 0-3.25.82-4.31 2.14-1.04-.13-2.11.07-3.02.57-.96.53-1.7-1.35-2.07 2.36s-.43 2.1-.17 3.14c-1.3.71-2.18 2.08-2.18 3.66 0 1.58.88 2.95 2.18 3.66-.26 1.04-.2 2.13.17 3.14s1.11 1.83 2.07 2.36c.91.5 1.98.7 3.02.57 1.06 1.32 2.6 2.14 4.31 2.14 1.71 0 3.25-.82 4.31-2.14 1.04.13 2.11-.07 3.02-.57.96-.53 1.7-1.35 2.07-2.36s.43-2.1.17-3.14c1.3-.71 2.18-2.08 2.18-3.66zm-13.5 3.5l-4-4 1.5-1.5 2.5 2.5 6.5-6.5 1.5 1.5-8 8z"></path></svg>
+                </span>
+                <span class="text-white/70 text-xs">${esc(product.category || 'Luxury Collection')}</span>
+              </div>
+            </div>
+            <h2 class="text-white text-xl font-bold leading-tight">${esc(product.name)}</h2>
+            ${product.description ? `<p class="text-xs text-white/90 leading-normal line-clamp-2">${esc(product.description)}</p>` : ''}
+            <div class="flex items-center gap-3 pt-1">
+              <div class="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                <span class="font-bold text-base text-white">${formatMoney(price)}</span>
+                ${origPrice && origPrice > price ? `<span class="text-xs text-white/60 line-through">${formatMoney(origPrice)}</span>` : ''}
+                ${discountBadge}
+              </div>
+              <a href="product-detail?id=${encodeURIComponent(product.id)}" class="bg-white text-black px-5 py-2 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg flex items-center gap-1.5 hover:bg-neutral-200 transition-colors">
+                <span class="material-symbols-outlined text-[16px]">shopping_bag</span> Shop Now
+              </a>
+            </div>
+            <span class="text-[9px] font-semibold text-white/40 block tracking-widest uppercase pt-1">Powered by OneSpaceTechnology</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+      // Render initial shuffled set
+      feed.innerHTML = renderReelList(shuffledReels);
+
+      // IntersectionObserver for 60fps butter smooth reels scrolling
+      const reelObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const card = entry.target;
+          const holder = card.querySelector('.reel-media-holder');
+          if (!holder) return;
+
+          const ytId = holder.dataset.ytid;
+          const mp4Url = holder.dataset.mp4;
+
+          if (entry.isIntersecting) {
+            if (ytId && !holder.querySelector('iframe')) {
+              holder.innerHTML = `
+                <iframe class="w-full h-full object-cover pointer-events-none scale-[1.35]"
+                        src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                </iframe>`;
+            } else if (mp4Url) {
+              let vid = holder.querySelector('video');
+              if (vid) vid.play().catch(() => {});
+            }
+          } else {
+            if (ytId && holder.querySelector('iframe')) {
+              const bgImg = holder.dataset.bgimg || '';
+              holder.innerHTML = `<img class="w-full h-full object-cover shimmer" src="${bgImg}" onload="this.classList.remove('shimmer')">`;
+            } else if (mp4Url) {
+              let vid = holder.querySelector('video');
+              if (vid) vid.pause();
+            }
+          }
+        });
+      }, { root: feed, threshold: 0.5 });
+
+      document.querySelectorAll('.reel-card').forEach(card => reelObserver.observe(card));
+
+      // Infinite Looping Scroll Logic:
+      let appendCount = 0;
+      feed.addEventListener('scroll', () => {
+        if (feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 100) {
+          appendCount++;
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = renderReelList(shuffleArray(shuffledReels));
+          while (tempDiv.firstChild) {
+            feed.appendChild(tempDiv.firstChild);
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('Unable to load reels:', error);
+    }
+  });
+</script>
+</body>
+</html>
