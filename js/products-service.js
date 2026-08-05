@@ -858,33 +858,23 @@ export function renderStatusBadge(status) {
  *   // Later: unsub(); // stops the listener
  */
 export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
-  const { companyId = COMPANY_ID, status } = options;
-
-  const constraints = [
-    where('orderType', '==', 'online'),
-    where('companyId', '==', companyId),
-  ];
-  if (status) constraints.push(where('status', '==', status));
-
-  const q = query(collection(db, 'invoices'), ...constraints);
-
-  const unsubscribe = onSnapshot(
-    q,
-    (snapshot) => {
-      const orders = snapshot.docs
+  try {
+    const ref = collection(db, 'invoices');
+    return onSnapshot(ref, (snapshot) => {
+      let orders = snapshot.docs
         .map(d => ({ id: d.id, ...d.data() }))
         .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
-      console.info(`[TBC] onSnapshot: ${orders.length} online order(s) received.`);
+      console.info(`[TBC] onSnapshot: ${orders.length} order(s) received for admin.`);
       onUpdate(orders);
-    },
-    (err) => {
+    }, (err) => {
       console.error('[TBC] subscribeToOnlineOrders error:', err);
       if (typeof onError === 'function') onError(err);
-    }
-  );
-
-  return unsubscribe; // caller must invoke this to clean up
+    });
+  } catch (err) {
+    console.error('[TBC] subscribeToOnlineOrders exception:', err);
+    return () => {};
+  }
 }
 
 /**
