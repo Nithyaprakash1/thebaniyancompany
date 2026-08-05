@@ -221,40 +221,36 @@
     <div class="space-y-3">
       <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Choose Payment Option</label>
       
-      <!-- Option 1: Online Payment (UPI / Cards / NetBanking) -->
-      <label class="flex items-center justify-between p-3.5 bg-white rounded-2xl cursor-pointer hover:bg-slate-50 transition-all border-2 border-black/10 shadow-sm relative overflow-hidden group">
-        <div class="flex items-center gap-3">
-          <input type="radio" name="pay-method" value="Razorpay" checked class="w-4 h-4 accent-black">
-          <div class="space-y-1">
+      <!-- Option 1: Online Payment -->
+      <label class="flex items-center justify-between p-4 bg-white rounded-2xl cursor-pointer hover:bg-slate-50 transition-all border-2 border-black/10 shadow-sm relative overflow-hidden group">
+        <div class="flex items-start sm:items-center gap-3.5 w-full">
+          <input type="radio" name="pay-method" value="Razorpay" checked class="w-4 h-4 accent-black mt-1 sm:mt-0 flex-shrink-0">
+          <div class="space-y-2 flex-1 min-w-0">
+            <!-- Payment Type Icon Badges (First & Bigger) -->
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-bold text-xs text-primary">Online Payment (UPI / Card / NetBanking)</span>
-              <span class="text-[9px] font-extrabold uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">INSTANT DISPATCH</span>
-            </div>
-            <span class="text-[10px] text-secondary block">Pay securely with Google Pay, PhonePe, Paytm, Credit / Debit Cards &amp; NetBanking</span>
-            
-            <!-- Payment Type Icon Badges -->
-            <div class="flex items-center gap-1.5 pt-1.5 flex-wrap">
-              <span class="inline-flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-lg text-[10px] font-bold text-slate-800 border border-black/10 shadow-2xs">
-                <img src="assets/icons8-google-pay.svg" alt="Google Pay" class="w-4 h-4 object-contain">
+              <span class="inline-flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-800 border border-black/10 shadow-2xs">
+                <img src="assets/icons8-google-pay.svg" alt="Google Pay" class="w-5 h-5 object-contain">
                 GPay
               </span>
-              <span class="inline-flex items-center gap-1.5 bg-purple-50 px-2.5 py-1 rounded-lg text-[10px] font-bold text-purple-950 border border-purple-200 shadow-2xs">
-                <img src="assets/icons8-phone-pe.svg" alt="PhonePe" class="w-4 h-4 object-contain">
+              <span class="inline-flex items-center gap-1.5 bg-purple-50 px-3 py-1.5 rounded-xl text-xs font-bold text-purple-950 border border-purple-200 shadow-2xs">
+                <img src="assets/icons8-phone-pe.svg" alt="PhonePe" class="w-5 h-5 object-contain">
                 PhonePe
               </span>
-              <span class="inline-flex items-center gap-1.5 bg-sky-50 px-2.5 py-1 rounded-lg text-[10px] font-bold text-sky-950 border border-sky-200 shadow-2xs">
-                <img src="assets/icons8-paytm.svg" alt="Paytm" class="w-4 h-4 object-contain">
+              <span class="inline-flex items-center gap-1.5 bg-sky-50 px-3 py-1.5 rounded-lg text-xs font-bold text-sky-950 border border-sky-200 shadow-2xs">
+                <img src="assets/icons8-paytm.svg" alt="Paytm" class="w-5 h-5 object-contain">
                 Paytm
               </span>
-              <span class="inline-flex items-center gap-1.5 bg-amber-50 px-2.5 py-1 rounded-lg text-[10px] font-bold text-amber-950 border border-amber-200 shadow-2xs">
-                <img src="assets/icons8-amazon.svg" alt="Amazon Pay" class="w-4 h-4 object-contain">
+              <span class="inline-flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-lg text-xs font-bold text-amber-950 border border-amber-200 shadow-2xs">
+                <img src="assets/icons8-amazon.svg" alt="Amazon Pay" class="w-5 h-5 object-contain">
                 Amazon Pay
               </span>
-              <span class="inline-flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-lg text-[10px] font-bold text-slate-800 border border-slate-200">
-                <span class="material-symbols-outlined text-[13px] text-slate-600">payment</span>
+              <span class="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-800 border border-slate-200">
+                <span class="material-symbols-outlined text-[16px] text-slate-600">payment</span>
                 Cards &amp; NetBanking
               </span>
             </div>
+            
+            <span class="text-xs text-secondary block font-medium">Pay securely with Google Pay, PhonePe, Paytm, Credit / Debit Cards &amp; NetBanking</span>
           </div>
         </div>
       </label>
