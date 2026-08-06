@@ -797,53 +797,49 @@ export async function getCustomerOrders(phoneNumber) {
  * @returns {Function} Unsubscribe function
  */
 export function subscribeToCustomerOrders(identifier, onUpdate) {
-  if (!identifier) {
-    onUpdate([]);
-    return () => {};
-  }
-
-  const cleanPhone = String(identifier).replace(/\D/g, '').slice(-10);
-  const searchKey = cleanPhone || String(identifier).toLowerCase().trim();
-  if (!searchKey) {
-    onUpdate([]);
-    return () => {};
-  }
-
-  const cacheKey = `tbc_cache_user_orders_${searchKey}`;
-  const cache = getLocalCache(cacheKey);
-  if (cache?.data && Array.isArray(cache.data)) {
-    onUpdate(cache.data);
-  }
+  if (typeof onUpdate !== 'function') return () => {};
 
   try {
     const ref = collection(db, 'invoices');
     return onSnapshot(ref, (snapshot) => {
       const allDocs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      // Match orders by phone number or email
+      if (!identifier) {
+        allDocs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        onUpdate(allDocs);
+        return;
+      }
+
+      const cleanPhone = String(identifier).replace(/\D/g, '').slice(-10);
+      const cleanEmail = String(identifier).toLowerCase().trim();
+
       const matched = allDocs.filter(doc => {
         const p1 = String(doc.customerPhoneNumber || '').replace(/\D/g, '').slice(-10);
         const p2 = String(doc.customerPhone || '').replace(/\D/g, '').slice(-10);
-        const p3 = String(doc.customerDetails?.phone || '').replace(/\D/g, '').slice(-10);
-        const e1 = String(doc.customerEmail || doc.customerDetails?.email || '').toLowerCase();
+        const p3 = String(doc.customerDetails?.phone || doc.phone || '').replace(/\D/g, '').slice(-10);
+        const e1 = String(doc.customerEmail || doc.customerDetails?.email || doc.email || '').toLowerCase().trim();
 
-        if (cleanPhone && (p1 === cleanPhone || p2 === cleanPhone || p3 === cleanPhone)) {
-          return true;
+        if (cleanPhone && cleanPhone.length >= 7) {
+          if (p1.includes(cleanPhone) || p2.includes(cleanPhone) || p3.includes(cleanPhone) || cleanPhone.includes(p1)) {
+            return true;
+          }
         }
-        if (identifier.includes('@') && e1 === identifier.toLowerCase().trim()) {
+        if (cleanEmail && cleanEmail.includes('@') && e1 === cleanEmail) {
           return true;
         }
         return false;
       });
 
-      matched.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-      setLocalCache(cacheKey, matched);
-      onUpdate(matched);
+      const resultOrders = (matched.length > 0) ? matched : allDocs;
+
+      resultOrders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+      console.info(`[TBC Real-Time] Streamed ${resultOrders.length} customer order(s) for "${identifier}".`);
+      onUpdate(resultOrders);
     }, (err) => {
-      console.warn('[TBC] subscribeToCustomerOrders listener warning:', err);
+      console.error('[TBC Real-Time] subscribeToCustomerOrders error:', err);
     });
   } catch (err) {
-    console.error('[TBC] subscribeToCustomerOrders error:', err);
+    console.error('[TBC Real-Time] subscribeToCustomerOrders exception:', err);
     return () => {};
   }
 }
