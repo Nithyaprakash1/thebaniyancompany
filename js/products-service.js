@@ -893,16 +893,25 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
     return onSnapshot(ref, (snapshot) => {
       let orders = snapshot.docs
         .map(d => ({ id: d.id, ...d.data() }))
+        .filter(d => {
+          // Filter ONLY e-commerce order bills — exclude POS/counter/store bills
+          const orderType = (d.orderType || '').toLowerCase();
+          const source = (d.customerSource || d.source || '').toLowerCase();
+          if (orderType === 'pos' || orderType === 'counter' || orderType === 'store' || source === 'pos') {
+            return false;
+          }
+          return true;
+        })
         .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
-      console.info(`[TBC] onSnapshot: ${orders.length} order(s) received for admin.`);
+      console.info(`[TBC Ecom Admin] onSnapshot: ${orders.length} e-commerce order bill(s) streamed.`);
       onUpdate(orders);
     }, (err) => {
-      console.error('[TBC] subscribeToOnlineOrders error:', err);
+      console.error('[TBC Ecom Admin] subscribeToOnlineOrders error:', err);
       if (typeof onError === 'function') onError(err);
     });
   } catch (err) {
-    console.error('[TBC] subscribeToOnlineOrders exception:', err);
+    console.error('[TBC Ecom Admin] subscribeToOnlineOrders exception:', err);
     return () => {};
   }
 }
