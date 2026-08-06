@@ -658,19 +658,22 @@
           : 'bg-amber-100 text-amber-800 border-amber-200';
 
         return `
-          <div onclick="viewOrderDetails('${o.id}')" class="bg-white p-4 rounded-2xl shadow-sm border border-black/5 hover:border-black/20 transition-all cursor-pointer space-y-3">
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <img src="${img}" alt="Order item" class="w-14 h-16 object-cover rounded-xl bg-slate-100 border border-black/5 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f0f0f0/999?text=Order'">
-                <div class="min-w-0">
-                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-secondary">#${o.id}</span>
-                  <h4 class="font-bold text-xs text-primary truncate mt-0.5">${firstItem.name || 'Merchandise Package'}</h4>
-                  <p class="text-[11px] font-medium text-slate-500 mt-0.5">📅 ${dateStr} · ${itemCount} Item${itemCount > 1 ? 's' : ''}</p>
-                </div>
-              </div>
-              <span class="${badgeClass} px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider border select-none flex-shrink-0">
-                ${o.status || 'In Transit'}
+          <div onclick="viewOrderDetails('${o.id}')" class="bg-white p-4 rounded-2xl shadow-sm border border-black/10 hover:border-black/30 transition-all cursor-pointer space-y-3">
+            <div class="flex items-center justify-between border-b border-black/5 pb-2">
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-black bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                📦 ORDER ID: #${o.id}
               </span>
+              <span class="${badgeClass} px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border select-none">
+                ${o.status || 'Awaiting Acceptance'}
+              </span>
+            </div>
+            <div class="flex items-center gap-3 min-w-0">
+              <img src="${img}" alt="Order item" class="w-14 h-16 object-cover rounded-xl bg-slate-100 border border-black/5 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f0f0f0/999?text=Order'">
+              <div class="min-w-0 flex-1">
+                <h4 class="font-bold text-xs text-primary truncate mt-0.5">${firstItem.name || 'Merchandise Package'}</h4>
+                <p class="text-[11px] font-medium text-slate-500 mt-0.5">📅 ${dateStr} · ${itemCount} Item${itemCount > 1 ? 's' : ''}</p>
+                <p class="text-xs font-bold text-black mt-1">Total: ₹${(o.totalAmount || 0).toLocaleString('en-IN')}</p>
+              </div>
             </div>
           </div>`;
       }).join('');
@@ -687,22 +690,24 @@
     const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
     const phone = localStorage.getItem('tbc_customer_phone') || stored.phone || user?.phoneNumber || '';
     const cleanPhone = String(phone).replace(/\D/g, '').slice(-10);
-    const name = stored.name || user?.displayName || (user?.email ? user.email.split('@')[0] : '') || (cleanPhone ? `Customer (${cleanPhone})` : 'Valued Customer');
-    const email = stored.email || user?.email || (cleanPhone ? `+91 ${cleanPhone}` : 'customer@thebaniyancompany.com');
+    const email = stored.email || user?.email || '';
+    const identifier = cleanPhone || email || '';
+
+    const name = stored.name || user?.displayName || (email ? email.split('@')[0] : '') || (cleanPhone ? `Customer (${cleanPhone})` : 'Valued Customer');
+    const displayEmail = email || (cleanPhone ? `+91 ${cleanPhone}` : 'customer@thebaniyancompany.com');
 
     const nameEl = document.getElementById('profile-name');
     const emailEl = document.getElementById('profile-email');
     const avatarEl = document.getElementById('profile-avatar');
 
     if (nameEl) nameEl.textContent = name;
-    if (emailEl) emailEl.textContent = cleanPhone ? `📱 +91 ${cleanPhone} · ${email}` : email;
+    if (emailEl) emailEl.textContent = cleanPhone ? `📱 +91 ${cleanPhone} · ${displayEmail}` : displayEmail;
     if (avatarEl) avatarEl.textContent = (name || 'U').charAt(0).toUpperCase();
 
-    if (cleanPhone) {
-      subscribeToCustomerOrders(cleanPhone, (liveOrders) => {
-        renderCustomerOrders(liveOrders);
-      });
-    }
+    // Pure real-time stream subscription for customer orders
+    subscribeToCustomerOrders(identifier, (liveOrders) => {
+      renderCustomerOrders(liveOrders);
+    });
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
@@ -716,21 +721,11 @@
       if (wishNavEl) wishNavEl.textContent = wishList.length > 0 ? `${wishList.length} saved items` : 'Saved items';
     } catch (e) {}
 
-    // Instant load from localStorage
+    // Instant load from localStorage & Firebase Auth state
     loadAndInitProfile();
 
     onAuthStateChanged(auth, (user) => {
       if (user) loadAndInitProfile(user);
-    });
-  });
-
-              `;
-            }).join('');
-          }
-        } catch (e) {
-          console.error('[TBC] Live orders load error:', e);
-        }
-      }
     });
   });
 
