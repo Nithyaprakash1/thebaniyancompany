@@ -148,55 +148,29 @@
 <main class="pt-16 pb-28 md:pb-20 bg-background min-h-screen">
   <div class="w-full">
     
-    <!-- Hero Banner Carousel with Curved Edges -->
+    <!-- Dynamic Hero Banner Carousel -->
     <section class="max-w-screen-xl mx-auto px-4 md:px-8 pt-3 pb-1">
       <div class="relative w-full h-[210px] sm:h-[260px] md:h-[300px] overflow-hidden rounded-3xl group shadow-md border border-black/5">
         <!-- Slides Wrapper -->
         <div id="hero-banner-slider" class="w-full h-full flex transition-transform duration-700 ease-out">
           
-          <!-- Slide 1 -->
+          <!-- Primary Banner Slide -->
           <div class="w-full h-full flex-shrink-0 relative flex items-end">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC7gSC-AY0gup0RY7oAapdADA-11eEL1Db6thMN2eYHXa0O71R1TBICDHrKsZPQVYOwwKlraWt0wzvTiBzPtIIKrwwBqFZBJH0xr8OrVsm8y7gixum_XPGDiJfo4dP3g5-Ofen5QxxdTXcGd7hsRKrRtL0yLIlMVTh5T-aJQHg9so0FP4jmSdZQmLZ39-7IlbFX6IloFrkJg33aKsG3xNt8M1QTN3CnjgF-wjGVgk1D5UU2TcaJakoe7HGs31wWHJGb7VDJQtpyxmCL')"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+            <div class="absolute inset-0 bg-cover bg-center transition-all duration-500 bg-gradient-to-r from-black via-neutral-900 to-black"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
             <div class="relative z-10 px-5 md:px-8 pb-5 md:pb-6 w-full">
-              <span class="text-[10px] md:text-xs tracking-[0.25em] uppercase mb-1 block font-medium text-white/80">Summer 2026</span>
-              <h1 class="text-xl sm:text-2xl md:text-4xl font-bold text-white mb-2 leading-tight">New Collection</h1>
+              <span class="text-[10px] md:text-xs tracking-[0.25em] uppercase mb-1 block font-medium text-white/80">THE BANIYAN COMPANY</span>
+              <h1 class="text-xl sm:text-2xl md:text-4xl font-bold text-white mb-2 leading-tight">Premium Apparel Collection</h1>
               <div class="flex flex-wrap gap-2">
-                <a href="shop" class="bg-white text-black px-4 py-2 rounded-xl font-semibold text-[11px] tracking-wider uppercase hover:bg-surface-container transition-transform active:scale-95 shadow-md">Shop Now</a>
+                <a href="shop" class="bg-white text-black px-4 py-2 rounded-xl font-semibold text-[11px] tracking-wider uppercase hover:bg-surface-container transition-transform active:scale-95 shadow-md">Shop Catalog</a>
                 <a href="reels" class="border border-white/80 text-white px-4 py-2 rounded-xl font-semibold text-[11px] tracking-wider uppercase backdrop-blur-md hover:bg-white/10 transition-colors flex items-center gap-1">Watch Reels <span class="material-symbols-outlined text-[14px]">play_circle</span></a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Slide 2 -->
-          <div class="w-full h-full flex-shrink-0 relative flex items-end">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmMc6t81D85qcK88-AoEaixZdCckjEijh7L0klxGRZykEiyLhBlGEVyUxy8quhm3CXbnsR1fHGNR8x4LCBhCZv6yD_WEjpxv5lwA4dVABOMD4ny_cV9cL8zVZx0416FNHrn8XgrOowm71KGGibilhYlu0Xtc24lN5-9hE7GjuPaznFEIydGIgqu2KqFRL4BOBPAOGw1UAkLsaAiLV3UTrI2T4dLOcCXKnD9JOt824w69wt48rA9iKFaeA9iEnZKpiHIKa_nv1QdUR2')"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
-            <div class="relative z-10 px-5 md:px-8 pb-5 md:pb-6 w-full">
-              <span class="text-[10px] md:text-xs tracking-[0.25em] uppercase mb-1 block font-medium text-white/80">Editorial Collection</span>
-              <h1 class="text-xl sm:text-2xl md:text-4xl font-bold text-white mb-2 leading-tight">Urban Streetwear</h1>
-              <div class="flex flex-wrap gap-2">
-                <a href="shop" class="bg-white text-black px-4 py-2 rounded-xl font-semibold text-[11px] tracking-wider uppercase hover:bg-surface-container transition-transform active:scale-95 shadow-md">Explore Blazers</a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Slide 3 -->
-          <div class="w-full h-full flex-shrink-0 relative flex items-end">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCeY4hU0Fbt9R0TmLg23oGguMMRa3hwWHbZm9e0hunXVSkc-LEwEQypEn63BZhBRBiKHAQRGTWSxqibuXtmQ2H43TFY0ZqwlonwZH-mD4mFD_OuzY_UAWseH-4-z8LbUPsgj64al9b6Q6W7eKRqpNpK5UxuAYzL_4-43S27nGVwhtsW0H3bZtsYvWAslEWaviGYNvFq9Z9_ShD_ZubmPXkaKiFLXZEis5jofecIeyRiAN5BXwAtZ4nNUVHj955wvW8awsZIhVDvCO0t')"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
-            <div class="relative z-10 px-5 md:px-8 pb-5 md:pb-6 w-full">
-              <span class="text-[10px] md:text-xs tracking-[0.25em] uppercase mb-1 block font-medium text-white/80">Essentials</span>
-              <h1 class="text-xl sm:text-2xl md:text-4xl font-bold text-white mb-2 leading-tight">The Linen Edit</h1>
-              <div class="flex flex-wrap gap-2">
-                <a href="shop" class="bg-white text-black px-4 py-2 rounded-xl font-semibold text-[11px] tracking-wider uppercase hover:bg-surface-container transition-transform active:scale-95 shadow-md">Shop Shirts</a>
               </div>
             </div>
           </div>
 
         </div>
 
-        <!-- Manual Navigation Arrows -->
+        <!-- Navigation Arrows -->
         <button onclick="prevHeroSlide()" aria-label="Previous Slide" class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all opacity-0 group-hover:opacity-100">
           <span class="material-symbols-outlined text-[18px]">chevron_left</span>
         </button>
@@ -204,11 +178,9 @@
           <span class="material-symbols-outlined text-[18px]">chevron_right</span>
         </button>
 
-        <!-- Pagination Slide Indicator Dots (Non-Overlapping Compact) -->
+        <!-- Pagination Slide Indicator Dots -->
         <div class="absolute top-3 right-4 z-20 flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
           <button onclick="setHeroSlide(0)" id="hero-dot-0" class="w-2 h-2 rounded-full bg-white transition-all shadow-md scale-125"></button>
-          <button onclick="setHeroSlide(1)" id="hero-dot-1" class="w-2 h-2 rounded-full bg-white/40 transition-all shadow-md"></button>
-          <button onclick="setHeroSlide(2)" id="hero-dot-2" class="w-2 h-2 rounded-full bg-white/40 transition-all shadow-md"></button>
         </div>
       </div>
     </section>
@@ -255,9 +227,8 @@
 
     <!-- Explore More Reels Banner Card -->
     <section class="max-w-screen-xl mx-auto px-4 md:px-8 py-6">
-      <a href="reels" class="group relative block w-full rounded-3xl overflow-hidden shadow-lg bg-neutral-950 border border-black/10 p-6 md:p-10 transition-transform active:scale-[0.99]">
+      <a href="reels" class="group relative block w-full rounded-3xl overflow-hidden shadow-lg bg-gradient-to-r from-neutral-900 via-black to-neutral-900 border border-black/10 p-6 md:p-10 transition-transform active:scale-[0.99]">
         <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10"></div>
-        <img class="absolute right-0 top-0 h-full w-1/2 object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" alt="Explore More Reels" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI21Mcb8hVCUTYgUTm_gxw35-_YKqlJA0OqT5XjCmh1qDP9iZ83gdZIe-ZmomtwQBY30rx5CQn_R93764NXwYKgKQKfI5z2AMr6TT4cKiCxZdUSgH0yAiil2De0vMMeIoVrBzSYqqU4lgoK3M38E_VRpvcslYa47dZRnreFjBX45B592R4o3G_fqRVxwqt8CyTIlDXDhn1Rl0ApioSh_x8owDQjK4ur5xq-VpeVpbtb8gBqDDOzwywQNXugwERbcGoSg_FMGerxyHX">
         <div class="relative z-20 max-w-md">
           <div class="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest mb-3">
             <span class="material-symbols-outlined text-[14px]">movie</span> Video Lookbook
@@ -413,7 +384,7 @@
           <h3 class="font-bold text-sm md:text-base text-on-surface truncate">Need help? Chat with us</h3>
           <p class="text-xs text-secondary mt-0.5 truncate">Available 9 AM – 9 PM · Reply in minutes</p>
         </div>
-        <a href="https://wa.me/919876543210" target="_blank" class="bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md flex-shrink-0">
+        <a href="https://wa.me/918110061911" target="_blank" class="bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md flex-shrink-0">
           Chat <span class="material-symbols-outlined text-[16px]">chat</span>
         </a>
       </div>
