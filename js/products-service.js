@@ -153,9 +153,11 @@ export function normalizeProduct(id, data = {}) {
     ? data.tag
     : Array.isArray(data.tags) ? (data.tags[0] ?? '') : '';
 
-  const discountPct = originalPrice && originalPrice > price
+  const calcPct = (originalPrice && originalPrice > price)
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
-    : (typeof data.discount === 'number' ? data.discount : null);
+    : (typeof data.discount === 'number' ? data.discount : (parseInt(data.discount) || 0));
+
+  const discountPct = (typeof calcPct === 'number' && calcPct > 0) ? calcPct : 0;
 
   return {
     ...data,
@@ -173,7 +175,8 @@ export function normalizeProduct(id, data = {}) {
     variants,
     price,
     originalPrice,
-    discount:       discountPct != null ? `${discountPct}% OFF` : '',
+    discountPct,
+    discount:       discountPct > 0 ? `${discountPct}% OFF` : '',
     availableStock: variants.reduce((sum, v) => sum + getVariantStock(v), 0),
     showInEcom:     data.showInEcom !== false, // Strict E-commerce visibility flag (defaults to true unless explicitly false)
   };

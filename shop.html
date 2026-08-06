@@ -824,9 +824,12 @@
     const sizes = Array.isArray(p.variants) ? p.variants.map(v => v.size).filter(Boolean).join(' ') : 'S M L XL';
     const colors = Array.isArray(p.variants) ? p.variants.map(v => v.color).filter(Boolean).join(' ') : 'White Black';
 
-    const discountVal = (origP && origP > price)
-      ? '-' + Math.round(((origP - price) / origP) * 100) + '%'
-      : (p.discount || '');
+    const calcPct = (origP && origP > price)
+      ? Math.round(((origP - price) / origP) * 100)
+      : (typeof p.discountPct === 'number' ? p.discountPct : (parseInt(p.discount) || 0));
+
+    const discountPct = (calcPct > 0) ? calcPct : 0;
+    const discountVal = discountPct > 0 ? `-${discountPct}%` : '';
 
     // Top-Left Status Pill Tag
     let topTagPill = '';
