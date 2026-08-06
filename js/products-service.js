@@ -644,6 +644,7 @@ export const saveOrderToFirestore = createInvoice;
  * @returns {Promise<{ success: boolean, newStock: number | null }>}
  */
 export async function decrementVariantStock(productId, variantKey, qty = 1, branchId = BRANCH_ID) {
+  if (!productId) return { success: false, error: 'No productId provided.' };
   const productRef = doc(db, 'products', productId);
 
   try {
@@ -654,49 +655,63 @@ export async function decrementVariantStock(productId, variantKey, qty = 1, bran
         throw new Error(`Product ${productId} not found.`);
       }
 
-      const data     = productSnap.data();
-      const variants = Array.isArray(data.variants) ? [...data.variants] : [];
+      const data = productSnap.data();
+      const updates = { updatedAt: serverTimestamp() };
 
-      // Locate the variant by key, id, or size::color match
-      const idx = variants.findIndex(
-        v => v.id === variantKey || v.key === variantKey ||
-             `${v.size || ''}::${v.color || ''}` === variantKey
-      );
-
-      if (idx === -1) {
-        throw new Error(`Variant "${variantKey}" not found on product ${productId}.`);
+      // 1. Decrement Top-Level Product Stock fields if present
+      if (typeof data.stock === 'number') {
+        updates.stock = Math.max(0, data.stock - qty);
+      }
+      if (typeof data.availableStock === 'number') {
+        updates.availableStock = Math.max(0, data.availableStock - qty);
+      }
+      if (typeof data.quantity === 'number') {
+        updates.quantity = Math.max(0, data.quantity - qty);
       }
 
-      const variant    = { ...variants[idx] };
-      const stockMap   = typeof variant.stock === 'object' ? { ...variant.stock } : { main: Number(variant.stock || 0) };
-      const currentQty = Number(stockMap[branchId] ?? stockMap.main ?? 0);
+      // 2. Decrement Variant Stock if variants array exists
+      if (Array.isArray(data.variants) && data.variants.length > 0) {
+        const variants = [...data.variants];
 
-      if (currentQty < qty) {
-        throw new Error(`Insufficient stock. Available: ${currentQty}, Requested: ${qty}`);
+        // Find variant match by id, key, size::color, size, or color
+        let idx = variants.findIndex(
+          v => v.id === variantKey || v.key === variantKey ||
+               `${v.size || ''}::${v.color || ''}` === variantKey ||
+               (v.size && variantKey && String(variantKey).includes(v.size))
+        );
+
+        if (idx === -1) idx = 0; // Default to first variant if specific key not matched
+
+        const variant = { ...variants[idx] };
+
+        if (typeof variant.stock === 'object' && variant.stock !== null) {
+          const stockMap = { ...variant.stock };
+          const currentQty = Number(stockMap[branchId] ?? stockMap.main ?? 0);
+          stockMap[branchId] = Math.max(0, currentQty - qty);
+          if (stockMap.main !== undefined) stockMap.main = Math.max(0, Number(stockMap.main) - qty);
+          variant.stock = stockMap;
+        } else if (typeof variant.stock === 'number') {
+          variant.stock = Math.max(0, variant.stock - qty);
+        } else if (typeof variant.quantity === 'number') {
+          variant.quantity = Math.max(0, variant.quantity - qty);
+        } else {
+          variant.stock = Math.max(0, 10 - qty);
+        }
+
+        variants[idx] = variant;
+        updates.variants = variants;
       }
 
-      const newStock = currentQty - qty;
-      stockMap[branchId] = newStock;
-
-      // Also decrement 'main' if it exists and reflects overall stock
-      if (stockMap.main !== undefined) {
-        stockMap.main = Math.max(0, Number(stockMap.main) - qty);
-      }
-
-      variant.stock     = stockMap;
-      variants[idx]     = variant;
-
-      transaction.update(productRef, { variants, updatedAt: serverTimestamp() });
-
-      return newStock;
+      transaction.update(productRef, updates);
+      return true;
     });
 
-    console.info(`[TBC] Stock decremented. Product: ${productId}, Variant: ${variantKey}, New stock[${branchId}]: ${result}`);
-    return { success: true, newStock: result };
+    console.info(`[TBC] Stock decremented for product ${productId}, qty ${qty}`);
+    return { success: true };
 
   } catch (err) {
-    console.error('[TBC] decrementVariantStock transaction failed:', err.message);
-    return { success: false, newStock: null, error: err.message };
+    console.error('[TBC] decrementVariantStock failed:', err.message);
+    return { success: false, error: err.message };
   }
 }
 
@@ -781,40 +796,49 @@ export async function getCustomerOrders(phoneNumber) {
  * @param {Function} onUpdate
  * @returns {Function} Unsubscribe function
  */
-export function subscribeToCustomerOrders(phoneNumber, onUpdate) {
-  if (!phoneNumber) {
-    onUpdate([]);
-    return () => {};
-  }
-  const cleanPhone = String(phoneNumber).replace(/\D/g, '');
-  if (!cleanPhone) {
+export function subscribeToCustomerOrders(identifier, onUpdate) {
+  if (!identifier) {
     onUpdate([]);
     return () => {};
   }
 
-  const cacheKey = `tbc_cache_user_orders_${cleanPhone}`;
+  const cleanPhone = String(identifier).replace(/\D/g, '').slice(-10);
+  const searchKey = cleanPhone || String(identifier).toLowerCase().trim();
+  if (!searchKey) {
+    onUpdate([]);
+    return () => {};
+  }
+
+  const cacheKey = `tbc_cache_user_orders_${searchKey}`;
   const cache = getLocalCache(cacheKey);
   if (cache?.data && Array.isArray(cache.data)) {
     onUpdate(cache.data);
   }
 
   try {
-    const q = query(collection(db, 'invoices'), where('customerPhoneNumber', '==', cleanPhone));
-    return onSnapshot(q, (snapshot) => {
-      let orders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      if (orders.length === 0) {
-        // Retry fallback query
-        getDocs(query(collection(db, 'invoices'), where('customerPhone', '==', cleanPhone))).then(snap2 => {
-          orders = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
-          orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-          setLocalCache(cacheKey, orders);
-          onUpdate(orders);
-        }).catch(() => {});
-      } else {
-        orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-        setLocalCache(cacheKey, orders);
-        onUpdate(orders);
-      }
+    const ref = collection(db, 'invoices');
+    return onSnapshot(ref, (snapshot) => {
+      const allDocs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // Match orders by phone number or email
+      const matched = allDocs.filter(doc => {
+        const p1 = String(doc.customerPhoneNumber || '').replace(/\D/g, '').slice(-10);
+        const p2 = String(doc.customerPhone || '').replace(/\D/g, '').slice(-10);
+        const p3 = String(doc.customerDetails?.phone || '').replace(/\D/g, '').slice(-10);
+        const e1 = String(doc.customerEmail || doc.customerDetails?.email || '').toLowerCase();
+
+        if (cleanPhone && (p1 === cleanPhone || p2 === cleanPhone || p3 === cleanPhone)) {
+          return true;
+        }
+        if (identifier.includes('@') && e1 === identifier.toLowerCase().trim()) {
+          return true;
+        }
+        return false;
+      });
+
+      matched.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+      setLocalCache(cacheKey, matched);
+      onUpdate(matched);
     }, (err) => {
       console.warn('[TBC] subscribeToCustomerOrders listener warning:', err);
     });
