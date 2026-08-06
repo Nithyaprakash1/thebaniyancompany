@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>THE BANIYAN COMPANY — Premium Clothing &amp; Essentials</title>
+  <title>THE BANIYAN COMPANY — Official Apparel Store</title>
+  <!-- Favicon Logo -->
+  <link rel="icon" type="image/jpeg" href="tbclogo.jpg">
+  <link rel="shortcut icon" href="tbclogo.jpg">
+  <link rel="apple-touch-icon" href="tbclogo.jpg">
   <meta name="description" content="Shop premium clothing, co-ords, undershirts, and streetwear essentials at The Baniyan Company.">
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -586,23 +590,21 @@
 
   // Hero Banner Slider Logic
   let currentHeroSlide = 0;
-  let totalHeroSlides = 3;
   let heroAutoInterval = null;
 
+  function getActualSlideCount() {
+    const slider = document.getElementById('hero-banner-slider');
+    if (!slider) return 1;
+    const slides = slider.querySelectorAll(':scope > div');
+    return Math.max(1, slides.length);
+  }
+
   function updateHeroSlider() {
+    const total = getActualSlideCount();
+    if (currentHeroSlide >= total) currentHeroSlide = 0;
     const slider = document.getElementById('hero-banner-slider');
     if (slider) {
       slider.style.transform = `translateX(-${currentHeroSlide * 100}%)`;
-    }
-    for (let i = 0; i < totalHeroSlides; i++) {
-      const dot = document.getElementById(`hero-dot-${i}`);
-      if (dot) {
-        if (i === currentHeroSlide) {
-          dot.className = 'w-3 h-3 rounded-full bg-white transition-all shadow-md scale-125';
-        } else {
-          dot.className = 'w-3 h-3 rounded-full bg-white/40 transition-all shadow-md';
-        }
-      }
     }
   }
 
@@ -611,33 +613,36 @@
     updateHeroSlider();
     resetHeroTimer();
   }
-  window.setHeroSlides = function(count) {
-    totalHeroSlides = Math.max(1, count);
-    currentHeroSlide = 0;
-    updateHeroSlider();
-  };
 
   function nextHeroSlide() {
-    currentHeroSlide = (currentHeroSlide + 1) % totalHeroSlides;
+    const total = getActualSlideCount();
+    if (total <= 1) return;
+    currentHeroSlide = (currentHeroSlide + 1) % total;
     updateHeroSlider();
     resetHeroTimer();
   }
 
   function prevHeroSlide() {
-    currentHeroSlide = (currentHeroSlide - 1 + totalHeroSlides) % totalHeroSlides;
+    const total = getActualSlideCount();
+    if (total <= 1) return;
+    currentHeroSlide = (currentHeroSlide - 1 + total) % total;
     updateHeroSlider();
     resetHeroTimer();
   }
 
   function resetHeroTimer() {
     if (heroAutoInterval) clearInterval(heroAutoInterval);
-    heroAutoInterval = setInterval(() => {
-      currentHeroSlide = (currentHeroSlide + 1) % totalHeroSlides;
-      updateHeroSlider();
-    }, 4500);
+    const total = getActualSlideCount();
+    if (total > 1) {
+      heroAutoInterval = setInterval(() => {
+        currentHeroSlide = (currentHeroSlide + 1) % total;
+        updateHeroSlider();
+      }, 4500);
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    updateHeroSlider();
     resetHeroTimer();
   });
 

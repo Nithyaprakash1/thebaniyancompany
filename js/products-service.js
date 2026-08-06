@@ -897,17 +897,22 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
       let orders = snapshot.docs
         .map(d => ({ id: d.id, ...d.data() }))
         .filter(d => {
-          // Filter ONLY e-commerce order bills — exclude POS/counter/store bills
-          const orderType = (d.orderType || '').toLowerCase();
-          const source = (d.customerSource || d.source || '').toLowerCase();
-          if (orderType === 'pos' || orderType === 'counter' || orderType === 'store' || source === 'pos') {
-            return false;
-          }
+          const orderType = String(d.orderType || '').toLowerCase().trim();
+          const source = String(d.customerSource || d.source || '').toLowerCase().trim();
+          const payMethod = String(d.paymentMethod || '').toLowerCase().trim();
+          const docId = String(d.id || d.invoiceNumber || '').toLowerCase().trim();
+
+          // Strictly exclude POS / counter / store / manual bills
+          if (orderType === 'pos' || orderType === 'counter' || orderType === 'store' || orderType === 'manual') return false;
+          if (source === 'pos' || source === 'counter' || source === 'store' || source === 'offline') return false;
+          if (docId.startsWith('pos-') || docId.startsWith('store-') || docId.startsWith('inv-pos')) return false;
+
+          // Include e-commerce website orders
           return true;
         })
         .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
-      console.info(`[TBC Ecom Admin] onSnapshot: ${orders.length} e-commerce order bill(s) streamed.`);
+      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s).`);
       onUpdate(orders);
     }, (err) => {
       console.error('[TBC Ecom Admin] subscribeToOnlineOrders error:', err);
