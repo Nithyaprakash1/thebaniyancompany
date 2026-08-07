@@ -220,7 +220,7 @@
 <!-- Loading Screen -->
 <div id="loading-screen">
   <div class="flex flex-col items-center gap-4">
-    <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+    <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain rounded-xl" src="tbclogo.jpeg" onerror="this.src='tbclogo.jpeg'">
     <span class="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">THE BANIYAN COMPANY</span>
     <div class="loading-bar"></div>
   </div>
@@ -234,7 +234,7 @@
     </a>
 
     <a href="home" class="flex items-center gap-3">
-      <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-9 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+      <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-9 object-contain rounded-xl" src="tbclogo.jpeg" onerror="this.src='tbclogo.jpeg'">
       <span class="font-bold tracking-[0.15em] text-sm md:text-base text-primary uppercase hidden sm:inline-block">THE BANIYAN COMPANY</span>
     </a>
 
@@ -394,19 +394,6 @@
           <span class="bg-error text-on-error px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">34% OFF</span>
         </div>
 
-        <!-- Pincode Delivery Check -->
-        <div class="bg-surface-container-low rounded-2xl p-3.5 space-y-2">
-          <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Check Delivery</label>
-          <div class="flex gap-2">
-            <input type="text" id="delivery-pincode" pattern="[0-9]{6}" maxlength="6"
-                   oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)"
-                   placeholder="Enter 6-digit pincode"
-                   class="flex-1 bg-white border border-black/10 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black">
-            <button onclick="checkPincodeDelivery()" class="bg-primary text-on-primary px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity whitespace-nowrap">Check</button>
-          </div>
-          <p id="pincode-result" class="text-xs font-medium hidden"></p>
-        </div>
-
         <!-- Color Options -->
         <div class="space-y-3">
           <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Color: <span id="selected-color" class="text-secondary font-medium">Select Color</span></label>
@@ -430,18 +417,31 @@
             <button onclick="selectSize('L', this)" class="size-btn py-3 rounded-xl border border-black/10 font-bold text-sm hover:border-black transition-all">L</button>
             <button onclick="selectSize('XL', this)" class="size-btn py-3 rounded-xl border border-black/10 font-bold text-sm hover:border-black transition-all">XL</button>
           </div>
-          <p id="size-hint" class="text-xs text-rose-600 font-bold hidden">⚠ Please select a size to continue</p>
+          <p id="size-hint" class="text-xs text-rose-600 font-bold hidden">⚠ Please select a size to enable Buy Now &amp; Add to Bag</p>
+        </div>
+
+        <!-- Pincode Delivery Check (POSITIONED DIRECTLY BELOW SELECT SIZE) -->
+        <div class="bg-surface-container-low rounded-2xl p-3.5 space-y-2 mt-4 border border-black/5">
+          <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Check Delivery</label>
+          <div class="flex gap-2">
+            <input type="text" id="delivery-pincode" pattern="[0-9]{6}" maxlength="6"
+                   oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)"
+                   placeholder="Enter 6-digit pincode"
+                   class="flex-1 bg-white border border-black/10 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black font-semibold">
+            <button onclick="checkPincodeDelivery()" class="bg-primary text-on-primary px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity whitespace-nowrap shadow-sm">Check</button>
+          </div>
+          <p id="pincode-result" class="text-xs font-medium hidden"></p>
         </div>
 
         <!-- Desktop Add to Cart / Buy Now (only visible on desktop) -->
         <div class="hidden lg:block space-y-4 pt-2">
           <div class="flex gap-4">
-            <button onclick="addToCart()" id="desktop-add-to-bag-btn"
-                    class="flex-1 bg-primary text-on-primary py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity shadow-lg flex items-center justify-center gap-2">
+            <button onclick="addToCart()" id="desktop-add-to-bag-btn" disabled
+                    class="flex-1 bg-primary text-on-primary py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
               <span class="material-symbols-outlined text-[18px]">shopping_bag</span> Add to Bag
             </button>
-            <button onclick="buyNowDirect()" id="desktop-buy-now-btn"
-                    class="flex-1 bg-surface-container text-on-surface py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-black/10 transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+            <button onclick="buyNowDirect()" id="desktop-buy-now-btn" disabled
+                    class="flex-1 bg-surface-container text-on-surface py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-1.5 shadow-sm opacity-50 cursor-not-allowed">
               <span class="material-symbols-outlined text-[18px]">bolt</span> Buy Now
             </button>
           </div>
@@ -813,6 +813,36 @@
     }
   }
 
+  window.updateBuyButtonsState = function() {
+    const isSizeSelected = !!(window.currentSelectedSize && window._sizeSelected);
+    const addBagBtns = [document.getElementById('add-to-bag-btn'), document.getElementById('desktop-add-to-bag-btn')].filter(Boolean);
+    const buyNowBtns = [document.getElementById('buy-now-btn'), document.getElementById('desktop-buy-now-btn')].filter(Boolean);
+
+    addBagBtns.forEach(btn => {
+      if (isSizeSelected) {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.classList.add('hover:opacity-90');
+      } else {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        btn.classList.remove('hover:opacity-90');
+      }
+    });
+
+    buyNowBtns.forEach(btn => {
+      if (isSizeSelected) {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.classList.add('hover:opacity-90');
+      } else {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        btn.classList.remove('hover:opacity-90');
+      }
+    });
+  };
+
   function selectSize(size, btn) {
     window.currentSelectedSize = size;
     window._sizeSelected = true;
@@ -822,6 +852,10 @@
     if (btn) btn.className = 'size-btn py-3 rounded-xl border-2 border-black bg-black text-white font-bold text-sm transition-all';
     const hint = document.getElementById('size-hint');
     if (hint) hint.classList.add('hidden');
+    
+    // Enable Buy & Add to Bag buttons ONLY when a size is selected
+    window.updateBuyButtonsState();
+
     if (window.currentProductData?.variants) {
       window.selectProductVariant(window.currentSelectedColor, size, btn);
     }
@@ -1427,6 +1461,9 @@
       const initStock = Number(window.currentSelectedVariant?.stock?.main ?? window.currentSelectedVariant?.stock ?? product.availableStock ?? 999);
       if (typeof window.updateStockUI === 'function') {
         window.updateStockUI(initStock);
+      }
+      if (typeof window.updateBuyButtonsState === 'function') {
+        window.updateBuyButtonsState();
       }
 
       // Related Products (Horizontal Scroll)
