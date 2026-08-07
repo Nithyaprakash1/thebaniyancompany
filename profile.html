@@ -348,6 +348,30 @@
         <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Shipping Address</label>
         <textarea id="modal-field-address" rows="2" placeholder="Full house address & landmark" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black resize-none"></textarea>
       </div>
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary">Pincode</label>
+          <span class="text-[9px] text-slate-400 font-bold uppercase">6-Digit India Pincode</span>
+        </div>
+        <div class="relative">
+          <input id="modal-field-pincode" type="tel" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" oninput="handleProfilePincodeInput(this.value)" placeholder="e.g. 680001 or 600001" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-black">
+          <div id="profile-pincode-loader" class="absolute right-3 top-1/2 -translate-y-1/2 hidden flex items-center gap-1 text-[11px] text-slate-600">
+            <span class="material-symbols-outlined animate-spin text-[14px]">motion_photos_on</span>
+            <span>Fetching...</span>
+          </div>
+        </div>
+        <p id="profile-pincode-status" class="text-[10px] font-semibold mt-1 hidden"></p>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">State</label>
+          <input id="modal-field-state" type="text" placeholder="State" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">City / District</label>
+          <input id="modal-field-city" type="text" placeholder="City / District" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+        </div>
+      </div>
       <div class="flex gap-2 pt-2">
         <button type="button" onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 font-bold text-xs text-primary rounded-xl">Cancel</button>
         <button type="submit" class="flex-1 py-3 bg-black font-bold text-xs text-white rounded-xl shadow-md">Save Changes</button>
@@ -459,10 +483,17 @@
 
   function openEditModal() {
     const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
-    document.getElementById('modal-field-name').value = stored.name || document.getElementById('profile-name').textContent || '';
-    document.getElementById('modal-field-email').value = stored.email || document.getElementById('profile-email').textContent || '';
-    document.getElementById('modal-field-phone').value = stored.phone || localStorage.getItem('tbc_customer_phone') || '';
-    document.getElementById('modal-field-address').value = stored.address || '';
+    if (document.getElementById('modal-field-name')) document.getElementById('modal-field-name').value = stored.name || document.getElementById('profile-name')?.textContent || '';
+    if (document.getElementById('modal-field-email')) document.getElementById('modal-field-email').value = stored.email || document.getElementById('profile-email')?.textContent || '';
+    if (document.getElementById('modal-field-phone')) document.getElementById('modal-field-phone').value = stored.phone || localStorage.getItem('tbc_customer_phone') || '';
+    if (document.getElementById('modal-field-address')) document.getElementById('modal-field-address').value = stored.address || '';
+    if (document.getElementById('modal-field-pincode')) document.getElementById('modal-field-pincode').value = stored.pincode || '';
+    if (document.getElementById('modal-field-state')) document.getElementById('modal-field-state').value = stored.state || '';
+    if (document.getElementById('modal-field-city')) document.getElementById('modal-field-city').value = stored.city || '';
+
+    if (stored.pincode && String(stored.pincode).length === 6 && typeof window.handleProfilePincodeInput === 'function') {
+      window.handleProfilePincodeInput(stored.pincode);
+    }
     
     const m = document.getElementById('edit-profile-modal');
     if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
@@ -478,23 +509,29 @@
     const email = document.getElementById('modal-field-email').value.trim();
     const phone = document.getElementById('modal-field-phone').value.trim();
     const address = document.getElementById('modal-field-address').value.trim();
+    const pincode = document.getElementById('modal-field-pincode')?.value.trim() || '';
+    const state = document.getElementById('modal-field-state')?.value.trim() || '';
+    const city = document.getElementById('modal-field-city')?.value.trim() || '';
 
     const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
     stored.name = name;
     stored.email = email;
     stored.phone = phone;
     stored.address = address;
+    stored.pincode = pincode;
+    stored.state = state;
+    stored.city = city;
 
     localStorage.setItem('tbc_user_profile', JSON.stringify(stored));
     if (phone) localStorage.setItem('tbc_customer_phone', phone);
     if (email) localStorage.setItem('tbc_customer_email', email);
 
-    document.getElementById('profile-name').textContent = name || 'Valued Customer';
-    document.getElementById('profile-email').textContent = email || 'customer@thebaniyancompany.com';
-    document.getElementById('profile-avatar').textContent = (name || 'U').charAt(0).toUpperCase();
+    if (document.getElementById('profile-name')) document.getElementById('profile-name').textContent = name || 'Valued Customer';
+    if (document.getElementById('profile-email')) document.getElementById('profile-email').textContent = email || 'customer@thebaniyancompany.com';
+    if (document.getElementById('profile-avatar')) document.getElementById('profile-avatar').textContent = (name || 'U').charAt(0).toUpperCase();
 
     closeEditModal();
-    alert('Profile details updated successfully!');
+    alert('Profile & delivery address updated successfully!');
   }
 
   function openAddressModal() {
@@ -519,6 +556,53 @@
     sendPasswordResetEmail
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getCustomerOrders, subscribeToCustomerOrders, getCompany } from './js/products-service.js';
+  import { fetchIndiaPincodeDetails } from './js/pincode-service.js';
+
+  window.handleProfilePincodeInput = function(val) {
+    const clean = String(val || '').replace(/\D/g, '').slice(0, 6);
+    const pinInput = document.getElementById('modal-field-pincode');
+    if (pinInput) pinInput.value = clean;
+
+    const loader = document.getElementById('profile-pincode-loader');
+    const statusText = document.getElementById('profile-pincode-status');
+
+    if (clean.length < 6) {
+      if (statusText) { statusText.classList.add('hidden'); statusText.textContent = ''; }
+      if (loader) loader.classList.add('hidden');
+      return;
+    }
+
+    if (loader) loader.classList.remove('hidden');
+    if (statusText) {
+      statusText.className = 'text-[10px] font-semibold text-slate-500 mt-1';
+      statusText.textContent = '🔄 Auto-detecting location...';
+      statusText.classList.remove('hidden');
+    }
+
+    fetchIndiaPincodeDetails(clean).then(result => {
+      if (loader) loader.classList.add('hidden');
+      const stateInput = document.getElementById('modal-field-state');
+      const cityInput = document.getElementById('modal-field-city');
+
+      if (result.success) {
+        if (stateInput) { stateInput.value = result.state; stateInput.readOnly = true; stateInput.classList.add('bg-slate-100'); }
+        if (cityInput) { cityInput.value = result.city; cityInput.readOnly = true; cityInput.classList.add('bg-slate-100'); }
+        if (statusText) {
+          statusText.className = 'text-[10px] font-bold text-emerald-700 mt-1';
+          statusText.innerHTML = `✓ Auto-filled: ${result.city}, ${result.state}`;
+          statusText.classList.remove('hidden');
+        }
+      } else {
+        if (stateInput) { stateInput.readOnly = false; stateInput.classList.remove('bg-slate-100'); }
+        if (cityInput) { cityInput.readOnly = false; cityInput.classList.remove('bg-slate-100'); }
+        if (statusText) {
+          statusText.className = 'text-[10px] font-bold text-amber-700 mt-1 block';
+          statusText.textContent = result.message || '⚠️ Unable to fetch location. Please enter manually below.';
+          statusText.classList.remove('hidden');
+        }
+      }
+    });
+  };
 
   getCompany().then(comp => {
     if (comp?.logo) {

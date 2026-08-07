@@ -125,7 +125,7 @@
       <h2 class="text-xl font-bold text-primary mt-1">Delivery Address 🏠</h2>
     </div>
 
-    <form id="step-2-form" onsubmit="event.preventDefault(); goToStep3();" class="space-y-3">
+    <form id="step-2-form" onsubmit="event.preventDefault(); goToStep3();" class="space-y-3.5">
       <div>
         <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">House / Flat / Building Address *</label>
         <textarea required rows="2" id="cust-address" oninput="this.style.height = ''; this.style.height = Math.max(68, this.scrollHeight) + 'px';" placeholder="Flat No. 402, Building A, Studio Lane..." class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all overflow-hidden resize-none min-h-[68px]"></textarea>
@@ -136,60 +136,38 @@
         <input type="text" id="cust-landmark" placeholder="Near Studio Central Park" class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all">
       </div>
 
+      <!-- India Pincode Field with Auto-Fetch -->
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Pincode *</label>
+          <span class="text-[10px] text-slate-500 font-bold uppercase">6-Digit Indian Pincode</span>
+        </div>
+        <div class="relative">
+          <input required type="tel" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" id="cust-pincode" oninput="handlePincodeInput(this.value)" placeholder="e.g. 680001 or 600001" class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-black transition-all">
+          <div id="pincode-loader" class="absolute right-3 top-1/2 -translate-y-1/2 hidden flex items-center gap-1.5 text-xs text-slate-700 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-black/10 shadow-sm">
+            <span class="material-symbols-outlined animate-spin text-[16px] text-black">motion_photos_on</span>
+            <span class="text-[11px] font-bold">Auto-fetching...</span>
+          </div>
+        </div>
+        <p id="pincode-status-text" class="text-[11px] font-semibold mt-1.5 hidden"></p>
+      </div>
+
+      <!-- State & City/District Fields -->
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">State *</label>
-          <select required id="cust-state" onchange="handleStateChange(this.value)" class="w-full bg-surface-container px-3 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all">
-            <option value="Tamil Nadu" selected>Tamil Nadu</option>
-            <option value="Andhra Pradesh">Andhra Pradesh</option>
-            <option value="Karnataka">Karnataka</option>
-            <option value="Kerala">Kerala</option>
-            <option value="Puducherry">Puducherry</option>
-            <option value="Telangana">Telangana</option>
-            <option value="Maharashtra">Maharashtra</option>
-            <option value="Delhi">Delhi</option>
-            <option value="Gujarat">Gujarat</option>
-            <option value="West Bengal">West Bengal</option>
-            <option value="Rajasthan">Rajasthan</option>
-            <option value="Punjab">Punjab</option>
-            <option value="Haryana">Haryana</option>
-            <option value="Uttar Pradesh">Uttar Pradesh</option>
-            <option value="Madhya Pradesh">Madhya Pradesh</option>
-            <option value="Other State">Other State</option>
-          </select>
+          <input required type="text" id="cust-state" oninput="handleStateChange(this.value)" placeholder="State Name" class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">City *</label>
-          <select required id="cust-city" onchange="handleCityChange(this.value)" class="w-full bg-surface-container px-3 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all">
-            <option value="Chennai">Chennai</option>
-            <option value="Coimbatore">Coimbatore</option>
-            <option value="Madurai">Madurai</option>
-            <option value="Tiruchirappalli">Tiruchirappalli</option>
-            <option value="Salem">Salem</option>
-            <option value="Erode">Erode</option>
-            <option value="Tiruppur">Tiruppur</option>
-            <option value="Vellore">Vellore</option>
-            <option value="Thanjavur">Thanjavur</option>
-            <option value="Nagercoil">Nagercoil</option>
-            <option value="Other City">Other City</option>
-          </select>
+          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">City / District *</label>
+          <input required type="text" id="cust-city" oninput="handleCityChange(this.value)" placeholder="City / District" class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
         </div>
       </div>
 
-      <!-- Conditional Text Boxes for Other State & Other City -->
-      <div id="other-state-box" class="hidden">
-        <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">Type Your State Name *</label>
-        <input type="text" id="cust-other-state" oninput="checkStateAutoMatch(this.value)" placeholder="e.g. Goa, Sikkim, Punjab..." class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
-      </div>
-
-      <div id="other-city-box" class="hidden">
-        <label class="block text-xs font-bold uppercase tracking-wider text-primary mb-1">Type Your City Name *</label>
-        <input type="text" id="cust-other-city" oninput="checkCityAutoMatch(this.value)" placeholder="e.g. Tirunelveli, Hosur, Trichy..." class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Pincode *</label>
-        <input required type="tel" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" id="cust-pincode" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 6)" placeholder="600001" class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all">
+      <div id="pincode-manual-toggle-box" class="hidden pt-1">
+        <button type="button" onclick="enableManualPincodeMode()" class="text-[11px] font-bold text-slate-600 hover:text-black underline flex items-center gap-1">
+          <span class="material-symbols-outlined text-[13px]">edit</span> Edit City &amp; State Manually
+        </button>
       </div>
     </form>
   </div>
@@ -367,12 +345,14 @@
       if (phoneEl && phone) phoneEl.value = phone.replace(/\D/g, '').slice(-10);
       if (addrEl && stored.address) addrEl.value = stored.address;
       if (landmarkEl && stored.landmark) landmarkEl.value = stored.landmark;
-      if (stateEl && stored.state) {
-        stateEl.value = stored.state;
-        if (typeof window.handleStateChange === 'function') window.handleStateChange(stored.state);
-      }
+      if (stateEl && stored.state) stateEl.value = stored.state;
       if (cityEl && stored.city) cityEl.value = stored.city;
-      if (pinEl && stored.pincode) pinEl.value = stored.pincode;
+      if (pinEl && stored.pincode) {
+        pinEl.value = stored.pincode;
+        if (typeof window.handlePincodeInput === 'function' && String(stored.pincode).length === 6) {
+          window.handlePincodeInput(stored.pincode);
+        }
+      }
     } catch(e) {}
   }
 
@@ -492,8 +472,93 @@
 
   let deliveryTnPrice = 0;
   let deliveryNonTnPrice = 60;
+  let pincodeFetchDebounce = null;
 
   import { getCompany } from './js/products-service.js';
+  import { fetchIndiaPincodeDetails } from './js/pincode-service.js';
+
+  window.handlePincodeInput = function(val) {
+    const clean = String(val || '').replace(/\D/g, '').slice(0, 6);
+    const pinInput = document.getElementById('cust-pincode');
+    if (pinInput) pinInput.value = clean;
+
+    const statusText = document.getElementById('pincode-status-text');
+    const loader = document.getElementById('pincode-loader');
+    const toggleBox = document.getElementById('pincode-manual-toggle-box');
+
+    if (clean.length < 6) {
+      if (statusText) { statusText.classList.add('hidden'); statusText.textContent = ''; }
+      if (loader) loader.classList.add('hidden');
+      if (toggleBox) toggleBox.classList.add('hidden');
+      return;
+    }
+
+    if (pincodeFetchDebounce) clearTimeout(pincodeFetchDebounce);
+    pincodeFetchDebounce = setTimeout(async () => {
+      if (loader) loader.classList.remove('hidden');
+      if (statusText) {
+        statusText.className = 'text-[11px] font-semibold text-slate-500 mt-1.5';
+        statusText.textContent = '🔄 Auto-detecting location...';
+        statusText.classList.remove('hidden');
+      }
+
+      const result = await fetchIndiaPincodeDetails(clean);
+      if (loader) loader.classList.add('hidden');
+
+      if (result.success) {
+        const stateInput = document.getElementById('cust-state');
+        const cityInput = document.getElementById('cust-city');
+
+        if (stateInput) {
+          stateInput.value = result.state;
+          stateInput.readOnly = true;
+          stateInput.classList.add('bg-slate-100', 'text-slate-700');
+        }
+        if (cityInput) {
+          cityInput.value = result.city;
+          cityInput.readOnly = true;
+          cityInput.classList.add('bg-slate-100', 'text-slate-700');
+        }
+
+        if (statusText) {
+          statusText.className = 'text-[11px] font-bold text-emerald-700 mt-1.5 flex items-center gap-1';
+          statusText.innerHTML = `✓ Location auto-filled: <strong>${result.city}, ${result.state}</strong>`;
+          statusText.classList.remove('hidden');
+        }
+        if (toggleBox) toggleBox.classList.remove('hidden');
+
+        if (typeof window.handleStateChange === 'function') {
+          window.handleStateChange(result.state);
+        }
+      } else {
+        window.enableManualPincodeMode(result.message || 'Unable to fetch location details. Please enter manually.');
+      }
+    }, 350);
+  };
+
+  window.enableManualPincodeMode = function(msg) {
+    const stateInput = document.getElementById('cust-state');
+    const cityInput = document.getElementById('cust-city');
+    const statusText = document.getElementById('pincode-status-text');
+    const toggleBox = document.getElementById('pincode-manual-toggle-box');
+
+    if (stateInput) {
+      stateInput.readOnly = false;
+      stateInput.classList.remove('bg-slate-100', 'text-slate-700');
+      stateInput.focus();
+    }
+    if (cityInput) {
+      cityInput.readOnly = false;
+      cityInput.classList.remove('bg-slate-100', 'text-slate-700');
+    }
+
+    if (statusText) {
+      statusText.className = 'text-[11px] font-bold text-amber-700 mt-1.5 block';
+      statusText.textContent = msg || '⚠️ Unable to fetch location details. Please enter manually below.';
+      statusText.classList.remove('hidden');
+    }
+    if (toggleBox) toggleBox.classList.add('hidden');
+  };
   getCompany().then(comp => {
     if (comp) {
       if (comp.logo) {
