@@ -1087,7 +1087,7 @@ async function revalidateCompany(companyId = COMPANY_ID) {
     if (!raw) return null;
 
     const name = raw.name || raw.companyName || raw.brandName || 'THE BANIYAN COMPANY';
-    const logo = raw.logo || raw.logoUrl || raw.imageUrl || raw.image || raw.icon || '';
+    const logo = raw.logo || raw.logoUrl || raw.imageUrl || raw.image || raw.icon || 'tbclogo.jpeg';
     const handle = raw.handle || raw.username || ('@' + name.toLowerCase().replace(/[^a-z0-9]/g, ''));
 
     const result = {
