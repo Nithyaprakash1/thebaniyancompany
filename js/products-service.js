@@ -897,22 +897,15 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
       let orders = snapshot.docs
         .map(d => ({ id: d.id, ...d.data() }))
         .filter(d => {
+          // STRICT RULE: Show ONLY ecom order bills where orderType === 'online' (or customerSource === 'website')
           const orderType = String(d.orderType || '').toLowerCase().trim();
           const source = String(d.customerSource || d.source || '').toLowerCase().trim();
-          const payMethod = String(d.paymentMethod || '').toLowerCase().trim();
-          const docId = String(d.id || d.invoiceNumber || '').toLowerCase().trim();
 
-          // Strictly exclude POS / counter / store / manual bills
-          if (orderType === 'pos' || orderType === 'counter' || orderType === 'store' || orderType === 'manual') return false;
-          if (source === 'pos' || source === 'counter' || source === 'store' || source === 'offline') return false;
-          if (docId.startsWith('pos-') || docId.startsWith('store-') || docId.startsWith('inv-pos')) return false;
-
-          // Include e-commerce website orders
-          return true;
+          return orderType === 'online' || source === 'website';
         })
         .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
-      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s).`);
+      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s) (orderType='online').`);
       onUpdate(orders);
     }, (err) => {
       console.error('[TBC Ecom Admin] subscribeToOnlineOrders error:', err);
@@ -1072,7 +1065,7 @@ export async function getCompanyProfile(companyId = COMPANY_ID) {
   return await revalidateCompany(companyId);
 }
 
-async function revalidateCompany(companyId = COMPANY_ID) {
+export async function revalidateCompany(companyId = COMPANY_ID) {
   try {
     const snap = await getDoc(doc(db, 'companies', companyId));
     let raw = null;
@@ -1197,6 +1190,9 @@ export async function updateCompanySettings(fields = {}, companyId = COMPANY_ID)
       ...fields,
       updatedAt: serverTimestamp(),
     });
+    _cachedCompany = null;
+    localStorage.removeItem('tbc_cache_company');
+    await revalidateCompany(companyId);
     return { success: true };
   } catch (err) {
     console.error('[TBC] updateCompanySettings error:', err);

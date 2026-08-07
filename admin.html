@@ -385,7 +385,7 @@
 <script type="module">
   import { db, collection, getDocs, doc, getDoc, auth } from './js/firebase-config.js';
   import { signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-  import { getCompany, subscribeToOnlineOrders, setOrderStatus, updateCompanyBanner, updateCompanySettings } from './js/products-service.js';
+  import { getCompany, revalidateCompany, subscribeToOnlineOrders, setOrderStatus, updateCompanyBanner, updateCompanySettings } from './js/products-service.js';
 
   const COMPANY_ID = 'thebaniyancompany';
 
@@ -521,17 +521,17 @@
   };
 
   async function initDashboard() {
-    // 1. Fetch company profile & settings
-    const comp = await getCompany(COMPANY_ID);
+    // 1. Fetch fresh company profile & settings directly from database
+    const comp = await revalidateCompany(COMPANY_ID);
     if (comp) {
-      document.getElementById('header-brand-name').textContent = comp.name || 'THE BANIYAN COMPANY';
-      document.getElementById('display-company-id').textContent = comp.id || COMPANY_ID;
-      document.getElementById('ctrl-store-name').value = comp.name || '';
-      document.getElementById('ctrl-store-logo').value = comp.logo || '';
-      document.getElementById('ctrl-whatsapp-num').value = comp.whatsappNumber || '';
-      document.getElementById('ctrl-instagram-link').value = comp.instagramLink || '';
-      document.getElementById('ctrl-delivery-tn').value = comp.deliveryTnPrice ?? 0;
-      document.getElementById('ctrl-delivery-non-tn').value = comp.deliveryNonTnPrice ?? 60;
+      if (document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = comp.name || 'THE BANIYAN COMPANY';
+      if (document.getElementById('display-company-id')) document.getElementById('display-company-id').textContent = comp.id || COMPANY_ID;
+      if (document.getElementById('ctrl-store-name')) document.getElementById('ctrl-store-name').value = comp.name || '';
+      if (document.getElementById('ctrl-store-logo')) document.getElementById('ctrl-store-logo').value = comp.logo || '';
+      if (document.getElementById('ctrl-whatsapp-num')) document.getElementById('ctrl-whatsapp-num').value = comp.whatsappNumber || '';
+      if (document.getElementById('ctrl-instagram-link')) document.getElementById('ctrl-instagram-link').value = comp.instagramLink || '';
+      if (document.getElementById('ctrl-delivery-tn')) document.getElementById('ctrl-delivery-tn').value = comp.deliveryTnPrice !== undefined ? comp.deliveryTnPrice : (comp.deliveryTnFee !== undefined ? comp.deliveryTnFee : 0);
+      if (document.getElementById('ctrl-delivery-non-tn')) document.getElementById('ctrl-delivery-non-tn').value = comp.deliveryNonTnPrice !== undefined ? comp.deliveryNonTnPrice : (comp.deliveryFee !== undefined ? comp.deliveryFee : 60);
 
       // Set iOS liquid toggles
       const waToggle = document.getElementById('ctrl-whatsapp-toggle');
