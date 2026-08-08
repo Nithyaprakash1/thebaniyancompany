@@ -356,7 +356,6 @@
     document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
     document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
     document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
-    updateActionBar(1);
   };
 
   window.goToStep2 = function() {
@@ -389,7 +388,6 @@
     document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
     document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
     document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
-    updateActionBar(2);
   };
 
   window.goToStep3 = function() {
@@ -433,7 +431,6 @@
     document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
     document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
 
-    updateActionBar(3);
     window.renderOrderSummary();
   };
 
@@ -450,11 +447,9 @@
     document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-emerald-600';
     document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-emerald-600';
     document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
-    updateActionBar(4);
   };
 
-  // Initialize Action Bar & auto-prefill customer profile from LocalStorage
-  updateActionBar(1);
+  // Auto-prefill customer profile from LocalStorage
   autoPrefillCustomerProfile();
 
   let deliveryTnPrice = 0;
