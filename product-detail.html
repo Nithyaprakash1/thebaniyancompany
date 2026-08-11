@@ -397,7 +397,7 @@
         <!-- Color Options -->
         <div class="space-y-3">
           <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Color: <span id="selected-color" class="text-secondary font-medium">Select Color</span></label>
-          <div id="color-options" class="flex gap-3">
+          <div id="color-options" class="flex flex-wrap gap-3">
             <button onclick="selectColor('Optic White', this)" class="color-btn w-8 h-8 rounded-full bg-white border-2 border-transparent shadow-sm hover:scale-110 transition-transform" style="outline:1px solid #ccc" title="Optic White"></button>
             <button onclick="selectColor('Charcoal', this)" class="color-btn w-8 h-8 rounded-full bg-neutral-800 border-2 border-transparent shadow-sm hover:scale-110 transition-transform" title="Charcoal"></button>
             <button onclick="selectColor('Noir Black', this)" class="color-btn w-8 h-8 rounded-full bg-black border-2 border-transparent shadow-sm hover:scale-110 transition-transform" title="Noir Black"></button>
@@ -796,6 +796,92 @@
   window._colorSelected = false;
   window._sizeSelected = false;
 
+  function getVStock(v) {
+    if (!v) return 0;
+    if (typeof v.stock === 'number') return Math.max(0, v.stock);
+    if (typeof v.stock === 'object' && v.stock !== null) {
+      return Math.max(0, Number(v.stock.main ?? v.stock.online ?? Object.values(v.stock)[0] ?? 0));
+    }
+    if (typeof v.quantity === 'number') return Math.max(0, v.quantity);
+    if (typeof v.availableStock === 'number') return Math.max(0, v.availableStock);
+    return 0;
+  }
+
+  window.renderVariantChips = function() {
+    const product = window.currentProductData;
+    if (!product) return;
+
+    const colorContainer = document.getElementById('color-options');
+    const sizeGrid = document.getElementById('size-grid');
+
+    const variants = Array.isArray(product.variants) ? product.variants : [];
+    const colors = [...new Set(variants.map(v => v.color).filter(Boolean))];
+    let sizes = [...new Set(variants.map(v => v.size).filter(Boolean))];
+    if (sizes.length === 0 && sizeGrid) {
+      const existingBtns = [...sizeGrid.querySelectorAll('.size-btn')].map(b => b.getAttribute('data-size') || b.textContent.trim().split('\n')[0]);
+      sizes = existingBtns.length > 0 ? existingBtns : ['S', 'M', 'L', 'XL'];
+    }
+
+    const colorMap = { 'Optic White': '#fff', 'Charcoal': '#374151', 'Noir Black': '#000', 'Cloud Grey': '#9ca3af', 'Oatmeal': '#d4c5b0', 'Pitch Black': '#000', 'Natural Linen': '#c8b89a', 'Sage Green': '#6b8c6b', 'Crisp White': '#fafafa', 'Midnight Black': '#111', 'Deep Navy': '#1e3a5f', 'Heather Grey': '#9ca3af', 'Black': '#000', 'White': '#fff', 'Red': '#dc2626', 'Scarlet Red': '#dc2626', 'Emerald': '#059669' };
+
+    // Render Color Chips
+    if (colorContainer && colors.length > 0) {
+      colorContainer.innerHTML = colors.map(color => {
+        let isOutOfStock = false;
+        if (variants.length > 0) {
+          if (window.currentSelectedSize && window._sizeSelected) {
+            const matchedV = variants.find(v => v.color === color && v.size === window.currentSelectedSize);
+            isOutOfStock = !matchedV || getVStock(matchedV) <= 0;
+          } else {
+            const colorVs = variants.filter(v => v.color === color);
+            isOutOfStock = colorVs.length === 0 || colorVs.every(v => getVStock(v) <= 0);
+          }
+        }
+        const bg = colorMap[color] || '#ccc';
+        const borderStyle = (color === 'Crisp White' || color === 'Optic White' || color === 'White') ? '1px solid #ccc' : 'none';
+        const isSelected = window.currentSelectedColor === color && window._colorSelected;
+
+        if (isOutOfStock) {
+          return `<button disabled data-color="${color.replace(/"/g, '&quot;')}" class="color-btn px-3 py-2 rounded-xl border border-rose-200 bg-rose-50/60 text-rose-400 text-xs font-bold flex items-center gap-2 opacity-65 cursor-not-allowed" title="${color} — Out of Stock"><span class="w-4 h-4 rounded-full border border-black/10 opacity-50 flex-shrink-0" style="background:${bg};outline:${borderStyle}"></span><span>${color}</span><span class="text-[9px] font-bold text-rose-600 uppercase tracking-tight ml-1">Out of Stock</span></button>`;
+        } else {
+          const borderCls = isSelected ? 'border-2 border-primary bg-white shadow-sm' : 'border border-black/10 bg-white shadow-sm hover:border-black';
+          return `<button onclick="selectColor('${color.replace(/'/g, "\\'")}', this)" data-color="${color.replace(/"/g, '&quot;')}" class="color-btn px-3 py-2 rounded-xl ${borderCls} flex items-center gap-2 text-xs font-bold transition-all"><span class="w-4 h-4 rounded-full border border-black/20 flex-shrink-0" style="background:${bg};outline:${borderStyle}"></span><span>${color}</span></button>`;
+        }
+      }).join('');
+    }
+
+    // Render Size Chips
+    if (sizeGrid && sizes.length > 0) {
+      sizeGrid.innerHTML = sizes.map(size => {
+        let isOutOfStock = false;
+        if (variants.length > 0) {
+          if (window.currentSelectedColor && window._colorSelected) {
+            const matchedV = variants.find(v => v.size === size && v.color === window.currentSelectedColor);
+            isOutOfStock = !matchedV || getVStock(matchedV) <= 0;
+          } else {
+            const sizeVs = variants.filter(v => v.size === size);
+            isOutOfStock = sizeVs.length === 0 || sizeVs.every(v => getVStock(v) <= 0);
+          }
+        } else if (typeof product.availableStock === 'number') {
+          isOutOfStock = product.availableStock <= 0;
+        } else if (typeof product.stock === 'number') {
+          isOutOfStock = product.stock <= 0;
+        }
+
+        const isSelected = window.currentSelectedSize === size && window._sizeSelected;
+
+        if (isOutOfStock) {
+          return `<button disabled data-size="${size.replace(/"/g, '&quot;')}" class="size-btn py-2.5 px-2 rounded-xl border border-rose-200 bg-rose-50/60 text-rose-500 font-bold text-xs flex flex-col items-center justify-center gap-0.5 opacity-70 cursor-not-allowed" title="${size} — Out of Stock"><span class="line-through">${size}</span><span class="text-[9px] font-bold text-rose-600 uppercase tracking-tighter">Out of Stock</span></button>`;
+        } else {
+          const sizeCls = isSelected
+            ? 'size-btn py-3 rounded-xl border-2 border-black bg-black text-white font-bold text-sm transition-all'
+            : 'size-btn py-3 rounded-xl border border-black/10 font-bold text-sm hover:border-black transition-all text-on-surface';
+          return `<button onclick="selectSize('${size.replace(/'/g, "\\'")}', this)" data-size="${size.replace(/"/g, '&quot;')}" class="${sizeCls}">${size}</button>`;
+        }
+      }).join('');
+    }
+  };
+
   function selectColor(color, btn) {
     window.currentSelectedColor = color;
     window._colorSelected = true;
@@ -804,10 +890,13 @@
       lbl.innerText = color;
       lbl.className = 'text-primary font-bold';
     }
-    document.querySelectorAll('.color-btn').forEach(b => b.classList.replace('border-primary', 'border-transparent'));
-    if (btn) btn.classList.replace('border-transparent', 'border-primary');
     const colorHint = document.getElementById('color-hint');
     if (colorHint) colorHint.classList.add('hidden');
+
+    if (typeof window.renderVariantChips === 'function') {
+      window.renderVariantChips();
+    }
+
     if (window.currentProductData?.variants) {
       window.selectProductVariant(color, window.currentSelectedSize, btn);
     }
@@ -846,15 +935,15 @@
   function selectSize(size, btn) {
     window.currentSelectedSize = size;
     window._sizeSelected = true;
-    document.querySelectorAll('.size-btn').forEach(b => {
-      b.className = 'size-btn py-3 rounded-xl border border-black/10 font-bold text-sm hover:border-black transition-all text-on-surface';
-    });
-    if (btn) btn.className = 'size-btn py-3 rounded-xl border-2 border-black bg-black text-white font-bold text-sm transition-all';
     const hint = document.getElementById('size-hint');
     if (hint) hint.classList.add('hidden');
     
     // Enable Buy & Add to Bag buttons ONLY when a size is selected
     window.updateBuyButtonsState();
+
+    if (typeof window.renderVariantChips === 'function') {
+      window.renderVariantChips();
+    }
 
     if (window.currentProductData?.variants) {
       window.selectProductVariant(window.currentSelectedColor, size, btn);
@@ -944,11 +1033,11 @@
     const targetSize = size || window.currentSelectedSize;
     const variant = product.variants.find(item => item.color === targetColor && item.size === targetSize) || product.variants.find(item => item.color === targetColor) || product.variants[0];
     window.currentSelectedVariant = variant;
-    window.currentSelectedColor = variant.color;
-    window.currentSelectedSize = variant.size;
+    if (variant.color) window.currentSelectedColor = variant.color;
+    if (variant.size && window._sizeSelected) window.currentSelectedSize = variant.size;
     
     const colorLabel = document.getElementById('selected-color');
-    if (colorLabel) colorLabel.textContent = variant.color;
+    if (colorLabel && variant.color) colorLabel.textContent = variant.color;
 
     const price = document.querySelector('main .flex.items-baseline .text-3xl');
     if (price) price.textContent = `₹${Number(variant.price || 0).toLocaleString('en-IN')}`;
@@ -956,11 +1045,12 @@
     const stockCount = Number(variant.stock?.main ?? variant.stock ?? 0);
     const stockLabel = [...document.querySelectorAll('main .text-xs.font-bold')].find(element => /stock/i.test(element.textContent));
     if (stockLabel) {
-      if (stockCount <= 0) {
+      const totalStock = product.variants.reduce((sum, v) => sum + (typeof v.stock === 'number' ? v.stock : Number(v.stock?.main ?? 0)), 0);
+      if (totalStock <= 0) {
         stockLabel.textContent = 'Out of Stock ❌';
         stockLabel.className = 'text-xs font-bold text-rose-600';
       } else {
-        stockLabel.textContent = `${stockCount} in Stock ✓`;
+        stockLabel.textContent = 'In Stock ✓';
         stockLabel.className = 'text-xs font-bold text-emerald-600';
       }
     }
@@ -1401,13 +1491,10 @@
 
       // (Reviews section removed per user request)
 
-      // Update Color and Size Buttons from variants array
+      // Update Color and Size Selection state & render chips dynamically
       if (Array.isArray(product.variants) && product.variants.length > 0) {
-        const colorContainer = document.getElementById('color-options');
-        const sizeGrid = document.getElementById('size-grid');
         const colors = [...new Set(product.variants.map(v => v.color).filter(Boolean))];
         const sizes = [...new Set(product.variants.map(v => v.size).filter(Boolean))];
-        const colorMap = { 'Optic White': '#fff', 'Charcoal': '#374151', 'Noir Black': '#000', 'Cloud Grey': '#9ca3af', 'Oatmeal': '#d4c5b0', 'Pitch Black': '#000', 'Natural Linen': '#c8b89a', 'Sage Green': '#6b8c6b', 'Crisp White': '#fafafa', 'Midnight Black': '#111', 'Deep Navy': '#1e3a5f', 'Heather Grey': '#9ca3af', 'Black': '#000', 'White': '#fff', 'Red': '#dc2626', 'Scarlet Red': '#dc2626', 'Emerald': '#059669' };
 
         // Color selection logic: If only 1 color exists, pre-select default. If >1, require user selection.
         if (colors.length === 1) {
@@ -1425,16 +1512,6 @@
           window._colorSelected = true;
         }
 
-        if (colorContainer && colors.length > 0) {
-          colorContainer.innerHTML = colors.map((color) => {
-            const bg = colorMap[color] || '#ccc';
-            const border = color === 'Crisp White' || color === 'Optic White' || color === 'White' ? '1px solid #ccc' : 'none';
-            const isSelected = (colors.length === 1 || window.currentSelectedColor === color);
-            const borderCls = isSelected ? 'border-primary' : 'border-transparent';
-            return `<button onclick="selectColor('${color.replace(/'/g, "\\'")}', this)" class="color-btn w-8 h-8 rounded-full border-2 ${borderCls} shadow-sm hover:scale-110 transition-transform" style="background:${bg};outline:${border}" title="${color}"></button>`;
-          }).join('');
-        }
-
         // Size selection logic: If only 1 size exists, pre-select default. If >1, require user selection.
         if (sizes.length === 1) {
           window.currentSelectedSize = sizes[0];
@@ -1446,16 +1523,10 @@
           window.currentSelectedSize = 'Standard';
           window._sizeSelected = true;
         }
+      }
 
-        if (sizeGrid && sizes.length > 0) {
-          sizeGrid.innerHTML = sizes.map((size) => {
-            const isSelected = (sizes.length === 1 || window.currentSelectedSize === size);
-            const sizeCls = isSelected
-              ? 'size-btn py-3 rounded-xl border-2 border-black bg-black text-white font-bold text-sm transition-all'
-              : 'size-btn py-3 rounded-xl border border-black/10 font-bold text-sm hover:border-black transition-all text-on-surface';
-            return `<button onclick="selectSize('${size.replace(/'/g, "\\'")}', this)" class="${sizeCls}">${size}</button>`;
-          }).join('');
-        }
+      if (typeof window.renderVariantChips === 'function') {
+        window.renderVariantChips();
       }
 
       const initStock = Number(window.currentSelectedVariant?.stock?.main ?? window.currentSelectedVariant?.stock ?? product.availableStock ?? 999);
