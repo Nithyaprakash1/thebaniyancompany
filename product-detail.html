@@ -407,9 +407,8 @@
 
         <!-- Size Options -->
         <div class="space-y-3">
-          <div class="flex justify-between items-center">
+          <div>
             <label class="text-xs font-bold uppercase tracking-wider text-secondary">Select Size <span class="text-error">*</span></label>
-            <button onclick="openSizeGuide()" class="text-xs font-bold text-primary underline flex items-center gap-1 hover:opacity-70 transition-opacity"><span class="material-symbols-outlined text-[14px]">straighten</span> Size Guide</button>
           </div>
           <div id="size-grid" class="grid grid-cols-4 gap-3">
             <button onclick="selectSize('S', this)" class="size-btn py-3 rounded-xl border border-black/10 font-bold text-sm hover:border-black transition-all">S</button>
@@ -529,110 +528,6 @@
   </div>
 </div>
 
-<!-- SIZE GUIDE MODAL -->
-<div id="size-guide-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
-  <div class="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-5">
-
-    <!-- Header -->
-    <div class="flex justify-between items-center pb-3 border-b border-black/10">
-      <div>
-        <h2 class="font-bold text-lg text-primary uppercase tracking-wider">Size Guide</h2>
-        <p class="text-xs text-secondary mt-0.5">Standard Indian Fit — All measurements in inches</p>
-      </div>
-      <button onclick="closeSizeGuide()" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:text-black transition-colors">
-        <span class="material-symbols-outlined text-[20px]">close</span>
-      </button>
-    </div>
-
-    <!-- How to Measure Tip -->
-    <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 p-3.5 rounded-2xl">
-      <span class="material-symbols-outlined text-amber-600 text-[20px] mt-0.5">info</span>
-      <p class="text-xs text-amber-800 leading-relaxed"><strong>How to measure:</strong> Use a soft measuring tape. Measure your chest at the fullest point, waist at the natural waistline, and hips at the fullest point. Keep the tape snug but not tight.</p>
-    </div>
-
-    <!-- Size Chart Table -->
-    <div class="overflow-x-auto rounded-2xl border border-black/10">
-      <table class="w-full text-xs text-left">
-        <thead>
-          <tr class="bg-black text-white">
-            <th class="px-4 py-3 font-bold uppercase tracking-wider rounded-tl-2xl">Size</th>
-            <th class="px-4 py-3 font-bold uppercase tracking-wider">Chest</th>
-            <th class="px-4 py-3 font-bold uppercase tracking-wider">Waist</th>
-            <th class="px-4 py-3 font-bold uppercase tracking-wider">Hip</th>
-            <th class="px-4 py-3 font-bold uppercase tracking-wider rounded-tr-2xl">Length</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="border-t border-black/5 hover:bg-surface-container transition-colors">
-            <td class="px-4 py-3 font-bold text-primary">XS</td>
-            <td class="px-4 py-3 text-secondary">34 – 35"</td>
-            <td class="px-4 py-3 text-secondary">28 – 29"</td>
-            <td class="px-4 py-3 text-secondary">36 – 37"</td>
-            <td class="px-4 py-3 text-secondary">26"</td>
-          </tr>
-          <tr class="border-t border-black/5 hover:bg-surface-container transition-colors">
-            <td class="px-4 py-3 font-bold text-primary">S</td>
-            <td class="px-4 py-3 text-secondary">36 – 37"</td>
-            <td class="px-4 py-3 text-secondary">30 – 31"</td>
-            <td class="px-4 py-3 text-secondary">38 – 39"</td>
-            <td class="px-4 py-3 text-secondary">27"</td>
-          </tr>
-          <tr class="border-t border-black/5 bg-emerald-50 hover:bg-emerald-100 transition-colors">
-            <td class="px-4 py-3 font-bold text-emerald-700 flex items-center gap-1.5">M <span class="text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">BEST FIT</span></td>
-            <td class="px-4 py-3 text-secondary">38 – 40"</td>
-            <td class="px-4 py-3 text-secondary">32 – 33"</td>
-            <td class="px-4 py-3 text-secondary">40 – 41"</td>
-            <td class="px-4 py-3 text-secondary">27.5"</td>
-          </tr>
-          <tr class="border-t border-black/5 hover:bg-surface-container transition-colors">
-            <td class="px-4 py-3 font-bold text-primary">L</td>
-            <td class="px-4 py-3 text-secondary">42 – 44"</td>
-            <td class="px-4 py-3 text-secondary">34 – 36"</td>
-            <td class="px-4 py-3 text-secondary">42 – 44"</td>
-            <td class="px-4 py-3 text-secondary">28"</td>
-          </tr>
-          <tr class="border-t border-black/5 hover:bg-surface-container transition-colors">
-            <td class="px-4 py-3 font-bold text-primary">XL</td>
-            <td class="px-4 py-3 text-secondary">46 – 48"</td>
-            <td class="px-4 py-3 text-secondary">38 – 40"</td>
-            <td class="px-4 py-3 text-secondary">46 – 48"</td>
-            <td class="px-4 py-3 text-secondary">28.5"</td>
-          </tr>
-          <tr class="border-t border-black/5 hover:bg-surface-container transition-colors">
-            <td class="px-4 py-3 font-bold text-primary">2XL</td>
-            <td class="px-4 py-3 text-secondary">50 – 52"</td>
-            <td class="px-4 py-3 text-secondary">42 – 44"</td>
-            <td class="px-4 py-3 text-secondary">50 – 52"</td>
-            <td class="px-4 py-3 text-secondary">29"</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Fit Tips -->
-    <div class="space-y-2">
-      <p class="text-[11px] font-bold uppercase tracking-wider text-secondary">Fit Notes</p>
-      <div class="grid grid-cols-2 gap-2 text-xs">
-        <div class="bg-surface-container p-3 rounded-xl">
-          <span class="material-symbols-outlined text-[16px] text-primary block mb-1">straighten</span>
-          <p class="font-bold text-on-surface">Relaxed Fit</p>
-          <p class="text-secondary mt-0.5">Our cuts are relaxed. Size down for a slimmer look.</p>
-        </div>
-        <div class="bg-surface-container p-3 rounded-xl">
-          <span class="material-symbols-outlined text-[16px] text-primary block mb-1">dry_cleaning</span>
-          <p class="font-bold text-on-surface">Pre-Washed</p>
-          <p class="text-secondary mt-0.5">All fabrics are pre-washed. Minimal shrinkage expected.</p>
-        </div>
-      </div>
-    </div>
-
-    <button onclick="closeSizeGuide()" class="w-full bg-primary text-on-primary py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity">
-      Got it — Close
-    </button>
-
-  </div>
-</div>
-
 
 
 <!-- Sticky Add to Cart / Buy Now bar (mobile, fixed above bottom nav) -->
@@ -678,19 +573,6 @@
   window.addEventListener('load', () => {
     const ls = document.getElementById('loading-screen');
     if (ls) ls.classList.add('hidden');
-  });
-
-  // Size Guide Modal
-  window.openSizeGuide = function() {
-    const m = document.getElementById('size-guide-modal');
-    if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
-  };
-  window.closeSizeGuide = function() {
-    const m = document.getElementById('size-guide-modal');
-    if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
-  };
-  document.getElementById('size-guide-modal')?.addEventListener('click', function(e) {
-    if (e.target === this) closeSizeGuide();
   });
 
   // Profile Dropdown Toggle
