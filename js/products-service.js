@@ -201,77 +201,59 @@ export function normalizeCategory(id, data = {}) {
 
 
 // ═══════════════════════════════════════════════════════════════
-// 1.  CATEGORIES  —  /categories
-//     Fetch all documents. Display name, icon, imageUrl.
+// 1.  CATEGORIES & PRODUCTS — LIVE REAL-TIME DATA LAYER
+//     Real-time Firestore listeners with instant memory state.
 // ═══════════════════════════════════════════════════════════════
 
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hour persistent session cache duration
+// Clean up any legacy persistent product caches to prevent old stock traps
+try {
+  localStorage.removeItem('tbc_cache_products');
+  localStorage.removeItem('tbc_cache_categories');
+} catch (e) {}
 
-function getLocalCache(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    const { time, data } = JSON.parse(raw);
-    if (data && (Array.isArray(data) ? data.length > 0 : !!data)) {
-      // Return cached data immediately without background revalidation overhead
-      return { data, time };
-    }
-  } catch (e) {}
-  return null;
-}
+let _cachedProducts = null;
+let _cachedCategories = null;
 
-function setLocalCache(key, data) {
-  try {
-    localStorage.setItem(key, JSON.stringify({ time: Date.now(), data }));
-  } catch (e) {}
-}
-
-let _cachedProductsObj = getLocalCache('tbc_cache_products');
-let _cachedProducts = _cachedProductsObj?.data || null;
-
-let _cachedCategoriesObj = getLocalCache('tbc_cache_categories');
-let _cachedCategories = _cachedCategoriesObj?.data || null;
-
-// Exported Caching Utilities for Multi-Page Performance
+// Exported live accessors
 export function getCachedProducts() {
-  if (!_cachedProducts) {
-    const c = getLocalCache('tbc_cache_products');
-    _cachedProducts = c?.data || null;
-  }
   return _cachedProducts;
 }
 
 export function setCachedProducts(products) {
   _cachedProducts = products;
-  setLocalCache('tbc_cache_products', products);
 }
 
 export function getCachedCategories() {
-  if (!_cachedCategories) {
-    const c = getLocalCache('tbc_cache_categories');
-    _cachedCategories = c?.data || null;
-  }
   return _cachedCategories;
 }
 
 export function setCachedCategories(categories) {
   _cachedCategories = categories;
-  setLocalCache('tbc_cache_categories', categories);
 }
 
 export function getCachedCompany() {
-  const c = getLocalCache('tbc_cache_company');
-  return c?.data || null;
+  try {
+    const raw = localStorage.getItem('tbc_cache_company');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.data || parsed;
+  } catch (e) {
+    return null;
+  }
 }
 
 export function setCachedCompany(company) {
-  setLocalCache('tbc_cache_company', company);
+  try {
+    localStorage.setItem('tbc_cache_company', JSON.stringify({ time: Date.now(), data: company }));
+  } catch (e) {}
 }
 
 export function clearTbcCache() {
-  localStorage.removeItem('tbc_cache_products');
-  localStorage.removeItem('tbc_cache_categories');
-  localStorage.removeItem('tbc_cache_company');
+  try {
+    localStorage.removeItem('tbc_cache_products');
+    localStorage.removeItem('tbc_cache_categories');
+    localStorage.removeItem('tbc_cache_company');
+  } catch (e) {}
   _cachedProducts = null;
   _cachedCategories = null;
 }
@@ -280,6 +262,9 @@ export async function deleteProduct(id) {
   if (!id) return false;
   try {
     await deleteDoc(doc(db, 'products', id));
+    if (Array.isArray(_cachedProducts)) {
+      _cachedProducts = _cachedProducts.filter(p => p.id !== id && p.productId !== id);
+    }
     clearTbcCache();
     return true;
   } catch (err) {
@@ -321,21 +306,51 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Fetch all category documents from /categories with zero-latency caching.
+ * Real-time live listener for categories.
+ * @param {Function} onUpdate
+ * @param {Function} [onError]
+ * @returns {Function} Unsubscribe function
+ */
+export function subscribeToCategories(onUpdate, onError) {
+  if (typeof onUpdate !== 'function') return () => {};
+
+  if (_cachedCategories && _cachedCategories.length > 0) {
+    onUpdate(_cachedCategories);
+  }
+
+  try {
+    const ref = collection(db, 'categories');
+    return onSnapshot(ref, (snapshot) => {
+      const normalized = snapshot.docs
+        .map(d => normalizeCategory(d.id, d.data()))
+        .filter(c => c.id)
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+      _cachedCategories = normalized;
+      onUpdate(normalized);
+    }, (err) => {
+      console.warn('[TBC Real-Time] subscribeToCategories warning:', err);
+      if (typeof onError === 'function') onError(err);
+    });
+  } catch (err) {
+    console.error('[TBC Real-Time] subscribeToCategories error:', err);
+    return () => {};
+  }
+}
+
+/**
+ * Fetch all category documents from /categories.
  * @param {string} [companyId]
  * @returns {Promise<object[]>}
  */
 export async function getCategories(companyId = COMPANY_ID) {
-  const cache = getLocalCache('tbc_cache_categories');
-  if (cache?.data && cache.data.length > 0) {
-    _cachedCategories = [...cache.data].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  if (_cachedCategories && _cachedCategories.length > 0) {
     return _cachedCategories;
   }
-
   return await revalidateCategories(companyId);
 }
 
-async function revalidateCategories(companyId = COMPANY_ID) {
+export async function revalidateCategories(companyId = COMPANY_ID) {
   try {
     const ref = collection(db, 'categories');
     const snapshot = await getDocs(ref);
@@ -344,10 +359,7 @@ async function revalidateCategories(companyId = COMPANY_ID) {
       .filter(c => c.id && (!companyId || c.companyId === companyId || true))
       .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
-    if (normalized.length > 0) {
-      _cachedCategories = normalized;
-      setLocalCache('tbc_cache_categories', _cachedCategories);
-    }
+    _cachedCategories = normalized;
     return _cachedCategories || [];
   } catch (err) {
     console.error('[TBC] getCategories error:', err);
@@ -356,15 +368,49 @@ async function revalidateCategories(companyId = COMPANY_ID) {
 }
 
 /**
- * Fetch all products for a given company with zero-latency single-read caching.
+ * Real-time live listener for all store products, stock quantity & visibility.
+ * Whenever an admin uploads a product, edits stock, or changes details,
+ * all subscribed pages update instantly in real time.
+ *
+ * @param {Function} onUpdate
+ * @param {Function} [onError]
+ * @returns {Function} Unsubscribe function
+ */
+export function subscribeToProducts(onUpdate, onError) {
+  if (typeof onUpdate !== 'function') return () => {};
+
+  // Instant render from memory if available
+  if (_cachedProducts && Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
+    onUpdate(_cachedProducts);
+  }
+
+  try {
+    const ref = collection(db, 'products');
+    return onSnapshot(ref, (snapshot) => {
+      const normalized = snapshot.docs
+        .map(d => normalizeProduct(d.id, d.data()))
+        .filter(p => p.id && p.showInEcom !== false);
+
+      _cachedProducts = normalized;
+      onUpdate(normalized);
+    }, (err) => {
+      console.warn('[TBC Real-Time] subscribeToProducts warning:', err);
+      if (typeof onError === 'function') onError(err);
+    });
+  } catch (err) {
+    console.error('[TBC Real-Time] subscribeToProducts error:', err);
+    return () => {};
+  }
+}
+
+/**
+ * Fetch all products for a given company live from Firestore.
  * @param {string} [companyId]
  * @param {number} [limitCount]
  * @returns {Promise<object[]>}
  */
 export async function getProducts(companyId = COMPANY_ID, limitCount = null) {
-  const cache = getLocalCache('tbc_cache_products');
-  if (cache?.data && cache.data.length > 0) {
-    _cachedProducts = cache.data;
+  if (_cachedProducts && Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
     return limitCount ? _cachedProducts.slice(0, limitCount) : _cachedProducts;
   }
 
@@ -372,7 +418,7 @@ export async function getProducts(companyId = COMPANY_ID, limitCount = null) {
   return limitCount ? products.slice(0, limitCount) : products;
 }
 
-async function revalidateProducts(companyId = COMPANY_ID) {
+export async function revalidateProducts(companyId = COMPANY_ID) {
   try {
     const ref = collection(db, 'products');
     const snapshot = await getDocs(ref);
@@ -380,10 +426,7 @@ async function revalidateProducts(companyId = COMPANY_ID) {
       .map(d => normalizeProduct(d.id, d.data()))
       .filter(p => p.id && p.showInEcom !== false); // Strict filter: exclude any product marked showInEcom = false
 
-    if (normalized.length > 0) {
-      _cachedProducts = normalized;
-      setLocalCache('tbc_cache_products', _cachedProducts);
-    }
+    _cachedProducts = normalized;
     return _cachedProducts || [];
   } catch (err) {
     console.error('[TBC] getProducts error:', err);
@@ -392,23 +435,14 @@ async function revalidateProducts(companyId = COMPANY_ID) {
 }
 
 /**
- * Fetch a single product by its Firestore document ID or productId field.
+ * Fetch a single product by its Firestore document ID or productId field live from Firestore.
  * @param {string} id
  * @returns {Promise<object|null>}
  */
 export async function getProductById(id) {
   if (!id) return null;
 
-  // 1. Check local storage / in-memory cache first (0ms latency, 0 Firestore reads)
-  try {
-    const cachedProducts = await getProducts();
-    if (Array.isArray(cachedProducts) && cachedProducts.length > 0) {
-      const match = cachedProducts.find(p => (p.id === id || p.productId === id) && p.showInEcom !== false);
-      if (match) return match;
-    }
-  } catch (e) {}
-
-  // 2. Fallback to direct Firestore document lookup if missing from local cache
+  // 1. Direct Firestore document lookup (Guarantees real-time accurate stock & price)
   try {
     const snap = await getDoc(doc(db, 'products', id));
     if (snap.exists()) {
@@ -422,12 +456,17 @@ export async function getProductById(id) {
       const p = normalizeProduct(snap2.docs[0].id, snap2.docs[0].data());
       return p.showInEcom !== false ? p : null;
     }
-
-    return null;
   } catch (err) {
-    console.error(`[TBC] getProductById(${id}) error:`, err);
-    return null;
+    console.error(`[TBC] getProductById(${id}) direct fetch error:`, err);
   }
+
+  // 2. Fallback to active in-memory list if offline or network glitch
+  if (Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
+    const match = _cachedProducts.find(p => (p.id === id || p.productId === id) && p.showInEcom !== false);
+    if (match) return match;
+  }
+
+  return null;
 }
 
 /**
@@ -450,18 +489,18 @@ export async function getRelatedProducts(product, max = 4) {
 }
 
 /**
- * Real-time live listener for a single product's stock & availability with instant local cache sync.
+ * Real-time live listener for a single product's stock & availability.
  * @param {string} id
  * @param {Function} onUpdate
+ * @param {Function} [onError]
  * @returns {Function} Unsubscribe function
  */
-export function subscribeToProduct(id, onUpdate) {
-  if (!id) return () => {};
+export function subscribeToProduct(id, onUpdate, onError) {
+  if (!id || typeof onUpdate !== 'function') return () => {};
 
-  // Instant local cache hit
-  const cache = getLocalCache('tbc_cache_products');
-  if (cache?.data && Array.isArray(cache.data)) {
-    const cachedMatch = cache.data.find(p => p.id === id || p.productId === id);
+  // Instant in-memory match if available
+  if (Array.isArray(_cachedProducts)) {
+    const cachedMatch = _cachedProducts.find(p => p.id === id || p.productId === id);
     if (cachedMatch) onUpdate(cachedMatch);
   }
 
@@ -471,50 +510,21 @@ export function subscribeToProduct(id, onUpdate) {
       if (docSnap.exists()) {
         const liveProd = normalizeProduct(docSnap.id, docSnap.data());
         
-        // Update local cache
-        const currentCache = getLocalCache('tbc_cache_products')?.data || [];
-        const idx = currentCache.findIndex(p => p.id === id || p.productId === id);
-        if (idx > -1) currentCache[idx] = liveProd;
-        else currentCache.push(liveProd);
-        setLocalCache('tbc_cache_products', currentCache);
+        // Update in-memory registry
+        if (Array.isArray(_cachedProducts)) {
+          const idx = _cachedProducts.findIndex(p => p.id === id || p.productId === id);
+          if (idx > -1) _cachedProducts[idx] = liveProd;
+          else _cachedProducts.push(liveProd);
+        }
 
         onUpdate(liveProd);
       }
     }, (err) => {
-      console.warn('[TBC] subscribeToProduct error:', err);
+      console.warn('[TBC Real-Time] subscribeToProduct error:', err);
+      if (typeof onError === 'function') onError(err);
     });
   } catch (err) {
-    console.error('[TBC] subscribeToProduct exception:', err);
-    return () => {};
-  }
-}
-
-/**
- * Real-time live listener for all store products' stock & availability.
- * @param {Function} onUpdate
- * @returns {Function} Unsubscribe function
- */
-export function subscribeToProducts(onUpdate) {
-  const cache = getLocalCache('tbc_cache_products');
-  if (cache?.data && Array.isArray(cache.data)) {
-    onUpdate(cache.data);
-  }
-
-  try {
-    const ref = collection(db, 'products');
-    return onSnapshot(ref, (snapshot) => {
-      const normalized = snapshot.docs
-        .map(d => normalizeProduct(d.id, d.data()))
-        .filter(p => p.id && p.showInEcom !== false);
-
-      _cachedProducts = normalized;
-      setLocalCache('tbc_cache_products', normalized);
-      onUpdate(normalized);
-    }, (err) => {
-      console.warn('[TBC] subscribeToProducts warning:', err);
-    });
-  } catch (err) {
-    console.error('[TBC] subscribeToProducts error:', err);
+    console.error('[TBC Real-Time] subscribeToProduct exception:', err);
     return () => {};
   }
 }
@@ -761,13 +771,6 @@ export async function getCustomerOrders(phoneNumber) {
   const cleanPhone = String(phoneNumber).replace(/\D/g, '');
   if (!cleanPhone) return [];
 
-  // Check instant cache
-  const cacheKey = `tbc_cache_user_orders_${cleanPhone}`;
-  const cache = getLocalCache(cacheKey);
-  if (cache?.data && Array.isArray(cache.data)) {
-    return cache.data;
-  }
-
   try {
     const q        = query(
       collection(db, 'invoices'),
@@ -784,12 +787,11 @@ export async function getCustomerOrders(phoneNumber) {
     }
 
     const sorted = orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-    setLocalCache(cacheKey, sorted);
     return sorted;
 
   } catch (err) {
     console.error('[TBC] getCustomerOrders error:', err);
-    return cache?.data || [];
+    return [];
   }
 }
 
@@ -1050,16 +1052,10 @@ export async function setOrderStatus(invoiceId, status) {
  *   .heroHeading      — Main headline text
  *   .heroSubheading   — Subheadline / tagline text
  */
-let _cachedCompanyObj = getLocalCache('tbc_cache_company');
-let _cachedCompany = _cachedCompanyObj?.data || null;
+let _cachedCompany = getCachedCompany();
 
 export async function getCompanyProfile(companyId = COMPANY_ID) {
-  const cache = getLocalCache('tbc_cache_company');
-  if (cache?.data) {
-    _cachedCompany = cache.data;
-    if (cache.isStale) {
-      revalidateCompany(companyId).catch(() => {});
-    }
+  if (_cachedCompany) {
     return _cachedCompany;
   }
   return await revalidateCompany(companyId);
@@ -1090,7 +1086,7 @@ export async function revalidateCompany(companyId = COMPANY_ID) {
       handle,
     };
     _cachedCompany = result;
-    setLocalCache('tbc_cache_company', _cachedCompany);
+    setCachedCompany(_cachedCompany);
     return result;
   } catch (err) {
     console.error('[TBC] getCompanyProfile error:', err);

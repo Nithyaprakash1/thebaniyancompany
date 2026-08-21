@@ -1269,9 +1269,33 @@
       subscribeToProduct(product.id, (liveProduct) => {
         if (!liveProduct) return;
         window.currentProductData = { ...window.currentProductData, ...liveProduct };
-        let liveStock = Number(window.currentSelectedVariant?.stock?.main ?? window.currentSelectedVariant?.stock ?? liveProduct.availableStock ?? 999);
-        if (typeof window.updateStockUI === 'function') {
-          window.updateStockUI(liveStock);
+        
+        // Re-evaluate stock for current selection
+        const variants = liveProduct.variants || [];
+        if (variants.length > 0 && window.currentSelectedColor && window.currentSelectedSize) {
+          const match = variants.find(v => v.color === window.currentSelectedColor && v.size === window.currentSelectedSize);
+          if (match) {
+            window.currentSelectedVariant = match;
+          }
+        }
+        
+        // Update price display if changed
+        const currentPrice = Number(liveProduct.price || (window.currentSelectedVariant?.price ?? 0));
+        const origP = liveProduct.originalPrice ? Number(liveProduct.originalPrice) : null;
+        const priceContainer = document.querySelector('main .flex.items-baseline');
+        if (priceContainer && currentPrice > 0) {
+          priceContainer.innerHTML = `
+            <span class="text-3xl font-bold text-primary">${formatMoney(currentPrice)}</span>
+            ${origP && origP > currentPrice ? `<span class="text-base text-secondary line-through">${formatMoney(origP)}</span>` : ''}
+            ${liveProduct.discount ? `<span class="bg-error text-on-error px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${liveProduct.discount}</span>` : ''}
+          `;
+        }
+
+        if (typeof window.renderVariantChips === 'function') {
+          window.renderVariantChips();
+        }
+        if (typeof window.updateBuyButtonsState === 'function') {
+          window.updateBuyButtonsState();
         }
       });
 

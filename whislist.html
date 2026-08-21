@@ -265,7 +265,7 @@
   });
 </script>
 <script type="module">
-  import { getProducts, formatMoney, getCompany } from './js/products-service.js';
+  import { subscribeToProducts, formatMoney, getCompany } from './js/products-service.js';
   import { getWishlistIds, removeWishlistItem as removeStoredItem } from './js/wishlist-store.js';
 
   getCompany().then(comp => {
@@ -281,9 +281,11 @@
     const grid = document.getElementById('wishlist-grid');
     const empty = document.getElementById('empty-state');
     const count = document.getElementById('wishlist-count');
-    const render = async () => {
+    let currentStoreProducts = [];
+
+    const render = () => {
       const ids = getWishlistIds();
-      const products = (await getProducts()).filter(product => ids.includes(product.id));
+      const products = (currentStoreProducts || []).filter(product => ids.includes(product.id));
       if (count) count.textContent = `${products.length} item${products.length === 1 ? '' : 's'} saved for your next look`;
       if (grid) grid.innerHTML = products.map(product => {
         const imgUrl = (Array.isArray(product.imageUrls) && product.imageUrls[0]) || product.imageUrl || product.image || 'https://placehold.co/400x500/f0f0f0/999?text=No+Image';
@@ -293,8 +295,19 @@
       empty?.classList.toggle('hidden', Boolean(products.length));
       empty?.classList.toggle('flex', !products.length);
     };
-    window.removeSavedProduct = async id => { removeStoredItem(id); await render(); };
-    await render();
+
+    window.removeSavedProduct = async id => {
+      removeStoredItem(id);
+      render();
+    };
+
+    // Live subscription for wishlist items
+    subscribeToProducts((liveProducts) => {
+      currentStoreProducts = liveProducts || [];
+      render();
+      const loader = document.getElementById('loading-screen');
+      if (loader) loader.classList.add('hidden');
+    });
   });
 </script>
 </body>

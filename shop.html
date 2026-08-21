@@ -745,7 +745,7 @@
 <!-- Dynamic Products Integration -->
 <script type="module">
   import tbcCart from './js/cart-store.js';
-  import { getProducts, subscribeToProducts, getCategories, getCompany } from './js/products-service.js';
+  import { subscribeToProducts, subscribeToCategories, getCompany } from './js/products-service.js';
   import { toggleWishlistItem, hasWishlistItem } from './js/wishlist-store.js';
 
   getCompany().then(comp => {
@@ -906,23 +906,38 @@
     const filterBar = document.getElementById('shop-category-filters');
 
     try {
-      const categories = await getCategories();
+      // Real-time Category Listener
+      subscribeToCategories((categories) => {
+        if (filterBar && categories.length > 0) {
+          const sortedCats = [...categories].sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+          const pills = sortedCats.map(c =>
+            `<button onclick="filterCategory('${String(c.name).toLowerCase().replace(/'/g, "\\'").replace(/"/g, '&quot;')}', this)"
+                     class="filter-btn px-5 py-2 rounded-full text-xs font-semibold transition-all">${c.name}</button>`
+          ).join('');
+          
+          const activeBtn = filterBar.querySelector('.filter-btn.active');
+          const activeCat = activeBtn ? activeBtn.getAttribute('onclick') : null;
 
-      // Build category filter pills (Sorted in Ascending Order A-Z)
-      if (filterBar && categories.length > 0) {
-        const sortedCats = [...categories].sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
-        const pills = sortedCats.map(c =>
-          `<button onclick="filterCategory('${String(c.name).toLowerCase().replace(/'/g, "\\'").replace(/"/g, '&quot;')}', this)"
-                   class="filter-btn px-5 py-2 rounded-full text-xs font-semibold transition-all">${c.name}</button>`
-        ).join('');
-        filterBar.innerHTML =
-          `<button onclick="filterCategory('all', this)" class="filter-btn active px-5 py-2 rounded-full text-xs font-semibold transition-all">All</button>` +
-          pills;
-      }
+          filterBar.innerHTML =
+            `<button onclick="filterCategory('all', this)" class="filter-btn active px-5 py-2 rounded-full text-xs font-semibold transition-all">All</button>` +
+            pills;
+
+          // Restore active filter if applicable
+          if (activeCat) {
+            const matchBtn = Array.from(filterBar.querySelectorAll('.filter-btn')).find(b => b.getAttribute('onclick') === activeCat);
+            if (matchBtn) {
+              filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+              matchBtn.classList.add('active');
+            }
+          }
+        }
+      });
 
       // Real-time live subscription for products, stock quantity & out-of-stock badges
       subscribeToProducts((liveProducts) => {
         renderStoreCatalog(liveProducts);
+        const loader = document.getElementById('loading-screen');
+        if (loader) loader.classList.add('hidden');
       });
     } catch (e) {
       console.error('[TBC] Shop load error:', e);

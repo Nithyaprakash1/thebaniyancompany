@@ -283,7 +283,7 @@
 </script>
 
 <script type="module">
-  import { getProducts, getCompany, formatMoney } from './js/products-service.js';
+  import { subscribeToProducts, getCompany, formatMoney } from './js/products-service.js';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
 
   function extractYouTubeId(url) {
@@ -304,53 +304,74 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      const [products, company] = await Promise.all([getProducts(), getCompany()]);
+      const company = await getCompany();
       const feed = document.getElementById('reels-container');
       if (!feed) return;
 
       const youtubeLinks = (company && Array.isArray(company.youtubeLinks)) ? company.youtubeLinks : [];
-      
-      // Build YouTube Short reel items
-      const ytReels = youtubeLinks.map((ytUrl, i) => {
-        const ytId = extractYouTubeId(ytUrl);
-        const assocProduct = (products && products.length > 0) ? products[i % products.length] : null;
-        return {
-          id: assocProduct ? assocProduct.id : `yt-short-${i}`,
-          name: assocProduct ? assocProduct.name : 'Exclusive Streetwear Drop',
-          category: 'YouTube Shorts',
-          youtubeUrl: ytUrl,
-          youtubeId: ytId,
-          imageUrls: [ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (assocProduct?.imageUrls?.[0] || '')],
-          price: assocProduct ? assocProduct.price : 1499,
-          originalPrice: assocProduct ? assocProduct.originalPrice : 2499,
-          description: assocProduct ? assocProduct.description : 'Watch our latest YouTube Short & shop the drop live!'
-        };
+      let currentCompany = company;
+
+      const companyName   = company?.name || 'THE BANIYAN COMPANY';
+      const companyHandle = company?.handle || '@thebaniyancompany';
+      const companyLogo   = company?.logo || '';
+
+      // Update header logo / name if element exists
+      const logoEl = document.getElementById('nav-company-logo');
+      if (logoEl && companyLogo) logoEl.src = companyLogo;
+      const headerBrand = document.querySelector('header .font-bold.tracking-\\[0\\.2em\\]');
+      if (headerBrand) headerBrand.textContent = companyName;
+
+      let initialRenderDone = false;
+
+      subscribeToProducts((products) => {
+        // Build YouTube Short reel items
+        const ytReels = youtubeLinks.map((ytUrl, i) => {
+          const ytId = extractYouTubeId(ytUrl);
+          const assocProduct = (products && products.length > 0) ? products[i % products.length] : null;
+          return {
+            id: assocProduct ? assocProduct.id : `yt-short-${i}`,
+            name: assocProduct ? assocProduct.name : 'Exclusive Streetwear Drop',
+            category: 'YouTube Shorts',
+            youtubeUrl: ytUrl,
+            youtubeId: ytId,
+            imageUrls: [ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (assocProduct?.imageUrls?.[0] || '')],
+            price: assocProduct ? assocProduct.price : 1499,
+            originalPrice: assocProduct ? assocProduct.originalPrice : 2499,
+            description: assocProduct ? assocProduct.description : 'Watch our latest YouTube Short & shop the drop live!'
+          };
+        });
+
+        // Combine products and YouTube Shorts
+        let allReelItems = [...(products || [])];
+        
+        // Attach youtubeId to products if their videoUrl/youtubeUrl has one
+        allReelItems = allReelItems.map(p => {
+          const ytId = extractYouTubeId(p.youtubeUrl || p.videoUrl);
+          return ytId ? { ...p, youtubeId: ytId } : p;
+        });
+
+        // Merge standalone YouTube Shorts links from admin
+        if (ytReels.length > 0) {
+          allReelItems = [...allReelItems, ...ytReels];
+        }
+
+        if (!allReelItems || allReelItems.length === 0) {
+          feed.innerHTML = `
+            <div class="h-screen w-full flex items-center justify-center text-center p-8">
+              <p class="text-secondary text-sm">No reels available right now.</p>
+            </div>`;
+          return;
+        }
+
+        if (!initialRenderDone) {
+          const shuffledReels = shuffleArray(allReelItems);
+          feed.innerHTML = renderReelList(shuffledReels);
+          initialRenderDone = true;
+          if (typeof setupIntersectionObserver === 'function') {
+            setupIntersectionObserver();
+          }
+        }
       });
-
-      // Combine products and YouTube Shorts
-      let allReelItems = [...(products || [])];
-      
-      // Attach youtubeId to products if their videoUrl/youtubeUrl has one
-      allReelItems = allReelItems.map(p => {
-        const ytId = extractYouTubeId(p.youtubeUrl || p.videoUrl);
-        return ytId ? { ...p, youtubeId: ytId } : p;
-      });
-
-      // Merge standalone YouTube Shorts links from admin
-      if (ytReels.length > 0) {
-        allReelItems = [...allReelItems, ...ytReels];
-      }
-
-      if (!allReelItems || allReelItems.length === 0) {
-        feed.innerHTML = `
-          <div class="h-screen w-full flex items-center justify-center text-center p-8">
-            <p class="text-secondary text-sm">No reels available right now.</p>
-          </div>`;
-        return;
-      }
-
-      // Randomly shuffle reels like YouTube Shorts!
-      const shuffledReels = shuffleArray(allReelItems);
 
       const companyName   = company?.name || 'THE BANIYAN COMPANY';
       const companyHandle = company?.handle || '@thebaniyancompany';
