@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>Checkout — THE BANIYAN COMPANY</title>
-  <link rel="icon" type="image/jpeg" href="tbclogo.jpeg">
-  <link rel="shortcut icon" href="tbclogo.jpeg">
+  <link rel="icon" type="image/jpeg" href="assets/tbclogo.jpeg">
+  <link rel="shortcut icon" href="assets/tbclogo.jpeg">
+  <link rel="apple-touch-icon" href="assets/tbclogo.jpeg">
   <meta name="description" content="Complete your purchase with secure Razorpay checkout at THE BANIYAN COMPANY.">
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    name="viewport">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Razorpay Checkout JS SDK -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -31,622 +35,692 @@
     }
   </script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    ::-webkit-scrollbar { display: none; }
-    .step-active { background-color: #000; color: #fff; border-color: #000; }
-    .step-done { background-color: #10b981; color: #fff; border-color: #10b981; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .step-active {
+      background-color: #000;
+      color: #fff;
+      border-color: #000;
+    }
+
+    .step-done {
+      background-color: #10b981;
+      color: #fff;
+      border-color: #10b981;
+    }
   </style>
 </head>
-<body class="bg-background text-on-surface font-sans antialiased min-h-screen sm:h-screen overflow-y-auto sm:overflow-hidden flex flex-col justify-between">
 
-<!-- Header -->
-<header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-black/5">
-  <div class="max-w-screen-xl mx-auto h-14 sm:h-16 px-4 md:px-8 flex items-center justify-between">
-    <a href="cart" aria-label="Back" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-black/10 transition-colors">
-      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">arrow_back</span>
-    </a>
+<body
+  class="bg-background text-on-surface font-sans antialiased min-h-screen sm:h-screen overflow-y-auto sm:overflow-hidden flex flex-col justify-between">
 
-    <a href="home" class="flex items-center gap-3">
-      <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-7 sm:h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
-      <span class="font-bold tracking-[0.15em] text-xs sm:text-sm uppercase text-primary">CHECKOUT</span>
-    </a>
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-black/5">
+    <div class="max-w-screen-xl mx-auto h-14 sm:h-16 px-4 md:px-8 flex items-center justify-between">
+      <a href="cart" aria-label="Back"
+        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-black/10 transition-colors">
+        <span class="material-symbols-outlined text-[20px] sm:text-[22px]">arrow_back</span>
+      </a>
 
-    <div class="flex items-center gap-1 text-emerald-600 font-semibold text-[11px] sm:text-xs uppercase">
-      <span class="material-symbols-outlined text-[15px] sm:text-[16px]">lock</span>
-      <span>256-Bit SSL</span>
+      <a href="home" class="flex items-center gap-3">
+        <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-7 sm:h-8 object-contain"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM"
+          onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
+        <span class="font-bold tracking-[0.15em] text-xs sm:text-sm uppercase text-primary">CHECKOUT</span>
+      </a>
+
+      <div class="flex items-center gap-1 text-emerald-600 font-semibold text-[11px] sm:text-xs uppercase">
+        <span class="material-symbols-outlined text-[15px] sm:text-[16px]">lock</span>
+        <span>256-Bit SSL</span>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<main class="pt-16 sm:pt-20 pb-8 max-w-2xl mx-auto px-4 w-full flex-1 flex flex-col justify-start">
-  
-  <!-- 4 STEP PROGRESS INDICATOR BAR (FULL SCREEN FLOW) -->
-  <div class="mb-3 sm:mb-4 border-b border-black/10 pb-2.5">
-    <div class="flex items-center justify-between relative">
-      <!-- Connecting Line (Middle-aligned through the center of 32px step badges) -->
-      <div class="absolute left-6 right-6 top-[16px] -translate-y-1/2 h-0.5 bg-neutral-200 z-0">
-        <div id="progress-line" class="h-full bg-black transition-all duration-500 w-0"></div>
-      </div>
+  <main class="pt-16 sm:pt-20 pb-8 max-w-2xl mx-auto px-4 w-full flex-1 flex flex-col justify-start">
 
-      <!-- Step 1: Your Details -->
-      <div class="relative z-10 flex flex-col items-center gap-1">
-        <div id="step-badge-1" class="w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all">1</div>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-primary">Your Details</span>
-      </div>
-
-      <!-- Step 2: Delivery Address -->
-      <div class="relative z-10 flex flex-col items-center gap-1">
-        <div id="step-badge-2" class="w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all">2</div>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400" id="step-label-2">Address</span>
-      </div>
-
-      <!-- Step 3: Summary -->
-      <div class="relative z-10 flex flex-col items-center gap-1">
-        <div id="step-badge-3" class="w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all">3</div>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400" id="step-label-3">Summary</span>
-      </div>
-
-      <!-- Step 4: Payment -->
-      <div class="relative z-10 flex flex-col items-center gap-1">
-        <div id="step-badge-4" class="w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all">4</div>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400" id="step-label-4">Payment</span>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- STEP 1: YOUR DETAILS (Full Screen) -->
-  <div id="step-1-panel" class="space-y-4">
-    <div>
-      <h2 class="text-xl font-bold text-primary mt-1">Your Details 📱</h2>
-    </div>
-
-    <form id="step-1-form" onsubmit="event.preventDefault(); goToStep2();" class="space-y-3.5">
-      <div>
-        <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Full Name *</label>
-        <input required type="text" id="cust-name" placeholder="e.g. Alex Mercer" class="w-full bg-surface-container px-4 py-3 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all">
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Phone Number *</label>
-        <div class="flex items-center bg-surface-container rounded-xl overflow-hidden border border-black/10 focus-within:ring-2 focus-within:ring-black transition-all">
-          <span class="px-3.5 py-3 text-sm font-bold text-slate-800 bg-black/5 border-r border-black/10 flex items-center gap-1 select-none flex-shrink-0">
-            🇮🇳 +91
-          </span>
-          <input required type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" id="cust-phone" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" placeholder="9876543210" class="w-full bg-transparent px-3.5 py-3 text-sm font-semibold outline-none text-primary">
+    <!-- 4 STEP PROGRESS INDICATOR BAR (FULL SCREEN FLOW) -->
+    <div class="mb-3 sm:mb-4 border-b border-black/10 pb-2.5">
+      <div class="flex items-center justify-between relative">
+        <!-- Connecting Line (Middle-aligned through the center of 32px step badges) -->
+        <div class="absolute left-6 right-6 top-[16px] -translate-y-1/2 h-0.5 bg-neutral-200 z-0">
+          <div id="progress-line" class="h-full bg-black transition-all duration-500 w-0"></div>
         </div>
-      </div>
 
-      <div class="pt-2">
-        <button type="submit" class="w-full bg-black hover:bg-neutral-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
-          Next: Delivery Address 🏠 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-        </button>
-      </div>
-    </form>
-  </div>
+        <!-- Step 1: Your Details -->
+        <div class="relative z-10 flex flex-col items-center gap-1">
+          <div id="step-badge-1"
+            class="w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all">
+            1</div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-primary">Your Details</span>
+        </div>
 
-  <!-- STEP 2: DELIVERY ADDRESS (Full Screen) -->
-  <div id="step-2-panel" class="hidden space-y-4">
-    <div>
-      <h2 class="text-xl font-bold text-primary mt-1">Delivery Address 🏠</h2>
+        <!-- Step 2: Delivery Address -->
+        <div class="relative z-10 flex flex-col items-center gap-1">
+          <div id="step-badge-2"
+            class="w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all">
+            2</div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400" id="step-label-2">Address</span>
+        </div>
+
+        <!-- Step 3: Summary -->
+        <div class="relative z-10 flex flex-col items-center gap-1">
+          <div id="step-badge-3"
+            class="w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all">
+            3</div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400" id="step-label-3">Summary</span>
+        </div>
+
+        <!-- Step 4: Payment -->
+        <div class="relative z-10 flex flex-col items-center gap-1">
+          <div id="step-badge-4"
+            class="w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all">
+            4</div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400" id="step-label-4">Payment</span>
+        </div>
+
+      </div>
     </div>
 
-    <form id="step-2-form" onsubmit="event.preventDefault(); goToStep3();" class="space-y-3.5">
+    <!-- STEP 1: YOUR DETAILS (Full Screen) -->
+    <div id="step-1-panel" class="space-y-4">
       <div>
-        <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">House / Flat / Building Address *</label>
-        <textarea required rows="2" id="cust-address" oninput="this.style.height = ''; this.style.height = Math.max(68, this.scrollHeight) + 'px';" placeholder="Flat No. 402, Building A, Studio Lane..." class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all overflow-hidden resize-none min-h-[68px]"></textarea>
+        <h2 class="text-xl font-bold text-primary mt-1">Your Details 📱</h2>
       </div>
 
-      <div>
-        <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Landmark (Optional)</label>
-        <input type="text" id="cust-landmark" placeholder="Near Studio Central Park" class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all">
-      </div>
-
-      <!-- India Pincode Field with Auto-Fetch -->
-      <div>
-        <div class="flex justify-between items-center mb-1">
-          <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Pincode *</label>
-          <span class="text-[10px] text-slate-500 font-bold uppercase">6-Digit Indian Pincode</span>
+      <form id="step-1-form" onsubmit="event.preventDefault(); goToStep2();" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Full Name *</label>
+          <input required type="text" id="cust-name" placeholder="e.g. Alex Mercer"
+            class="w-full bg-surface-container px-4 py-3 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all">
         </div>
-        <div class="relative">
-          <input required type="tel" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" id="cust-pincode" oninput="handlePincodeInput(this.value)" placeholder="e.g. 680001 or 600001" class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-black transition-all">
-          <div id="pincode-loader" class="absolute right-3 top-1/2 -translate-y-1/2 hidden flex items-center gap-1.5 text-xs text-slate-700 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-black/10 shadow-sm">
-            <span class="material-symbols-outlined animate-spin text-[16px] text-black">motion_photos_on</span>
-            <span class="text-[11px] font-bold">Auto-fetching...</span>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Phone Number *</label>
+          <div
+            class="flex items-center bg-surface-container rounded-xl overflow-hidden border border-black/10 focus-within:ring-2 focus-within:ring-black transition-all">
+            <span
+              class="px-3.5 py-3 text-sm font-bold text-slate-800 bg-black/5 border-r border-black/10 flex items-center gap-1 select-none flex-shrink-0">
+              🇮🇳 +91
+            </span>
+            <input required type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" id="cust-phone"
+              oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" placeholder="9876543210"
+              class="w-full bg-transparent px-3.5 py-3 text-sm font-semibold outline-none text-primary">
           </div>
         </div>
-        <p id="pincode-status-text" class="text-[11px] font-semibold mt-1.5 hidden"></p>
+
+        <div class="pt-2">
+          <button type="submit"
+            class="w-full bg-black hover:bg-neutral-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
+            Next: Delivery Address 🏠 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- STEP 2: DELIVERY ADDRESS (Full Screen) -->
+    <div id="step-2-panel" class="hidden space-y-4">
+      <div>
+        <h2 class="text-xl font-bold text-primary mt-1">Delivery Address 🏠</h2>
       </div>
 
-      <!-- State & City/District Fields -->
-      <div class="grid grid-cols-2 gap-3">
+      <form id="step-2-form" onsubmit="event.preventDefault(); goToStep3();" class="space-y-3.5">
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">State *</label>
-          <input required type="text" id="cust-state" oninput="handleStateChange(this.value)" placeholder="State Name" class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
+          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">House / Flat / Building
+            Address *</label>
+          <textarea required rows="2" id="cust-address"
+            oninput="this.style.height = ''; this.style.height = Math.max(68, this.scrollHeight) + 'px';"
+            placeholder="Flat No. 402, Building A, Studio Lane..."
+            class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all overflow-hidden resize-none min-h-[68px]"></textarea>
         </div>
+
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">City / District *</label>
-          <input required type="text" id="cust-city" oninput="handleCityChange(this.value)" placeholder="City / District" class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
+          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Landmark
+            (Optional)</label>
+          <input type="text" id="cust-landmark" placeholder="Near Studio Central Park"
+            class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all">
         </div>
+
+        <!-- India Pincode Field with Auto-Fetch -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Pincode *</label>
+            <span class="text-[10px] text-slate-500 font-bold uppercase">6-Digit Indian Pincode</span>
+          </div>
+          <div class="relative">
+            <input required type="tel" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" id="cust-pincode"
+              oninput="handlePincodeInput(this.value)" placeholder="e.g. 680001 or 600001"
+              class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-black transition-all">
+            <div id="pincode-loader"
+              class="absolute right-3 top-1/2 -translate-y-1/2 hidden flex items-center gap-1.5 text-xs text-slate-700 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-black/10 shadow-sm">
+              <span class="material-symbols-outlined animate-spin text-[16px] text-black">motion_photos_on</span>
+              <span class="text-[11px] font-bold">Auto-fetching...</span>
+            </div>
+          </div>
+          <p id="pincode-status-text" class="text-[11px] font-semibold mt-1.5 hidden"></p>
+        </div>
+
+        <!-- State & City/District Fields -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">State *</label>
+            <input required type="text" id="cust-state" oninput="handleStateChange(this.value)" placeholder="State Name"
+              class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">City / District
+              *</label>
+            <input required type="text" id="cust-city" oninput="handleCityChange(this.value)"
+              placeholder="City / District"
+              class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
+          </div>
+        </div>
+
+        <div id="pincode-manual-toggle-box" class="hidden pt-1">
+          <button type="button" onclick="enableManualPincodeMode()"
+            class="text-[11px] font-bold text-slate-600 hover:text-black underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">edit</span> Edit City &amp; State Manually
+          </button>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button type="button" onclick="goToStep1()"
+            class="w-1/3 bg-slate-100 text-black py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition-colors">
+            Back
+          </button>
+          <button type="submit"
+            class="w-2/3 bg-black hover:bg-neutral-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
+            Next: Order Summary 🧾 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- STEP 3: ORDER SUMMARY (Full Screen) -->
+    <div id="step-3-panel" class="hidden space-y-4">
+      <div>
+        <h2 class="text-xl font-bold text-primary mt-1">Order Summary 🧾</h2>
       </div>
 
-      <div id="pincode-manual-toggle-box" class="hidden pt-1">
-        <button type="button" onclick="enableManualPincodeMode()" class="text-[11px] font-bold text-slate-600 hover:text-black underline flex items-center gap-1">
-          <span class="material-symbols-outlined text-[13px]">edit</span> Edit City &amp; State Manually
-        </button>
+      <!-- Order Items List & Pricing Breakdown -->
+      <div id="order-summary-box" class="space-y-3.5">
+        <!-- Rendered dynamically -->
       </div>
 
       <div class="pt-2 flex gap-3">
-        <button type="button" onclick="goToStep1()" class="w-1/3 bg-slate-100 text-black py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition-colors">
+        <button type="button" onclick="goToStep2()"
+          class="w-1/3 bg-slate-100 text-black py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition-colors">
           Back
         </button>
-        <button type="submit" class="w-2/3 bg-black hover:bg-neutral-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
-          Next: Order Summary 🧾 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        <button type="button" onclick="goToStep4()"
+          class="w-2/3 bg-black hover:bg-neutral-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
+          Next: Payment Method 💳 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
         </button>
       </div>
-    </form>
-  </div>
-
-  <!-- STEP 3: ORDER SUMMARY (Full Screen) -->
-  <div id="step-3-panel" class="hidden space-y-4">
-    <div>
-      <h2 class="text-xl font-bold text-primary mt-1">Order Summary 🧾</h2>
     </div>
 
-    <!-- Order Items List & Pricing Breakdown -->
-    <div id="order-summary-box" class="space-y-3.5">
-      <!-- Rendered dynamically -->
-    </div>
-
-    <div class="pt-2 flex gap-3">
-      <button type="button" onclick="goToStep2()" class="w-1/3 bg-slate-100 text-black py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition-colors">
-        Back
-      </button>
-      <button type="button" onclick="goToStep4()" class="w-2/3 bg-black hover:bg-neutral-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
-        Next: Payment Method 💳 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- STEP 4: PAYMENT METHOD (Full Screen) -->
-  <div id="step-4-panel" class="hidden space-y-4">
-    <div class="flex justify-between items-start">
-      <div>
-        <h2 class="text-xl font-bold text-primary mt-1">Payment Method 💳</h2>
+    <!-- STEP 4: PAYMENT METHOD (Full Screen) -->
+    <div id="step-4-panel" class="hidden space-y-4">
+      <div class="flex justify-between items-start">
+        <div>
+          <h2 class="text-xl font-bold text-primary mt-1">Payment Method 💳</h2>
+        </div>
+        <!-- 100% Secure Badge -->
+        <div class="flex items-center gap-1.5 bg-slate-900 text-white px-3 py-1 rounded-xl text-xs font-bold shadow-sm">
+          <span class="material-symbols-outlined text-[15px] text-emerald-400">verified_user</span>
+          <span class="text-emerald-300 font-bold uppercase tracking-wider text-[9px]">100% Secure Payment</span>
+        </div>
       </div>
-      <!-- 100% Secure Badge -->
-      <div class="flex items-center gap-1.5 bg-slate-900 text-white px-3 py-1 rounded-xl text-xs font-bold shadow-sm">
-        <span class="material-symbols-outlined text-[15px] text-emerald-400">verified_user</span>
-        <span class="text-emerald-300 font-bold uppercase tracking-wider text-[9px]">100% Secure Payment</span>
-      </div>
-    </div>
 
-    <!-- Payment Option Choices -->
-    <div class="space-y-3">
-      <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Choose Payment Option</label>
-      
-      <!-- Option 1: Online Payment -->
-      <label class="flex items-center justify-between p-4 bg-white rounded-2xl cursor-pointer hover:bg-slate-50 transition-all border-2 border-black/10 shadow-sm relative overflow-hidden group">
-        <div class="flex items-start sm:items-center gap-3.5 w-full">
-          <input type="radio" name="pay-method" value="Razorpay" checked class="w-4 h-4 accent-black mt-1 sm:mt-0 flex-shrink-0">
-          <div class="space-y-2 flex-1 min-w-0">
-            <!-- Payment Type Icon Badges (First & Bigger) -->
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="inline-flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-800 border border-black/10 shadow-2xs">
-                <img src="assets/icons8-google-pay.svg" alt="Google Pay" class="w-5 h-5 object-contain">
-                GPay
-              </span>
-              <span class="inline-flex items-center gap-1.5 bg-purple-50 px-3 py-1.5 rounded-xl text-xs font-bold text-purple-950 border border-purple-200 shadow-2xs">
-                <img src="assets/icons8-phone-pe.svg" alt="PhonePe" class="w-5 h-5 object-contain">
-                PhonePe
-              </span>
-              <span class="inline-flex items-center gap-1.5 bg-sky-50 px-3 py-1.5 rounded-lg text-xs font-bold text-sky-950 border border-sky-200 shadow-2xs">
-                <img src="assets/icons8-paytm.svg" alt="Paytm" class="w-5 h-5 object-contain">
-                Paytm
-              </span>
-              <span class="inline-flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-lg text-xs font-bold text-amber-950 border border-amber-200 shadow-2xs">
-                <img src="assets/icons8-amazon.svg" alt="Amazon Pay" class="w-5 h-5 object-contain">
-                Amazon Pay
-              </span>
-              <span class="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-800 border border-slate-200">
-                <span class="material-symbols-outlined text-[16px] text-slate-600">payment</span>
-                Cards &amp; NetBanking
-              </span>
+      <!-- Payment Option Choices -->
+      <div class="space-y-3">
+        <label class="block text-xs font-bold uppercase tracking-wider text-secondary">Choose Payment Option</label>
+
+        <!-- Option 1: Online Payment -->
+        <label
+          class="flex items-center justify-between p-4 bg-white rounded-2xl cursor-pointer hover:bg-slate-50 transition-all border-2 border-black/10 shadow-sm relative overflow-hidden group">
+          <div class="flex items-start sm:items-center gap-3.5 w-full">
+            <input type="radio" name="pay-method" value="Razorpay" checked
+              class="w-4 h-4 accent-black mt-1 sm:mt-0 flex-shrink-0">
+            <div class="space-y-2 flex-1 min-w-0">
+              <!-- Payment Type Icon Badges (First & Bigger) -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <span
+                  class="inline-flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-800 border border-black/10 shadow-2xs">
+                  <img src="assets/icons8-google-pay.svg" alt="Google Pay" class="w-5 h-5 object-contain">
+                  GPay
+                </span>
+                <span
+                  class="inline-flex items-center gap-1.5 bg-purple-50 px-3 py-1.5 rounded-xl text-xs font-bold text-purple-950 border border-purple-200 shadow-2xs">
+                  <img src="assets/icons8-phone-pe.svg" alt="PhonePe" class="w-5 h-5 object-contain">
+                  PhonePe
+                </span>
+                <span
+                  class="inline-flex items-center gap-1.5 bg-sky-50 px-3 py-1.5 rounded-lg text-xs font-bold text-sky-950 border border-sky-200 shadow-2xs">
+                  <img src="assets/icons8-paytm.svg" alt="Paytm" class="w-5 h-5 object-contain">
+                  Paytm
+                </span>
+                <span
+                  class="inline-flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-lg text-xs font-bold text-amber-950 border border-amber-200 shadow-2xs">
+                  <img src="assets/icons8-amazon.svg" alt="Amazon Pay" class="w-5 h-5 object-contain">
+                  Amazon Pay
+                </span>
+                <span
+                  class="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-800 border border-slate-200">
+                  <span class="material-symbols-outlined text-[16px] text-slate-600">payment</span>
+                  Cards &amp; NetBanking
+                </span>
+              </div>
+
+              <span class="text-xs text-secondary block font-medium">Pay securely with Google Pay, PhonePe, Paytm,
+                Credit / Debit Cards &amp; NetBanking</span>
             </div>
-            
-            <span class="text-xs text-secondary block font-medium">Pay securely with Google Pay, PhonePe, Paytm, Credit / Debit Cards &amp; NetBanking</span>
           </div>
-        </div>
-      </label>
+        </label>
 
-      <!-- Option 2: Cash on Delivery -->
-      <label id="cod-option-wrapper" class="flex items-center justify-between p-3.5 bg-surface-container rounded-2xl cursor-pointer hover:bg-black/5 transition-colors border border-black/5">
-        <div class="flex items-center gap-3">
-          <input type="radio" name="pay-method" value="COD" class="w-4 h-4 accent-black">
-          <div>
-            <span class="font-bold text-xs text-primary block">Cash on Delivery (COD)</span>
-            <span class="text-[10px] text-secondary">Pay cash upon package delivery</span>
+        <!-- Option 2: Cash on Delivery -->
+        <label id="cod-option-wrapper"
+          class="flex items-center justify-between p-3.5 bg-surface-container rounded-2xl cursor-pointer hover:bg-black/5 transition-colors border border-black/5">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="pay-method" value="COD" class="w-4 h-4 accent-black">
+            <div>
+              <span class="font-bold text-xs text-primary block">Cash on Delivery (COD)</span>
+              <span class="text-[10px] text-secondary">Pay cash upon package delivery</span>
+            </div>
           </div>
-        </div>
-        <span class="material-symbols-outlined text-emerald-600">payments</span>
-      </label>
+          <span class="material-symbols-outlined text-emerald-600">payments</span>
+        </label>
+      </div>
+
+      <!-- WhatsApp Direct Order Button -->
+      <div id="m-whatsapp-option-wrapper" class="pt-1">
+        <button type="button" onclick="placeWhatsAppOrder()"
+          class="w-full bg-[#25D366] text-white py-3 rounded-2xl font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path
+              d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z">
+            </path>
+          </svg>
+          Order Directly via WhatsApp
+        </button>
+      </div>
+
+      <div class="pt-2 flex gap-3 pb-6">
+        <button type="button" onclick="goToStep3()"
+          class="w-1/3 bg-slate-100 text-black py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition-colors">
+          Back
+        </button>
+        <button type="button" id="pay-submit-btn" onclick="submitFinalOrder()"
+          class="w-2/3 bg-black hover:bg-neutral-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2">
+          Pay Now 🔒 <span class="material-symbols-outlined text-[18px]">lock</span>
+        </button>
+      </div>
     </div>
 
-    <!-- WhatsApp Direct Order Button -->
-    <div id="m-whatsapp-option-wrapper" class="pt-1">
-      <button type="button" onclick="placeWhatsAppOrder()" class="w-full bg-[#25D366] text-white py-3 rounded-2xl font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm">
-        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
-        Order Directly via WhatsApp
-      </button>
-    </div>
+  </main>
 
-    <div class="pt-2 flex gap-3 pb-6">
-      <button type="button" onclick="goToStep3()" class="w-1/3 bg-slate-100 text-black py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition-colors">
-        Back
-      </button>
-      <button type="button" id="pay-submit-btn" onclick="submitFinalOrder()" class="w-2/3 bg-black hover:bg-neutral-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2">
-        Pay Now 🔒 <span class="material-symbols-outlined text-[18px]">lock</span>
-      </button>
-    </div>
-  </div>
+  <script type="module">
+    import tbcCart from './js/cart-store.js';
+    import { saveOrderToFirestore } from './js/products-service.js';
 
-</main>
+    // Expose to window so non-module functions can call it
+    window.tbcCart = tbcCart;
+    window.saveOrderToFirestore = saveOrderToFirestore;
 
-<script type="module">
-  import tbcCart from './js/cart-store.js';
-  import { saveOrderToFirestore } from './js/products-service.js';
+    const BACKEND_URL = window.TBC_BACKEND_URL || 'http://localhost:5000';
+    const WHATSAPP_NUMBER = '918110061911';
 
-  // Expose to window so non-module functions can call it
-  window.tbcCart = tbcCart;
-  window.saveOrderToFirestore = saveOrderToFirestore;
+    function api(path, body) {
+      return fetch(`${BACKEND_URL}${path}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      }).then(async response => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'Unable to complete your order.');
+        return data;
+      });
+    }
 
-  const BACKEND_URL = window.TBC_BACKEND_URL || 'http://localhost:5000';
-  const WHATSAPP_NUMBER = '918110061911';
+    // updateActionBar removed — buttons are now inline in each step panel
 
-  function api(path, body) {
-    return fetch(`${BACKEND_URL}${path}`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-    }).then(async response => {
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || 'Unable to complete your order.');
-      return data;
-    });
-  }
+    function autoPrefillCustomerProfile() {
+      try {
+        const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+        const phone = localStorage.getItem('tbc_customer_phone') || stored.phone || '';
 
-  // updateActionBar removed — buttons are now inline in each step panel
+        const nameEl = document.getElementById('cust-name');
+        const phoneEl = document.getElementById('cust-phone');
+        const addrEl = document.getElementById('cust-address');
+        const landmarkEl = document.getElementById('cust-landmark');
+        const stateEl = document.getElementById('cust-state');
+        const cityEl = document.getElementById('cust-city');
+        const pinEl = document.getElementById('cust-pincode');
 
-  function autoPrefillCustomerProfile() {
-    try {
-      const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
-      const phone = localStorage.getItem('tbc_customer_phone') || stored.phone || '';
-
-      const nameEl = document.getElementById('cust-name');
-      const phoneEl = document.getElementById('cust-phone');
-      const addrEl = document.getElementById('cust-address');
-      const landmarkEl = document.getElementById('cust-landmark');
-      const stateEl = document.getElementById('cust-state');
-      const cityEl = document.getElementById('cust-city');
-      const pinEl = document.getElementById('cust-pincode');
-
-      if (nameEl && stored.name) nameEl.value = stored.name;
-      if (phoneEl && phone) phoneEl.value = phone.replace(/\D/g, '').slice(-10);
-      if (addrEl && stored.address) addrEl.value = stored.address;
-      if (landmarkEl && stored.landmark) landmarkEl.value = stored.landmark;
-      if (stateEl && stored.state) stateEl.value = stored.state;
-      if (cityEl && stored.city) cityEl.value = stored.city;
-      if (pinEl && stored.pincode) {
-        pinEl.value = stored.pincode;
-        if (typeof window.handlePincodeInput === 'function' && String(stored.pincode).length === 6) {
-          window.handlePincodeInput(stored.pincode);
+        if (nameEl && stored.name) nameEl.value = stored.name;
+        if (phoneEl && phone) phoneEl.value = phone.replace(/\D/g, '').slice(-10);
+        if (addrEl && stored.address) addrEl.value = stored.address;
+        if (landmarkEl && stored.landmark) landmarkEl.value = stored.landmark;
+        if (stateEl && stored.state) stateEl.value = stored.state;
+        if (cityEl && stored.city) cityEl.value = stored.city;
+        if (pinEl && stored.pincode) {
+          pinEl.value = stored.pincode;
+          if (typeof window.handlePincodeInput === 'function' && String(stored.pincode).length === 6) {
+            window.handlePincodeInput(stored.pincode);
+          }
         }
+      } catch (e) { }
+    }
+
+    window.goToStep1 = function () {
+      ['step-1-panel', 'step-2-panel', 'step-3-panel', 'step-4-panel'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', i !== 0);
+      });
+      document.getElementById('progress-line').style.width = '0%';
+      document.getElementById('step-badge-1').className = 'w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-badge-2').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
+      document.getElementById('step-badge-3').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
+      document.getElementById('step-badge-4').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
+      document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
+      document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
+      document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
+    };
+
+    window.goToStep2 = function () {
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      if (!name) {
+        alert("Please enter your Full Name.");
+        return;
       }
-    } catch(e) {}
-  }
-
-  window.goToStep1 = function() {
-    ['step-1-panel','step-2-panel','step-3-panel','step-4-panel'].forEach((id, i) => {
-      const el = document.getElementById(id);
-      if (el) el.classList.toggle('hidden', i !== 0);
-    });
-    document.getElementById('progress-line').style.width = '0%';
-    document.getElementById('step-badge-1').className = 'w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-badge-2').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
-    document.getElementById('step-badge-3').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
-    document.getElementById('step-badge-4').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
-    document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
-    document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
-    document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
-  };
-
-  window.goToStep2 = function() {
-    const name = document.getElementById('cust-name').value.trim();
-    const phone = document.getElementById('cust-phone').value.trim();
-    if (!name) {
-      alert("Please enter your Full Name.");
-      return;
-    }
-    if (!phone || phone.replace(/\D/g, '').length !== 10) {
-      alert("Phone number must be exactly 10 digits.");
-      return;
-    }
-
-    try {
-      const current = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
-      localStorage.setItem('tbc_user_profile', JSON.stringify({ ...current, name, phone: phone.replace(/\D/g, '').slice(-10) }));
-      localStorage.setItem('tbc_customer_phone', phone.replace(/\D/g, '').slice(-10));
-    } catch(e) {}
-
-    ['step-1-panel','step-2-panel','step-3-panel','step-4-panel'].forEach((id, i) => {
-      const el = document.getElementById(id);
-      if (el) el.classList.toggle('hidden', i !== 1);
-    });
-    document.getElementById('progress-line').style.width = '33%';
-    document.getElementById('step-badge-1').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-badge-2').className = 'w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-badge-3').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
-    document.getElementById('step-badge-4').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
-    document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
-    document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
-    document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
-  };
-
-  window.goToStep3 = function() {
-    const addr = document.getElementById('cust-address').value.trim();
-    const city = document.getElementById('cust-city').value.trim();
-    const state = document.getElementById('cust-state').value.trim();
-    const pin = document.getElementById('cust-pincode').value.trim();
-    const landmark = document.getElementById('cust-landmark')?.value.trim() || '';
-
-    if (!addr || !city || !state) {
-      alert("Please fill in all mandatory delivery address fields.");
-      return;
-    }
-    if (!pin || pin.length !== 6) {
-      alert("Pincode must be exactly 6 digits.");
-      return;
-    }
-
-    try {
-      const current = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
-      localStorage.setItem('tbc_user_profile', JSON.stringify({
-        ...current,
-        address: addr,
-        landmark,
-        city,
-        state,
-        pincode: pin
-      }));
-    } catch(e) {}
-
-    ['step-1-panel','step-2-panel','step-3-panel','step-4-panel'].forEach((id, i) => {
-      const el = document.getElementById(id);
-      if (el) el.classList.toggle('hidden', i !== 2);
-    });
-    document.getElementById('progress-line').style.width = '66%';
-    document.getElementById('step-badge-1').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-badge-2').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-badge-3').className = 'w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-badge-4').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
-    document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-emerald-600';
-    document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
-    document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
-
-    window.renderOrderSummary();
-  };
-
-  window.goToStep4 = function() {
-    ['step-1-panel','step-2-panel','step-3-panel','step-4-panel'].forEach((id, i) => {
-      const el = document.getElementById(id);
-      if (el) el.classList.toggle('hidden', i !== 3);
-    });
-    document.getElementById('progress-line').style.width = '100%';
-    document.getElementById('step-badge-1').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-badge-2').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-badge-3').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-badge-4').className = 'w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all shadow-sm';
-    document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-emerald-600';
-    document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-emerald-600';
-    document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
-  };
-
-  // Auto-prefill customer profile from LocalStorage
-  autoPrefillCustomerProfile();
-
-  let deliveryTnPrice = 0;
-  let deliveryNonTnPrice = 60;
-  let pincodeFetchDebounce = null;
-
-  import { getCompany } from './js/products-service.js';
-  import { fetchIndiaPincodeDetails } from './js/pincode-service.js';
-
-  window.handlePincodeInput = function(val) {
-    const clean = String(val || '').replace(/\D/g, '').slice(0, 6);
-    const pinInput = document.getElementById('cust-pincode');
-    if (pinInput) pinInput.value = clean;
-
-    const statusText = document.getElementById('pincode-status-text');
-    const loader = document.getElementById('pincode-loader');
-    const toggleBox = document.getElementById('pincode-manual-toggle-box');
-
-    if (clean.length < 6) {
-      if (statusText) { statusText.classList.add('hidden'); statusText.textContent = ''; }
-      if (loader) loader.classList.add('hidden');
-      if (toggleBox) toggleBox.classList.add('hidden');
-      return;
-    }
-
-    if (pincodeFetchDebounce) clearTimeout(pincodeFetchDebounce);
-    pincodeFetchDebounce = setTimeout(async () => {
-      if (loader) loader.classList.remove('hidden');
-      if (statusText) {
-        statusText.className = 'text-[11px] font-semibold text-slate-500 mt-1.5';
-        statusText.textContent = '🔄 Auto-detecting location...';
-        statusText.classList.remove('hidden');
+      if (!phone || phone.replace(/\D/g, '').length !== 10) {
+        alert("Phone number must be exactly 10 digits.");
+        return;
       }
 
-      const result = await fetchIndiaPincodeDetails(clean);
-      if (loader) loader.classList.add('hidden');
+      try {
+        const current = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+        localStorage.setItem('tbc_user_profile', JSON.stringify({ ...current, name, phone: phone.replace(/\D/g, '').slice(-10) }));
+        localStorage.setItem('tbc_customer_phone', phone.replace(/\D/g, '').slice(-10));
+      } catch (e) { }
 
-      if (result.success) {
-        const stateInput = document.getElementById('cust-state');
-        const cityInput = document.getElementById('cust-city');
+      ['step-1-panel', 'step-2-panel', 'step-3-panel', 'step-4-panel'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', i !== 1);
+      });
+      document.getElementById('progress-line').style.width = '33%';
+      document.getElementById('step-badge-1').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-badge-2').className = 'w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-badge-3').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
+      document.getElementById('step-badge-4').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
+      document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
+      document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
+      document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
+    };
 
-        if (stateInput) {
-          stateInput.value = result.state;
-          stateInput.readOnly = true;
-          stateInput.classList.add('bg-slate-100', 'text-slate-700');
-        }
-        if (cityInput) {
-          cityInput.value = result.city;
-          cityInput.readOnly = true;
-          cityInput.classList.add('bg-slate-100', 'text-slate-700');
-        }
+    window.goToStep3 = function () {
+      const addr = document.getElementById('cust-address').value.trim();
+      const city = document.getElementById('cust-city').value.trim();
+      const state = document.getElementById('cust-state').value.trim();
+      const pin = document.getElementById('cust-pincode').value.trim();
+      const landmark = document.getElementById('cust-landmark')?.value.trim() || '';
 
+      if (!addr || !city || !state) {
+        alert("Please fill in all mandatory delivery address fields.");
+        return;
+      }
+      if (!pin || pin.length !== 6) {
+        alert("Pincode must be exactly 6 digits.");
+        return;
+      }
+
+      try {
+        const current = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+        localStorage.setItem('tbc_user_profile', JSON.stringify({
+          ...current,
+          address: addr,
+          landmark,
+          city,
+          state,
+          pincode: pin
+        }));
+      } catch (e) { }
+
+      ['step-1-panel', 'step-2-panel', 'step-3-panel', 'step-4-panel'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', i !== 2);
+      });
+      document.getElementById('progress-line').style.width = '66%';
+      document.getElementById('step-badge-1').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-badge-2').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-badge-3').className = 'w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-badge-4').className = 'w-8 h-8 rounded-full border-2 bg-neutral-100 border-neutral-300 text-neutral-400 font-bold text-xs flex items-center justify-center transition-all';
+      document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-emerald-600';
+      document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
+      document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-neutral-400';
+
+      window.renderOrderSummary();
+    };
+
+    window.goToStep4 = function () {
+      ['step-1-panel', 'step-2-panel', 'step-3-panel', 'step-4-panel'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', i !== 3);
+      });
+      document.getElementById('progress-line').style.width = '100%';
+      document.getElementById('step-badge-1').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-badge-2').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-badge-3').className = 'w-8 h-8 rounded-full border-2 step-done font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-badge-4').className = 'w-8 h-8 rounded-full border-2 step-active font-bold text-xs flex items-center justify-center transition-all shadow-sm';
+      document.getElementById('step-label-2').className = 'text-[10px] font-bold uppercase tracking-wider text-emerald-600';
+      document.getElementById('step-label-3').className = 'text-[10px] font-bold uppercase tracking-wider text-emerald-600';
+      document.getElementById('step-label-4').className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
+    };
+
+    // Auto-prefill customer profile from LocalStorage
+    autoPrefillCustomerProfile();
+
+    let deliveryTnPrice = 0;
+    let deliveryNonTnPrice = 60;
+    let pincodeFetchDebounce = null;
+
+    import { getCompany } from './js/products-service.js';
+    import { fetchIndiaPincodeDetails } from './js/pincode-service.js';
+
+    window.handlePincodeInput = function (val) {
+      const clean = String(val || '').replace(/\D/g, '').slice(0, 6);
+      const pinInput = document.getElementById('cust-pincode');
+      if (pinInput) pinInput.value = clean;
+
+      const statusText = document.getElementById('pincode-status-text');
+      const loader = document.getElementById('pincode-loader');
+      const toggleBox = document.getElementById('pincode-manual-toggle-box');
+
+      if (clean.length < 6) {
+        if (statusText) { statusText.classList.add('hidden'); statusText.textContent = ''; }
+        if (loader) loader.classList.add('hidden');
+        if (toggleBox) toggleBox.classList.add('hidden');
+        return;
+      }
+
+      if (pincodeFetchDebounce) clearTimeout(pincodeFetchDebounce);
+      pincodeFetchDebounce = setTimeout(async () => {
+        if (loader) loader.classList.remove('hidden');
         if (statusText) {
-          statusText.className = 'text-[11px] font-bold text-emerald-700 mt-1.5 flex items-center gap-1';
-          statusText.innerHTML = `✓ Location auto-filled: <strong>${result.city}, ${result.state}</strong>`;
+          statusText.className = 'text-[11px] font-semibold text-slate-500 mt-1.5';
+          statusText.textContent = '🔄 Auto-detecting location...';
           statusText.classList.remove('hidden');
         }
-        if (toggleBox) toggleBox.classList.remove('hidden');
 
-        if (typeof window.handleStateChange === 'function') {
-          window.handleStateChange(result.state);
+        const result = await fetchIndiaPincodeDetails(clean);
+        if (loader) loader.classList.add('hidden');
+
+        if (result.success) {
+          const stateInput = document.getElementById('cust-state');
+          const cityInput = document.getElementById('cust-city');
+
+          if (stateInput) {
+            stateInput.value = result.state;
+            stateInput.readOnly = true;
+            stateInput.classList.add('bg-slate-100', 'text-slate-700');
+          }
+          if (cityInput) {
+            cityInput.value = result.city;
+            cityInput.readOnly = true;
+            cityInput.classList.add('bg-slate-100', 'text-slate-700');
+          }
+
+          if (statusText) {
+            statusText.className = 'text-[11px] font-bold text-emerald-700 mt-1.5 flex items-center gap-1';
+            statusText.innerHTML = `✓ Location auto-filled: <strong>${result.city}, ${result.state}</strong>`;
+            statusText.classList.remove('hidden');
+          }
+          if (toggleBox) toggleBox.classList.remove('hidden');
+
+          if (typeof window.handleStateChange === 'function') {
+            window.handleStateChange(result.state);
+          }
+        } else {
+          window.enableManualPincodeMode(result.message || 'Unable to fetch location details. Please enter manually.');
         }
-      } else {
-        window.enableManualPincodeMode(result.message || 'Unable to fetch location details. Please enter manually.');
+      }, 350);
+    };
+
+    window.enableManualPincodeMode = function (msg) {
+      const stateInput = document.getElementById('cust-state');
+      const cityInput = document.getElementById('cust-city');
+      const statusText = document.getElementById('pincode-status-text');
+      const toggleBox = document.getElementById('pincode-manual-toggle-box');
+
+      if (stateInput) {
+        stateInput.readOnly = false;
+        stateInput.classList.remove('bg-slate-100', 'text-slate-700');
+        stateInput.focus();
       }
-    }, 350);
-  };
-
-  window.enableManualPincodeMode = function(msg) {
-    const stateInput = document.getElementById('cust-state');
-    const cityInput = document.getElementById('cust-city');
-    const statusText = document.getElementById('pincode-status-text');
-    const toggleBox = document.getElementById('pincode-manual-toggle-box');
-
-    if (stateInput) {
-      stateInput.readOnly = false;
-      stateInput.classList.remove('bg-slate-100', 'text-slate-700');
-      stateInput.focus();
-    }
-    if (cityInput) {
-      cityInput.readOnly = false;
-      cityInput.classList.remove('bg-slate-100', 'text-slate-700');
-    }
-
-    if (statusText) {
-      statusText.className = 'text-[11px] font-bold text-amber-700 mt-1.5 block';
-      statusText.textContent = msg || '⚠️ Unable to fetch location details. Please enter manually below.';
-      statusText.classList.remove('hidden');
-    }
-    if (toggleBox) toggleBox.classList.add('hidden');
-  };
-  getCompany().then(comp => {
-    if (comp) {
-      if (comp.logo) {
-        const logoEl = document.getElementById('nav-company-logo');
-        if (logoEl) logoEl.src = comp.logo;
+      if (cityInput) {
+        cityInput.readOnly = false;
+        cityInput.classList.remove('bg-slate-100', 'text-slate-700');
       }
-      if (comp.deliveryTnPrice !== undefined) deliveryTnPrice = Number(comp.deliveryTnPrice);
-      if (comp.deliveryNonTnPrice !== undefined) deliveryNonTnPrice = Number(comp.deliveryNonTnPrice);
-      if (comp.isCodEnabled !== undefined) {
-        const codWrapper = document.getElementById('cod-option-wrapper');
-        if (codWrapper) {
-          if (comp.isCodEnabled === false) {
-            codWrapper.classList.add('hidden');
-            const codRadio = document.querySelector('input[name="pay-method"][value="COD"]');
-            if (codRadio && codRadio.checked) {
-              const rzpRadio = document.querySelector('input[name="pay-method"][value="Razorpay"]');
-              if (rzpRadio) rzpRadio.checked = true;
+
+      if (statusText) {
+        statusText.className = 'text-[11px] font-bold text-amber-700 mt-1.5 block';
+        statusText.textContent = msg || '⚠️ Unable to fetch location details. Please enter manually below.';
+        statusText.classList.remove('hidden');
+      }
+      if (toggleBox) toggleBox.classList.add('hidden');
+    };
+    getCompany().then(comp => {
+      if (comp) {
+        if (comp.logo) {
+          const logoEl = document.getElementById('nav-company-logo');
+          if (logoEl) logoEl.src = comp.logo;
+        }
+        if (comp.deliveryTnPrice !== undefined) deliveryTnPrice = Number(comp.deliveryTnPrice);
+        if (comp.deliveryNonTnPrice !== undefined) deliveryNonTnPrice = Number(comp.deliveryNonTnPrice);
+        if (comp.isCodEnabled !== undefined) {
+          const codWrapper = document.getElementById('cod-option-wrapper');
+          if (codWrapper) {
+            if (comp.isCodEnabled === false) {
+              codWrapper.classList.add('hidden');
+              const codRadio = document.querySelector('input[name="pay-method"][value="COD"]');
+              if (codRadio && codRadio.checked) {
+                const rzpRadio = document.querySelector('input[name="pay-method"][value="Razorpay"]');
+                if (rzpRadio) rzpRadio.checked = true;
+              }
+            } else {
+              codWrapper.classList.remove('hidden');
             }
-          } else {
-            codWrapper.classList.remove('hidden');
           }
         }
-      }
-      if (comp.isWhatsappEnabled !== undefined) {
-        const waWrapper = document.getElementById('m-whatsapp-option-wrapper');
-        if (waWrapper) {
-          if (comp.isWhatsappEnabled === false) {
-            waWrapper.classList.add('hidden');
-          } else {
-            waWrapper.classList.remove('hidden');
+        if (comp.isWhatsappEnabled !== undefined) {
+          const waWrapper = document.getElementById('m-whatsapp-option-wrapper');
+          if (waWrapper) {
+            if (comp.isWhatsappEnabled === false) {
+              waWrapper.classList.add('hidden');
+            } else {
+              waWrapper.classList.remove('hidden');
+            }
           }
         }
+        if (comp.isCouponEnabled !== undefined) {
+          const couponWrappers = document.querySelectorAll('.coupon-box-wrapper, #coupon-box-wrapper');
+          couponWrappers.forEach(el => {
+            if (comp.isCouponEnabled === false) {
+              el.classList.add('hidden');
+            } else {
+              el.classList.remove('hidden');
+            }
+          });
+        }
       }
-      if (comp.isCouponEnabled !== undefined) {
-        const couponWrappers = document.querySelectorAll('.coupon-box-wrapper, #coupon-box-wrapper');
-        couponWrappers.forEach(el => {
-          if (comp.isCouponEnabled === false) {
-            el.classList.add('hidden');
-          } else {
-            el.classList.remove('hidden');
-          }
-        });
+      if (typeof window.renderOrderSummary === 'function') window.renderOrderSummary();
+    }).catch(() => { });
+
+    window.handleStateChange = function (stateVal) {
+      const val = stateVal || document.getElementById('cust-state')?.value;
+      const box = document.getElementById('other-state-box');
+      if (box) {
+        if (val === 'Other State') box.classList.remove('hidden');
+        else box.classList.add('hidden');
       }
-    }
-    if (typeof window.renderOrderSummary === 'function') window.renderOrderSummary();
-  }).catch(() => {});
+      window.renderOrderSummary();
+    };
 
-  window.handleStateChange = function(stateVal) {
-    const val = stateVal || document.getElementById('cust-state')?.value;
-    const box = document.getElementById('other-state-box');
-    if (box) {
-      if (val === 'Other State') box.classList.remove('hidden');
-      else box.classList.add('hidden');
-    }
-    window.renderOrderSummary();
-  };
+    window.handleCityChange = function (cityVal) {
+      const val = cityVal || document.getElementById('cust-city')?.value;
+      const box = document.getElementById('other-city-box');
+      if (box) {
+        if (val === 'Other City') box.classList.remove('hidden');
+        else box.classList.add('hidden');
+      }
+    };
 
-  window.handleCityChange = function(cityVal) {
-    const val = cityVal || document.getElementById('cust-city')?.value;
-    const box = document.getElementById('other-city-box');
-    if (box) {
-      if (val === 'Other City') box.classList.remove('hidden');
-      else box.classList.add('hidden');
-    }
-  };
+    window.checkStateAutoMatch = function (val) {
+      const select = document.getElementById('cust-state');
+      if (!select || !val) return;
+      const match = Array.from(select.options).find(opt => opt.value !== 'Other State' && opt.value.toLowerCase() === val.trim().toLowerCase());
+      if (match) {
+        select.value = match.value;
+        window.handleStateChange(match.value);
+      }
+    };
 
-  window.checkStateAutoMatch = function(val) {
-    const select = document.getElementById('cust-state');
-    if (!select || !val) return;
-    const match = Array.from(select.options).find(opt => opt.value !== 'Other State' && opt.value.toLowerCase() === val.trim().toLowerCase());
-    if (match) {
-      select.value = match.value;
-      window.handleStateChange(match.value);
-    }
-  };
+    window.checkCityAutoMatch = function (val) {
+      const select = document.getElementById('cust-city');
+      if (!select || !val) return;
+      const match = Array.from(select.options).find(opt => opt.value !== 'Other City' && opt.value.toLowerCase() === val.trim().toLowerCase());
+      if (match) {
+        select.value = match.value;
+        window.handleCityChange(match.value);
+      }
+    };
 
-  window.checkCityAutoMatch = function(val) {
-    const select = document.getElementById('cust-city');
-    if (!select || !val) return;
-    const match = Array.from(select.options).find(opt => opt.value !== 'Other City' && opt.value.toLowerCase() === val.trim().toLowerCase());
-    if (match) {
-      select.value = match.value;
-      window.handleCityChange(match.value);
-    }
-  };
+    window.renderOrderSummary = function () {
+      const items = tbcCart.getCart();
+      const totals = tbcCart.getCartTotals();
+      const state = (document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
 
-  window.renderOrderSummary = function() {
-    const items = tbcCart.getCart();
-    const totals = tbcCart.getCartTotals();
-    const state = (document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
+      const isTN = state.toLowerCase().includes('tamil nadu');
+      const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+      const deliveryLabel = isTN
+        ? (deliveryTnPrice === 0 ? 'FREE (Tamil Nadu)' : `₹${deliveryTnPrice}`)
+        : `₹${deliveryNonTnPrice} (Outside TN)`;
 
-    const isTN = state.toLowerCase().includes('tamil nadu');
-    const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
-    const deliveryLabel = isTN 
-      ? (deliveryTnPrice === 0 ? 'FREE (Tamil Nadu)' : `₹${deliveryTnPrice}`) 
-      : `₹${deliveryNonTnPrice} (Outside TN)`;
+      const grandTotal = totals.grandTotal + deliveryFee;
+      const box = document.getElementById('order-summary-box');
 
-    const grandTotal = totals.grandTotal + deliveryFee;
-    const box = document.getElementById('order-summary-box');
-
-    if (box) {
-      box.innerHTML = `
+      if (box) {
+        box.innerHTML = `
         <div class="space-y-3 pb-3 border-b border-black/10">
           ${items.map(i => {
-            const img = i.image || i.imageUrl || (i.imageUrls && i.imageUrls[0]) || 'https://placehold.co/400x500/f0f0f0/999?text=No+Image';
-            return `
+          const img = i.image || i.imageUrl || (i.imageUrls && i.imageUrls[0]) || 'https://placehold.co/400x500/f0f0f0/999?text=No+Image';
+          return `
               <div class="flex items-center gap-3 bg-surface-container p-3 rounded-2xl">
                 <img class="w-14 h-16 object-cover rounded-xl bg-neutral-200 flex-shrink-0" src="${img}" alt="${i.name}" onerror="this.src='https://placehold.co/400x500/f0f0f0/999?text=No+Image'">
                 <div class="flex-1 min-w-0">
@@ -657,7 +731,7 @@
                 <span class="font-bold text-sm text-primary">₹${(i.price * i.quantity).toLocaleString('en-IN')}</span>
               </div>
             `;
-          }).join('')}
+        }).join('')}
         </div>
         <div class="space-y-2 text-xs pt-1">
           <div class="flex justify-between text-secondary">
@@ -680,244 +754,245 @@
           </div>
         </div>
       `;
-    }
-
-    const payBtn = document.getElementById('pay-submit-btn');
-    if (payBtn) {
-      payBtn.innerHTML = `Pay Now: ₹${grandTotal.toLocaleString('en-IN')} <span class="material-symbols-outlined text-[18px]">lock</span>`;
-    }
-  };
-
-  window.getCustomerDetails = function() {
-    let state = document.getElementById('cust-state')?.value.trim() || 'Tamil Nadu';
-    if (state.toLowerCase().includes('tamil nadu') || state.toLowerCase().includes('tn')) {
-      state = 'Tamil Nadu';
-    }
-    
-    let city = document.getElementById('cust-city')?.value.trim() || 'Coimbatore';
-    if (city === 'Other City') {
-      const custom = document.getElementById('cust-other-city')?.value.trim();
-      if (custom) city = custom;
-    }
-
-    return {
-      name: document.getElementById('cust-name')?.value.trim() || '',
-      phone: document.getElementById('cust-phone')?.value.trim() || '',
-      email: (document.getElementById('cust-email')?.value || '').trim() || 'customer@thebaniyancompany.com',
-      address: document.getElementById('cust-address')?.value.trim() || '',
-      landmark: document.getElementById('cust-landmark')?.value.trim() || '',
-      city: city,
-      state: state,
-      pincode: document.getElementById('cust-pincode')?.value.trim() || ''
-    };
-  };
-
-  window.submitFinalOrder = async function() {
-    const selectedMethod = document.querySelector('input[name="pay-method"]:checked')?.value || 'Razorpay';
-
-    if (selectedMethod === 'COD') {
-      await processCODOrder();
-    } else {
-      await processRazorpayOrder();
-    }
-  };
-
-  async function processCODOrder() {
-    const customer = getCustomerDetails();
-    const items = tbcCart.getCart();
-    const totals = tbcCart.getCartTotals();
-    const state = (document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
-    const isTN = state.toLowerCase().includes('tamil nadu');
-    const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
-    const finalTotal = totals.grandTotal + deliveryFee;
-
-    const btn = document.getElementById('pay-submit-btn');
-    btn.disabled = true;
-
-    try {
-      let orderId;
-      try {
-        const result = await api('/api/place-cod-order', { customer, requestedItems: items });
-        orderId = result.orderId;
-      } catch (err) {
-        console.warn("Backend COD API notice, using direct Firestore write fallback:", err);
-        const directRes = await saveOrderToFirestore({
-          customerDetails: customer,
-          items,
-          subtotal: totals.subtotal,
-          cgstAmount: Math.round(totals.subtotal * 0.025),
-          sgstAmount: Math.round(totals.subtotal * 0.025),
-          deliveryFee,
-          totalAmount: finalTotal,
-          paymentMethod: 'cod',
-          status: 'Pending'
-        });
-        orderId = directRes.orderId;
       }
+
+      const payBtn = document.getElementById('pay-submit-btn');
+      if (payBtn) {
+        payBtn.innerHTML = `Pay Now: ₹${grandTotal.toLocaleString('en-IN')} <span class="material-symbols-outlined text-[18px]">lock</span>`;
+      }
+    };
+
+    window.getCustomerDetails = function () {
+      let state = document.getElementById('cust-state')?.value.trim() || 'Tamil Nadu';
+      if (state.toLowerCase().includes('tamil nadu') || state.toLowerCase().includes('tn')) {
+        state = 'Tamil Nadu';
+      }
+
+      let city = document.getElementById('cust-city')?.value.trim() || 'Coimbatore';
+      if (city === 'Other City') {
+        const custom = document.getElementById('cust-other-city')?.value.trim();
+        if (custom) city = custom;
+      }
+
+      return {
+        name: document.getElementById('cust-name')?.value.trim() || '',
+        phone: document.getElementById('cust-phone')?.value.trim() || '',
+        email: (document.getElementById('cust-email')?.value || '').trim() || 'customer@thebaniyancompany.com',
+        address: document.getElementById('cust-address')?.value.trim() || '',
+        landmark: document.getElementById('cust-landmark')?.value.trim() || '',
+        city: city,
+        state: state,
+        pincode: document.getElementById('cust-pincode')?.value.trim() || ''
+      };
+    };
+
+    window.submitFinalOrder = async function () {
+      const selectedMethod = document.querySelector('input[name="pay-method"]:checked')?.value || 'Razorpay';
+
+      if (selectedMethod === 'COD') {
+        await processCODOrder();
+      } else {
+        await processRazorpayOrder();
+      }
+    };
+
+    async function processCODOrder() {
+      const customer = getCustomerDetails();
+      const items = tbcCart.getCart();
+      const totals = tbcCart.getCartTotals();
+      const state = (document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
+      const isTN = state.toLowerCase().includes('tamil nadu');
+      const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+      const finalTotal = totals.grandTotal + deliveryFee;
+
+      const btn = document.getElementById('pay-submit-btn');
+      btn.disabled = true;
+
+      try {
+        let orderId;
+        try {
+          const result = await api('/api/place-cod-order', { customer, requestedItems: items });
+          orderId = result.orderId;
+        } catch (err) {
+          console.warn("Backend COD API notice, using direct Firestore write fallback:", err);
+          const directRes = await saveOrderToFirestore({
+            customerDetails: customer,
+            items,
+            subtotal: totals.subtotal,
+            cgstAmount: Math.round(totals.subtotal * 0.025),
+            sgstAmount: Math.round(totals.subtotal * 0.025),
+            deliveryFee,
+            totalAmount: finalTotal,
+            paymentMethod: 'cod',
+            status: 'Pending'
+          });
+          orderId = directRes.orderId;
+        }
+
+        localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
+        tbcCart.clearCart();
+        window.location.href = `order-success.html?orderId=${encodeURIComponent(orderId)}&method=COD`;
+      } catch (error) {
+        alert(error.message);
+        btn.disabled = false;
+      }
+    }
+
+    async function processRazorpayOrder() {
+      const customer = getCustomerDetails();
+      const items = tbcCart.getCart();
+      const totals = tbcCart.getCartTotals();
+      const btn = document.getElementById('pay-submit-btn');
+
+      if (!window.Razorpay) {
+        alert("Razorpay checkout SDK is loading. Please try again in a moment.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Opening Razorpay...`;
+
+      const liveKey = 'rzp_live_TM8qhpQTojuGA9';
+      const stateStr = (customer.state || document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
+      const isTN = stateStr.toLowerCase().includes('tamil nadu') || stateStr.toLowerCase().includes('tn');
+      const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+      const finalTotal = totals.grandTotal + deliveryFee;
+      const finalAmountPaise = Math.round(finalTotal * 100);
+
+      const options = {
+        key: liveKey,
+        amount: finalAmountPaise,
+        currency: "INR",
+        name: "THE BANIYAN COMPANY",
+        description: "Standard Checkout",
+        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM",
+        handler: async function (response) {
+          btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Finalizing Order...`;
+          try {
+            const paymentId = response.razorpay_payment_id || `PAY_${Date.now()}`;
+            let invoiceId = `TBC-${Math.floor(100000 + Math.random() * 900000)}`;
+
+            if (typeof window.saveOrderToFirestore === 'function') {
+              try {
+                const cleanPhone = (customer.phone || '').replace(/\D/g, '').slice(-10);
+                const res = await window.saveOrderToFirestore({
+                  customerDetails: customer,
+                  customerName: customer.name,
+                  customerPhoneNumber: cleanPhone,
+                  customerPhone: cleanPhone,
+                  customerAddress: customer.address,
+                  city: customer.city,
+                  state: customer.state,
+                  pincode: customer.pincode,
+                  items: items,
+                  subtotal: totals.subtotal,
+                  deliveryFee: deliveryFee,
+                  totalAmount: totals.grandTotal + deliveryFee,
+                  paymentMethod: 'Razorpay Online Payment',
+                  paymentStatus: 'Paid',
+                  razorpayPaymentId: paymentId
+                });
+                if (res && res.orderId) invoiceId = res.orderId;
+              } catch (e) {
+                console.error("[TBC] saveOrderToFirestore error:", e);
+              }
+            }
+
+            localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
+            tbcCart.clearCart();
+            window.location.href = `order-success.html?orderId=${encodeURIComponent(invoiceId)}&method=Razorpay`;
+          } catch (error) {
+            tbcCart.clearCart();
+            window.location.href = 'order-success.html?method=Razorpay';
+          }
+        },
+        prefill: {
+          name: customer.name,
+          email: customer.email !== 'Not provided' ? customer.email : 'customer@thebaniyancompany.com',
+          contact: customer.phone
+        },
+        theme: { color: "#000000" },
+        modal: {
+          ondismiss: function () {
+            btn.disabled = false;
+            window.renderOrderSummary();
+          }
+        }
+      };
+
+      try {
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } catch (error) {
+        console.error("Razorpay Modal Error:", error);
+        btn.disabled = false;
+        window.renderOrderSummary();
+        alert("Unable to open Razorpay. Please check your connection or select Cash on Delivery (COD).");
+      }
+    }
+
+    window.placeWhatsAppOrder = async function () {
+      const customer = getCustomerDetails();
+      const items = tbcCart.getCart();
+      const totals = tbcCart.getCartTotals();
+
+      if (!customer.name || !customer.phone || !customer.address) {
+        alert("Please enter your Name, Phone Number, and Address before ordering on WhatsApp.");
+        return;
+      }
+
+      if (!items.length) return alert("Your shopping bag is empty.");
+      let result;
+      try {
+        result = await api('/api/place-whatsapp-order', { customer, requestedItems: items });
+      } catch (error) {
+        alert(error.message);
+        return;
+      }
+      const timeStr = `Order Number: ${result.orderId}`;
+
+      let itemLines = items.map((item, idx) => `${idx + 1}. ${item.name} (${item.size}/${item.color}) x${item.quantity} = ₹${(item.price * item.quantity).toLocaleString()}`).join('\n');
+
+      let text = `*NEW ORDER — THE BANIYAN COMPANY*\n\n` +
+        `*Customer Details:*\n` +
+        `• Name: ${customer.name}\n` +
+        `• Phone: ${customer.phone}\n` +
+        `• Email: ${customer.email}\n` +
+        `• Address: ${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}\n` +
+        `• Landmark: ${customer.landmark}\n\n` +
+        `*Ordered Items:*\n${itemLines}\n\n` +
+        `*Order Totals:*\n` +
+        `• Subtotal: ₹${totals.subtotal.toLocaleString()}\n` +
+        `• GST (5%): ₹${totals.tax.toLocaleString()}\n` +
+        `• Total Amount: ₹${totals.grandTotal.toLocaleString()}\n` +
+        `• Payment Choice: WhatsApp Direct Order\n` +
+        `• Order Time: ${timeStr}\n\n` +
+        `Please confirm my order details!`;
 
       localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
       tbcCart.clearCart();
-      window.location.href = `order-success.html?orderId=${encodeURIComponent(orderId)}&method=COD`;
-    } catch (error) {
-      alert(error.message);
-      btn.disabled = false;
-    }
-  }
-
-  async function processRazorpayOrder() {
-    const customer = getCustomerDetails();
-    const items = tbcCart.getCart();
-    const totals = tbcCart.getCartTotals();
-    const btn = document.getElementById('pay-submit-btn');
-
-    if (!window.Razorpay) {
-      alert("Razorpay checkout SDK is loading. Please try again in a moment.");
-      return;
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Opening Razorpay...`;
-
-    const liveKey = 'rzp_live_TM8qhpQTojuGA9';
-    const stateStr = (customer.state || document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
-    const isTN = stateStr.toLowerCase().includes('tamil nadu') || stateStr.toLowerCase().includes('tn');
-    const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
-    const finalTotal = totals.grandTotal + deliveryFee;
-    const finalAmountPaise = Math.round(finalTotal * 100);
-
-    const options = {
-      key: liveKey,
-      amount: finalAmountPaise,
-      currency: "INR",
-      name: "THE BANIYAN COMPANY",
-      description: "Standard Checkout",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM",
-      handler: async function (response) {
-        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Finalizing Order...`;
-        try {
-          const paymentId = response.razorpay_payment_id || `PAY_${Date.now()}`;
-          let invoiceId = `TBC-${Math.floor(100000 + Math.random() * 900000)}`;
-
-          if (typeof window.saveOrderToFirestore === 'function') {
-            try {
-              const cleanPhone = (customer.phone || '').replace(/\D/g, '').slice(-10);
-              const res = await window.saveOrderToFirestore({
-                customerDetails: customer,
-                customerName: customer.name,
-                customerPhoneNumber: cleanPhone,
-                customerPhone: cleanPhone,
-                customerAddress: customer.address,
-                city: customer.city,
-                state: customer.state,
-                pincode: customer.pincode,
-                items: items,
-                subtotal: totals.subtotal,
-                deliveryFee: deliveryFee,
-                totalAmount: totals.grandTotal + deliveryFee,
-                paymentMethod: 'Razorpay Online Payment',
-                paymentStatus: 'Paid',
-                razorpayPaymentId: paymentId
-              });
-              if (res && res.orderId) invoiceId = res.orderId;
-            } catch(e) {
-              console.error("[TBC] saveOrderToFirestore error:", e);
-            }
-          }
-
-          localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
-          tbcCart.clearCart();
-          window.location.href = `order-success.html?orderId=${encodeURIComponent(invoiceId)}&method=Razorpay`;
-        } catch (error) {
-          tbcCart.clearCart();
-          window.location.href = 'order-success.html?method=Razorpay';
-        }
-      },
-      prefill: {
-        name: customer.name,
-        email: customer.email !== 'Not provided' ? customer.email : 'customer@thebaniyancompany.com',
-        contact: customer.phone
-      },
-      theme: { color: "#000000" },
-      modal: {
-        ondismiss: function() {
-          btn.disabled = false;
-          window.renderOrderSummary();
-        }
-      }
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+      window.open(whatsappUrl, '_blank');
+      window.location.href = `order-success.html?orderId=${encodeURIComponent(result.orderId)}&method=WhatsApp`;
     };
 
-    try {
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (error) {
-      console.error("Razorpay Modal Error:", error);
-      btn.disabled = false;
-      window.renderOrderSummary();
-      alert("Unable to open Razorpay. Please check your connection or select Cash on Delivery (COD).");
-    }
-  }
-
-  window.placeWhatsAppOrder = async function() {
-    const customer = getCustomerDetails();
-    const items = tbcCart.getCart();
-    const totals = tbcCart.getCartTotals();
-
-    if (!customer.name || !customer.phone || !customer.address) {
-      alert("Please enter your Name, Phone Number, and Address before ordering on WhatsApp.");
-      return;
-    }
-
-    if (!items.length) return alert("Your shopping bag is empty.");
-    let result;
-    try {
-      result = await api('/api/place-whatsapp-order', { customer, requestedItems: items });
-    } catch (error) {
-      alert(error.message);
-      return;
-    }
-    const timeStr = `Order Number: ${result.orderId}`;
-
-    let itemLines = items.map((item, idx) => `${idx + 1}. ${item.name} (${item.size}/${item.color}) x${item.quantity} = ₹${(item.price * item.quantity).toLocaleString()}`).join('\n');
-
-    let text = `*NEW ORDER — THE BANIYAN COMPANY*\n\n` +
-      `*Customer Details:*\n` +
-      `• Name: ${customer.name}\n` +
-      `• Phone: ${customer.phone}\n` +
-      `• Email: ${customer.email}\n` +
-      `• Address: ${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}\n` +
-      `• Landmark: ${customer.landmark}\n\n` +
-      `*Ordered Items:*\n${itemLines}\n\n` +
-      `*Order Totals:*\n` +
-      `• Subtotal: ₹${totals.subtotal.toLocaleString()}\n` +
-      `• GST (5%): ₹${totals.tax.toLocaleString()}\n` +
-      `• Total Amount: ₹${totals.grandTotal.toLocaleString()}\n` +
-      `• Payment Choice: WhatsApp Direct Order\n` +
-      `• Order Time: ${timeStr}\n\n` +
-      `Please confirm my order details!`;
-
-    localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
-    tbcCart.clearCart();
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-    window.open(whatsappUrl, '_blank');
-    window.location.href = `order-success.html?orderId=${encodeURIComponent(result.orderId)}&method=WhatsApp`;
-  };
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Wait a tick so the module (tbcCart) finishes initializing before checking
-    setTimeout(() => {
-      const cart = window.tbcCart ? window.tbcCart.getCart() : [];
-      if (cart.length === 0) {
-        const msg = document.createElement('div');
-        msg.className = 'fixed inset-0 bg-white z-50 flex flex-col items-center justify-center gap-4';
-        msg.innerHTML = '<span class="text-5xl">🛍️</span><h2 class="font-bold text-xl">Your cart is empty</h2><p class="text-sm text-gray-500">Redirecting you to the shop...</p>';
-        document.body.appendChild(msg);
-        setTimeout(() => { window.location.href = 'shop.html'; }, 1500);
-        return;
-      }
-      window.renderOrderSummary();
-    }, 200);
-  });
-</script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait a tick so the module (tbcCart) finishes initializing before checking
+      setTimeout(() => {
+        const cart = window.tbcCart ? window.tbcCart.getCart() : [];
+        if (cart.length === 0) {
+          const msg = document.createElement('div');
+          msg.className = 'fixed inset-0 bg-white z-50 flex flex-col items-center justify-center gap-4';
+          msg.innerHTML = '<span class="text-5xl">🛍️</span><h2 class="font-bold text-xl">Your cart is empty</h2><p class="text-sm text-gray-500">Redirecting you to the shop...</p>';
+          document.body.appendChild(msg);
+          setTimeout(() => { window.location.href = 'shop.html'; }, 1500);
+          return;
+        }
+        window.renderOrderSummary();
+      }, 200);
+    });
+  </script>
 
 </body>
+
 </html>

@@ -176,7 +176,7 @@ export function normalizeProduct(id, data = {}) {
     price,
     originalPrice,
     discountPct,
-    discount:       discountPct > 0 ? `${discountPct}% OFF` : '',
+    discount:       discountPct > 0 ? `${discountPct}% OFFER` : '',
     availableStock: variants.reduce((sum, v) => sum + getVariantStock(v), 0),
     showInEcom:     data.showInEcom !== false, // Strict E-commerce visibility flag (defaults to true unless explicitly false)
   };
@@ -1076,7 +1076,7 @@ export async function revalidateCompany(companyId = COMPANY_ID) {
     if (!raw) return null;
 
     const name = raw.name || raw.companyName || raw.brandName || 'THE BANIYAN COMPANY';
-    const logo = raw.logo || raw.logoUrl || raw.imageUrl || raw.image || raw.icon || 'tbclogo.jpeg';
+    const logo = raw.logo || raw.logoUrl || raw.imageUrl || raw.image || raw.icon || 'tbclogo.svg';
     const handle = raw.handle || raw.username || ('@' + name.toLowerCase().replace(/[^a-z0-9]/g, ''));
 
     const result = {

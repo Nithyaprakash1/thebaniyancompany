@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>Shop Collection — THE BANIYAN COMPANY</title>
-  <link rel="icon" type="image/jpeg" href="tbclogo.jpeg">
-  <link rel="shortcut icon" href="tbclogo.jpeg">
+  <link rel="icon" type="image/jpeg" href="assets/tbclogo.jpeg">
+  <link rel="shortcut icon" href="assets/tbclogo.jpeg">
+  <link rel="apple-touch-icon" href="assets/tbclogo.jpeg">
   <meta name="description" content="Browse the complete affordable collection from THE BANIYAN COMPANY. Blazers, co-ords, oversized hoodies, linen shirts, and essential affordable tees.">
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -64,6 +65,61 @@
       100% { transform: scale(1) rotate(0deg); }
     }
     .animate-liquid-pop { animation: liquidPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+    /* ── Golden Glowing Luxury Offer Chip ── */
+    @keyframes goldAuraGlow {
+      0%, 100% {
+        box-shadow: 0 0 8px rgba(234, 179, 8, 0.4), 0 0 16px rgba(217, 119, 6, 0.2), inset 0 0 6px rgba(253, 224, 71, 0.2);
+        border-color: #EAB308;
+        outline-color: rgba(234, 179, 8, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 16px rgba(250, 204, 21, 0.8), 0 0 28px rgba(234, 179, 8, 0.45), inset 0 0 12px rgba(254, 240, 138, 0.4);
+        border-color: #FDE047;
+        outline-color: rgba(250, 204, 21, 0.9);
+      }
+    }
+
+    @keyframes goldShimmerSweep {
+      0% { transform: translateX(-150%) skewX(-20deg); }
+      35%, 100% { transform: translateX(220%) skewX(-20deg); }
+    }
+
+    .golden-offer-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3.5px;
+      background: linear-gradient(135deg, #141108 0%, #241c09 50%, #100d04 100%);
+      color: #FDE047;
+      border: 1.5px solid #EAB308;
+      outline: 1.5px solid rgba(234, 179, 8, 0.45);
+      outline-offset: 1.5px;
+      border-radius: 9999px;
+      padding: 3px 9px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      animation: goldAuraGlow 2.5s infinite ease-in-out;
+      user-select: none;
+      vertical-align: middle;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      white-space: nowrap;
+    }
+
+    .golden-offer-chip::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
+      animation: goldShimmerSweep 3.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
 
     /* Product card default flex layout */
     .product-card { display: flex; flex-direction: column; background: transparent; border: none; box-shadow: none; }
@@ -849,9 +905,9 @@
       topTagPill = `<div class="absolute top-3 left-3 bg-black text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm z-10">${upperTag}</div>`;
     }
 
-    // Bottom-Left Discount Badge
-    const discountBadge = discountVal
-      ? `<div class="absolute bottom-3 left-3 bg-rose-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm z-10">${discountVal}</div>`
+    // Bottom-Left Golden Offer Badge
+    const discountBadge = discountPct > 0
+      ? `<div class="absolute bottom-3 left-3 golden-offer-chip text-[10px] py-1 px-2.5 shadow-md z-10"><span class="material-symbols-outlined text-[12px] text-amber-300">local_fire_department</span>${discountPct}% OFFER</div>`
       : '';
 
     return `
