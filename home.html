@@ -123,8 +123,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 24px;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
+      gap: 0;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s ease;
     }
 
     #loading-screen.hidden {
@@ -133,31 +133,23 @@
       pointer-events: none;
     }
 
-    @keyframes shimmer {
-      0% {
-        transform: translateX(-100%);
-      }
-
-      100% {
-        transform: translateX(100%);
-      }
-    }
-
-    .loading-bar {
-      width: 140px;
-      height: 3px;
-      background: #e2e2e2;
+    .loading-bar-wrap {
+      width: 160px;
+      height: 3.5px;
+      background: #e5e5e5;
       border-radius: 999px;
       overflow: hidden;
       position: relative;
+      margin-top: 14px;
     }
 
-    .loading-bar::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, #000, transparent);
-      animation: shimmer 1.2s infinite;
+    .loading-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #000000;
+      border-radius: 999px;
+      transition: width 0.08s linear;
+      position: relative;
     }
 
     /* Category circle cards scroll */
@@ -209,13 +201,16 @@
 
 <body class="bg-background text-on-surface font-sans antialiased">
 
-  <!-- Loading Screen -->
+  <!-- Loading Screen with Progression Bar & Percentage -->
   <div id="loading-screen">
-    <div class="flex flex-col items-center gap-4">
-      <img alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain rounded-xl" src="tbclogo.svg"
-        onerror="this.onerror=null;">
-      <span class="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">THE BANIYAN COMPANY</span>
-      <div class="loading-bar"></div>
+    <div class="flex flex-col items-center text-center">
+      <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain rounded-xl" src="tbclogo.svg"
+        onerror="this.src='tbclogo.jpeg'">
+      <span class="text-[11px] font-bold uppercase tracking-[0.28em] text-neutral-800 mt-3">THE BANIYAN COMPANY</span>
+      <div class="loading-bar-wrap">
+        <div class="loading-bar-fill" id="loading-bar-fill"></div>
+      </div>
+      <span id="loading-pct" class="text-[11px] font-semibold font-mono tracking-wider text-neutral-600 mt-2">0%</span>
     </div>
   </div>
 
@@ -1145,8 +1140,7 @@
         subscribeToProducts((liveProducts) => {
           allProductsStore = liveProducts || [];
           applyHomeProductFilter();
-          const loader = document.getElementById('loading-screen');
-          if (loader) loader.classList.add('hidden');
+          if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
         }, (err) => {
           console.error('[TBC] Real-time products error:', err);
         });
@@ -1155,8 +1149,7 @@
         console.error('[TBC] Home load error:', e);
         if (grid) grid.innerHTML = `<div class="col-span-full py-12 text-center text-red-500">Error loading products: ${e.message}</div>`;
       } finally {
-        const loader = document.getElementById('loading-screen');
-        if (loader) loader.classList.add('hidden');
+        if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
       }
     });
   </script>

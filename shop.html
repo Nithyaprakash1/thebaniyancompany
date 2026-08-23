@@ -37,6 +37,7 @@
       }
     }
   </script>
+  <script src="./js/loading-controller.js"></script>
   <style>
     @layer base { body { -webkit-tap-highlight-color: transparent; } }
     ::-webkit-scrollbar { display: none; }
@@ -44,8 +45,8 @@
 
     #loading-screen {
       position: fixed; inset: 0; background: #f7f7f7; z-index: 9999;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s ease;
     }
     #loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     @keyframes shimmerAnim { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
@@ -54,8 +55,23 @@
       background-size: 200% 100% !important;
       animation: shimmerAnim 1.4s infinite linear !important;
     }
-    .loading-bar { width: 140px; height: 3px; background: #e2e2e2; border-radius: 999px; overflow: hidden; position: relative; }
-    .loading-bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #000, transparent); animation: shimmer 1.2s infinite; }
+    .loading-bar-wrap {
+      width: 160px;
+      height: 3.5px;
+      background: #e5e5e5;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      margin-top: 14px;
+    }
+    .loading-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #000000;
+      border-radius: 999px;
+      transition: width 0.08s linear;
+      position: relative;
+    }
 
     /* Liquid Pop Animation */
     @keyframes liquidPop {
@@ -179,12 +195,15 @@
 </head>
 <body class="bg-background text-on-surface font-sans antialiased">
 
-<!-- Loading Screen -->
+<!-- Loading Screen with Progression Bar & Percentage -->
 <div id="loading-screen">
-  <div class="flex flex-col items-center gap-4">
-    <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
-    <span class="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">THE BANIYAN COMPANY</span>
-    <div class="loading-bar"></div>
+  <div class="flex flex-col items-center text-center">
+    <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain" src="tbclogo.svg" onerror="this.src='tbclogo.jpeg'">
+    <span class="text-[11px] font-bold uppercase tracking-[0.28em] text-neutral-800 mt-3">THE BANIYAN COMPANY</span>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-fill" id="loading-bar-fill"></div>
+    </div>
+    <span id="loading-pct" class="text-[11px] font-semibold font-mono tracking-wider text-neutral-600 mt-2">0%</span>
   </div>
 </div>
 
@@ -992,16 +1011,14 @@
       // Real-time live subscription for products, stock quantity & out-of-stock badges
       subscribeToProducts((liveProducts) => {
         renderStoreCatalog(liveProducts);
-        const loader = document.getElementById('loading-screen');
-        if (loader) loader.classList.add('hidden');
+        if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
       });
     } catch (e) {
       console.error('[TBC] Shop load error:', e);
       const grid = document.getElementById('product-grid');
       if (grid) grid.innerHTML = `<div class="col-span-full py-16 text-center text-red-500">Error: ${e.message}</div>`;
     } finally {
-      const loader = document.getElementById('loading-screen');
-      if (loader) loader.classList.add('hidden');
+      if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
     }
   });
 </script>

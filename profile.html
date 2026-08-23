@@ -31,6 +31,7 @@
       }
     }
   </script>
+  <script src="./js/loading-controller.js"></script>
   <style>
     @layer base { body { -webkit-tap-highlight-color: transparent; } }
     ::-webkit-scrollbar { display: none; }
@@ -38,23 +39,40 @@
 
     #loading-screen {
       position: fixed; inset: 0; background: #121212; z-index: 9999;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s ease;
     }
     #loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-    .loading-bar { width: 140px; height: 3px; background: #333; border-radius: 999px; overflow: hidden; position: relative; }
-    .loading-bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #fbbf24, transparent); animation: shimmer 1.2s infinite; }
+    .loading-bar-wrap {
+      width: 160px;
+      height: 3.5px;
+      background: #2a2a2a;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      margin-top: 14px;
+    }
+    .loading-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #ffffff;
+      border-radius: 999px;
+      transition: width 0.08s linear;
+      position: relative;
+    }
   </style>
 </head>
 <body class="bg-background text-on-surface font-sans antialiased pb-20">
 
-<!-- Loading Screen -->
+<!-- Loading Screen with Progression Bar & Percentage -->
 <div id="loading-screen">
-  <div class="flex flex-col items-center gap-4">
-    <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 160 160\'><rect width=\'160\' height=\'160\' rx=\'36\' fill=\'%23000000\'/><text x=\'80\' y=\'95\' font-family=\'system-ui,sans-serif\' font-weight=\'900\' font-size=\'48\' fill=\'%23ffffff\' text-anchor=\'middle\' letter-spacing=\'4\'>TBC</text></svg>'">
-    <span class="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-400">THE BANIYAN COMPANY</span>
-    <div class="loading-bar"></div>
+  <div class="flex flex-col items-center text-center">
+    <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain" src="tbclogo.svg" onerror="this.src='tbclogo.jpeg'">
+    <span class="text-[11px] font-bold uppercase tracking-[0.28em] text-neutral-300 mt-3">THE BANIYAN COMPANY</span>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-fill" id="loading-bar-fill"></div>
+    </div>
+    <span id="loading-pct" class="text-[11px] font-semibold font-mono tracking-wider text-neutral-400 mt-2">0%</span>
   </div>
 </div>
 
@@ -474,7 +492,8 @@
 
 <script>
   window.addEventListener('load', () => {
-    document.getElementById('loading-screen').classList.add('hidden');
+    if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
+    else document.getElementById('loading-screen')?.classList.add('hidden');
   });
 
   function scrollToOrders() {
