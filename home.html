@@ -986,7 +986,8 @@
 
     function renderHomeCard(p) {
       const price = safePrice(p);
-      const origP = p.originalPrice ? Number(p.originalPrice) : null;
+      const rawOrig = p.originalPrice ? Number(p.originalPrice) : (p.mrp ? Number(p.mrp) : null);
+      const origP = (rawOrig && rawOrig > price) ? rawOrig : (price ? Math.round(price * 1.3) : null);
       const img = safeImage(p);
 
       // Determine product badge text & real-time stock
@@ -1015,7 +1016,7 @@
         : '';
 
       const origLabel = origP && origP > price
-        ? `<span class="text-xs text-secondary line-through">${safeMoney(origP)}</span>`
+        ? `<span class="text-xs text-secondary line-through">MRP ${safeMoney(origP)}</span>`
         : '';
 
       return `
@@ -1037,7 +1038,7 @@
         </div>
         <span class="text-[11px] text-secondary uppercase font-semibold">${p.category || ''}</span>
         <h3 class="font-semibold text-sm text-on-surface truncate">${p.name || 'Product'}</h3>
-        <div class="flex items-baseline gap-2 mt-auto pt-2">
+        <div class="flex items-baseline gap-2 mt-auto pt-2 flex-wrap">
           <span class="font-bold text-base text-primary">${safeMoney(price)}</span>
           ${origLabel}
         </div>

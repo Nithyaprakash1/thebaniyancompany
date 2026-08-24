@@ -141,9 +141,13 @@ export function normalizeProduct(id, data = {}) {
     ? Number(data.price)
     : productPrice({ variants });
 
-  const originalPrice = data.originalPrice != null ? Number(data.originalPrice)
-    : data.mrp         != null ? Number(data.mrp)
+  const rawOrig = data.originalPrice != null ? Number(data.originalPrice)
+    : data.mrp != null ? Number(data.mrp)
     : null;
+
+  const originalPrice = (rawOrig && rawOrig > price)
+    ? rawOrig
+    : (price ? Math.round(price * 1.3) : null);
 
   const category = typeof data.category === 'string'
     ? data.category

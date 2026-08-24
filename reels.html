@@ -473,7 +473,8 @@
     return list.map((product, idx) => {
       const image = (product.imageUrls && product.imageUrls[0]) ? product.imageUrls[0] : 'https://placehold.co/600x900/000/fff?text=TBC';
       const price = product.price || (product.variants && product.variants[0] ? product.variants[0].price : 0);
-      const origPrice = product.originalPrice;
+      const rawOrig = product.originalPrice ? Number(product.originalPrice) : (product.mrp ? Number(product.mrp) : null);
+      const origPrice = (rawOrig && rawOrig > price) ? rawOrig : (price ? Math.round(price * 1.3) : null);
       let reelPct = 0;
       if (origPrice && origPrice > price) {
         reelPct = Math.round(((origPrice - price) / origPrice) * 100);
@@ -561,7 +562,7 @@
             <div class="flex items-center gap-3 pt-1">
               <div class="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
                 <span class="font-bold text-base text-white">${formatMoney(price)}</span>
-                ${origPrice && origPrice > price ? `<span class="text-xs text-white/60 line-through">${formatMoney(origPrice)}</span>` : ''}
+                ${origPrice && origPrice > price ? `<span class="text-xs text-white/60 line-through">MRP ${formatMoney(origPrice)}</span>` : ''}
                 ${discountBadge}
               </div>
               <a href="product-detail?id=${encodeURIComponent(product.id)}" class="bg-white text-black px-5 py-2 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg flex items-center gap-1.5 hover:bg-neutral-200 transition-colors">
