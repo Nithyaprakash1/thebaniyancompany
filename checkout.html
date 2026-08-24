@@ -41,6 +41,19 @@
       box-sizing: border-box;
     }
 
+    body {
+      text-transform: uppercase;
+    }
+
+    .material-symbols-outlined,
+    .material-symbols-rounded,
+    .material-icons,
+    svg,
+    script,
+    style {
+      text-transform: none !important;
+    }
+
     ::-webkit-scrollbar {
       display: none;
     }
@@ -701,6 +714,28 @@
       }
     };
 
+    window.updateStep3Qty = function (cartItemId, newQty) {
+      try {
+        if (newQty <= 0) {
+          tbcCart.removeFromCart(cartItemId);
+        } else {
+          tbcCart.updateQuantity(cartItemId, newQty);
+        }
+        window.renderOrderSummary();
+      } catch (err) {
+        alert(err.message || 'Unable to update item quantity.');
+      }
+    };
+
+    window.removeStep3Item = function (cartItemId) {
+      try {
+        tbcCart.removeFromCart(cartItemId);
+        window.renderOrderSummary();
+      } catch (err) {
+        alert(err.message || 'Unable to remove item.');
+      }
+    };
+
     window.renderOrderSummary = function () {
       const items = tbcCart.getCart();
       const totals = tbcCart.getCartTotals();
@@ -716,19 +751,58 @@
       const box = document.getElementById('order-summary-box');
 
       if (box) {
+        if (!items || items.length === 0) {
+          box.innerHTML = `
+            <div class="text-center py-8 space-y-3 bg-surface-container rounded-2xl p-6">
+              <span class="material-symbols-outlined text-4xl text-neutral-400">shopping_bag</span>
+              <p class="text-sm font-bold text-neutral-600">Your bag is empty</p>
+              <a href="shop" class="inline-block bg-black text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-neutral-800 transition-colors">Return to Shop</a>
+            </div>
+          `;
+          const nextBtn = document.querySelector('button[onclick="goToStep4()"]');
+          if (nextBtn) {
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          }
+          return;
+        }
+
+        const nextBtn = document.querySelector('button[onclick="goToStep4()"]');
+        if (nextBtn) {
+          nextBtn.disabled = false;
+          nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
         box.innerHTML = `
         <div class="space-y-3 pb-3 border-b border-black/10">
           ${items.map(i => {
           const img = i.image || i.imageUrl || (i.imageUrls && i.imageUrls[0]) || 'https://placehold.co/400x500/f0f0f0/999?text=No+Image';
+          const itemKey = i.cartItemId || `${i.productId}_${i.size}_${i.color}`;
           return `
               <div class="flex items-center gap-3 bg-surface-container p-3 rounded-2xl">
                 <img class="w-14 h-16 object-cover rounded-xl bg-neutral-200 flex-shrink-0" src="${img}" alt="${i.name}" onerror="this.src='https://placehold.co/400x500/f0f0f0/999?text=No+Image'">
                 <div class="flex-1 min-w-0">
                   <h4 class="font-bold text-sm text-primary truncate">${i.name}</h4>
-                  <p class="text-xs text-secondary">Size: ${i.size || 'M'} · Color: ${i.color || 'Default'}</p>
-                  <p class="text-xs font-semibold text-primary mt-0.5">Qty: ${i.quantity || 1}</p>
+                  <p class="text-xs text-secondary mb-1.5">Size: ${i.size || 'M'} · Color: ${i.color || 'Default'}</p>
+                  <div class="flex items-center gap-2">
+                    <div class="flex items-center border border-black/15 rounded-lg bg-white overflow-hidden shadow-2xs">
+                      <button type="button" onclick="window.updateStep3Qty('${itemKey}', ${i.quantity - 1})" class="w-6 h-6 flex items-center justify-center text-slate-800 hover:bg-neutral-100 font-bold transition-colors" title="Decrease quantity">
+                        <span class="material-symbols-outlined text-[14px]">remove</span>
+                      </button>
+                      <span class="w-6 text-center font-bold text-xs text-primary select-none">${i.quantity}</span>
+                      <button type="button" onclick="window.updateStep3Qty('${itemKey}', ${i.quantity + 1})" class="w-6 h-6 flex items-center justify-center text-slate-800 hover:bg-neutral-100 font-bold transition-colors" title="Increase quantity">
+                        <span class="material-symbols-outlined text-[14px]">add</span>
+                      </button>
+                    </div>
+                    <button type="button" onclick="window.removeStep3Item('${itemKey}')" class="text-red-500 hover:text-red-700 p-1 flex items-center justify-center transition-colors" title="Remove item">
+                      <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                  </div>
                 </div>
-                <span class="font-bold text-sm text-primary">₹${(i.price * i.quantity).toLocaleString('en-IN')}</span>
+                <div class="text-right flex-shrink-0">
+                  <span class="font-bold text-sm text-primary block">₹${(i.price * i.quantity).toLocaleString('en-IN')}</span>
+                  <span class="text-[10px] text-secondary">₹${i.price.toLocaleString('en-IN')} each</span>
+                </div>
               </div>
             `;
         }).join('')}
