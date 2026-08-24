@@ -983,7 +983,7 @@
           <h3 class="font-semibold text-sm text-neutral-900 leading-snug line-clamp-1">${p.name || 'Product'}</h3>
           <div class="flex items-baseline gap-2 pt-0.5 flex-wrap">
             <span class="font-bold text-sm text-neutral-900">${safeMoney(price)}</span>
-            ${origP && origP > price ? `<span class="text-xs text-neutral-400 line-through">MRP ${safeMoney(origP)}</span>` : ''}
+            ${origP && origP > price ? `<span class="text-xs text-rose-600 font-bold line-through">MRP ${safeMoney(origP)}</span>` : ''}
           </div>
         </div>
       </a>`;

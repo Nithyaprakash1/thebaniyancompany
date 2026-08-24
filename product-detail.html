@@ -632,7 +632,7 @@
           <!-- Pricing -->
           <div class="flex items-baseline gap-3 pb-4 border-b border-black/10">
             <span class="text-3xl font-bold text-primary">₹3,299</span>
-            <span class="text-base text-secondary line-through">₹4,999</span>
+            <span class="text-base text-rose-600 font-bold line-through">MRP ₹4,999</span>
             <span class="golden-offer-chip">
               <span class="material-symbols-outlined text-[13px] text-amber-300">local_fire_department</span>
               34% OFFER
@@ -1206,7 +1206,7 @@
         const formatBadge = window.formatOfferBadge ? window.formatOfferBadge({ ...product, price: vPrice }) : '';
         priceContainer.innerHTML = `
           <span class="text-3xl font-bold text-primary">₹${vPrice.toLocaleString('en-IN')}</span>
-          ${origPrice && origPrice > vPrice ? `<span class="text-base text-secondary line-through">MRP ₹${origPrice.toLocaleString('en-IN')}</span>` : ''}
+          ${origPrice && origPrice > vPrice ? `<span class="text-base text-rose-600 font-bold line-through">MRP ₹${origPrice.toLocaleString('en-IN')}</span>` : ''}
           ${formatBadge}
         `;
       }
@@ -1594,7 +1594,7 @@
           if (priceContainer && currentPrice > 0) {
             priceContainer.innerHTML = `
             <span class="text-3xl font-bold text-primary">${formatMoney(currentPrice)}</span>
-            ${origP && origP > currentPrice ? `<span class="text-base text-secondary line-through">MRP ${formatMoney(origP)}</span>` : ''}
+            ${origP && origP > currentPrice ? `<span class="text-base text-rose-600 font-bold line-through">MRP ${formatMoney(origP)}</span>` : ''}
             ${formatOfferBadge(liveProduct)}
           `;
           }

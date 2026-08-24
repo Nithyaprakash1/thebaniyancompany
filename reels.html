@@ -562,7 +562,7 @@
             <div class="flex items-center gap-3 pt-1">
               <div class="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
                 <span class="font-bold text-base text-white">${formatMoney(price)}</span>
-                ${origPrice && origPrice > price ? `<span class="text-xs text-white/60 line-through">MRP ${formatMoney(origPrice)}</span>` : ''}
+                ${origPrice && origPrice > price ? `<span class="text-xs text-rose-300 font-bold line-through">MRP ${formatMoney(origPrice)}</span>` : ''}
                 ${discountBadge}
               </div>
               <a href="product-detail?id=${encodeURIComponent(product.id)}" class="bg-white text-black px-5 py-2 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg flex items-center gap-1.5 hover:bg-neutral-200 transition-colors">
