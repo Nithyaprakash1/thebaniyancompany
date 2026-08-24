@@ -739,17 +739,33 @@
   };
 
   function renderCustomerOrders(liveOrders) {
-    window.currentCustomerOrders = liveOrders;
+    let localOrders = [];
+    try {
+      localOrders = JSON.parse(localStorage.getItem('tbc_local_orders') || '[]');
+    } catch(e) {}
+
+    const combinedMap = new Map();
+    (liveOrders || []).forEach(o => { if (o && o.id) combinedMap.set(String(o.id), o); });
+    (localOrders || []).forEach(o => { if (o && o.id && !combinedMap.has(String(o.id))) combinedMap.set(String(o.id), o); });
+
+    const allOrders = Array.from(combinedMap.values());
+    allOrders.sort((a, b) => {
+      const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.timestamp || 0);
+      const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.timestamp || 0);
+      return timeB - timeA;
+    });
+
+    window.currentCustomerOrders = allOrders;
     const container = document.getElementById('recent-orders-container');
     const statOrdersEl = document.getElementById('stat-orders-count');
     const navOrderStatusEl = document.getElementById('nav-order-status');
     const statSavedEl = document.getElementById('stat-saved-amount');
 
-    if (statOrdersEl) statOrdersEl.textContent = liveOrders.length;
-    if (navOrderStatusEl) navOrderStatusEl.textContent = `${liveOrders.length} active`;
+    if (statOrdersEl) statOrdersEl.textContent = allOrders.length;
+    if (navOrderStatusEl) navOrderStatusEl.textContent = `${allOrders.length} active`;
 
     let totalSaved = 0;
-    liveOrders.forEach(o => {
+    allOrders.forEach(o => {
       (o.items || []).forEach(i => {
         const orig = Number(i.originalPrice || i.mrp || 0);
         const sel = Number(i.price || 0);
@@ -762,11 +778,10 @@
     });
     if (statSavedEl) statSavedEl.textContent = `₹${totalSaved.toLocaleString('en-IN')}`;
 
-    if (container && liveOrders.length > 0) {
-      container.innerHTML = liveOrders.map(o => {
-        const firstItem = (o.items && o.items[0]) || {};
-        const img = firstItem.image || firstItem.imageUrl || 'https://placehold.co/200x250/f0f0f0/999?text=Order';
-        const itemCount = (o.items || []).reduce((acc, i) => acc + (i.qty || i.quantity || 1), 0);
+    if (container && allOrders.length > 0) {
+      container.innerHTML = allOrders.map(o => {
+        const items = o.items || [];
+        const itemCount = items.reduce((acc, i) => acc + (i.qty || i.quantity || 1), 0);
         const dateStr = o.createdAt?.seconds 
           ? new Date(o.createdAt.seconds * 1000).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
           : (o.orderDateStr || 'Recently');
@@ -775,6 +790,24 @@
         const badgeClass = isDelivered 
           ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
           : 'bg-amber-100 text-amber-800 border-amber-200';
+
+        const itemsListHtml = items.length > 0 ? items.map(i => {
+          const img = i.image || i.imageUrl || (i.imageUrls && i.imageUrls[0]) || 'https://placehold.co/200x250/f0f0f0/999?text=Product';
+          const qty = i.qty || i.quantity || 1;
+          const itemPrice = Number(i.price || 0);
+          return `
+            <div class="flex items-center gap-3 bg-surface-container/70 p-2.5 rounded-xl border border-black/5">
+              <img src="${img}" alt="${i.name || 'Product'}" class="w-12 h-14 object-cover rounded-lg bg-white border border-black/10 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f0f0f0/999?text=Product'">
+              <div class="flex-1 min-w-0">
+                <h5 class="font-bold text-xs text-primary truncate">${i.name || 'Product'}</h5>
+                <p class="text-[11px] font-medium text-secondary mt-0.5">Size: ${i.size || 'M'} · Color: ${i.color || 'Default'} · Qty: ${qty}</p>
+                <p class="text-xs font-bold text-primary mt-0.5">₹${(itemPrice * qty).toLocaleString('en-IN')}</p>
+              </div>
+            </div>
+          `;
+        }).join('') : `
+          <div class="text-xs text-secondary italic p-2 bg-slate-50 rounded-xl">Standard merchandise package</div>
+        `;
 
         return `
           <div onclick="viewOrderDetails('${o.id}')" class="bg-white p-4 rounded-2xl shadow-sm border border-black/10 hover:border-black/30 transition-all cursor-pointer space-y-3">
@@ -786,13 +819,14 @@
                 ${o.status || 'Awaiting Acceptance'}
               </span>
             </div>
-            <div class="flex items-center gap-3 min-w-0">
-              <img src="${img}" alt="Order item" class="w-14 h-16 object-cover rounded-xl bg-slate-100 border border-black/5 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f0f0f0/999?text=Order'">
-              <div class="min-w-0 flex-1">
-                <h4 class="font-bold text-xs text-primary truncate mt-0.5">${firstItem.name || 'Merchandise Package'}</h4>
-                <p class="text-[11px] font-medium text-slate-500 mt-0.5">📅 ${dateStr} · ${itemCount} Item${itemCount > 1 ? 's' : ''}</p>
-                <p class="text-xs font-bold text-black mt-1">Total: ₹${(o.totalAmount || 0).toLocaleString('en-IN')}</p>
-              </div>
+            
+            <div class="space-y-2">
+              ${itemsListHtml}
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-black/5 text-xs">
+              <span class="text-slate-500 font-medium">📅 ${dateStr} · ${itemCount} Item${itemCount > 1 ? 's' : ''}</span>
+              <span class="font-extrabold text-sm text-black">Total: ₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
             </div>
           </div>`;
       }).join('');

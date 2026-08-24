@@ -870,6 +870,15 @@
       }
     };
 
+    function saveOrderToLocalStorage(orderObj) {
+      try {
+        const existing = JSON.parse(localStorage.getItem('tbc_local_orders') || '[]');
+        const filtered = existing.filter(o => o.id !== orderObj.id);
+        filtered.unshift(orderObj);
+        localStorage.setItem('tbc_local_orders', JSON.stringify(filtered.slice(0, 50)));
+      } catch (e) {}
+    }
+
     async function processCODOrder() {
       const customer = getCustomerDetails();
       const items = tbcCart.getCart();
@@ -902,6 +911,29 @@
           });
           orderId = directRes.orderId;
         }
+
+        saveOrderToLocalStorage({
+          id: orderId,
+          customerName: customer.name,
+          customerPhoneNumber: customer.phone.replace(/\D/g, '').slice(-10),
+          customerPhone: customer.phone.replace(/\D/g, '').slice(-10),
+          customerAddress: customer.address,
+          city: customer.city,
+          state: customer.state,
+          pincode: customer.pincode,
+          items: items,
+          subtotal: totals.subtotal,
+          deliveryFee: deliveryFee,
+          totalAmount: finalTotal,
+          paymentMethod: 'COD',
+          paymentStatus: 'Pending',
+          status: 'Awaiting Acceptance',
+          timestamp: Date.now(),
+          orderDateStr: new Date().toLocaleString('en-IN', {
+            day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', hour12: true
+          })
+        });
 
         localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
         tbcCart.clearCart();
@@ -971,6 +1003,30 @@
                 console.error("[TBC] saveOrderToFirestore error:", e);
               }
             }
+
+            saveOrderToLocalStorage({
+              id: invoiceId,
+              customerName: customer.name,
+              customerPhoneNumber: customer.phone.replace(/\D/g, '').slice(-10),
+              customerPhone: customer.phone.replace(/\D/g, '').slice(-10),
+              customerAddress: customer.address,
+              city: customer.city,
+              state: customer.state,
+              pincode: customer.pincode,
+              items: items,
+              subtotal: totals.subtotal,
+              deliveryFee: deliveryFee,
+              totalAmount: totals.grandTotal + deliveryFee,
+              paymentMethod: 'Razorpay Online Payment',
+              paymentStatus: 'Paid',
+              status: 'Paid',
+              razorpayPaymentId: paymentId,
+              timestamp: Date.now(),
+              orderDateStr: new Date().toLocaleString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', hour12: true
+              })
+            });
 
             localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
             tbcCart.clearCart();
