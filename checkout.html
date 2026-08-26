@@ -182,22 +182,26 @@
     <div id="step-2-panel" class="hidden space-y-4">
       <div>
         <h2 class="text-xl font-bold text-primary mt-1">Delivery Address 🏠</h2>
+        <p class="text-xs text-secondary mt-0.5">Please provide your exact address details for express delivery</p>
       </div>
 
       <form id="step-2-form" onsubmit="event.preventDefault(); goToStep3();" class="space-y-3.5">
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">House / Flat / Building
-            Address *</label>
-          <textarea required rows="2" id="cust-address"
-            oninput="this.style.height = ''; this.style.height = Math.max(68, this.scrollHeight) + 'px';"
-            placeholder="Flat No. 402, Building A, Studio Lane..."
-            class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all overflow-hidden resize-none min-h-[68px]"></textarea>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Door / Flat / House No *</label>
+            <input required type="text" id="cust-door" placeholder="e.g. Door No. 4B / Flat 302"
+              class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Street Name / Area / Road *</label>
+            <input required type="text" id="cust-street" placeholder="e.g. MG Road, Anna Nagar"
+              class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
+          </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Landmark
-            (Optional)</label>
-          <input type="text" id="cust-landmark" placeholder="Near Studio Central Park"
+          <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">Landmark (Optional)</label>
+          <input type="text" id="cust-landmark" placeholder="e.g. Near Studio Central Park / Opp. Temple"
             class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-black transition-all">
         </div>
 
@@ -228,8 +232,7 @@
               class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
           </div>
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">City / District
-              *</label>
+            <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-1">City / District *</label>
             <input required type="text" id="cust-city" oninput="handleCityChange(this.value)"
               placeholder="City / District"
               class="w-full bg-surface-container px-4 py-2.5 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-black transition-all">
@@ -377,6 +380,112 @@
       </div>
     </div>
 
+    <!-- CUSTOMIZED ORDER & ADDRESS CONFIRMATION DIALOG BOX ("Is this right? 🤔") -->
+    <div id="order-confirm-dialog" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden items-center justify-center p-4 transition-all duration-300">
+      <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 border border-black/10 transform transition-all scale-100 max-h-[92vh] overflow-y-auto">
+        
+        <!-- Header -->
+        <div class="flex items-start justify-between pb-3 border-b border-black/10">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-amber-500/10 text-amber-600 rounded-2xl flex items-center justify-center flex-shrink-0 border border-amber-500/20 shadow-2xs">
+              <span class="material-symbols-outlined text-[24px]">contact_support</span>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-lg sm:text-xl text-primary tracking-tight">Is this right? 🤔</h3>
+              <p class="text-xs text-secondary font-medium">Please review your delivery details before placing your order</p>
+            </div>
+          </div>
+          <button type="button" onclick="closeConfirmationDialog()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-black hover:bg-slate-200 transition-colors" title="Close">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+
+        <!-- Address Verification Card -->
+        <div class="bg-surface-container rounded-2xl p-4 sm:p-5 border border-black/5 space-y-3.5 relative overflow-hidden">
+          <div class="flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-slate-800 bg-white px-2.5 py-1 rounded-lg border border-black/10 shadow-2xs">
+              <span class="material-symbols-outlined text-[14px] text-emerald-600">location_on</span>
+              Delivery Address
+            </span>
+            <button type="button" onclick="editAddressFromConfirmation()" class="text-xs font-bold text-slate-700 hover:text-black flex items-center gap-1 underline underline-offset-2 transition-colors">
+              <span class="material-symbols-outlined text-[14px]">edit</span> Edit Address
+            </button>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            <!-- Recipient Name & Phone -->
+            <div class="flex items-start gap-2.5 text-slate-800">
+              <span class="material-symbols-outlined text-[16px] text-slate-500 mt-0.5 flex-shrink-0">person</span>
+              <div>
+                <span class="font-extrabold text-sm text-primary block" id="confirm-dialog-name">Customer Name</span>
+                <span class="text-secondary font-bold text-xs" id="confirm-dialog-phone">+91 9876543210</span>
+              </div>
+            </div>
+
+            <!-- Door No, Street & Landmark -->
+            <div class="flex items-start gap-2.5 text-slate-800 pt-2 border-t border-black/5">
+              <span class="material-symbols-outlined text-[16px] text-slate-500 mt-0.5 flex-shrink-0">home</span>
+              <div class="flex-1 space-y-0.5">
+                <div class="font-bold text-slate-900 leading-snug">
+                  <span id="confirm-dialog-door" class="font-extrabold">Door No. 4B</span>,
+                  <span id="confirm-dialog-street">Studio Lane Road</span>
+                </div>
+                <div id="confirm-dialog-landmark" class="text-[11px] text-slate-500 font-medium hidden"></div>
+              </div>
+            </div>
+
+            <!-- City, State & Pincode -->
+            <div class="flex items-start gap-2.5 text-slate-800 pt-2 border-t border-black/5">
+              <span class="material-symbols-outlined text-[16px] text-slate-500 mt-0.5 flex-shrink-0">pin_drop</span>
+              <div class="flex items-center gap-2 flex-wrap font-bold text-slate-900">
+                <span id="confirm-dialog-city-state">Coimbatore, Tamil Nadu</span>
+                <span class="inline-flex items-center gap-1 bg-black text-white px-2 py-0.5 rounded-md text-[10px] font-mono tracking-wider font-extrabold">
+                  📮 PIN: <span id="confirm-dialog-pincode">641001</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order & Payment Snapshot -->
+        <div class="bg-slate-50 rounded-2xl p-4 border border-black/5 space-y-2.5 text-xs">
+          <div class="flex justify-between items-center text-slate-600">
+            <span>Payment Method:</span>
+            <span class="font-bold text-slate-900 flex items-center gap-1.5" id="confirm-dialog-method">
+              <span class="material-symbols-outlined text-[16px] text-emerald-600">verified</span>
+              Online Payment (UPI/Cards)
+            </span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600">
+            <span>Items in Bag:</span>
+            <span class="font-bold text-slate-900" id="confirm-dialog-items-count">1 Item</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600">
+            <span>Express Delivery:</span>
+            <span class="font-bold text-emerald-700" id="confirm-dialog-shipping">FREE (Tamil Nadu)</span>
+          </div>
+          <div class="flex justify-between items-center font-extrabold text-sm sm:text-base text-primary pt-2 border-t border-black/10">
+            <span>Total Payable Amount:</span>
+            <span class="text-lg text-black font-black" id="confirm-dialog-total">₹0</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-2.5 pt-1">
+          <button type="button" id="confirm-dialog-proceed-btn" onclick="executeConfirmedOrder()"
+            class="w-full bg-black hover:bg-neutral-800 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2">
+            <span>Yes, Confirm &amp; Place Order 🚀</span>
+          </button>
+          <button type="button" onclick="editAddressFromConfirmation()"
+            class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">edit</span>
+            No, Edit Delivery Address
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </main>
 
   <script type="module">
@@ -409,7 +518,8 @@
 
         const nameEl = document.getElementById('cust-name');
         const phoneEl = document.getElementById('cust-phone');
-        const addrEl = document.getElementById('cust-address');
+        const doorEl = document.getElementById('cust-door');
+        const streetEl = document.getElementById('cust-street');
         const landmarkEl = document.getElementById('cust-landmark');
         const stateEl = document.getElementById('cust-state');
         const cityEl = document.getElementById('cust-city');
@@ -417,7 +527,13 @@
 
         if (nameEl && stored.name) nameEl.value = stored.name;
         if (phoneEl && phone) phoneEl.value = phone.replace(/\D/g, '').slice(-10);
-        if (addrEl && stored.address) addrEl.value = stored.address;
+        if (doorEl && stored.doorNo) doorEl.value = stored.doorNo;
+        if (streetEl && stored.streetName) streetEl.value = stored.streetName;
+        if (!doorEl?.value && !streetEl?.value && stored.address) {
+          const parts = stored.address.split(',');
+          if (doorEl && parts.length > 0) doorEl.value = parts[0].trim();
+          if (streetEl && parts.length > 1) streetEl.value = parts.slice(1).join(',').trim();
+        }
         if (landmarkEl && stored.landmark) landmarkEl.value = stored.landmark;
         if (stateEl && stored.state) stateEl.value = stored.state;
         if (cityEl && stored.city) cityEl.value = stored.city;
@@ -449,11 +565,13 @@
       const name = document.getElementById('cust-name').value.trim();
       const phone = document.getElementById('cust-phone').value.trim();
       if (!name) {
-        alert("Please enter your Full Name.");
+        alert("Full Name is mandatory. Please enter your full name.");
+        document.getElementById('cust-name')?.focus();
         return;
       }
       if (!phone || phone.replace(/\D/g, '').length !== 10) {
         alert("Phone number must be exactly 10 digits.");
+        document.getElementById('cust-phone')?.focus();
         return;
       }
 
@@ -478,26 +596,48 @@
     };
 
     window.goToStep3 = function () {
-      const addr = document.getElementById('cust-address').value.trim();
-      const city = document.getElementById('cust-city').value.trim();
-      const state = document.getElementById('cust-state').value.trim();
-      const pin = document.getElementById('cust-pincode').value.trim();
+      const door = document.getElementById('cust-door')?.value.trim() || '';
+      const street = document.getElementById('cust-street')?.value.trim() || '';
       const landmark = document.getElementById('cust-landmark')?.value.trim() || '';
+      const pin = document.getElementById('cust-pincode')?.value.trim() || '';
+      const state = document.getElementById('cust-state')?.value.trim() || '';
+      const city = document.getElementById('cust-city')?.value.trim() || '';
 
-      if (!addr || !city || !state) {
-        alert("Please fill in all mandatory delivery address fields.");
+      if (!door) {
+        alert("Door / Flat / House No is mandatory. Please enter your door or flat number.");
+        document.getElementById('cust-door')?.focus();
         return;
       }
-      if (!pin || pin.length !== 6) {
-        alert("Pincode must be exactly 6 digits.");
+      if (!street) {
+        alert("Street Name / Area is mandatory. Please enter your street or area name.");
+        document.getElementById('cust-street')?.focus();
         return;
       }
+      if (!pin || !/^\d{6}$/.test(pin)) {
+        alert("Pincode is mandatory and must be a valid 6-digit Indian postal code.");
+        document.getElementById('cust-pincode')?.focus();
+        return;
+      }
+      if (!state) {
+        alert("State is mandatory. Please enter your state name.");
+        document.getElementById('cust-state')?.focus();
+        return;
+      }
+      if (!city) {
+        alert("City / District is mandatory. Please enter your city or district.");
+        document.getElementById('cust-city')?.focus();
+        return;
+      }
+
+      const fullAddress = `${door}, ${street}`;
 
       try {
         const current = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
         localStorage.setItem('tbc_user_profile', JSON.stringify({
           ...current,
-          address: addr,
+          doorNo: door,
+          streetName: street,
+          address: fullAddress,
           landmark,
           city,
           state,
@@ -837,6 +977,11 @@
     };
 
     window.getCustomerDetails = function () {
+      const door = document.getElementById('cust-door')?.value.trim() || '';
+      const street = document.getElementById('cust-street')?.value.trim() || '';
+      const landmark = document.getElementById('cust-landmark')?.value.trim() || '';
+      const fullAddress = door && street ? `${door}, ${street}` : (door || street || '');
+
       let state = document.getElementById('cust-state')?.value.trim() || 'Tamil Nadu';
       if (state.toLowerCase().includes('tamil nadu') || state.toLowerCase().includes('tn')) {
         state = 'Tamil Nadu';
@@ -852,22 +997,192 @@
         name: document.getElementById('cust-name')?.value.trim() || '',
         phone: document.getElementById('cust-phone')?.value.trim() || '',
         email: (document.getElementById('cust-email')?.value || '').trim() || 'customer@thebaniyancompany.com',
-        address: document.getElementById('cust-address')?.value.trim() || '',
-        landmark: document.getElementById('cust-landmark')?.value.trim() || '',
+        doorNo: door,
+        streetName: street,
+        address: fullAddress,
+        landmark: landmark,
         city: city,
         state: state,
         pincode: document.getElementById('cust-pincode')?.value.trim() || ''
       };
     };
 
-    window.submitFinalOrder = async function () {
-      const selectedMethod = document.querySelector('input[name="pay-method"]:checked')?.value || 'Razorpay';
+    window.validateAllOrderFields = function () {
+      const name = document.getElementById('cust-name')?.value.trim() || '';
+      const phone = document.getElementById('cust-phone')?.value.replace(/\D/g, '').slice(-10) || '';
+      const door = document.getElementById('cust-door')?.value.trim() || '';
+      const street = document.getElementById('cust-street')?.value.trim() || '';
+      const pin = document.getElementById('cust-pincode')?.value.trim() || '';
+      const state = document.getElementById('cust-state')?.value.trim() || '';
+      const city = document.getElementById('cust-city')?.value.trim() || '';
 
-      if (selectedMethod === 'COD') {
-        await processCODOrder();
-      } else {
-        await processRazorpayOrder();
+      if (!name) {
+        alert("Full Name is mandatory. Please enter your full name.");
+        window.goToStep1();
+        document.getElementById('cust-name')?.focus();
+        return false;
       }
+      if (!phone || phone.length !== 10) {
+        alert("10-Digit Mobile Number is mandatory. Please enter a valid 10-digit phone number.");
+        window.goToStep1();
+        document.getElementById('cust-phone')?.focus();
+        return false;
+      }
+      if (!door) {
+        alert("Door / Flat / House No is mandatory. Please enter your door or flat number.");
+        window.goToStep2();
+        document.getElementById('cust-door')?.focus();
+        return false;
+      }
+      if (!street) {
+        alert("Street Name / Area is mandatory. Please enter your street or area name.");
+        window.goToStep2();
+        document.getElementById('cust-street')?.focus();
+        return false;
+      }
+      if (!pin || !/^\d{6}$/.test(pin)) {
+        alert("Pincode is mandatory and must be a valid 6-digit Indian postal code.");
+        window.goToStep2();
+        document.getElementById('cust-pincode')?.focus();
+        return false;
+      }
+      if (!state) {
+        alert("State is mandatory. Please enter your state name.");
+        window.goToStep2();
+        document.getElementById('cust-state')?.focus();
+        return false;
+      }
+      if (!city) {
+        alert("City / District is mandatory. Please enter your city or district.");
+        window.goToStep2();
+        document.getElementById('cust-city')?.focus();
+        return false;
+      }
+      return true;
+    };
+
+    let pendingConfirmedOrderAction = null;
+
+    window.openConfirmationDialog = function(actionType = 'payment') {
+      if (!window.validateAllOrderFields()) return;
+
+      const cust = window.getCustomerDetails();
+      const items = window.tbcCart ? window.tbcCart.getCart() : [];
+      const totals = window.tbcCart ? window.tbcCart.getCartTotals() : { grandTotal: 0, itemCount: 0, subtotal: 0 };
+      
+      const isTN = (cust.state || '').toLowerCase().includes('tamil nadu');
+      const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+      const grandTotal = totals.grandTotal + deliveryFee;
+
+      pendingConfirmedOrderAction = actionType;
+
+      // Populate confirmation dialog elements
+      const nameEl = document.getElementById('confirm-dialog-name');
+      const phoneEl = document.getElementById('confirm-dialog-phone');
+      const doorEl = document.getElementById('confirm-dialog-door');
+      const streetEl = document.getElementById('confirm-dialog-street');
+      const landmarkEl = document.getElementById('confirm-dialog-landmark');
+      const cityStateEl = document.getElementById('confirm-dialog-city-state');
+      const pinEl = document.getElementById('confirm-dialog-pincode');
+      const methodEl = document.getElementById('confirm-dialog-method');
+      const itemsCountEl = document.getElementById('confirm-dialog-items-count');
+      const shippingEl = document.getElementById('confirm-dialog-shipping');
+      const totalEl = document.getElementById('confirm-dialog-total');
+      const proceedBtn = document.getElementById('confirm-dialog-proceed-btn');
+
+      if (nameEl) nameEl.textContent = cust.name;
+      if (phoneEl) phoneEl.textContent = `+91 ${cust.phone.replace(/(\d{5})(\d{5})/, '$1 $2')}`;
+      if (doorEl) doorEl.textContent = cust.doorNo || '';
+      if (streetEl) streetEl.textContent = cust.streetName || '';
+      
+      if (landmarkEl) {
+        if (cust.landmark) {
+          landmarkEl.textContent = `Landmark: ${cust.landmark}`;
+          landmarkEl.classList.remove('hidden');
+        } else {
+          landmarkEl.classList.add('hidden');
+        }
+      }
+
+      if (cityStateEl) cityStateEl.textContent = `${cust.city}, ${cust.state}`;
+      if (pinEl) pinEl.textContent = cust.pincode;
+      if (itemsCountEl) itemsCountEl.textContent = `${totals.itemCount || items.length} Item${(totals.itemCount || items.length) !== 1 ? 's' : ''}`;
+      if (shippingEl) shippingEl.textContent = isTN ? (deliveryTnPrice === 0 ? 'FREE (Tamil Nadu)' : `₹${deliveryTnPrice}`) : `₹${deliveryNonTnPrice} (Outside TN)`;
+      if (totalEl) totalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
+
+      const selectedPayRadio = document.querySelector('input[name="pay-method"]:checked')?.value || 'Razorpay';
+
+      if (actionType === 'whatsapp') {
+        if (methodEl) {
+          methodEl.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-[#25D366]"></span> WhatsApp Direct Order`;
+        }
+        if (proceedBtn) {
+          proceedBtn.innerHTML = `<span>Yes, Order via WhatsApp 💬</span>`;
+          proceedBtn.className = 'w-full bg-[#25D366] hover:opacity-90 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2';
+        }
+      } else if (selectedPayRadio === 'COD') {
+        if (methodEl) {
+          methodEl.innerHTML = `<span class="material-symbols-outlined text-[16px] text-emerald-600">payments</span> Cash on Delivery (COD)`;
+        }
+        if (proceedBtn) {
+          proceedBtn.innerHTML = `<span>Yes, Place COD Order (₹${grandTotal.toLocaleString('en-IN')}) 🚚</span>`;
+          proceedBtn.className = 'w-full bg-black hover:bg-neutral-800 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2';
+        }
+      } else {
+        if (methodEl) {
+          methodEl.innerHTML = `<span class="material-symbols-outlined text-[16px] text-emerald-600">verified_user</span> Online Payment (UPI / Cards)`;
+        }
+        if (proceedBtn) {
+          proceedBtn.innerHTML = `<span>Yes, Pay Now (₹${grandTotal.toLocaleString('en-IN')}) 🔒</span>`;
+          proceedBtn.className = 'w-full bg-black hover:bg-neutral-800 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2';
+        }
+      }
+
+      const dialog = document.getElementById('order-confirm-dialog');
+      if (dialog) {
+        dialog.classList.remove('hidden');
+        dialog.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+      }
+    };
+
+    window.closeConfirmationDialog = function() {
+      const dialog = document.getElementById('order-confirm-dialog');
+      if (dialog) {
+        dialog.classList.add('hidden');
+        dialog.classList.remove('flex');
+        document.body.style.overflow = '';
+      }
+      pendingConfirmedOrderAction = null;
+    };
+
+    window.editAddressFromConfirmation = function() {
+      window.closeConfirmationDialog();
+      window.goToStep2();
+      setTimeout(() => {
+        const doorInput = document.getElementById('cust-door');
+        if (doorInput) doorInput.focus();
+      }, 100);
+    };
+
+    window.executeConfirmedOrder = async function() {
+      const action = pendingConfirmedOrderAction;
+      window.closeConfirmationDialog();
+
+      if (action === 'whatsapp') {
+        await window.executeWhatsAppOrder();
+      } else {
+        const selectedMethod = document.querySelector('input[name="pay-method"]:checked')?.value || 'Razorpay';
+        if (selectedMethod === 'COD') {
+          await processCODOrder();
+        } else {
+          await processRazorpayOrder();
+        }
+      }
+    };
+
+    window.submitFinalOrder = async function () {
+      window.openConfirmationDialog('payment');
     };
 
     function saveOrderToLocalStorage(orderObj) {
@@ -889,7 +1204,7 @@
       const finalTotal = totals.grandTotal + deliveryFee;
 
       const btn = document.getElementById('pay-submit-btn');
-      btn.disabled = true;
+      if (btn) btn.disabled = true;
 
       try {
         let orderId;
@@ -940,7 +1255,7 @@
         window.location.href = `order-success.html?orderId=${encodeURIComponent(orderId)}&method=COD`;
       } catch (error) {
         alert(error.message);
-        btn.disabled = false;
+        if (btn) btn.disabled = false;
       }
     }
 
@@ -955,8 +1270,10 @@
         return;
       }
 
-      btn.disabled = true;
-      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Opening Razorpay...`;
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Opening Razorpay...`;
+      }
 
       const liveKey = 'rzp_live_TM8qhpQTojuGA9';
       const stateStr = (customer.state || document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
@@ -973,7 +1290,7 @@
         description: "Standard Checkout",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM",
         handler: async function (response) {
-          btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Finalizing Order...`;
+          if (btn) btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Finalizing Order...`;
           try {
             const paymentId = response.razorpay_payment_id || `PAY_${Date.now()}`;
             let invoiceId = `TBC-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -1044,7 +1361,7 @@
         theme: { color: "#000000" },
         modal: {
           ondismiss: function () {
-            btn.disabled = false;
+            if (btn) btn.disabled = false;
             window.renderOrderSummary();
           }
         }
@@ -1055,58 +1372,32 @@
         rzp.open();
       } catch (error) {
         console.error("Razorpay Modal Error:", error);
-        btn.disabled = false;
+        if (btn) btn.disabled = false;
         window.renderOrderSummary();
         alert("Unable to open Razorpay. Please check your connection or select Cash on Delivery (COD).");
       }
     }
 
-    window.placeWhatsAppOrder = async function () {
-      const customer = getCustomerDetails();
-      const items = tbcCart.getCart();
-      const totals = tbcCart.getCartTotals();
-
-      if (!customer.name || !customer.phone || !customer.address) {
-        alert("Please enter your Name, Phone Number, and Address before ordering on WhatsApp.");
-        return;
-      }
-
-      if (!items.length) return alert("Your shopping bag is empty.");
-      let result;
-      try {
-        result = await api('/api/place-whatsapp-order', { customer, requestedItems: items });
-      } catch (error) {
-        alert(error.message);
-        return;
-      }
-      const timeStr = `Order Number: ${result.orderId}`;
-
-      let itemLines = items.map((item, idx) => `${idx + 1}. ${item.name} (${item.size}/${item.color}) x${item.quantity} = ₹${(item.price * item.quantity).toLocaleString()}`).join('\n');
-
-      let text = `*NEW ORDER — THE BANIYAN COMPANY*\n\n` +
-        `*Customer Details:*\n` +
-        `• Name: ${customer.name}\n` +
-        `• Phone: ${customer.phone}\n` +
-        `• Email: ${customer.email}\n` +
-        `• Address: ${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}\n` +
-        `• Landmark: ${customer.landmark}\n\n` +
-        `*Ordered Items:*\n${itemLines}\n\n` +
-        `*Order Totals:*\n` +
-        `• Subtotal: ₹${totals.subtotal.toLocaleString()}\n` +
-        `• GST (5%): ₹${totals.tax.toLocaleString()}\n` +
-        `• Total Amount: ₹${totals.grandTotal.toLocaleString()}\n` +
-        `• Payment Choice: WhatsApp Direct Order\n` +
-        `• Order Time: ${timeStr}\n\n` +
-        `Please confirm my order details!`;
-
-      localStorage.setItem('tbc_customer_phone', customer.phone.replace(/\D/g, '').slice(-10));
-      tbcCart.clearCart();
-      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-      window.open(whatsappUrl, '_blank');
-      window.location.href = `order-success.html?orderId=${encodeURIComponent(result.orderId)}&method=WhatsApp`;
-    };
-
     document.addEventListener('DOMContentLoaded', () => {
+      // Payment method radio change listener to update button label dynamically
+      document.querySelectorAll('input[name="pay-method"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+          const payBtn = document.getElementById('pay-submit-btn');
+          if (!payBtn) return;
+          const totals = window.tbcCart ? window.tbcCart.getCartTotals() : { grandTotal: 0 };
+          const stateStr = (document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
+          const isTN = stateStr.toLowerCase().includes('tamil nadu');
+          const fee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+          const tot = totals.grandTotal + fee;
+
+          if (radio.value === 'COD') {
+            payBtn.innerHTML = `Place COD Order: ₹${tot.toLocaleString('en-IN')} <span class="material-symbols-outlined text-[18px]">local_shipping</span>`;
+          } else {
+            payBtn.innerHTML = `Pay Now: ₹${tot.toLocaleString('en-IN')} <span class="material-symbols-outlined text-[18px]">lock</span>`;
+          }
+        });
+      });
+
       // Wait a tick so the module (tbcCart) finishes initializing before checking
       setTimeout(() => {
         const cart = window.tbcCart ? window.tbcCart.getCart() : [];

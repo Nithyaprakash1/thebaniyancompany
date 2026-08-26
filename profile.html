@@ -358,35 +358,48 @@
 <div id="edit-profile-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
   <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
     <div class="flex justify-between items-center pb-3 border-b border-black/10">
-      <h3 class="font-bold text-base text-primary">Edit Personal Details</h3>
-      <button onclick="closeEditModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-secondary">
+      <h3 class="font-bold text-base text-primary">Edit Personal &amp; Delivery Details</h3>
+      <button onclick="closeEditModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-secondary hover:text-black">
         <span class="material-symbols-outlined text-[18px]">close</span>
       </button>
     </div>
     <form onsubmit="event.preventDefault(); saveProfileDetails();" class="space-y-3">
       <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Full Name</label>
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Full Name *</label>
         <input id="modal-field-name" type="text" required class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
       </div>
       <div>
         <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Email Address</label>
-        <input id="modal-field-email" type="email" required class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+        <input id="modal-field-email" type="email" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
       </div>
       <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Phone Number</label>
-        <input id="modal-field-phone" type="tel" maxlength="10" placeholder="10-digit mobile" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Phone Number *</label>
+        <div class="flex items-center bg-slate-50 rounded-xl overflow-hidden border border-black/10 focus-within:ring-2 focus-within:ring-black">
+          <span class="px-3 py-2.5 text-xs font-bold text-slate-700 bg-black/5 border-r border-black/10 select-none">🇮🇳 +91</span>
+          <input id="modal-field-phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" placeholder="10-digit mobile" class="w-full bg-transparent px-3 py-2.5 text-xs font-bold outline-none text-primary">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Door / Flat No *</label>
+          <input id="modal-field-door" type="text" required placeholder="e.g. 4B / Flat 302" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Street / Area *</label>
+          <input id="modal-field-street" type="text" required placeholder="e.g. MG Road, Anna Nagar" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+        </div>
       </div>
       <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Shipping Address</label>
-        <textarea id="modal-field-address" rows="2" placeholder="Full house address & landmark" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black resize-none"></textarea>
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Landmark (Optional)</label>
+        <input id="modal-field-landmark" type="text" placeholder="e.g. Near Studio Central Park" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
       </div>
       <div>
         <div class="flex justify-between items-center mb-1">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary">Pincode</label>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary">Pincode *</label>
           <span class="text-[9px] text-slate-400 font-bold uppercase">6-Digit India Pincode</span>
         </div>
         <div class="relative">
-          <input id="modal-field-pincode" type="tel" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" oninput="handleProfilePincodeInput(this.value)" placeholder="e.g. 680001 or 600001" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-black">
+          <input id="modal-field-pincode" type="tel" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required oninput="handleProfilePincodeInput(this.value)" placeholder="e.g. 680001 or 600001" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-black">
           <div id="profile-pincode-loader" class="absolute right-3 top-1/2 -translate-y-1/2 hidden flex items-center gap-1 text-[11px] text-slate-600">
             <span class="material-symbols-outlined animate-spin text-[14px]">motion_photos_on</span>
             <span>Fetching...</span>
@@ -396,17 +409,17 @@
       </div>
       <div class="grid grid-cols-2 gap-2.5">
         <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">State</label>
-          <input id="modal-field-state" type="text" placeholder="State" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">State *</label>
+          <input id="modal-field-state" type="text" required placeholder="State" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
         </div>
         <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">City / District</label>
-          <input id="modal-field-city" type="text" placeholder="City / District" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">City / District *</label>
+          <input id="modal-field-city" type="text" required placeholder="City / District" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
         </div>
       </div>
       <div class="flex gap-2 pt-2">
-        <button type="button" onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 font-bold text-xs text-primary rounded-xl">Cancel</button>
-        <button type="submit" class="flex-1 py-3 bg-black font-bold text-xs text-white rounded-xl shadow-md">Save Changes</button>
+        <button type="button" onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 font-bold text-xs text-primary rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
+        <button type="submit" class="flex-1 py-3 bg-black font-bold text-xs text-white rounded-xl shadow-md hover:bg-neutral-800 transition-colors">Save Changes</button>
       </div>
     </form>
   </div>
@@ -519,7 +532,14 @@
     if (document.getElementById('modal-field-name')) document.getElementById('modal-field-name').value = stored.name || document.getElementById('profile-name')?.textContent || '';
     if (document.getElementById('modal-field-email')) document.getElementById('modal-field-email').value = stored.email || document.getElementById('profile-email')?.textContent || '';
     if (document.getElementById('modal-field-phone')) document.getElementById('modal-field-phone').value = stored.phone || localStorage.getItem('tbc_customer_phone') || '';
-    if (document.getElementById('modal-field-address')) document.getElementById('modal-field-address').value = stored.address || '';
+    if (document.getElementById('modal-field-door')) document.getElementById('modal-field-door').value = stored.doorNo || '';
+    if (document.getElementById('modal-field-street')) document.getElementById('modal-field-street').value = stored.streetName || '';
+    if (!document.getElementById('modal-field-door')?.value && !document.getElementById('modal-field-street')?.value && stored.address) {
+      const parts = stored.address.split(',');
+      if (document.getElementById('modal-field-door') && parts.length > 0) document.getElementById('modal-field-door').value = parts[0].trim();
+      if (document.getElementById('modal-field-street') && parts.length > 1) document.getElementById('modal-field-street').value = parts.slice(1).join(',').trim();
+    }
+    if (document.getElementById('modal-field-landmark')) document.getElementById('modal-field-landmark').value = stored.landmark || '';
     if (document.getElementById('modal-field-pincode')) document.getElementById('modal-field-pincode').value = stored.pincode || '';
     if (document.getElementById('modal-field-state')) document.getElementById('modal-field-state').value = stored.state || '';
     if (document.getElementById('modal-field-city')) document.getElementById('modal-field-city').value = stored.city || '';
@@ -538,19 +558,61 @@
   }
 
   function saveProfileDetails() {
-    const name = document.getElementById('modal-field-name').value.trim();
-    const email = document.getElementById('modal-field-email').value.trim();
-    const phone = document.getElementById('modal-field-phone').value.trim();
-    const address = document.getElementById('modal-field-address').value.trim();
+    const name = document.getElementById('modal-field-name')?.value.trim() || '';
+    const email = document.getElementById('modal-field-email')?.value.trim() || '';
+    const phone = document.getElementById('modal-field-phone')?.value.replace(/\D/g, '').slice(-10) || '';
+    const door = document.getElementById('modal-field-door')?.value.trim() || '';
+    const street = document.getElementById('modal-field-street')?.value.trim() || '';
+    const landmark = document.getElementById('modal-field-landmark')?.value.trim() || '';
     const pincode = document.getElementById('modal-field-pincode')?.value.trim() || '';
     const state = document.getElementById('modal-field-state')?.value.trim() || '';
     const city = document.getElementById('modal-field-city')?.value.trim() || '';
 
+    if (!name) {
+      alert('Full Name is required.');
+      document.getElementById('modal-field-name')?.focus();
+      return;
+    }
+    if (!phone || phone.length !== 10) {
+      alert('Valid 10-digit Phone Number is required.');
+      document.getElementById('modal-field-phone')?.focus();
+      return;
+    }
+    if (!door) {
+      alert('Door / Flat / House No is required.');
+      document.getElementById('modal-field-door')?.focus();
+      return;
+    }
+    if (!street) {
+      alert('Street Name / Area is required.');
+      document.getElementById('modal-field-street')?.focus();
+      return;
+    }
+    if (!pincode || !/^\d{6}$/.test(pincode)) {
+      alert('Valid 6-digit Indian Pincode is required.');
+      document.getElementById('modal-field-pincode')?.focus();
+      return;
+    }
+    if (!state) {
+      alert('State is required.');
+      document.getElementById('modal-field-state')?.focus();
+      return;
+    }
+    if (!city) {
+      alert('City / District is required.');
+      document.getElementById('modal-field-city')?.focus();
+      return;
+    }
+
+    const fullAddress = `${door}, ${street}`;
     const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
     stored.name = name;
     stored.email = email;
     stored.phone = phone;
-    stored.address = address;
+    stored.doorNo = door;
+    stored.streetName = street;
+    stored.address = fullAddress;
+    stored.landmark = landmark;
     stored.pincode = pincode;
     stored.state = state;
     stored.city = city;

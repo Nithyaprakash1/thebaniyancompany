@@ -33,7 +33,7 @@ function razorpayClient() {
 }
 
 function sanitizeCustomer(customer = {}) {
-  const fields = ['name', 'phone', 'email', 'address', 'landmark', 'city', 'state', 'pincode'];
+  const fields = ['name', 'phone', 'email', 'address', 'landmark', 'city', 'state', 'pincode', 'doorNo', 'streetName'];
   const result = Object.fromEntries(fields.map(field => [field, String(customer[field] || '').trim()]));
   if (!result.name || !/^\d{10}$/.test(result.phone.replace(/\D/g, '')) || !result.address || !result.city || !result.state || !/^\d{6}$/.test(result.pincode)) {
     throw new Error('Please provide a valid name, phone number, and complete delivery address.');
