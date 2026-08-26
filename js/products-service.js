@@ -643,24 +643,61 @@ export function subscribeToProduct(id, onUpdate, onError) {
 
 // ═══════════════════════════════════════════════════════════════
 // HELPER: Deeply clean and sanitize Firestore payloads to eliminate
-// any 'undefined' values that cause Firestore addDoc/setDoc exceptions.
+// any 'undefined' values while strictly preserving serverTimestamp(),
+// FieldValue sentinels, and Date objects.
 // ═══════════════════════════════════════════════════════════════
+function isFirestoreSentinel(val) {
+  if (!val || typeof val !== 'object') return false;
+  if (val instanceof Date) return true;
+  if (typeof val.toMillis === 'function') return true;
+  if (typeof val.isEqual === 'function') return true;
+  if (val._methodName || val._delegate || val.constructor?.name === 'FieldValueImpl' || val.constructor?.name === 'ServerTimestampTransform') return true;
+  return false;
+}
+
 function cleanFirestoreDoc(obj) {
   if (obj === null || obj === undefined) return null;
   if (typeof obj !== 'object') return obj;
+  if (isFirestoreSentinel(obj)) return obj;
   if (Array.isArray(obj)) return obj.map(cleanFirestoreDoc);
 
   const cleaned = {};
   for (const [key, value] of Object.entries(obj)) {
     if (value === undefined) {
       continue; // omit undefined keys completely
-    } else if (value !== null && typeof value === 'object' && !(value instanceof Date) && typeof value.toMillis !== 'function') {
+    } else if (value !== null && typeof value === 'object' && !isFirestoreSentinel(value)) {
       cleaned[key] = cleanFirestoreDoc(value);
     } else {
       cleaned[key] = value;
     }
   }
   return cleaned;
+}
+
+/**
+ * Universal helper to accurately extract milliseconds from any order timestamp format
+ * (Firestore Timestamp, ISO string, milliseconds, or Date object).
+ */
+export function getOrderTimestamp(o) {
+  if (!o) return 0;
+  if (typeof o.timestamp === 'number' && o.timestamp > 0) return o.timestamp;
+  if (o.createdAt && typeof o.createdAt.toMillis === 'function') return o.createdAt.toMillis();
+  if (o.createdAt?.seconds) return o.createdAt.seconds * 1000 + (o.createdAt.nanoseconds ? o.createdAt.nanoseconds / 1000000 : 0);
+  if (typeof o.createdAt === 'string') {
+    const t = new Date(o.createdAt).getTime();
+    if (!isNaN(t) && t > 0) return t;
+  }
+  if (o.updatedAt && typeof o.updatedAt.toMillis === 'function') return o.updatedAt.toMillis();
+  if (o.updatedAt?.seconds) return o.updatedAt.seconds * 1000;
+  if (typeof o.updatedAt === 'string') {
+    const t = new Date(o.updatedAt).getTime();
+    if (!isNaN(t) && t > 0) return t;
+  }
+  if (o.orderDateStr) {
+    const t = new Date(o.orderDateStr).getTime();
+    if (!isNaN(t) && t > 0) return t;
+  }
+  return Date.now();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -758,6 +795,7 @@ export async function createInvoice(orderData = {}) {
     };
   });
 
+  const nowMs = Date.now();
   const rawPayload = {
     // ── Identity ──────────────────────────────────────────
     companyId:           COMPANY_ID,
@@ -806,6 +844,7 @@ export async function createInvoice(orderData = {}) {
     items:               sanitizedItems,
 
     // ── Timestamps ────────────────────────────────────────
+    timestamp:           nowMs,
     createdAt:           serverTimestamp(),
     updatedAt:           serverTimestamp(),
     orderDateStr:        new Date().toLocaleString('en-IN', {
@@ -1040,7 +1079,7 @@ export async function getCustomerOrders(phoneNumber) {
       orders = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
-    const sorted = orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    const sorted = orders.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
     return sorted;
 
   } catch (err) {
@@ -1091,11 +1130,7 @@ export function subscribeToCustomerOrders(identifier, onUpdate) {
         return false;
       });
 
-      matched.sort((a, b) => {
-        const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.createdAt ? new Date(a.createdAt).getTime() : (a.timestamp || 0));
-        const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.createdAt ? new Date(b.createdAt).getTime() : (b.timestamp || 0));
-        return timeB - timeA;
-      });
+      matched.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
 
       console.info(`[TBC Real-Time] Streamed ${matched.length} customer order(s) for "${identifier}".`);
       onUpdate(matched);
@@ -1172,11 +1207,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
 
           return isOnlineOrder;
         })
-        .sort((a, b) => {
-          const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.createdAt ? new Date(a.createdAt).getTime() : (a.timestamp || 0));
-          const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.createdAt ? new Date(b.createdAt).getTime() : (b.timestamp || 0));
-          return timeB - timeA;
-        });
+        .sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
 
       console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s).`);
       onUpdate(orders);
