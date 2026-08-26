@@ -1247,17 +1247,26 @@
 
       const priceContainer = document.querySelector('main .flex.items-baseline');
       if (priceContainer && variant?.price) {
-        const vPrice = Number(variant.price);
-        const rawOrig = Number(variant.mrp || variant.originalPrice || product.originalPrice || product.mrp || 0);
-        const hasDiscount = rawOrig > vPrice;
-        const discountPct = hasDiscount ? Math.round(((rawOrig - vPrice) / rawOrig) * 100) : 0;
-        const formatBadge = discountPct > 0
+        const vPricing = (typeof window.getProductPricing === 'function')
+          ? window.getProductPricing(product, variant)
+          : {
+              price: Number(variant.price),
+              mrp: Number(variant.mrp || variant.originalPrice || product.originalPrice || product.mrp || 0),
+              discountPct: 0,
+              hasDiscount: false
+            };
+
+        const vPrice = vPricing.price;
+        const rawOrig = vPricing.mrp;
+        const hasDiscount = vPricing.hasDiscount;
+        const discountPct = vPricing.discountPct;
+        const formatBadge = (hasDiscount && discountPct > 0)
           ? `<span class="golden-offer-chip"><span class="material-symbols-outlined text-[13px] text-amber-300">local_fire_department</span>${discountPct}% OFFER</span>`
           : '';
 
         priceContainer.innerHTML = `
           <span class="text-3xl font-bold text-primary">₹${vPrice.toLocaleString('en-IN')}</span>
-          ${hasDiscount ? `<span class="text-base text-rose-600 font-bold line-through">MRP ₹${rawOrig.toLocaleString('en-IN')}</span>` : ''}
+          ${hasDiscount && rawOrig ? `<span class="text-base text-rose-600 font-bold line-through">MRP ₹${rawOrig.toLocaleString('en-IN')}</span>` : ''}
           ${formatBadge}
         `;
       }
@@ -1478,6 +1487,7 @@
       return '';
     }
     window.formatOfferBadge = formatOfferBadge;
+    window.getProductPricing = getProductPricing;
 
     // ── User / Profile helpers ──────────────────────────────────────────────────
     const PROFILE_KEY = 'tbc_user_profile';
@@ -1769,7 +1779,10 @@
         const titleEl = document.querySelector('main h1');
         if (titleEl) titleEl.textContent = product.name || 'Unnamed Product';
         const catLabel = document.querySelector('main span.text-xs.font-bold.text-secondary');
-        if (catLabel) catLabel.textContent = `THE BANIYAN COMPANY · ${String(product.category || 'AFFORDABLE').toUpperCase()}`;
+        if (catLabel) {
+          const catName = product.category || 'AFFORDABLE';
+          catLabel.innerHTML = `<a href="shop.html?category=${encodeURIComponent(product.category || '')}" class="hover:underline hover:text-primary transition-colors cursor-pointer">THE BANIYAN COMPANY · ${String(catName).toUpperCase()}</a>`;
+        }
 
         // Update Pricing
         const priceContainer = document.querySelector('main .flex.items-baseline');

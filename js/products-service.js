@@ -165,16 +165,28 @@ export function getProductPricing(product, selectedVariant = null) {
   if (!product) return { price: 0, mrp: null, discountPct: 0, hasDiscount: false };
 
   let price = Number(selectedVariant?.price ?? product.price ?? 0);
+  let poolVariant = null;
+
   if ((!price || price <= 0) && Array.isArray(product.variants) && product.variants.length > 0) {
     const inStock = product.variants.filter(v => getVariantStock(v) > 0);
     const pool = inStock.length ? inStock : product.variants;
-    const prices = pool.map(v => Number(v.price || v.sellingPrice || 0)).filter(p => p > 0);
-    if (prices.length) price = Math.min(...prices);
+    poolVariant = pool.reduce((minV, v) => {
+      const vp = Number(v.price || v.sellingPrice || 0);
+      if (vp <= 0) return minV;
+      if (!minV) return v;
+      return vp < Number(minV.price || minV.sellingPrice || Infinity) ? v : minV;
+    }, null);
+    if (poolVariant) {
+      price = Number(poolVariant.price || poolVariant.sellingPrice || 0);
+    }
   }
+
+  // Target variant to resolve MRP if not explicitly passed
+  const targetVariant = selectedVariant || poolVariant || (Array.isArray(product.variants) && product.variants.length > 0 ? product.variants[0] : null);
 
   // Parse raw MRP
   let rawMrp = null;
-  const rawMrpCandidate = selectedVariant?.mrp ?? selectedVariant?.originalPrice ?? product.originalPrice ?? product.mrp ?? null;
+  const rawMrpCandidate = targetVariant?.mrp ?? targetVariant?.originalPrice ?? product.originalPrice ?? product.mrp ?? null;
   if (rawMrpCandidate != null && rawMrpCandidate !== '') {
     const parsed = Number(String(rawMrpCandidate).replace(/[^0-9.-]+/g, ''));
     if (!isNaN(parsed) && parsed > price) {

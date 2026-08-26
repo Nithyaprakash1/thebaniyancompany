@@ -655,12 +655,97 @@
     }
   }
 
-  let currentCategory = 'all';
-  let currentSubTag = 'all';
-  let currentQuery = '';
+  // Match category names with strict gender separation and token matching
+  function matchCategoryName(productCat, targetCat) {
+    if (!targetCat || targetCat === 'all') return true;
+    if (!productCat) return false;
+    const p = String(productCat).toLowerCase().trim();
+    const t = String(targetCat).toLowerCase().trim();
+    if (p === t) return true;
+
+    // Strict gender separation so "Women" never matches "Men"
+    if (t === 'men' && (p === 'women' || p.includes('women'))) return false;
+    if (t === 'women' && p === 'men') return false;
+
+    // Word token matching
+    const pTokens = p.split(/[\s,/\-_]+/);
+    const tTokens = t.split(/[\s,/\-_]+/);
+    if (pTokens.includes(t) || tTokens.includes(p)) return true;
+
+    // Substring match only if not "men"
+    if (t !== 'men' && (p.includes(t) || t.includes(p))) return true;
+
+    return false;
+  }
+  window.matchCategoryName = matchCategoryName;
+
+  // Parse initial URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialCat = urlParams.get('category') || urlParams.get('cat') || 'all';
+  const initialTag = urlParams.get('tag') || 'all';
+  const initialSearch = urlParams.get('search') || urlParams.get('q') || '';
+  const focusSearch = urlParams.get('focus') === 'search';
+
+  let currentCategory = initialCat.toLowerCase().trim();
+  let currentSubTag = initialTag;
+  let currentQuery = initialSearch.toLowerCase().trim();
   let selectedTags = [];
   let selectedSizes = [];
   let selectedColors = [];
+
+  function updateCategoryPillsUI(targetCat) {
+    const filterBar = document.getElementById('shop-category-filters');
+    if (!filterBar) return;
+    const catLower = (targetCat || currentCategory || 'all').toLowerCase();
+    
+    let matched = false;
+    filterBar.querySelectorAll('.filter-btn').forEach(btn => {
+      const onclickAttr = btn.getAttribute('onclick') || '';
+      const m = onclickAttr.match(/filterCategory\(\s*['"]([^'"]+)['"]/i);
+      const btnCat = m ? m[1].toLowerCase() : btn.textContent.trim().toLowerCase();
+      
+      if (btnCat === catLower || (catLower !== 'all' && matchCategoryName(btnCat, catLower))) {
+        btn.classList.add('active');
+        matched = true;
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    if (!matched && catLower === 'all') {
+      const allBtn = filterBar.querySelector('.filter-btn');
+      if (allBtn) allBtn.classList.add('active');
+    }
+  }
+  window.updateCategoryPillsUI = updateCategoryPillsUI;
+
+  function initUrlFilters() {
+    const searchInp = document.getElementById('shop-search-input');
+    if (searchInp && currentQuery) {
+      searchInp.value = currentQuery;
+      const clearBtn = document.getElementById('search-clear-btn');
+      if (clearBtn) clearBtn.classList.remove('hidden');
+    }
+
+    if (focusSearch && searchInp) {
+      setTimeout(() => searchInp.focus(), 150);
+    }
+
+    if (currentSubTag !== 'all') {
+      document.querySelectorAll('.sub-filter-pill').forEach(b => {
+        if (b.textContent.trim().toLowerCase() === currentSubTag.toLowerCase()) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+    }
+
+    updateCategoryPillsUI(currentCategory);
+  }
+
+  document.addEventListener('DOMContentLoaded', initUrlFilters);
 
   function toggleAdvancedFilterPanel() {
     const panel = document.getElementById('advanced-filter-panel');
@@ -740,15 +825,50 @@
     const firstSubBtn = document.querySelector('.sub-filter-pill');
     if (firstSubBtn) firstSubBtn.classList.add('active');
 
+    // Clean URL
+    try {
+      const url = new URL(window.location);
+      url.searchParams.delete('category');
+      url.searchParams.delete('cat');
+      url.searchParams.delete('tag');
+      url.searchParams.delete('search');
+      url.searchParams.delete('q');
+      window.history.replaceState({}, '', url);
+    } catch(e) {}
+
     applyAdvancedFilters();
   }
 
   function filterCategory(cat, btn) {
-    currentCategory = cat;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    currentCategory = (cat || 'all').toLowerCase().trim();
+    
+    const filterBar = document.getElementById('shop-category-filters');
+    if (filterBar) {
+      filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) {
+        btn.classList.add('active');
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } else {
+        updateCategoryPillsUI(currentCategory);
+      }
+    }
+
+    // Sync URL without page refresh
+    try {
+      const url = new URL(window.location);
+      if (currentCategory === 'all') {
+        url.searchParams.delete('category');
+        url.searchParams.delete('cat');
+      } else {
+        url.searchParams.set('category', currentCategory);
+        url.searchParams.delete('cat');
+      }
+      window.history.replaceState({}, '', url);
+    } catch (e) {}
+
     applyAdvancedFilters();
   }
+  window.filterCategory = filterCategory;
 
   function applyAdvancedFilters() {
     const cards = document.querySelectorAll('.product-card');
@@ -781,7 +901,7 @@
       const colors = (card.getAttribute('data-colors') || '').toLowerCase();
       const hasDiscount = card.getAttribute('data-has-discount') === 'true';
 
-      const catOk = targetCat === 'all' || cat === targetCat || cat.includes(targetCat);
+      const catOk = targetCat === 'all' || matchCategoryName(cat, targetCat);
       const searchOk = currentQuery === '' || title.includes(currentQuery) || cat.includes(currentQuery) || tags.includes(currentQuery);
       const priceOk = price >= minPrice && price <= maxPrice;
 
@@ -801,6 +921,7 @@
 
     sortProducts();
   }
+  window.applyAdvancedFilters = applyAdvancedFilters;
 
   function sortProducts() {
     const sort = document.getElementById('sort-select')?.value || 'default';
@@ -994,25 +1115,30 @@
       subscribeToCategories((categories) => {
         if (filterBar && categories.length > 0) {
           const sortedCats = [...categories].sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
-          const pills = sortedCats.map(c =>
-            `<button onclick="filterCategory('${String(c.name).toLowerCase().replace(/'/g, "\\'").replace(/"/g, '&quot;')}', this)"
-                     class="filter-btn px-5 py-2 rounded-full text-xs font-semibold transition-all">${c.name}</button>`
-          ).join('');
           
-          const activeBtn = filterBar.querySelector('.filter-btn.active');
-          const activeCat = activeBtn ? activeBtn.getAttribute('onclick') : null;
+          let anyMatched = false;
+          const pills = sortedCats.map(c => {
+            const catName = String(c.name || '').trim();
+            const catVal = catName.toLowerCase().replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const isMatch = currentCategory !== 'all' && (typeof window.matchCategoryName === 'function' ? window.matchCategoryName(catName, currentCategory) : catName.toLowerCase() === currentCategory);
+            if (isMatch) anyMatched = true;
+            return `<button onclick="filterCategory('${catVal}', this)"
+                     class="filter-btn ${isMatch ? 'active' : ''} px-5 py-2 rounded-full text-xs font-semibold transition-all">${catName}</button>`;
+          }).join('');
 
+          const isAllActive = currentCategory === 'all' || !anyMatched;
           filterBar.innerHTML =
-            `<button onclick="filterCategory('all', this)" class="filter-btn active px-5 py-2 rounded-full text-xs font-semibold transition-all">All</button>` +
+            `<button onclick="filterCategory('all', this)" class="filter-btn ${isAllActive && currentCategory === 'all' ? 'active' : ''} px-5 py-2 rounded-full text-xs font-semibold transition-all">All</button>` +
             pills;
 
-          // Restore active filter if applicable
-          if (activeCat) {
-            const matchBtn = Array.from(filterBar.querySelectorAll('.filter-btn')).find(b => b.getAttribute('onclick') === activeCat);
-            if (matchBtn) {
-              filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-              matchBtn.classList.add('active');
-            }
+          // Scroll active category into view
+          const activeBtn = filterBar.querySelector('.filter-btn.active');
+          if (activeBtn) {
+            activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          }
+
+          if (typeof applyAdvancedFilters === 'function') {
+            applyAdvancedFilters();
           }
         }
       });
