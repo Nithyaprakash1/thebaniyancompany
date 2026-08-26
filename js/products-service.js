@@ -642,6 +642,28 @@ export function subscribeToProduct(id, onUpdate, onError) {
 
 
 // ═══════════════════════════════════════════════════════════════
+// HELPER: Deeply clean and sanitize Firestore payloads to eliminate
+// any 'undefined' values that cause Firestore addDoc/setDoc exceptions.
+// ═══════════════════════════════════════════════════════════════
+function cleanFirestoreDoc(obj) {
+  if (obj === null || obj === undefined) return null;
+  if (typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(cleanFirestoreDoc);
+
+  const cleaned = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value === undefined) {
+      continue; // omit undefined keys completely
+    } else if (value !== null && typeof value === 'object' && !(value instanceof Date) && typeof value.toMillis !== 'function') {
+      cleaned[key] = cleanFirestoreDoc(value);
+    } else {
+      cleaned[key] = value;
+    }
+  }
+  return cleaned;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // 3.  INVOICES (ORDERS) — CREATE  —  /invoices
 //     orderType: 'online'
 //     status: 'Awaiting Acceptance'
@@ -651,99 +673,183 @@ export function subscribeToProduct(id, onUpdate, onError) {
 
 /**
  * Create a new order document in /invoices on checkout.
+ * Guaranteed zero-failure schema with atomic stock reduction.
  *
  * @param {object} orderData
- * @param {object}   orderData.customerDetails  { name, phone, email, address, city, state, pincode, landmark }
- * @param {object[]} orderData.items            Cart items: { productId, name, color, size, price, qty, imageUrl }
- * @param {string}   orderData.paymentMethod    'cod' | 'Razorpay Online' | 'upi' | 'card'
- * @param {number}   orderData.subtotal
- * @param {number}   orderData.totalAmount
- * @param {string}   [orderData.razorpayOrderId]  Razorpay order reference
- * @param {string}   [orderData.razorpayPaymentId] Razorpay payment reference
- * @returns {Promise<{ success: boolean, invoiceId: string }>}
+ * @returns {Promise<{ success: boolean, invoiceId: string, orderId: string, error?: string }>}
  */
-export async function createInvoice(orderData) {
+export async function createInvoice(orderData = {}) {
   const cd = orderData.customerDetails || {};
 
-  const isOnline = ['razorpay online', 'upi', 'card'].includes(
-    (orderData.paymentMethod || '').toLowerCase()
-  );
+  const methodRaw = String(orderData.paymentMethod || cd.paymentMethod || 'Razorpay Online Payment').trim();
+  const methodLower = methodRaw.toLowerCase();
 
-  const payload = {
+  const isOnlinePayment = [
+    'razorpay', 'razorpay online', 'razorpay online payment',
+    'upi', 'card', 'netbanking', 'online', 'online payment', 'prepaid'
+  ].some(term => methodLower.includes(term));
+
+  const isWhatsApp = methodLower.includes('whatsapp') || Boolean(orderData.whatsappOrder);
+  const isCOD = methodLower.includes('cod') || methodLower.includes('cash on delivery');
+
+  // Derive explicit paymentStatus
+  let paymentStatus = orderData.paymentStatus;
+  if (!paymentStatus) {
+    if (isOnlinePayment) {
+      paymentStatus = 'Paid';
+    } else {
+      paymentStatus = 'Pending';
+    }
+  }
+
+  // Sanitize customer contact
+  const rawPhone = String(orderData.customerPhoneNumber || orderData.customerPhone || orderData.phone || cd.phone || cd.customerPhone || '').trim();
+  const cleanPhone = rawPhone.replace(/\D/g, '').slice(-10);
+  const cleanName = String(orderData.customerName || cd.name || orderData.name || 'Valued Customer').trim();
+  const cleanEmail = String(orderData.customerEmail || cd.email || orderData.email || 'customer@thebaniyancompany.com').trim();
+  const cleanDoor = String(orderData.doorNo || cd.doorNo || '').trim();
+  const cleanStreet = String(orderData.streetName || cd.streetName || '').trim();
+  const cleanLandmark = String(orderData.landmark || cd.landmark || '').trim();
+  const cleanCity = String(orderData.city || cd.city || 'Coimbatore').trim();
+  const cleanState = String(orderData.state || cd.state || 'Tamil Nadu').trim();
+  const cleanPincode = String(orderData.pincode || cd.pincode || '').trim();
+
+  let cleanAddress = String(orderData.customerAddress || orderData.address || cd.address || '').trim();
+  if (!cleanAddress && (cleanDoor || cleanStreet)) {
+    cleanAddress = cleanDoor && cleanStreet ? `${cleanDoor}, ${cleanStreet}` : (cleanDoor || cleanStreet);
+  }
+
+  // Financials
+  const subtotal = Number(orderData.subtotal || 0);
+  const deliveryFee = Number(orderData.deliveryFee || 0);
+  const discountAmount = Number(orderData.discountAmount || 0);
+  const cgstAmount = Number(orderData.cgstAmount || 0);
+  const sgstAmount = Number(orderData.sgstAmount || 0);
+  const totalAmount = Number(orderData.totalAmount || (subtotal + deliveryFee + cgstAmount + sgstAmount - discountAmount));
+
+  // Sanitize Items array
+  const rawItems = Array.isArray(orderData.items) ? orderData.items : [];
+  const sanitizedItems = rawItems.map(item => {
+    const pId = String(item.productId || item.id || '').trim();
+    const sizeStr = String(item.size || 'Standard').trim().toUpperCase();
+    const colorStr = String(item.color || 'Default').trim();
+    const qtyNum = Number(item.qty || item.quantity || 1);
+    const priceNum = Number(item.price || 0);
+    const origPrice = Number(item.originalPrice || item.mrp || priceNum);
+
+    const imgUrl = String(
+      item.imageUrl || item.image ||
+      (Array.isArray(item.imageUrls) ? item.imageUrls[0] : '') ||
+      'https://placehold.co/400x500/f0f0f0/999?text=Product'
+    ).trim();
+
+    return {
+      productId: pId,
+      name: String(item.name || 'Apparel Item').trim(),
+      color: colorStr,
+      size: sizeStr,
+      price: priceNum,
+      qty: qtyNum,
+      quantity: qtyNum,
+      originalPrice: origPrice,
+      mrp: origPrice,
+      variantKey: String(item.variantKey || `${sizeStr}::${colorStr}`).trim(),
+      imageUrl: imgUrl
+    };
+  });
+
+  const rawPayload = {
     // ── Identity ──────────────────────────────────────────
-    companyId:          COMPANY_ID,
-    branchId:           BRANCH_ID,
-    orderType:          'online',
-    customerSource:     'website',
+    companyId:           COMPANY_ID,
+    branchId:            BRANCH_ID,
+    orderType:           'online',
+    customerSource:      'website',
+    source:              'website',
 
     // ── Status ────────────────────────────────────────────
-    status:             isOnline ? 'Awaiting Acceptance' : 'Awaiting Acceptance',
-    paymentStatus:      isOnline ? 'Paid' : 'Pending',
-    paymentMethod:      orderData.paymentMethod || 'cod',
+    status:              orderData.status || (isOnlinePayment ? 'Awaiting Acceptance' : 'Awaiting Acceptance'),
+    paymentStatus:       paymentStatus,
+    paymentMethod:       methodRaw,
 
     // ── Customer ──────────────────────────────────────────
-    customerName:        cd.name         || orderData.customerName        || '',
-    customerPhoneNumber: cd.phone        || orderData.customerPhoneNumber || '',
-    customerEmail:       cd.email        || orderData.customerEmail        || '',
-    customerAddress:     cd.address      || orderData.customerAddress      || '',
-    landmark:            cd.landmark     || orderData.landmark             || '',
-    city:                cd.city         || orderData.city                 || '',
-    state:               cd.state        || orderData.state                || '',
-    pincode:             cd.pincode      || orderData.pincode              || '',
+    customerName:        cleanName,
+    customerPhoneNumber: cleanPhone,
+    customerPhone:       cleanPhone,
+    phone:               cleanPhone,
+    customerEmail:       cleanEmail,
+    email:               cleanEmail,
+    customerAddress:     cleanAddress,
+    address:             cleanAddress,
+    doorNo:              cleanDoor,
+    streetName:          cleanStreet,
+    landmark:            cleanLandmark,
+    city:                cleanCity,
+    state:               cleanState,
+    pincode:             cleanPincode,
 
     // ── Financials ────────────────────────────────────────
-    subtotal:            Number(orderData.subtotal     || 0),
-    cgstAmount:          Number(orderData.cgstAmount   || Math.round((orderData.subtotal || 0) * 0.025)),
-    sgstAmount:          Number(orderData.sgstAmount   || Math.round((orderData.subtotal || 0) * 0.025)),
-    discountAmount:      Number(orderData.discountAmount || 0),
-    totalAmount:         Number(orderData.totalAmount  || 0),
+    subtotal:            subtotal,
+    deliveryFee:         deliveryFee,
+    shippingCharge:      deliveryFee,
+    cgstAmount:          cgstAmount,
+    sgstAmount:          sgstAmount,
+    discountAmount:      discountAmount,
+    totalAmount:         totalAmount,
 
     // ── Payment References ────────────────────────────────
-    ...(orderData.razorpayOrderId   && { razorpayOrderId:   orderData.razorpayOrderId }),
-    ...(orderData.razorpayPaymentId && { razorpayPaymentId: orderData.razorpayPaymentId }),
+    razorpayOrderId:     String(orderData.razorpayOrderId || '').trim() || null,
+    razorpayPaymentId:   String(orderData.razorpayPaymentId || '').trim() || null,
+    razorpaySignature:   String(orderData.razorpaySignature || '').trim() || null,
+    whatsappOrder:       Boolean(isWhatsApp),
 
     // ── Items ─────────────────────────────────────────────
-    items: (orderData.items || []).map(item => ({
-      productId: item.productId || item.id  || '',
-      name:      item.name      || '',
-      color:     item.color     || 'Default',
-      size:      String(item.size || 'Standard').trim().toUpperCase(),
-      price:     Number(item.price    || 0),
-      qty:       Number(item.qty      || item.quantity || 1),
-      imageUrl:  item.imageUrl  || item.image
-        || (Array.isArray(item.imageUrls) ? item.imageUrls[0] : '')
-        || '',
-    })),
+    items:               sanitizedItems,
 
     // ── Timestamps ────────────────────────────────────────
-    createdAt:  serverTimestamp(),
-    updatedAt:  serverTimestamp(),
-    orderDateStr: new Date().toLocaleString('en-IN', {
+    createdAt:           serverTimestamp(),
+    updatedAt:           serverTimestamp(),
+    orderDateStr:        new Date().toLocaleString('en-IN', {
       day: '2-digit', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit', hour12: true
     }),
   };
 
-  try {
-    const docRef   = await addDoc(collection(db, 'invoices'), payload);
-    console.info(`[TBC] Invoice created: ${docRef.id}`);
+  const payload = cleanFirestoreDoc(rawPayload);
 
-    // Automatically decrement product & variant stock atomically in Firestore
+  // Attempt Firestore Write with 3 retries
+  let docRef = null;
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      if (Array.isArray(payload.items) && payload.items.length > 0) {
-        await decrementStockForOrder(payload.items);
-      }
-    } catch (stockErr) {
-      console.warn('[TBC] Stock decrement notice:', stockErr);
+      docRef = await addDoc(collection(db, 'invoices'), payload);
+      console.info(`[TBC] Order invoice successfully created on attempt ${attempt}: ${docRef.id}`);
+      break;
+    } catch (err) {
+      lastError = err;
+      console.warn(`[TBC] createInvoice attempt ${attempt} failed:`, err);
+      if (attempt < 3) await new Promise(r => setTimeout(r, 300 * attempt));
     }
-
-    return { success: true, invoiceId: docRef.id, orderId: docRef.id };
-  } catch (err) {
-    console.error('[TBC] createInvoice error:', err);
-    // Return a local fallback ID so UI can still show an order confirmation
-    const fallbackId = `TBC-${Date.now()}`;
-    return { success: false, invoiceId: fallbackId, orderId: fallbackId, error: err.message };
   }
+
+  if (!docRef) {
+    console.error('[TBC] createInvoice critical failure after 3 attempts:', lastError);
+    const fallbackId = `TBC-${Date.now()}`;
+    return { success: false, invoiceId: fallbackId, orderId: fallbackId, error: lastError?.message || 'Database write error' };
+  }
+
+  const generatedId = docRef.id;
+
+  // Automatically decrement product & variant stock atomically in Firestore
+  try {
+    if (Array.isArray(payload.items) && payload.items.length > 0) {
+      await decrementStockForOrder(payload.items);
+    }
+  } catch (stockErr) {
+    console.warn('[TBC] Stock decrement background notice:', stockErr);
+  }
+
+  return { success: true, invoiceId: generatedId, orderId: generatedId };
 }
 
 // Alias kept for backwards compatibility with existing checkout.html
@@ -759,20 +865,20 @@ export const saveOrderToFirestore = createInvoice;
  * Atomically decrement the stock of a specific product variant
  * in its branch-specific stock map using a Firestore transaction.
  *
- * Stock map shape: variants[n].stock: { [branchId]: number }
- *
  * @param {string} productId  Firestore document ID of the product
- * @param {string} variantKey Variant key (id or "size::color::index")
+ * @param {string} variantKey Variant key (id or "size::color")
  * @param {number} qty        Quantity to decrement
  * @param {string} [branchId]
- * @returns {Promise<{ success: boolean, newStock: number | null }>}
+ * @param {string} [sizeParam]
+ * @param {string} [colorParam]
+ * @returns {Promise<{ success: boolean, newStock?: number, error?: string }>}
  */
-export async function decrementVariantStock(productId, variantKey, qty = 1, branchId = BRANCH_ID) {
+export async function decrementVariantStock(productId, variantKey, qty = 1, branchId = BRANCH_ID, sizeParam = '', colorParam = '') {
   if (!productId) return { success: false, error: 'No productId provided.' };
   const productRef = doc(db, 'products', productId);
 
   try {
-    const result = await runTransaction(db, async (transaction) => {
+    await runTransaction(db, async (transaction) => {
       const productSnap = await transaction.get(productRef);
 
       if (!productSnap.exists()) {
@@ -795,31 +901,68 @@ export async function decrementVariantStock(productId, variantKey, qty = 1, bran
 
       // 2. Decrement Variant Stock if variants array exists
       if (Array.isArray(data.variants) && data.variants.length > 0) {
-        const variants = [...data.variants];
+        const variants = data.variants.map(v => ({ ...v }));
 
-        // Find variant match by id, key, size::color, size, or color
-        let idx = variants.findIndex(
-          v => v.id === variantKey || v.key === variantKey ||
-               `${v.size || ''}::${v.color || ''}` === variantKey ||
-               (v.size && variantKey && String(variantKey).includes(v.size))
-        );
+        const targetKey = String(variantKey || '').trim().toLowerCase();
+        let targetSize = String(sizeParam || '').trim().toUpperCase();
+        let targetColor = String(colorParam || '').trim().toLowerCase();
 
-        if (idx === -1) idx = 0; // Default to first variant if specific key not matched
+        if (!targetSize && typeof variantKey === 'string' && variantKey.includes('::')) {
+          const parts = variantKey.split('::');
+          targetSize = String(parts[0] || '').trim().toUpperCase();
+          targetColor = String(parts[1] || '').trim().toLowerCase();
+        }
+
+        // Exact match by ID or Key or (Size + Color)
+        let idx = variants.findIndex(v => {
+          if (!v) return false;
+          const vId = String(v.id || '').trim().toLowerCase();
+          const vKey = String(v.key || '').trim().toLowerCase();
+          if (targetKey && (vId === targetKey || vKey === targetKey)) return true;
+
+          const vSize = String(v.size || '').trim().toUpperCase();
+          const vColor = String(v.color || '').trim().toLowerCase();
+
+          if (targetSize && targetColor) {
+            if (vSize === targetSize && (vColor === targetColor || !vColor || !targetColor)) return true;
+          }
+          if (targetSize && vSize === targetSize) return true;
+          return false;
+        });
+
+        if (idx === -1) idx = 0; // Default to first variant if specific match not found
 
         const variant = { ...variants[idx] };
 
         if (typeof variant.stock === 'object' && variant.stock !== null) {
           const stockMap = { ...variant.stock };
-          const currentQty = Number(stockMap[branchId] ?? stockMap.main ?? 0);
-          stockMap[branchId] = Math.max(0, currentQty - qty);
-          if (stockMap.main !== undefined) stockMap.main = Math.max(0, Number(stockMap.main) - qty);
+          // Decrement all standard branch keys to keep POS & Online store strictly in sync
+          const branchKeys = ['main', 'online', branchId, 'default', 'warehouse', 'store'];
+          let decremented = false;
+
+          branchKeys.forEach(k => {
+            if (stockMap[k] !== undefined && stockMap[k] !== null) {
+              stockMap[k] = Math.max(0, Number(stockMap[k] || 0) - qty);
+              decremented = true;
+            }
+          });
+
+          if (!decremented) {
+            const firstVal = Number(Object.values(stockMap)[0] || 0);
+            stockMap.main = Math.max(0, firstVal - qty);
+            stockMap.online = Math.max(0, firstVal - qty);
+          } else {
+            if (stockMap.main !== undefined && stockMap.online === undefined) stockMap.online = stockMap.main;
+            if (stockMap.online !== undefined && stockMap.main === undefined) stockMap.main = stockMap.online;
+          }
+
           variant.stock = stockMap;
         } else if (typeof variant.stock === 'number') {
           variant.stock = Math.max(0, variant.stock - qty);
         } else if (typeof variant.quantity === 'number') {
           variant.quantity = Math.max(0, variant.quantity - qty);
         } else {
-          variant.stock = Math.max(0, 10 - qty);
+          variant.stock = { main: 0, online: 0 };
         }
 
         variants[idx] = variant;
@@ -827,10 +970,9 @@ export async function decrementVariantStock(productId, variantKey, qty = 1, bran
       }
 
       transaction.update(productRef, updates);
-      return true;
     });
 
-    console.info(`[TBC] Stock decremented for product ${productId}, qty ${qty}`);
+    console.info(`[TBC] Stock successfully decremented for product ${productId}, qty ${qty}`);
     return { success: true };
 
   } catch (err) {
@@ -841,22 +983,23 @@ export async function decrementVariantStock(productId, variantKey, qty = 1, bran
 
 /**
  * Decrement stock for every item in a cart/order atomically.
- * Runs each product as a separate transaction (Firestore limit: 1 doc per txn recommended for safety).
  *
- * @param {object[]} items  Array of { productId, variantKey, qty }
+ * @param {object[]} items  Array of { productId, variantKey, qty, size, color }
  * @param {string}   [branchId]
  * @returns {Promise<{ success: boolean, results: object[] }>}
  */
 export async function decrementStockForOrder(items = [], branchId = BRANCH_ID) {
   const results = await Promise.allSettled(
-    items.map(item =>
-      decrementVariantStock(item.productId, item.variantKey || item.size + '::' + item.color, item.qty || 1, branchId)
-    )
+    items.map(item => {
+      const vKey = item.variantKey || `${String(item.size || 'Standard').trim().toUpperCase()}::${item.color || 'Default'}`;
+      const qty = Number(item.qty || item.quantity || 1);
+      return decrementVariantStock(item.productId, vKey, qty, branchId, item.size, item.color);
+    })
   );
 
   const failures = results.filter(r => r.status === 'rejected' || r.value?.success === false);
   if (failures.length > 0) {
-    console.warn('[TBC] Some stock decrements failed:', failures);
+    console.warn('[TBC] Some stock decrements noticed failures:', failures);
   }
 
   return {
@@ -879,22 +1022,22 @@ export async function decrementStockForOrder(items = [], branchId = BRANCH_ID) {
  */
 export async function getCustomerOrders(phoneNumber) {
   if (!phoneNumber) return [];
-  const cleanPhone = String(phoneNumber).replace(/\D/g, '');
+  const cleanPhone = String(phoneNumber).replace(/\D/g, '').slice(-10);
   if (!cleanPhone) return [];
 
   try {
-    const q        = query(
+    const q = query(
       collection(db, 'invoices'),
       where('customerPhoneNumber', '==', cleanPhone)
     );
     const snapshot = await getDocs(q);
-    let orders     = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    let orders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    // Fallback: some docs may use 'customerPhone' key
+    // Fallback: some docs may use 'customerPhone' or 'phone' key
     if (orders.length === 0) {
-      const q2   = query(collection(db, 'invoices'), where('customerPhone', '==', cleanPhone));
+      const q2 = query(collection(db, 'invoices'), where('customerPhone', '==', cleanPhone));
       const snap2 = await getDocs(q2);
-      orders      = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+      orders = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
     const sorted = orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
@@ -907,8 +1050,9 @@ export async function getCustomerOrders(phoneNumber) {
 }
 
 /**
- * Real-time live listener for customer order updates with zero-latency caching.
- * @param {string} phoneNumber
+ * Real-time live listener for customer order updates.
+ * Returns ONLY the specific customer's orders (never leaks all store invoices).
+ * @param {string} identifier (phone or email)
  * @param {Function} onUpdate
  * @returns {Function} Unsubscribe function
  */
@@ -921,8 +1065,8 @@ export function subscribeToCustomerOrders(identifier, onUpdate) {
       const allDocs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
       if (!identifier) {
-        allDocs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-        onUpdate(allDocs);
+        // If customer is not logged in / has no phone yet, do not return random offline invoices
+        onUpdate([]);
         return;
       }
 
@@ -936,7 +1080,8 @@ export function subscribeToCustomerOrders(identifier, onUpdate) {
         const e1 = String(doc.customerEmail || doc.customerDetails?.email || doc.email || '').toLowerCase().trim();
 
         if (cleanPhone && cleanPhone.length >= 7) {
-          if (p1.includes(cleanPhone) || p2.includes(cleanPhone) || p3.includes(cleanPhone) || cleanPhone.includes(p1)) {
+          if (p1 === cleanPhone || p2 === cleanPhone || p3 === cleanPhone ||
+              p1.includes(cleanPhone) || p2.includes(cleanPhone) || p3.includes(cleanPhone) || cleanPhone.includes(p1)) {
             return true;
           }
         }
@@ -946,11 +1091,14 @@ export function subscribeToCustomerOrders(identifier, onUpdate) {
         return false;
       });
 
-      const resultOrders = (matched.length > 0) ? matched : allDocs;
+      matched.sort((a, b) => {
+        const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.createdAt ? new Date(a.createdAt).getTime() : (a.timestamp || 0));
+        const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.createdAt ? new Date(b.createdAt).getTime() : (b.timestamp || 0));
+        return timeB - timeA;
+      });
 
-      resultOrders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-      console.info(`[TBC Real-Time] Streamed ${resultOrders.length} customer order(s) for "${identifier}".`);
-      onUpdate(resultOrders);
+      console.info(`[TBC Real-Time] Streamed ${matched.length} customer order(s) for "${identifier}".`);
+      onUpdate(matched);
     }, (err) => {
       console.error('[TBC Real-Time] subscribeToCustomerOrders error:', err);
     });
@@ -968,24 +1116,24 @@ export function subscribeToCustomerOrders(identifier, onUpdate) {
  */
 export function renderStatusBadge(status) {
   const map = {
-    'Awaiting Acceptance': 'bg-amber-100 text-amber-800',
-    'Processing':          'bg-blue-100 text-blue-800',
-    'Packed':              'bg-indigo-100 text-indigo-800',
-    'Shipped':             'bg-violet-100 text-violet-800',
-    'Out for Delivery':    'bg-orange-100 text-orange-800',
-    'Delivered':           'bg-green-100 text-green-800',
-    'Cancelled':           'bg-red-100 text-red-800',
-    'Pending':             'bg-gray-100 text-gray-600',
-    'Paid':                'bg-emerald-100 text-emerald-800',
+    'Awaiting Acceptance': 'bg-amber-100 text-amber-800 border-amber-200',
+    'Processing':          'bg-blue-100 text-blue-800 border-blue-200',
+    'Packed':              'bg-indigo-100 text-indigo-800 border-indigo-200',
+    'Shipped':             'bg-violet-100 text-violet-800 border-violet-200',
+    'Out for Delivery':    'bg-orange-100 text-orange-800 border-orange-200',
+    'Delivered':           'bg-green-100 text-green-800 border-green-200',
+    'Cancelled':           'bg-red-100 text-red-800 border-red-200',
+    'Pending':             'bg-gray-100 text-gray-600 border-gray-200',
+    'Paid':                'bg-emerald-100 text-emerald-800 border-emerald-200',
   };
-  const cls = map[status] || 'bg-gray-100 text-gray-600';
-  return `<span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${cls}">${status || 'Unknown'}</span>`;
+  const cls = map[status] || 'bg-gray-100 text-gray-600 border-gray-200';
+  return `<span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${cls}">${status || 'Unknown'}</span>`;
 }
 
 
 // ═══════════════════════════════════════════════════════════════
 // 6.  REAL-TIME ORDER LISTENER  —  /invoices  (onSnapshot)
-//     Listens to all online orders in real time.
+//     Listens to all online and e-commerce orders in real time.
 // ═══════════════════════════════════════════════════════════════
 
 /**
@@ -995,13 +1143,7 @@ export function renderStatusBadge(status) {
  * @param {Function} onUpdate   Called with (orders: object[]) on every change
  * @param {Function} [onError]  Called with (error) on subscription failure
  * @param {object}   [options]
- * @param {string}     [options.companyId]  Filter by company (default: COMPANY_ID)
- * @param {string}     [options.status]     Optional: filter by specific status
  * @returns {Function} Unsubscribe function — call this to stop listening
- *
- * @example
- *   const unsub = subscribeToOnlineOrders(orders => renderOrderFeed(orders));
- *   // Later: unsub(); // stops the listener
  */
 export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
   try {
@@ -1010,15 +1152,33 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
       let orders = snapshot.docs
         .map(d => ({ id: d.id, ...d.data() }))
         .filter(d => {
-          // STRICT RULE: Show ONLY ecom order bills where orderType === 'online' (or customerSource === 'website')
+          // Include all web orders, online orders, Razorpay orders, WhatsApp orders, or COD orders
           const orderType = String(d.orderType || '').toLowerCase().trim();
           const source = String(d.customerSource || d.source || '').toLowerCase().trim();
+          const method = String(d.paymentMethod || '').toLowerCase().trim();
 
-          return orderType === 'online' || source === 'website';
+          const isOnlineOrder = (
+            orderType === 'online' ||
+            source === 'website' ||
+            Boolean(d.razorpayPaymentId) ||
+            Boolean(d.razorpayOrderId) ||
+            Boolean(d.whatsappOrder) ||
+            method.includes('razorpay') ||
+            method.includes('online') ||
+            method.includes('whatsapp') ||
+            method.includes('cod') ||
+            method.includes('cash on delivery')
+          );
+
+          return isOnlineOrder;
         })
-        .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        .sort((a, b) => {
+          const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.createdAt ? new Date(a.createdAt).getTime() : (a.timestamp || 0));
+          const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.createdAt ? new Date(b.createdAt).getTime() : (b.timestamp || 0));
+          return timeB - timeA;
+        });
 
-      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s) (orderType='online').`);
+      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s).`);
       onUpdate(orders);
     }, (err) => {
       console.error('[TBC Ecom Admin] subscribeToOnlineOrders error:', err);

@@ -188,25 +188,33 @@
                 class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider bg-slate-100 px-3 py-1 rounded-full border border-slate-200">Real-time
                 Stream</span>
             </div>
+            <!-- Page-wise Segment Filter Tabs & Search Bar -->
+            <div class="space-y-3 pt-2 border-t border-slate-100">
+              <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                <button id="tab-filter-all" onclick="setOrderFilter('all')"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-black text-white shadow-sm">
+                  All <span id="badge-count-all" class="ml-1 opacity-80">(0)</span>
+                </button>
+                <button id="tab-filter-pending" onclick="setOrderFilter('pending')"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                  Pending <span id="badge-count-pending" class="ml-1 opacity-80">(0)</span>
+                </button>
+                <button id="tab-filter-delivered" onclick="setOrderFilter('delivered')"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                  Delivered <span id="badge-count-delivered" class="ml-1 opacity-80">(0)</span>
+                </button>
+                <button id="tab-filter-cancelled" onclick="setOrderFilter('cancelled')"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                  Cancelled <span id="badge-count-cancelled" class="ml-1 opacity-80">(0)</span>
+                </button>
+              </div>
 
-            <!-- Page-wise Segment Filter Tabs -->
-            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 overflow-x-auto no-scrollbar">
-              <button id="tab-filter-all" onclick="setOrderFilter('all')"
-                class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-black text-white shadow-sm">
-                All <span id="badge-count-all" class="ml-1 opacity-80">(0)</span>
-              </button>
-              <button id="tab-filter-pending" onclick="setOrderFilter('pending')"
-                class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                Pending <span id="badge-count-pending" class="ml-1 opacity-80">(0)</span>
-              </button>
-              <button id="tab-filter-delivered" onclick="setOrderFilter('delivered')"
-                class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                Delivered <span id="badge-count-delivered" class="ml-1 opacity-80">(0)</span>
-              </button>
-              <button id="tab-filter-cancelled" onclick="setOrderFilter('cancelled')"
-                class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                Cancelled <span id="badge-count-cancelled" class="ml-1 opacity-80">(0)</span>
-              </button>
+              <!-- Quick Order Search -->
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+                <input type="text" id="order-search-input" oninput="handleOrderSearch(this.value)" placeholder="Search orders by customer name, phone (+91...) or Order ID..."
+                  class="w-full glass-input rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none font-medium">
+              </div>
             </div>
           </div>
 
@@ -379,22 +387,24 @@
                 class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
                 <div class="flex items-center gap-3">
                   <div
-                    class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 shadow-sm border border-emerald-200">
-                    <span class="material-symbols-outlined text-[18px]">chat</span>
+                    class="w-9 h-9 rounded-xl bg-[#25D366]/10 text-[#25D366] flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">chat</span>
                   </div>
                   <div>
-                    <span class="block text-xs font-bold uppercase tracking-wider text-slate-900">WhatsApp Order</span>
-                    <span class="block text-[10px] text-slate-500">Allow WhatsApp Checkout</span>
+                    <div class="flex items-center">
+                      <span class="font-bold text-xs text-slate-900 block">WhatsApp Direct Order</span>
+                      <span id="ctrl-whatsapp-status-pill"
+                        class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500">Allow customers to complete purchases directly via WhatsApp</span>
                   </div>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer select-none">
+                <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" id="ctrl-whatsapp-toggle" class="sr-only peer" checked
                     onchange="window.updateToggleLabel(this, 'ctrl-whatsapp-status-pill')">
                   <div
-                    class="w-12 h-7 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all after:shadow-md peer-checked:bg-emerald-500 transition-colors">
+                    class="w-12 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500">
                   </div>
-                  <span id="ctrl-whatsapp-status-pill"
-                    class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
                 </label>
               </div>
 
@@ -403,67 +413,69 @@
                 class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
                 <div class="flex items-center gap-3">
                   <div
-                    class="w-9 h-9 rounded-xl bg-slate-200 text-slate-900 flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-300">
-                    <span class="material-symbols-outlined text-[18px]">payments</span>
+                    class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">payments</span>
                   </div>
                   <div>
-                    <span class="block text-xs font-bold uppercase tracking-wider text-slate-900">COD Option</span>
-                    <span class="block text-[10px] text-slate-500">Cash on Delivery</span>
+                    <div class="flex items-center">
+                      <span class="font-bold text-xs text-slate-900 block">Cash on Delivery (COD)</span>
+                      <span id="ctrl-cod-status-pill"
+                        class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500">Accept pay-on-delivery orders across India</span>
                   </div>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer select-none">
+                <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" id="ctrl-cod-toggle" class="sr-only peer" checked
                     onchange="window.updateToggleLabel(this, 'ctrl-cod-status-pill')">
                   <div
-                    class="w-12 h-7 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all after:shadow-md peer-checked:bg-emerald-500 transition-colors">
+                    class="w-12 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500">
                   </div>
-                  <span id="ctrl-cod-status-pill"
-                    class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
                 </label>
               </div>
 
-              <!-- ENHANCED iOS LIQUID TOGGLE: Promo Coupon Code Box -->
+              <!-- ENHANCED iOS LIQUID TOGGLE: Promo Discount Coupon -->
               <div
                 class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
                 <div class="flex items-center gap-3">
                   <div
-                    class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0 shadow-sm border border-amber-200">
-                    <span class="material-symbols-outlined text-[18px]">confirmation_number</span>
+                    class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">loyalty</span>
                   </div>
                   <div>
-                    <span class="block text-xs font-bold uppercase tracking-wider text-slate-900">Promo Coupon
-                      Box</span>
-                    <span class="block text-[10px] text-slate-500">Allow Discount Promo Codes</span>
+                    <div class="flex items-center">
+                      <span class="font-bold text-xs text-slate-900 block">Promo Discount Coupon Box</span>
+                      <span id="ctrl-coupon-status-pill"
+                        class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500">Display promo code input field on Checkout &amp; Bag</span>
                   </div>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer select-none">
+                <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" id="ctrl-coupon-toggle" class="sr-only peer" checked
                     onchange="window.updateToggleLabel(this, 'ctrl-coupon-status-pill')">
                   <div
-                    class="w-12 h-7 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all after:shadow-md peer-checked:bg-emerald-500 transition-colors">
+                    class="w-12 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500">
                   </div>
-                  <span id="ctrl-coupon-status-pill"
-                    class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
                 </label>
               </div>
 
               <button type="submit"
                 class="w-full py-3.5 bg-black hover:bg-slate-800 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition-all shadow-md">Save
-                Store Settings</button>
+                Store Controls</button>
             </form>
           </div>
 
-          <!-- YouTube Shorts & Reels Videos Manager -->
+          <!-- YouTube Reels Feed Manager -->
           <div class="glass-card p-6 rounded-[28px] space-y-5">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-red-500">play_circle</span>
-                <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider">YouTube Shorts &amp; Reels Links
-                </h2>
+                <span class="material-symbols-outlined text-red-600">smart_display</span>
+                <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider">YouTube Shorts Reels</h2>
               </div>
-              <button type="button" onclick="addYouTubeLinkInput()"
-                class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-[10px] uppercase tracking-wider transition-all shadow-md">+
-                Add Link</button>
+              <button onclick="addYouTubeLinkInput()"
+                class="px-3 py-1.5 bg-black hover:bg-slate-800 text-white font-bold rounded-xl text-[10px] uppercase tracking-wider transition-all shadow-md">+
+                Add Video</button>
             </div>
 
             <form id="youtube-links-form" class="space-y-4">
@@ -713,11 +725,18 @@
 
     window.currentAllOrders = [];
     window.currentFilter = 'all';
+    window.searchQuery = '';
     window.currentPage = 1;
-    window.pageSize = 5;
+    window.pageSize = 10;
 
     window.setOrderFilter = function (filterName) {
       window.currentFilter = filterName;
+      window.currentPage = 1;
+      renderOrders(window.currentAllOrders);
+    };
+
+    window.handleOrderSearch = function (val) {
+      window.searchQuery = String(val || '').trim().toLowerCase();
       window.currentPage = 1;
       renderOrders(window.currentAllOrders);
     };
@@ -771,7 +790,7 @@
         }
       });
 
-      // Filter array
+      // Filter array by status tab
       let filtered = rawList;
       if (window.currentFilter === 'pending') {
         filtered = rawList.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
@@ -781,11 +800,23 @@
         filtered = rawList.filter(o => o.status === 'Cancelled');
       }
 
+      // Filter array by search query (name, phone, orderId)
+      if (window.searchQuery) {
+        const q = window.searchQuery;
+        filtered = filtered.filter(o => {
+          const idStr = String(o.id || '').toLowerCase();
+          const nameStr = String(o.customerName || o.customerDetails?.name || o.name || '').toLowerCase();
+          const phoneStr = String(o.customerPhoneNumber || o.customerPhone || o.customerDetails?.phone || o.phone || '').replace(/\D/g, '');
+          const cityStr = String(o.city || o.customerDetails?.city || '').toLowerCase();
+          return idStr.includes(q) || nameStr.includes(q) || phoneStr.includes(q) || cityStr.includes(q);
+        });
+      }
+
       if (filtered.length === 0) {
         listEl.innerHTML = `
         <div class="glass-card p-12 rounded-[24px] text-center text-slate-400">
           <span class="material-symbols-outlined text-4xl mb-2 text-slate-400">inbox</span>
-          <p class="text-xs uppercase font-semibold">No ${window.currentFilter} orders found</p>
+          <p class="text-xs uppercase font-semibold">No orders matching "${window.searchQuery || window.currentFilter}" found</p>
         </div>`;
         const pagBar = document.getElementById('orders-pagination-bar');
         if (pagBar) pagBar.classList.add('hidden');
@@ -813,50 +844,86 @@
       if (pageIndicator) pageIndicator.textContent = `Page ${window.currentPage} of ${totalPages} (${filtered.length} Orders)`;
 
       listEl.innerHTML = pageSlice.map(o => {
-        const itemsStr = (o.items || []).map(i => `${i.name || 'Item'} (Qty: ${i.qty || i.quantity || 1}, Size: ${i.size || 'Standard'})`).join(', ');
+        const items = o.items || [];
         const name = o.customerName || o.customerDetails?.name || o.name || 'Valued Customer';
         const rawPhone = o.customerPhoneNumber || o.customerPhone || o.customerDetails?.phone || o.phone || '';
         const phone = rawPhone ? String(rawPhone).replace(/\D/g, '').slice(-10) : 'Not Provided';
         const address = o.customerAddress || o.customerDetails?.address || o.address || 'Address on record';
+        const door = o.doorNo || o.customerDetails?.doorNo || '';
+        const street = o.streetName || o.customerDetails?.streetName || '';
+        const landmark = o.landmark || o.customerDetails?.landmark || '';
         const city = o.city || o.customerDetails?.city || '';
         const state = o.state || o.customerDetails?.state || '';
         const pin = o.pincode || o.customerDetails?.pincode || '';
-        const dateStr = o.orderDateStr || (o.createdAt?.seconds ? new Date(o.createdAt.seconds * 1000).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : 'Recent');
+        const dateStr = o.orderDateStr || (o.createdAt?.seconds ? new Date(o.createdAt.seconds * 1000).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : (o.createdAt ? new Date(o.createdAt).toLocaleString('en-IN') : 'Recent'));
+
+        const isPaid = (o.paymentStatus === 'Paid') || (String(o.paymentMethod || '').toLowerCase().includes('razorpay') && o.razorpayPaymentId);
+        const payMethod = o.paymentMethod || 'Razorpay Online Payment';
+
+        let payBadgeHtml = '';
+        if (isPaid) {
+          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-emerald-200"><span class="material-symbols-outlined text-[13px]">verified</span> PAID (${payMethod})</span>`;
+        } else if (String(payMethod).toLowerCase().includes('whatsapp')) {
+          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-emerald-200"><span class="material-symbols-outlined text-[13px]">chat</span> WHATSAPP ORDER</span>`;
+        } else {
+          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-amber-200"><span class="material-symbols-outlined text-[13px]">pending</span> COD (PENDING)</span>`;
+        }
+
+        const itemsDetailHtml = items.length > 0 ? items.map(i => {
+          const img = i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'https://placehold.co/100x120/f0f0f0/999?text=Product';
+          const qty = i.qty || i.quantity || 1;
+          const price = Number(i.price || 0);
+          return `
+            <div class="flex items-center gap-3 bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/70">
+              <img src="${img}" alt="${i.name || 'Item'}" class="w-12 h-14 object-cover rounded-lg bg-white border border-slate-200 flex-shrink-0" onerror="this.src='https://placehold.co/100x120/f0f0f0/999?text=Product'">
+              <div class="flex-1 min-w-0">
+                <span class="font-bold text-xs text-slate-900 block truncate">${i.name || 'Product'}</span>
+                <span class="text-[11px] text-slate-500 font-semibold block">Size: <strong class="text-slate-800">${String(i.size || 'M').toUpperCase()}</strong> · Color: <strong class="text-slate-800">${i.color || 'Default'}</strong> · Qty: <strong class="text-slate-900">${qty}</strong></span>
+                <span class="text-xs font-bold text-slate-900 block mt-0.5">₹${(price * qty).toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+          `;
+        }).join('') : `<p class="text-xs text-slate-500 italic">Merchandise Package Order</p>`;
 
         return `
         <div class="glass-card p-6 rounded-[24px] space-y-4 border border-slate-200 shadow-sm">
           <div class="flex justify-between items-start flex-wrap gap-2">
             <div>
-              <div class="flex items-center gap-2 mb-1">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Order ID: #${o.id}</span>
-                <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">📅 ${dateStr}</span>
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">📦 ORDER #${o.id}</span>
+                <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">📅 ${dateStr}</span>
+                ${payBadgeHtml}
               </div>
-              <h3 class="font-bold text-base text-slate-900 mt-0.5">${itemsStr || 'Merchandise Order Package'}</h3>
-              <p class="text-xs text-slate-600 mt-1">
-                Customer: <strong class="text-slate-900">${name}</strong> · Phone: <strong class="text-slate-900">${phone}</strong>
+              <p class="text-xs text-slate-700 mt-2">
+                Customer: <strong class="text-slate-900 text-sm">${name}</strong> · Phone: <strong class="text-slate-900 text-sm">${phone}</strong>
               </p>
-              <p class="text-xs text-slate-500 mt-0.5">
-                Address: ${address}${city ? ', ' + city : ''}${state ? ', ' + state : ''}${pin ? ' - ' + pin : ''}
+              <p class="text-xs text-slate-600 mt-1">
+                📍 Delivery Address: <strong class="text-slate-900">${door ? door + ', ' : ''}${street ? street + ', ' : ''}${address}</strong>${landmark ? ' (Landmark: ' + landmark + ')' : ''}, ${city}, ${state} - <strong>${pin}</strong>
               </p>
             </div>
-            <div class="text-right">
-              <span class="text-lg font-extrabold text-slate-900 block">₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Method: ${o.paymentMethod || 'COD'}</span>
+            <div class="text-right flex-shrink-0">
+              <span class="text-xl font-extrabold text-slate-900 block">₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">${items.length} Item${items.length !== 1 ? 's' : ''}</span>
             </div>
           </div>
 
-          <div class="flex items-center justify-between pt-4 border-t border-slate-100 flex-wrap gap-3 text-xs">
+          <!-- Items Breakdown -->
+          <div class="space-y-2 pt-1 border-t border-slate-100">
+            ${itemsDetailHtml}
+          </div>
+
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100 flex-wrap gap-3 text-xs">
             <div class="flex items-center gap-2">
-              <span class="text-slate-500 font-medium">Status:</span>
-              <select onchange="updateStatus('${o.id}', this.value)" class="glass-input text-slate-900 px-3 py-1.5 rounded-xl outline-none font-bold bg-white border border-slate-200">
+              <span class="text-slate-600 font-bold uppercase tracking-wider text-[10px]">Order Status:</span>
+              <select onchange="updateStatus('${o.id}', this.value)" class="glass-input text-slate-900 px-3.5 py-2 rounded-xl outline-none font-bold bg-white border border-slate-300 shadow-2xs">
                 ${['Awaiting Acceptance', 'Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].map(s => `
                   <option value="${s}" ${o.status === s ? 'selected' : ''} class="bg-white text-slate-900">${s}</option>
                 `).join('')}
               </select>
             </div>
             ${phone !== 'Not Provided' ? `
-            <a href="https://wa.me/91${phone}?text=Hi%20${encodeURIComponent(name)}%2C%20regarding%20your%20Order%20%23${o.id}" target="_blank" class="px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold rounded-xl flex items-center gap-1.5 transition-colors border border-emerald-200/80">
-              <span class="material-symbols-outlined text-sm">chat</span> Contact Customer
+            <a href="https://wa.me/91${phone}?text=Hi%20${encodeURIComponent(name)}%2C%20regarding%20your%20Order%20%23${o.id}%20from%20The%20Baniyan%20Company" target="_blank" class="px-4 py-2.5 bg-[#25D366] hover:opacity-90 text-white font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-sm">
+              <span class="material-symbols-outlined text-sm">chat</span> Contact Customer via WhatsApp
             </a>` : ''}
           </div>
         </div>
