@@ -68,19 +68,33 @@ export function formatMoney(value) {
 }
 
 /**
- * Safely extract a stock count from a variant's stock map.
- * Supports both { stock: number } and { stock: { [branchId]: number } } shapes.
+ * Safely extract a numeric stock count from a variant's stock map or attributes.
+ * Supports numbers, numeric strings, and multi-branch objects.
  * @param {object} variant
  * @param {string} [branchId]
  * @returns {number}
  */
 export function getVariantStock(variant, branchId = BRANCH_ID) {
-  if (!variant?.stock) return 0;
+  if (!variant) return 0;
   if (typeof variant.stock === 'number') return Math.max(0, variant.stock);
-  if (typeof variant.stock === 'object') {
-    // Prefer branch-specific count, fallback to 'main'
-    return Math.max(0, Number(variant.stock[branchId] ?? variant.stock.main ?? 0));
+  if (typeof variant.stock === 'string') {
+    const n = Number(variant.stock.replace(/[^0-9.-]+/g, ''));
+    return !isNaN(n) ? Math.max(0, n) : 0;
   }
+  if (typeof variant.stock === 'object' && variant.stock !== null) {
+    const candidateKeys = [branchId, 'main', 'online', 'tbc_main', 'default', 'warehouse', 'store'];
+    for (const key of candidateKeys) {
+      if (variant.stock[key] !== undefined && variant.stock[key] !== null) {
+        const val = Number(String(variant.stock[key]).replace(/[^0-9.-]+/g, ''));
+        if (!isNaN(val)) return Math.max(0, val);
+      }
+    }
+    const vals = Object.values(variant.stock).map(v => Number(String(v).replace(/[^0-9.-]+/g, ''))).filter(n => !isNaN(n));
+    if (vals.length > 0) return Math.max(0, Math.max(...vals));
+  }
+  if (typeof variant.availableStock === 'number') return Math.max(0, variant.availableStock);
+  if (typeof variant.quantity === 'number') return Math.max(0, variant.quantity);
+  if (typeof variant.inventory === 'number') return Math.max(0, variant.inventory);
   return 0;
 }
 
@@ -95,7 +109,8 @@ export function normalizeVariants(variants, branchId = BRANCH_ID) {
   return variants.map((v, i) => ({
     ...v,
     key:   v.id || `${v.size || ''}::${v.color || ''}::${i}`,
-    price: Number(v.price ?? 0),
+    price: Number(v.price ?? v.sellingPrice ?? 0),
+    mrp:   Number(v.mrp ?? v.originalPrice ?? 0) || null,
     cost:  Number(v.cost  ?? 0),
     size:  String(v.size  ?? 'Standard'),
     color: String(v.color ?? 'Default'),
@@ -104,6 +119,99 @@ export function normalizeVariants(variants, branchId = BRANCH_ID) {
       main:       getVariantStock(v, 'main'),
     },
   }));
+}
+
+/**
+ * Calculate total available inventory stock across all variants or root product fields.
+ * @param {object} product
+ * @returns {number}
+ */
+export function getProductTotalStock(product) {
+  if (!product) return 0;
+  if (Array.isArray(product.variants) && product.variants.length > 0) {
+    return product.variants.reduce((sum, v) => sum + getVariantStock(v), 0);
+  }
+  if (typeof product.availableStock === 'number') return Math.max(0, product.availableStock);
+  if (typeof product.stock === 'number') return Math.max(0, product.stock);
+  if (typeof product.stock === 'string') {
+    const n = Number(product.stock.replace(/[^0-9.-]+/g, ''));
+    if (!isNaN(n)) return Math.max(0, n);
+  }
+  if (typeof product.stock === 'object' && product.stock !== null) {
+    const vals = Object.values(product.stock).map(v => Number(String(v).replace(/[^0-9.-]+/g, ''))).filter(n => !isNaN(n));
+    if (vals.length > 0) return Math.max(0, vals.reduce((a, b) => a + b, 0));
+  }
+  if (typeof product.quantity === 'number') return Math.max(0, product.quantity);
+  if (typeof product.inventory === 'number') return Math.max(0, product.inventory);
+  return 0;
+}
+
+/**
+ * Check whether a product is completely out of stock.
+ * @param {object} product
+ * @returns {boolean}
+ */
+export function isProductOutOfStock(product) {
+  return getProductTotalStock(product) <= 0;
+}
+
+/**
+ * Derive clean pricing and MRP without fabricating false markups.
+ * @param {object} product
+ * @param {object} [selectedVariant]
+ * @returns {{ price: number, mrp: number|null, discountPct: number, hasDiscount: boolean }}
+ */
+export function getProductPricing(product, selectedVariant = null) {
+  if (!product) return { price: 0, mrp: null, discountPct: 0, hasDiscount: false };
+
+  let price = Number(selectedVariant?.price ?? product.price ?? 0);
+  if ((!price || price <= 0) && Array.isArray(product.variants) && product.variants.length > 0) {
+    const inStock = product.variants.filter(v => getVariantStock(v) > 0);
+    const pool = inStock.length ? inStock : product.variants;
+    const prices = pool.map(v => Number(v.price || v.sellingPrice || 0)).filter(p => p > 0);
+    if (prices.length) price = Math.min(...prices);
+  }
+
+  // Parse raw MRP
+  let rawMrp = null;
+  const rawMrpCandidate = selectedVariant?.mrp ?? selectedVariant?.originalPrice ?? product.originalPrice ?? product.mrp ?? null;
+  if (rawMrpCandidate != null && rawMrpCandidate !== '') {
+    const parsed = Number(String(rawMrpCandidate).replace(/[^0-9.-]+/g, ''));
+    if (!isNaN(parsed) && parsed > price) {
+      rawMrp = parsed;
+    }
+  }
+
+  // Parse explicit discount percentage if present
+  let explicitDiscountPct = 0;
+  if (typeof product.discountPct === 'number' && product.discountPct > 0) {
+    explicitDiscountPct = Math.round(product.discountPct);
+  } else if (product.discount) {
+    const match = String(product.discount).match(/\d+/);
+    if (match) explicitDiscountPct = parseInt(match[0], 10);
+  }
+
+  // If no rawMrp was provided but explicit discount percentage exists (> 0), compute matching MRP
+  if (!rawMrp && explicitDiscountPct > 0 && explicitDiscountPct < 100 && price > 0) {
+    rawMrp = Math.round(price / (1 - (explicitDiscountPct / 100)));
+  }
+
+  // Calculate actual discount percentage
+  let discountPct = 0;
+  if (rawMrp && rawMrp > price) {
+    discountPct = Math.round(((rawMrp - price) / rawMrp) * 100);
+  } else if (explicitDiscountPct > 0) {
+    discountPct = explicitDiscountPct;
+  }
+
+  const hasDiscount = discountPct > 0 && Boolean(rawMrp && rawMrp > price);
+
+  return {
+    price,
+    mrp: hasDiscount ? rawMrp : null,
+    discountPct: hasDiscount ? discountPct : 0,
+    hasDiscount,
+  };
 }
 
 /**
@@ -116,7 +224,7 @@ export function productPrice(product) {
   const variants  = product.variants || [];
   const inStock   = variants.filter(v => getVariantStock(v) > 0);
   const pool      = inStock.length ? inStock : variants;
-  const prices    = pool.map(v => v.price).filter(Number.isFinite);
+  const prices    = pool.map(v => Number(v.price || 0)).filter(p => p > 0);
   return prices.length ? Math.min(...prices) : 0;
 }
 
@@ -136,18 +244,9 @@ export function normalizeProduct(id, data = {}) {
   else if (typeof data.imageUrl === 'string' && data.imageUrl)      imageUrls = [data.imageUrl];
   else if (typeof data.image   === 'string' && data.image)          imageUrls = [data.image];
 
-  const name          = data.name || data.title || 'Unnamed Product';
-  const price         = Number.isFinite(Number(data.price)) && data.price != null
-    ? Number(data.price)
-    : productPrice({ variants });
-
-  const rawOrig = data.originalPrice != null ? Number(data.originalPrice)
-    : data.mrp != null ? Number(data.mrp)
-    : null;
-
-  const originalPrice = (rawOrig && rawOrig > price)
-    ? rawOrig
-    : (price ? Math.round(price * 1.3) : null);
+  const name = data.name || data.title || 'Unnamed Product';
+  const pricing = getProductPricing({ ...data, variants });
+  const totalStock = getProductTotalStock({ ...data, variants });
 
   const category = typeof data.category === 'string'
     ? data.category
@@ -156,12 +255,6 @@ export function normalizeProduct(id, data = {}) {
   const tag = typeof data.tag === 'string'
     ? data.tag
     : Array.isArray(data.tags) ? (data.tags[0] ?? '') : '';
-
-  const calcPct = (originalPrice && originalPrice > price)
-    ? Math.round(((originalPrice - price) / originalPrice) * 100)
-    : (typeof data.discount === 'number' ? data.discount : (parseInt(data.discount) || 0));
-
-  const discountPct = (typeof calcPct === 'number' && calcPct > 0) ? calcPct : 0;
 
   return {
     ...data,
@@ -177,11 +270,13 @@ export function normalizeProduct(id, data = {}) {
     imageUrls,
     thumbnail:      imageUrls[0] || '',         // ← first image, ready for UI
     variants,
-    price,
-    originalPrice,
-    discountPct,
-    discount:       discountPct > 0 ? `${discountPct}% OFFER` : '',
-    availableStock: variants.reduce((sum, v) => sum + getVariantStock(v), 0),
+    price:          pricing.price,
+    originalPrice:  pricing.mrp,
+    mrp:            pricing.mrp,
+    discountPct:    pricing.discountPct,
+    discount:       pricing.discountPct > 0 ? `${pricing.discountPct}% OFFER` : '',
+    availableStock: totalStock,
+    isOutOfStock:   totalStock <= 0,
     showInEcom:     data.showInEcom !== false, // Strict E-commerce visibility flag (defaults to true unless explicitly false)
   };
 }

@@ -958,11 +958,40 @@
     function getVStock(v) {
       if (!v) return 0;
       if (typeof v.stock === 'number') return Math.max(0, v.stock);
-      if (typeof v.stock === 'object' && v.stock !== null) {
-        return Math.max(0, Number(v.stock.main ?? v.stock.online ?? Object.values(v.stock)[0] ?? 0));
+      if (typeof v.stock === 'string') {
+        const n = Number(v.stock.replace(/[^0-9.-]+/g, ''));
+        return !isNaN(n) ? Math.max(0, n) : 0;
       }
-      if (typeof v.quantity === 'number') return Math.max(0, v.quantity);
+      if (typeof v.stock === 'object' && v.stock !== null) {
+        const keys = ['online', 'main', 'tbc_main', 'default', 'warehouse', 'store'];
+        for (const k of keys) {
+          if (v.stock[k] !== undefined && v.stock[k] !== null) {
+            const val = Number(String(v.stock[k]).replace(/[^0-9.-]+/g, ''));
+            if (!isNaN(val)) return Math.max(0, val);
+          }
+        }
+        const vals = Object.values(v.stock).map(n => Number(String(n).replace(/[^0-9.-]+/g, ''))).filter(n => !isNaN(n));
+        if (vals.length > 0) return Math.max(0, Math.max(...vals));
+      }
       if (typeof v.availableStock === 'number') return Math.max(0, v.availableStock);
+      if (typeof v.quantity === 'number') return Math.max(0, v.quantity);
+      if (typeof v.inventory === 'number') return Math.max(0, v.inventory);
+      return 0;
+    }
+
+    function getProdTotalStock(p) {
+      if (!p) return 0;
+      if (Array.isArray(p.variants) && p.variants.length > 0) {
+        return p.variants.reduce((sum, v) => sum + getVStock(v), 0);
+      }
+      if (typeof p.availableStock === 'number') return Math.max(0, p.availableStock);
+      if (typeof p.stock === 'number') return Math.max(0, p.stock);
+      if (typeof p.stock === 'string') {
+        const n = Number(p.stock.replace(/[^0-9.-]+/g, ''));
+        if (!isNaN(n)) return Math.max(0, n);
+      }
+      if (typeof p.quantity === 'number') return Math.max(0, p.quantity);
+      if (typeof p.inventory === 'number') return Math.max(0, p.inventory);
       return 0;
     }
 
@@ -1062,31 +1091,70 @@
     }
 
     window.updateBuyButtonsState = function () {
+      const product = window.currentProductData;
+      const totalStock = getProdTotalStock(product);
+      const isTotalOut = totalStock <= 0;
+
       const isSizeSelected = !!(window.currentSelectedSize && window._sizeSelected);
       const addBagBtns = [document.getElementById('add-to-bag-btn'), document.getElementById('desktop-add-to-bag-btn')].filter(Boolean);
       const buyNowBtns = [document.getElementById('buy-now-btn'), document.getElementById('desktop-buy-now-btn')].filter(Boolean);
 
-      addBagBtns.forEach(btn => {
-        if (isSizeSelected) {
-          btn.disabled = false;
-          btn.classList.remove('opacity-50', 'cursor-not-allowed');
-          btn.classList.add('hover:opacity-90');
-        } else {
+      if (isTotalOut) {
+        addBagBtns.forEach(btn => {
           btn.disabled = true;
-          btn.classList.add('opacity-50', 'cursor-not-allowed');
-          btn.classList.remove('hover:opacity-90');
+          btn.setAttribute('data-out-of-stock', 'true');
+          btn.className = 'flex-1 bg-neutral-300 text-neutral-500 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed shadow-none flex items-center justify-center gap-2';
+          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">block</span> Out of Stock';
+        });
+        buyNowBtns.forEach(btn => {
+          btn.classList.add('hidden');
+          btn.style.display = 'none';
+        });
+        return;
+      }
+
+      // If in stock overall:
+      // If a specific variant is selected, check its individual stock
+      let variantStock = 999;
+      if (window.currentSelectedVariant) {
+        variantStock = getVStock(window.currentSelectedVariant);
+      }
+
+      if (isSizeSelected && variantStock <= 0) {
+        addBagBtns.forEach(btn => {
+          btn.disabled = true;
+          btn.setAttribute('data-out-of-stock', 'true');
+          btn.className = 'flex-1 bg-neutral-300 text-neutral-500 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed shadow-none flex items-center justify-center gap-2';
+          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">block</span> Variant Out of Stock';
+        });
+        buyNowBtns.forEach(btn => {
+          btn.classList.add('hidden');
+          btn.style.display = 'none';
+        });
+        return;
+      }
+
+      // Enabled state
+      addBagBtns.forEach(btn => {
+        btn.disabled = !isSizeSelected;
+        btn.setAttribute('data-out-of-stock', 'false');
+        if (isSizeSelected) {
+          btn.className = 'flex-1 bg-primary text-on-primary py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2';
+          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">shopping_bag</span> Add to Bag';
+        } else {
+          btn.className = 'flex-1 bg-primary/70 text-on-primary/80 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-sm flex items-center justify-center gap-2';
+          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">straighten</span> Select Size';
         }
       });
 
       buyNowBtns.forEach(btn => {
+        btn.classList.remove('hidden');
+        btn.style.display = 'flex';
+        btn.disabled = !isSizeSelected;
         if (isSizeSelected) {
-          btn.disabled = false;
-          btn.classList.remove('opacity-50', 'cursor-not-allowed');
-          btn.classList.add('hover:opacity-90');
+          btn.className = 'flex-1 bg-on-surface text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-colors flex items-center justify-center gap-1.5 shadow-md';
         } else {
-          btn.disabled = true;
-          btn.classList.add('opacity-50', 'cursor-not-allowed');
-          btn.classList.remove('hover:opacity-90');
+          btn.className = 'flex-1 bg-neutral-800 text-white/80 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-1.5 shadow-sm';
         }
       });
     };
@@ -1097,7 +1165,6 @@
       const hint = document.getElementById('size-hint');
       if (hint) hint.classList.add('hidden');
 
-      // Enable Buy & Add to Bag buttons ONLY when a size is selected
       window.updateBuyButtonsState();
 
       if (typeof window.renderVariantChips === 'function') {
@@ -1154,35 +1221,7 @@
     };
 
     window.updateStockUI = function (stockCount) {
-      const isOutOfStock = stockCount <= 0;
-
-      // Handle Buy Now buttons visibility (Hide completely when out of stock!)
-      const buyBtns = document.querySelectorAll('#buy-now-btn, #desktop-buy-now-btn');
-      buyBtns.forEach(btn => {
-        if (isOutOfStock) {
-          btn.classList.add('hidden');
-          btn.style.display = 'none';
-        } else {
-          btn.classList.remove('hidden');
-          btn.style.display = 'flex';
-        }
-      });
-
-      // Handle Add to Bag buttons state
-      const addBtns = document.querySelectorAll('#add-to-bag-btn, #desktop-add-to-bag-btn');
-      addBtns.forEach(btn => {
-        if (isOutOfStock) {
-          btn.disabled = true;
-          btn.setAttribute('data-out-of-stock', 'true');
-          btn.className = btn.className.replace(/bg-\S+/g, '') + ' bg-neutral-300 text-neutral-500 cursor-not-allowed';
-          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">block</span> Out of Stock';
-        } else {
-          btn.disabled = false;
-          btn.setAttribute('data-out-of-stock', 'false');
-          btn.className = 'flex-1 bg-primary text-on-primary py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2';
-          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">shopping_bag</span> Add to Bag';
-        }
-      });
+      window.updateBuyButtonsState();
     };
 
     window.selectProductVariant = function (color, size, btn) {
@@ -1190,31 +1229,38 @@
       if (!product?.variants?.length) return;
       const targetColor = color || window.currentSelectedColor;
       const targetSize = size || window.currentSelectedSize;
-      const variant = product.variants.find(item => item.color === targetColor && item.size === targetSize) || product.variants.find(item => item.color === targetColor) || product.variants[0];
+      const variant = product.variants.find(item => item.color === targetColor && item.size === targetSize)
+        || product.variants.find(item => item.color === targetColor)
+        || product.variants.find(item => item.size === targetSize)
+        || product.variants[0];
+
       window.currentSelectedVariant = variant;
-      if (variant.color) window.currentSelectedColor = variant.color;
-      if (variant.size && window._sizeSelected) window.currentSelectedSize = variant.size;
+      if (variant.color && !window._colorSelected) window.currentSelectedColor = variant.color;
+      if (variant.size && !window._sizeSelected) window.currentSelectedSize = variant.size;
 
       const colorLabel = document.getElementById('selected-color');
-      if (colorLabel && variant.color) colorLabel.textContent = variant.color;
+      if (colorLabel && window.currentSelectedColor) colorLabel.textContent = window.currentSelectedColor;
 
       const priceContainer = document.querySelector('main .flex.items-baseline');
       if (priceContainer && variant?.price) {
         const vPrice = Number(variant.price);
-        const rawOrig = product.originalPrice ? Number(product.originalPrice) : (product.mrp ? Number(product.mrp) : null);
-        const origPrice = (rawOrig && rawOrig > vPrice) ? rawOrig : (vPrice ? Math.round(vPrice * 1.3) : null);
-        const formatBadge = window.formatOfferBadge ? window.formatOfferBadge({ ...product, price: vPrice }) : '';
+        const rawOrig = Number(variant.mrp || variant.originalPrice || product.originalPrice || product.mrp || 0);
+        const hasDiscount = rawOrig > vPrice;
+        const discountPct = hasDiscount ? Math.round(((rawOrig - vPrice) / rawOrig) * 100) : 0;
+        const formatBadge = discountPct > 0
+          ? `<span class="golden-offer-chip"><span class="material-symbols-outlined text-[13px] text-amber-300">local_fire_department</span>${discountPct}% OFFER</span>`
+          : '';
+
         priceContainer.innerHTML = `
           <span class="text-3xl font-bold text-primary">₹${vPrice.toLocaleString('en-IN')}</span>
-          ${origPrice && origPrice > vPrice ? `<span class="text-base text-rose-600 font-bold line-through">MRP ₹${origPrice.toLocaleString('en-IN')}</span>` : ''}
+          ${hasDiscount ? `<span class="text-base text-rose-600 font-bold line-through">MRP ₹${rawOrig.toLocaleString('en-IN')}</span>` : ''}
           ${formatBadge}
         `;
       }
 
-      const stockCount = Number(variant.stock?.main ?? variant.stock ?? 0);
+      const totalStock = getProdTotalStock(product);
       const stockLabel = [...document.querySelectorAll('main .text-xs.font-bold')].find(element => /stock/i.test(element.textContent));
       if (stockLabel) {
-        const totalStock = product.variants.reduce((sum, v) => sum + (typeof v.stock === 'number' ? v.stock : Number(v.stock?.main ?? 0)), 0);
         if (totalStock <= 0) {
           stockLabel.textContent = 'Out of Stock ❌';
           stockLabel.className = 'text-xs font-bold text-rose-600';
@@ -1224,7 +1270,7 @@
         }
       }
 
-      window.updateStockUI(stockCount);
+      window.updateBuyButtonsState();
     };
 
     function showToast(msg) {
@@ -1401,7 +1447,7 @@
   <!-- Dynamic Product Detail Integration Module -->
   <script type="module">
     import tbcCart from './js/cart-store.js';
-    import { getProductById, subscribeToProduct, getProducts, getRelatedProducts, formatMoney, createInvoice, getCompany, COMPANY_ID } from './js/products-service.js';
+    import { getProductById, subscribeToProduct, getProducts, getRelatedProducts, formatMoney, createInvoice, getCompany, COMPANY_ID, getProductPricing, getProductTotalStock, isProductOutOfStock, getVariantStock } from './js/products-service.js';
     import { db, collection, doc, setDoc, getDoc, serverTimestamp } from './js/firebase-config.js';
 
     // Make cart accessible globally
@@ -1417,21 +1463,13 @@
       }
     }).catch(() => { });
 
-    function formatOfferBadge(p) {
+    function formatOfferBadge(p, selectedVariant = null) {
       if (!p) return '';
-      const price = Number(p.price || (window.currentSelectedVariant?.price ?? 0));
-      const orig = p.originalPrice ? Number(p.originalPrice) : (p.mrp ? Number(p.mrp) : null);
-      let pct = 0;
-      if (orig && orig > price) {
-        pct = Math.round(((orig - price) / orig) * 100);
-      } else if (typeof p.discountPct === 'number' && p.discountPct > 0) {
-        pct = p.discountPct;
-      } else if (p.discount) {
-        const m = String(p.discount).match(/\d+/);
-        if (m) pct = parseInt(m[0]);
+      const pricing = getProductPricing(p, selectedVariant || window.currentSelectedVariant);
+      if (pricing.hasDiscount && pricing.discountPct > 0) {
+        return `<span class="golden-offer-chip"><span class="material-symbols-outlined text-[13px] text-amber-300">local_fire_department</span>${pricing.discountPct}% OFFER</span>`;
       }
-      if (pct <= 0) return '';
-      return `<span class="golden-offer-chip"><span class="material-symbols-outlined text-[13px] text-amber-300">local_fire_department</span>${pct}% OFFER</span>`;
+      return '';
     }
     window.formatOfferBadge = formatOfferBadge;
 
@@ -1565,12 +1603,14 @@
           ? product.imageUrls
           : [(product.imageUrl || product.image || 'https://placehold.co/600x800/f0f0f0/999?text=No+Image')];
 
-        const price = Number(product.price || (product.variants && product.variants[0] ? product.variants[0].price : 0));
-        const origPrice = product.originalPrice ? Number(product.originalPrice) : null;
+        const inStockVariant = Array.isArray(product.variants) ? product.variants.find(v => getVariantStock(v) > 0) : null;
+        const defaultVariant = inStockVariant || product.variants?.[0] || null;
+
+        const pricing = getProductPricing(product, defaultVariant);
 
         // CRITICAL: write to window so inline <script> functions can read it
-        window.currentProductData = { ...product, price, imageUrls: images };
-        window.currentSelectedVariant = (Array.isArray(product.variants) && product.variants.find(v => (v.stock?.main ?? 0) > 0)) || product.variants?.[0] || null;
+        window.currentProductData = { ...product, price: pricing.price, imageUrls: images };
+        window.currentSelectedVariant = defaultVariant;
 
         // Subscribe to real-time live stock & availability updates from Firestore
         subscribeToProduct(product.id, (liveProduct) => {
@@ -1587,16 +1627,26 @@
           }
 
           // Update price display if changed
-          const currentPrice = Number(liveProduct.price || (window.currentSelectedVariant?.price ?? 0));
-          const rawOrig = liveProduct.originalPrice ? Number(liveProduct.originalPrice) : (liveProduct.mrp ? Number(liveProduct.mrp) : null);
-          const origP = (rawOrig && rawOrig > currentPrice) ? rawOrig : (currentPrice ? Math.round(currentPrice * 1.3) : null);
+          const livePricing = getProductPricing(liveProduct, window.currentSelectedVariant);
           const priceContainer = document.querySelector('main .flex.items-baseline');
-          if (priceContainer && currentPrice > 0) {
+          if (priceContainer && livePricing.price > 0) {
             priceContainer.innerHTML = `
-            <span class="text-3xl font-bold text-primary">${formatMoney(currentPrice)}</span>
-            ${origP && origP > currentPrice ? `<span class="text-base text-rose-600 font-bold line-through">MRP ${formatMoney(origP)}</span>` : ''}
-            ${formatOfferBadge(liveProduct)}
+            <span class="text-3xl font-bold text-primary">${formatMoney(livePricing.price)}</span>
+            ${livePricing.hasDiscount ? `<span class="text-base text-rose-600 font-bold line-through">MRP ${formatMoney(livePricing.mrp)}</span>` : ''}
+            ${formatOfferBadge(liveProduct, window.currentSelectedVariant)}
           `;
+          }
+
+          const liveTotalStock = getProductTotalStock(liveProduct);
+          const stockLabel = [...document.querySelectorAll('main .text-xs.font-bold')].find(element => /stock/i.test(element.textContent));
+          if (stockLabel) {
+            if (liveTotalStock <= 0) {
+              stockLabel.textContent = 'Out of Stock ❌';
+              stockLabel.className = 'text-xs font-bold text-rose-600';
+            } else {
+              stockLabel.textContent = 'In Stock ✓';
+              stockLabel.className = 'text-xs font-bold text-emerald-600';
+            }
           }
 
           if (typeof window.renderVariantChips === 'function') {
@@ -1654,17 +1704,39 @@
         }
 
         // Update mobile hero product tag
-        let badgeText = product.tag || (Array.isArray(product.tags) && product.tags[0]) || '';
-        if (!badgeText) {
+        const totalProdStock = getProductTotalStock(product);
+        const isOut = totalProdStock <= 0;
+        let badgeText = isOut ? 'OUT OF STOCK' : (product.tag || (Array.isArray(product.tags) && product.tags[0]) || '');
+        if (!badgeText && !isOut) {
           if (product.isBestSeller) badgeText = 'Best Seller';
           else if (product.isNewArrival || product.isNew) badgeText = 'New Arrival';
           else if (product.isTrending) badgeText = 'Trending';
         }
         if (badgeText) {
           const heroTag = document.getElementById('hero-product-tag');
-          if (heroTag) { heroTag.textContent = badgeText.toUpperCase(); heroTag.classList.remove('hidden'); }
+          if (heroTag) {
+            heroTag.textContent = badgeText.toUpperCase();
+            heroTag.className = isOut ? 'bg-rose-600 text-white px-2.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider' : 'bg-black text-white px-2.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider';
+            heroTag.classList.remove('hidden');
+          }
           const deskTag = document.getElementById('desktop-product-tag');
-          if (deskTag) { deskTag.textContent = badgeText.toUpperCase(); deskTag.classList.remove('hidden'); }
+          if (deskTag) {
+            deskTag.textContent = badgeText.toUpperCase();
+            deskTag.className = isOut ? 'inline-block bg-rose-600 text-white text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider mb-2' : 'inline-block bg-black text-white text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider mb-2';
+            deskTag.classList.remove('hidden');
+          }
+        }
+
+        // Update Stock status indicator
+        const stockLabel = [...document.querySelectorAll('main .text-xs.font-bold')].find(element => /stock/i.test(element.textContent));
+        if (stockLabel) {
+          if (isOut) {
+            stockLabel.textContent = 'Out of Stock ❌';
+            stockLabel.className = 'text-xs font-bold text-rose-600';
+          } else {
+            stockLabel.textContent = 'In Stock ✓';
+            stockLabel.className = 'text-xs font-bold text-emerald-600';
+          }
         }
 
         // Update Thumbnail Row (desktop)
@@ -1697,45 +1769,47 @@
         const priceContainer = document.querySelector('main .flex.items-baseline');
         if (priceContainer) {
           priceContainer.innerHTML = `
-          <span class="text-3xl font-bold text-primary">${formatMoney(price)}</span>
-          ${origPrice && origPrice > price ? `<span class="text-base text-secondary line-through">${formatMoney(origPrice)}</span>` : ''}
-          ${formatOfferBadge(product)}
+          <span class="text-3xl font-bold text-primary">${formatMoney(pricing.price)}</span>
+          ${pricing.hasDiscount ? `<span class="text-base text-rose-600 font-bold line-through">MRP ${formatMoney(pricing.mrp)}</span>` : ''}
+          ${formatOfferBadge(product, defaultVariant)}
         `;
         }
 
-        // (Reviews section removed per user request)
-
         // Update Color and Size Selection state & render chips dynamically
         if (Array.isArray(product.variants) && product.variants.length > 0) {
+          const inStockVariants = product.variants.filter(v => getVariantStock(v) > 0);
+          const activePool = inStockVariants.length > 0 ? inStockVariants : product.variants;
           const colors = [...new Set(product.variants.map(v => v.color).filter(Boolean))];
           const sizes = [...new Set(product.variants.map(v => v.size).filter(Boolean))];
 
-          // Color selection logic: If only 1 color exists, pre-select default. If >1, require user selection.
+          // If only 1 color exists or single in-stock variant exists, pre-select it
           if (colors.length === 1) {
             window.currentSelectedColor = colors[0];
             window._colorSelected = true;
             const colorLabel = document.getElementById('selected-color');
             if (colorLabel) { colorLabel.textContent = colors[0]; colorLabel.className = 'text-primary font-bold'; }
-          } else if (colors.length > 1) {
+          } else if (defaultVariant?.color) {
+            window.currentSelectedColor = defaultVariant.color;
+            window._colorSelected = true;
+            const colorLabel = document.getElementById('selected-color');
+            if (colorLabel) { colorLabel.textContent = defaultVariant.color; colorLabel.className = 'text-primary font-bold'; }
+          } else {
             window.currentSelectedColor = null;
             window._colorSelected = false;
             const colorLabel = document.getElementById('selected-color');
             if (colorLabel) { colorLabel.textContent = 'Select Color'; colorLabel.className = 'text-secondary font-medium'; }
-          } else {
-            window.currentSelectedColor = 'Default';
-            window._colorSelected = true;
           }
 
-          // Size selection logic: If only 1 size exists, pre-select default. If >1, require user selection.
+          // If only 1 size exists or default variant exists, select it
           if (sizes.length === 1) {
             window.currentSelectedSize = sizes[0];
             window._sizeSelected = true;
-          } else if (sizes.length > 1) {
+          } else if (defaultVariant?.size) {
+            window.currentSelectedSize = defaultVariant.size;
+            window._sizeSelected = true;
+          } else {
             window.currentSelectedSize = null;
             window._sizeSelected = false;
-          } else {
-            window.currentSelectedSize = 'Standard';
-            window._sizeSelected = true;
           }
         }
 
@@ -1743,10 +1817,6 @@
           window.renderVariantChips();
         }
 
-        const initStock = Number(window.currentSelectedVariant?.stock?.main ?? window.currentSelectedVariant?.stock ?? product.availableStock ?? 999);
-        if (typeof window.updateStockUI === 'function') {
-          window.updateStockUI(initStock);
-        }
         if (typeof window.updateBuyButtonsState === 'function') {
           window.updateBuyButtonsState();
         }
@@ -1756,15 +1826,8 @@
         const relatedContainer = document.getElementById('related-products-scroll') || document.querySelector('main .pt-12 div');
         if (relatedContainer && related.length > 0) {
           relatedContainer.innerHTML = related.map(item => {
-            const relPrice = Number(item.price || 0);
-            const relOrig = item.originalPrice ? Number(item.originalPrice) : null;
-            let relPct = 0;
-            if (relOrig && relOrig > relPrice) {
-              relPct = Math.round(((relOrig - relPrice) / relOrig) * 100);
-            } else if (typeof item.discountPct === 'number' && item.discountPct > 0) {
-              relPct = item.discountPct;
-            }
-            const relBadge = relPct > 0 ? `<div class="absolute bottom-2 left-2 golden-offer-chip !text-[9px] !py-0.5 !px-2 shadow-md z-10"><span class="material-symbols-outlined !text-[11px] text-amber-300">local_fire_department</span>${relPct}% OFFER</div>` : '';
+            const relPricing = getProductPricing(item);
+            const relBadge = relPricing.hasDiscount ? `<div class="absolute bottom-2 left-2 golden-offer-chip !text-[9px] !py-0.5 !px-2 shadow-md z-10"><span class="material-symbols-outlined !text-[11px] text-amber-300">local_fire_department</span>${relPricing.discountPct}% OFFER</div>` : '';
 
             return `
           <a href="product-detail?id=${encodeURIComponent(item.id)}" class="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-shadow flex-shrink-0 w-44 sm:w-52 snap-start">
@@ -1774,7 +1837,10 @@
             </div>
             <span class="text-[11px] text-secondary uppercase font-semibold">${item.category || ''}</span>
             <h3 class="font-semibold text-sm text-on-surface truncate">${item.name || ''}</h3>
-            <span class="font-bold text-base text-primary mt-1 block">${formatMoney(item.price)}</span>
+            <div class="flex items-baseline gap-2 mt-1 flex-wrap">
+              <span class="font-bold text-base text-primary">${formatMoney(relPricing.price)}</span>
+              ${relPricing.hasDiscount ? `<span class="text-xs text-rose-600 font-bold line-through">MRP ${formatMoney(relPricing.mrp)}</span>` : ''}
+            </div>
           </a>
         `;
           }).join('');

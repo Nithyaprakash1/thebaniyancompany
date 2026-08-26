@@ -352,7 +352,7 @@
 </script>
 
 <script type="module">
-  import { subscribeToProducts, getCompany, formatMoney } from './js/products-service.js';
+  import { subscribeToProducts, getCompany, formatMoney, getProductPricing } from './js/products-service.js';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
 
   function extractYouTubeId(url) {
@@ -380,15 +380,15 @@
       const youtubeLinks = (company && Array.isArray(company.youtubeLinks)) ? company.youtubeLinks : [];
       let currentCompany = company;
 
-      const companyName   = company?.name || 'THE BANIYAN COMPANY';
-      const companyHandle = company?.handle || '@thebaniyancompany';
-      const companyLogo   = company?.logo || '';
+      const companyNameStr = company?.name || 'THE BANIYAN COMPANY';
+      const companyHandleStr = company?.handle || '@thebaniyancompany';
+      const companyLogoStr = company?.logo || '';
 
       // Update header logo / name if element exists
       const logoEl = document.getElementById('nav-company-logo');
-      if (logoEl && companyLogo) logoEl.src = companyLogo;
+      if (logoEl && companyLogoStr) logoEl.src = companyLogoStr;
       const headerBrand = document.querySelector('header .font-bold.tracking-\\[0\\.2em\\]');
-      if (headerBrand) headerBrand.textContent = companyName;
+      if (headerBrand) headerBrand.textContent = companyNameStr;
 
       let initialRenderDone = false;
 
@@ -442,16 +442,6 @@
         }
       });
 
-      const companyName   = company?.name || 'THE BANIYAN COMPANY';
-      const companyHandle = company?.handle || '@thebaniyancompany';
-      const companyLogo   = company?.logo || '';
-
-      // Update header logo / name if element exists
-      const logoEl = document.getElementById('nav-company-logo');
-      if (logoEl && companyLogo) logoEl.src = companyLogo;
-      const headerBrand = document.querySelector('header .font-bold.tracking-\\[0\\.2em\\]');
-      if (headerBrand) headerBrand.textContent = companyName;
-
   window.handleReelDoubleTap = function(card, idx) {
     const btn = card.querySelector('.like-btn-box');
     if (btn && !btn.classList.contains('text-red-500')) {
@@ -472,25 +462,16 @@
   function renderReelList(list) {
     return list.map((product, idx) => {
       const image = (product.imageUrls && product.imageUrls[0]) ? product.imageUrls[0] : 'https://placehold.co/600x900/000/fff?text=TBC';
-      const price = product.price || (product.variants && product.variants[0] ? product.variants[0].price : 0);
-      const rawOrig = product.originalPrice ? Number(product.originalPrice) : (product.mrp ? Number(product.mrp) : null);
-      const origPrice = (rawOrig && rawOrig > price) ? rawOrig : (price ? Math.round(price * 1.3) : null);
-      let reelPct = 0;
-      if (origPrice && origPrice > price) {
-        reelPct = Math.round(((origPrice - price) / origPrice) * 100);
-      } else if (typeof product.discountPct === 'number' && product.discountPct > 0) {
-        reelPct = product.discountPct;
-      } else if (product.discount) {
-        const m = String(product.discount).match(/\d+/);
-        if (m) reelPct = parseInt(m[0]);
-      }
+      const pricing = getProductPricing(product);
+      const price = pricing.price;
+      const reelPct = pricing.hasDiscount ? pricing.discountPct : 0;
       const discountBadge = reelPct > 0
         ? `<span class="golden-offer-chip !text-[10px] !py-0.5 !px-2"><span class="material-symbols-outlined !text-[12px] text-amber-300">local_fire_department</span>${reelPct}% OFFER</span>`
         : '';
 
-      const logoMarkup = companyLogo
-        ? `<img src="${companyLogo}" class="w-full h-full object-cover rounded-full">`
-        : `<div class="w-full h-full rounded-full bg-white text-black font-bold flex items-center justify-center border border-white/40 shadow-md">${companyName.charAt(0)}</div>`;
+      const logoMarkup = companyLogoStr
+        ? `<img src="${companyLogoStr}" class="w-full h-full object-cover rounded-full">`
+        : `<div class="w-full h-full rounded-full bg-white text-black font-bold flex items-center justify-center border border-white/40 shadow-md">${companyNameStr.charAt(0)}</div>`;
 
       const ytId = product.youtubeId || extractYouTubeId(product.youtubeUrl || product.videoUrl);
       const isMp4 = product.videoUrl && product.videoUrl.endsWith('.mp4');

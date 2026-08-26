@@ -954,7 +954,7 @@
   <!-- Dynamic Cart & Real-Time Storefront Integration -->
   <script type="module">
     import tbcCart from './js/cart-store.js';
-    import { subscribeToProducts, subscribeToCategories, getCompany, subscribeToCompanyBanner } from './js/products-service.js';
+    import { subscribeToProducts, subscribeToCategories, getCompany, subscribeToCompanyBanner, getProductTotalStock, isProductOutOfStock, getProductPricing } from './js/products-service.js';
 
     // Safe helpers — never throw, even on broken data
     function safePrice(p) {
@@ -985,15 +985,16 @@
     let currentActiveTag = 'all';
 
     function renderHomeCard(p) {
-      const price = safePrice(p);
-      const rawOrig = p.originalPrice ? Number(p.originalPrice) : (p.mrp ? Number(p.mrp) : null);
-      const origP = (rawOrig && rawOrig > price) ? rawOrig : (price ? Math.round(price * 1.3) : null);
+      const pricing = getProductPricing(p);
+      const price = pricing.price || safePrice(p);
+      const origP = pricing.mrp;
+      const discountPct = pricing.discountPct;
       const img = safeImage(p);
 
       // Determine product badge text & real-time stock
-      const isOut = (p.availableStock !== undefined && p.availableStock <= 0) || (p.stock !== undefined && Number(p.stock) <= 0);
+      const isOut = isProductOutOfStock(p);
       let badgeText = isOut ? 'OUT OF STOCK' : (p.tag || (Array.isArray(p.tags) && p.tags[0]) || '');
-      if (!badgeText) {
+      if (!badgeText && !isOut) {
         if (p.isBestSeller) badgeText = 'Best Seller';
         else if (p.isNewArrival || p.isNew) badgeText = 'New Arrival';
         else if (p.isTrending) badgeText = 'Trending';
@@ -1001,21 +1002,15 @@
         else if (p.isHot) badgeText = 'Hot';
       }
 
-      const tagBg = isOut ? 'bg-rose-600' : 'bg-black';
-      const tagLabel = badgeText
-        ? `<div class="absolute top-2 left-2 ${tagBg} text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shadow-sm z-10">${String(badgeText).toUpperCase()}</div>`
-        : '';
+      const tagLabel = isOut
+        ? `<div class="absolute top-2 left-2 bg-rose-600 text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shadow-sm z-10">OUT OF STOCK</div>`
+        : (badgeText ? `<div class="absolute top-2 left-2 bg-black text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shadow-sm z-10">${String(badgeText).toUpperCase()}</div>` : '');
 
-      const calcPct = (origP && origP > price)
-        ? Math.round(((origP - price) / origP) * 100)
-        : (typeof p.discountPct === 'number' ? p.discountPct : (parseInt(p.discount) || 0));
-      const discountPct = (calcPct > 0) ? calcPct : 0;
-
-      const offerBadge = discountPct > 0
+      const offerBadge = (discountPct > 0 && origP && origP > price)
         ? `<div class="absolute bottom-2 left-2 golden-offer-chip shadow-md z-10"><span class="material-symbols-outlined !text-[11px] text-amber-300">local_fire_department</span>${discountPct}% OFFER</div>`
         : '';
 
-      const origLabel = origP && origP > price
+      const origLabel = (origP && origP > price)
         ? `<span class="text-xs text-rose-600 font-bold line-through">MRP ${safeMoney(origP)}</span>`
         : '';
 
