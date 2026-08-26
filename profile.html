@@ -983,7 +983,7 @@
             <img src="${item.image || item.imageUrl || 'https://placehold.co/200x250/f0f0f0/999?text=Item'}" alt="${item.name || 'Product'}" class="w-12 h-14 object-cover rounded-lg border border-black/10 bg-white flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f0f0f0/999?text=Item'">
             <div class="flex-1 min-w-0">
               <h5 class="font-bold text-xs text-primary truncate">${item.name || 'Product'}</h5>
-              <p class="text-[10px] text-secondary font-medium mt-0.5">Size: ${item.size || 'M'} | Qty: ${item.qty || item.quantity || 1}</p>
+              <p class="text-[10px] text-secondary font-medium mt-0.5">Size: ${String(item.size || 'M').toUpperCase()} | Qty: ${item.qty || item.quantity || 1}</p>
               <p class="text-xs font-bold text-primary mt-1">₹${Number(item.price || 0).toLocaleString('en-IN')}</p>
             </div>
           </div>

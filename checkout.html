@@ -923,7 +923,7 @@
                 <img class="w-14 h-16 object-cover rounded-xl bg-neutral-200 flex-shrink-0" src="${img}" alt="${i.name}" onerror="this.src='https://placehold.co/400x500/f0f0f0/999?text=No+Image'">
                 <div class="flex-1 min-w-0">
                   <h4 class="font-bold text-sm text-primary truncate">${i.name}</h4>
-                  <p class="text-xs text-secondary mb-1.5">Size: ${i.size || 'M'} · Color: ${i.color || 'Default'}</p>
+                  <p class="text-xs text-secondary mb-1.5">Size: ${String(i.size || 'M').toUpperCase()} · Color: ${i.color || 'Default'}</p>
                   <div class="flex items-center gap-2">
                     <div class="flex items-center border border-black/15 rounded-lg bg-white overflow-hidden shadow-2xs">
                       <button type="button" onclick="window.updateStep3Qty('${itemKey}', ${i.quantity - 1})" class="w-6 h-6 flex items-center justify-center text-slate-800 hover:bg-neutral-100 font-bold transition-colors" title="Decrease quantity">
@@ -941,7 +941,7 @@
                 </div>
                 <div class="text-right flex-shrink-0">
                   <span class="font-bold text-sm text-primary block">₹${(i.price * i.quantity).toLocaleString('en-IN')}</span>
-                  ${(i.originalPrice || i.mrp || Math.round(i.price * 1.3)) > i.price ? `<span class="text-[10px] text-rose-600 font-bold line-through block">MRP ₹${((i.originalPrice || i.mrp || Math.round(i.price * 1.3)) * i.quantity).toLocaleString('en-IN')}</span>` : `<span class="text-[10px] text-secondary">₹${i.price.toLocaleString('en-IN')} each</span>`}
+                  ${(i.originalPrice || i.mrp) && (i.originalPrice || i.mrp) > i.price ? `<span class="text-[10px] text-rose-600 font-bold line-through block">MRP ₹${((i.originalPrice || i.mrp) * i.quantity).toLocaleString('en-IN')}</span>` : `<span class="text-[10px] text-secondary">₹${i.price.toLocaleString('en-IN')} each</span>`}
                 </div>
               </div>
             `;

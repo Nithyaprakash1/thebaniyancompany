@@ -57,10 +57,19 @@ async function resolveItems(transaction, requestedItems) {
     if (!snapshot.exists) throw new Error('A product in your bag is no longer available.');
     const product = snapshot.data();
     const variants = Array.isArray(product.variants) ? product.variants : [];
-    const index = variants.findIndex((variant, variantIndex) =>
-      (requested.variantKey && (variant.id === requested.variantKey || `${variant.size || ''}::${variant.color || ''}::${variantIndex}` === requested.variantKey)) ||
-      (!requested.variantKey && String(variant.size || '') === String(requested.size || '') && String(variant.color || '') === String(requested.color || ''))
-    );
+    const index = variants.findIndex((variant, variantIndex) => {
+      const vSize = String(variant.size || '').trim().toLowerCase();
+      const vColor = String(variant.color || '').trim().toLowerCase();
+      const reqSize = String(requested.size || '').trim().toLowerCase();
+      const reqColor = String(requested.color || '').trim().toLowerCase();
+      const reqKey = String(requested.variantKey || '').trim().toLowerCase();
+      const vKey1 = String(variant.id || '').trim().toLowerCase();
+      const vKey2 = `${vSize}::${vColor}::${variantIndex}`.toLowerCase();
+
+      return (reqKey && (vKey1 === reqKey || vKey2 === reqKey)) ||
+        (vSize === reqSize && vColor === reqColor) ||
+        (vSize === reqSize && (!reqColor || !vColor));
+    });
     if (index < 0) throw new Error(`${product.name || 'Selected product'} no longer has the selected variant.`);
     const variant = variants[index];
     const stock = Number(variant?.stock?.main || 0);

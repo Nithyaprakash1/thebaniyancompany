@@ -108,11 +108,11 @@ export function normalizeVariants(variants, branchId = BRANCH_ID) {
   if (!Array.isArray(variants)) return [];
   return variants.map((v, i) => ({
     ...v,
-    key:   v.id || `${v.size || ''}::${v.color || ''}::${i}`,
+    key:   v.id || `${String(v.size || '').trim().toUpperCase()}::${v.color || ''}::${i}`,
     price: Number(v.price ?? v.sellingPrice ?? 0),
     mrp:   Number(v.mrp ?? v.originalPrice ?? 0) || null,
     cost:  Number(v.cost  ?? 0),
-    size:  String(v.size  ?? 'Standard'),
+    size:  String(v.size  ?? 'Standard').trim().toUpperCase(),
     color: String(v.color ?? 'Default'),
     stock: {
       [branchId]: getVariantStock(v, branchId),
@@ -695,7 +695,7 @@ export async function createInvoice(orderData) {
       productId: item.productId || item.id  || '',
       name:      item.name      || '',
       color:     item.color     || 'Default',
-      size:      item.size      || 'Standard',
+      size:      String(item.size || 'Standard').trim().toUpperCase(),
       price:     Number(item.price    || 0),
       qty:       Number(item.qty      || item.quantity || 1),
       imageUrl:  item.imageUrl  || item.image

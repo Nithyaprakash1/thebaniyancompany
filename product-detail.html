@@ -1004,9 +1004,9 @@
 
       const variants = Array.isArray(product.variants) ? product.variants : [];
       const colors = [...new Set(variants.map(v => v.color).filter(Boolean))];
-      let sizes = [...new Set(variants.map(v => v.size).filter(Boolean))];
+      let sizes = [...new Set(variants.map(v => String(v.size || '').trim().toUpperCase()).filter(Boolean))];
       if (sizes.length === 0 && sizeGrid) {
-        const existingBtns = [...sizeGrid.querySelectorAll('.size-btn')].map(b => b.getAttribute('data-size') || b.textContent.trim().split('\n')[0]);
+        const existingBtns = [...sizeGrid.querySelectorAll('.size-btn')].map(b => (b.getAttribute('data-size') || b.textContent.trim().split('\n')[0]).toUpperCase());
         sizes = existingBtns.length > 0 ? existingBtns : ['S', 'M', 'L', 'XL'];
       }
 
@@ -1018,7 +1018,8 @@
           let isOutOfStock = false;
           if (variants.length > 0) {
             if (window.currentSelectedSize && window._sizeSelected) {
-              const matchedV = variants.find(v => v.color === color && v.size === window.currentSelectedSize);
+              const upperSelectedSize = String(window.currentSelectedSize).trim().toUpperCase();
+              const matchedV = variants.find(v => v.color === color && String(v.size || '').trim().toUpperCase() === upperSelectedSize);
               isOutOfStock = !matchedV || getVStock(matchedV) <= 0;
             } else {
               const colorVs = variants.filter(v => v.color === color);
@@ -1041,13 +1042,14 @@
       // Render Size Chips
       if (sizeGrid && sizes.length > 0) {
         sizeGrid.innerHTML = sizes.map(size => {
+          const upperSize = String(size).trim().toUpperCase();
           let isOutOfStock = false;
           if (variants.length > 0) {
             if (window.currentSelectedColor && window._colorSelected) {
-              const matchedV = variants.find(v => v.size === size && v.color === window.currentSelectedColor);
+              const matchedV = variants.find(v => String(v.size || '').trim().toUpperCase() === upperSize && v.color === window.currentSelectedColor);
               isOutOfStock = !matchedV || getVStock(matchedV) <= 0;
             } else {
-              const sizeVs = variants.filter(v => v.size === size);
+              const sizeVs = variants.filter(v => String(v.size || '').trim().toUpperCase() === upperSize);
               isOutOfStock = sizeVs.length === 0 || sizeVs.every(v => getVStock(v) <= 0);
             }
           } else if (typeof product.availableStock === 'number') {
@@ -1056,15 +1058,15 @@
             isOutOfStock = product.stock <= 0;
           }
 
-          const isSelected = window.currentSelectedSize === size && window._sizeSelected;
+          const isSelected = window.currentSelectedSize && String(window.currentSelectedSize).trim().toUpperCase() === upperSize && window._sizeSelected;
 
           if (isOutOfStock) {
-            return `<button disabled data-size="${size.replace(/"/g, '&quot;')}" class="size-btn py-2.5 px-2 rounded-xl border border-rose-200 bg-rose-50/60 text-rose-500 font-bold text-xs flex flex-col items-center justify-center gap-0.5 opacity-70 cursor-not-allowed" title="${size} — Out of Stock"><span class="line-through">${size}</span><span class="text-[9px] font-bold text-rose-600 uppercase tracking-tighter">Out of Stock</span></button>`;
+            return `<button disabled data-size="${upperSize}" class="size-btn py-2.5 px-2 rounded-xl border border-rose-200 bg-rose-50/60 text-rose-500 font-bold text-xs flex flex-col items-center justify-center gap-0.5 opacity-70 cursor-not-allowed" title="${upperSize} — Out of Stock"><span class="line-through">${upperSize}</span><span class="text-[9px] font-bold text-rose-600 uppercase tracking-tighter">Out of Stock</span></button>`;
           } else {
             const sizeCls = isSelected
               ? 'size-btn py-3 rounded-xl border-2 border-black bg-black text-white font-bold text-sm transition-all'
               : 'size-btn py-3 rounded-xl border border-black/10 font-bold text-sm hover:border-black transition-all text-on-surface';
-            return `<button onclick="selectSize('${size.replace(/'/g, "\\'")}', this)" data-size="${size.replace(/"/g, '&quot;')}" class="${sizeCls}">${size}</button>`;
+            return `<button onclick="selectSize('${upperSize}', this)" data-size="${upperSize}" class="${sizeCls}">${upperSize}</button>`;
           }
         }).join('');
       }
@@ -1160,7 +1162,8 @@
     };
 
     function selectSize(size, btn) {
-      window.currentSelectedSize = size;
+      const upperSize = String(size || '').trim().toUpperCase();
+      window.currentSelectedSize = upperSize;
       window._sizeSelected = true;
       const hint = document.getElementById('size-hint');
       if (hint) hint.classList.add('hidden');
@@ -1172,7 +1175,7 @@
       }
 
       if (window.currentProductData?.variants) {
-        window.selectProductVariant(window.currentSelectedColor, size, btn);
+        window.selectProductVariant(window.currentSelectedColor, upperSize, btn);
       }
     }
 
@@ -1227,16 +1230,17 @@
     window.selectProductVariant = function (color, size, btn) {
       const product = window.currentProductData;
       if (!product?.variants?.length) return;
-      const targetColor = color || window.currentSelectedColor;
-      const targetSize = size || window.currentSelectedSize;
-      const variant = product.variants.find(item => item.color === targetColor && item.size === targetSize)
-        || product.variants.find(item => item.color === targetColor)
-        || product.variants.find(item => item.size === targetSize)
+      const targetColor = (color || window.currentSelectedColor || '').toString().trim();
+      const targetSize = (size || window.currentSelectedSize || '').toString().trim().toUpperCase();
+
+      const variant = product.variants.find(item => String(item.color || '').trim().toLowerCase() === targetColor.toLowerCase() && String(item.size || '').trim().toUpperCase() === targetSize)
+        || product.variants.find(item => String(item.size || '').trim().toUpperCase() === targetSize)
+        || product.variants.find(item => String(item.color || '').trim().toLowerCase() === targetColor.toLowerCase())
         || product.variants[0];
 
       window.currentSelectedVariant = variant;
       if (variant.color && !window._colorSelected) window.currentSelectedColor = variant.color;
-      if (variant.size && !window._sizeSelected) window.currentSelectedSize = variant.size;
+      if (variant.size && !window._sizeSelected) window.currentSelectedSize = String(variant.size).trim().toUpperCase();
 
       const colorLabel = document.getElementById('selected-color');
       if (colorLabel && window.currentSelectedColor) colorLabel.textContent = window.currentSelectedColor;
@@ -1310,16 +1314,17 @@
         return;
       }
 
+      const selectedSizeUpper = String(window.currentSelectedSize || 'Standard').trim().toUpperCase();
       const payload = {
         id: product.id,
         productId: product.id,
         name: product.name || 'Product',
         price: Number(window.currentSelectedVariant?.price || product.price || 0),
         image: (product.imageUrls && product.imageUrls[0]) || product.imageUrl || '',
-        size: window.currentSelectedSize || 'Standard',
+        size: selectedSizeUpper,
         color: window.currentSelectedColor || 'Default',
         category: product.category || 'Luxury',
-        variantKey: window.currentSelectedVariant?.key || `${window.currentSelectedSize || 'Standard'}::${window.currentSelectedColor || 'Default'}`,
+        variantKey: window.currentSelectedVariant?.key || `${selectedSizeUpper}::${window.currentSelectedColor || 'Default'}`,
         stock: isNaN(stock) ? 999 : stock,
         quantity: 1
       };
@@ -1380,7 +1385,7 @@
       }
       const firstSize = document.querySelector('.size-btn');
       if (firstSize && !window.currentSelectedSize) {
-        window.currentSelectedSize = firstSize.getAttribute('data-size') || firstSize.textContent.trim();
+        window.currentSelectedSize = (firstSize.getAttribute('data-size') || firstSize.textContent.trim()).toUpperCase();
         window._sizeSelected = true;
       }
 
@@ -1389,7 +1394,7 @@
         if (inStockVariant) {
           window.currentSelectedVariant = inStockVariant;
           if (!window.currentSelectedColor) window.currentSelectedColor = inStockVariant.color || 'Default';
-          if (!window.currentSelectedSize) window.currentSelectedSize = inStockVariant.size || 'Standard';
+          if (!window.currentSelectedSize) window.currentSelectedSize = String(inStockVariant.size || 'Standard').toUpperCase();
           window._colorSelected = true;
           window._sizeSelected = true;
         }
@@ -1411,16 +1416,17 @@
       }
 
       if (product) {
+        const directSizeUpper = String(window.currentSelectedSize || 'Standard').trim().toUpperCase();
         const payload = {
           id: product.id,
           productId: product.id,
           name: product.name || 'Product',
           price: Number(window.currentSelectedVariant?.price || product.price || 0),
           image: (product.imageUrls && product.imageUrls[0]) || product.imageUrl || '',
-          size: window.currentSelectedSize || 'Standard',
+          size: directSizeUpper,
           color: window.currentSelectedColor || 'Default',
           category: product.category || 'Luxury',
-          variantKey: window.currentSelectedVariant?.key || `${window.currentSelectedSize || 'Standard'}::${window.currentSelectedColor || 'Default'}`,
+          variantKey: window.currentSelectedVariant?.key || `${directSizeUpper}::${window.currentSelectedColor || 'Default'}`,
           stock: isNaN(stock) ? 999 : stock,
           quantity: 1
         };
@@ -1780,7 +1786,7 @@
           const inStockVariants = product.variants.filter(v => getVariantStock(v) > 0);
           const activePool = inStockVariants.length > 0 ? inStockVariants : product.variants;
           const colors = [...new Set(product.variants.map(v => v.color).filter(Boolean))];
-          const sizes = [...new Set(product.variants.map(v => v.size).filter(Boolean))];
+          const sizes = [...new Set(product.variants.map(v => String(v.size || '').trim().toUpperCase()).filter(Boolean))];
 
           // If only 1 color exists or single in-stock variant exists, pre-select it
           if (colors.length === 1) {
@@ -1802,10 +1808,10 @@
 
           // If only 1 size exists or default variant exists, select it
           if (sizes.length === 1) {
-            window.currentSelectedSize = sizes[0];
+            window.currentSelectedSize = String(sizes[0]).toUpperCase();
             window._sizeSelected = true;
           } else if (defaultVariant?.size) {
-            window.currentSelectedSize = defaultVariant.size;
+            window.currentSelectedSize = String(defaultVariant.size).toUpperCase();
             window._sizeSelected = true;
           } else {
             window.currentSelectedSize = null;
