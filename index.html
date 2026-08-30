@@ -1,13 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>THE BANIYAN COMPANY</title>
-  <meta http-equiv="refresh" content="0;url=home">
-  <script>
-    window.location.replace('home');
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE BANIYAN COMPANY | Something Big is Coming</title>
+    <!-- Importing a premium look font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0a0a0a; /* Dark, luxury black */
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* The "Becoming Bigger" Animation */
+        .brand-name {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: growIn 4s ease-out forwards;
+        }
+
+        .sub-text {
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #888;
+            opacity: 0;
+            animation: fadeIn 2s ease-in 2s forwards; /* Starts after the name starts growing */
+        }
+
+        /* Subtle loading line */
+        .loader-bar {
+            width: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ffffff, transparent);
+            margin: 30px auto;
+            animation: expandLine 3s ease-in-out 1s forwards;
+        }
+
+        /* Animations */
+        @keyframes growIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+                letter-spacing: 20px;
+                filter: blur(10px);
+            }
+            100% {
+                transform: scale(1.1); /* Ends slightly larger for that "bigger" feel */
+                opacity: 1;
+                letter-spacing: 10px;
+                filter: blur(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes expandLine {
+            from { width: 0; }
+            to { width: 200px; }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .brand-name { font-size: 1.8rem; letter-spacing: 6px; }
+            .sub-text { font-size: 0.8rem; }
+        }
+    </style>
 </head>
-<body style="background:#0a0a0a;">
+<body>
+
+    <div class="container">
+        <div class="brand-name">THE BANIYAN COMPANY</div>
+        <div class="loader-bar"></div>
+        <div class="sub-text">BECOMING BIGGER. STAY TUNED.</div>
+    </div>
+
+    <!-- Optional: Add a subtle background particle effect or grain here -->
+
 </body>
 </html>
