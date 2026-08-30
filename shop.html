@@ -429,6 +429,17 @@
       <button onclick="resetAllAdvancedFilters()" class="mt-2 px-6 py-2.5 bg-black text-white rounded-xl text-xs font-bold uppercase tracking-wider">Reset All Filters</button>
     </div>
 
+    <!-- Pagination Scroll Sentinel & Loading Indicator -->
+    <div id="pagination-sentinel" class="py-8 flex flex-col items-center justify-center gap-2 text-center hidden">
+      <div class="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white border border-black/10 rounded-full shadow-sm text-xs font-semibold text-neutral-700">
+        <svg class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Loading next 20 products...</span>
+      </div>
+    </div>
+
     <!-- Item count mobile -->
     <p class="text-xs text-secondary font-medium text-center mt-6 sm:hidden" id="product-count-mobile">Showing 0 items</p>
   </div>
@@ -870,7 +881,31 @@
   }
   window.filterCategory = filterCategory;
 
-  function applyAdvancedFilters() {
+  let visibleProductLimit = 20;
+  let paginationObserver = null;
+
+  function initPaginationObserver() {
+    const sentinel = document.getElementById('pagination-sentinel');
+    if (!sentinel) return;
+    if (paginationObserver) paginationObserver.disconnect();
+
+    paginationObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && sentinel.style.display !== 'none' && !sentinel.classList.contains('hidden')) {
+          visibleProductLimit += 20;
+          applyAdvancedFilters(true);
+        }
+      });
+    }, { rootMargin: '300px' });
+
+    paginationObserver.observe(sentinel);
+  }
+
+  function applyAdvancedFilters(isScrollAppend = false) {
+    if (!isScrollAppend) {
+      visibleProductLimit = 20;
+    }
+
     const cards = document.querySelectorAll('.product-card');
     const searchInp = document.getElementById('shop-search-input');
     currentQuery = searchInp ? searchInp.value.toLowerCase().trim() : '';
@@ -892,6 +927,7 @@
       }
     }
 
+    const matchingCards = [];
     cards.forEach(card => {
       const cat = (card.getAttribute('data-category') || '').toLowerCase();
       const title = card.querySelector('h3')?.innerText?.toLowerCase() || '';
@@ -915,37 +951,76 @@
       const sizeOk = selectedSizes.length === 0 || selectedSizes.some(s => sizes.includes(s.toLowerCase()));
       const colorOk = selectedColors.length === 0 || selectedColors.some(c => colors.includes(c.toLowerCase()));
 
-      const isVisible = catOk && searchOk && priceOk && subOk && tagOk && sizeOk && colorOk;
-      card.style.display = isVisible ? 'flex' : 'none';
+      const isMatching = catOk && searchOk && priceOk && subOk && tagOk && sizeOk && colorOk;
+      if (isMatching) {
+        matchingCards.push(card);
+      } else {
+        card.style.display = 'none';
+      }
     });
 
-    sortProducts();
-  }
-  window.applyAdvancedFilters = applyAdvancedFilters;
-
-  function sortProducts() {
+    // Sort matching cards
     const sort = document.getElementById('sort-select')?.value || 'default';
     const grid = document.getElementById('product-grid');
-    if (!grid) return;
-    const cards = [...grid.querySelectorAll('.product-card')];
-    cards.sort((a, b) => {
-      const pa = parseInt(a.getAttribute('data-price') || '0');
-      const pb = parseInt(b.getAttribute('data-price') || '0');
-      if (sort === 'price-asc') return pa - pb;
-      if (sort === 'price-desc') return pb - pa;
-      return 0;
-    });
-    cards.forEach(c => grid.appendChild(c));
+    if (grid) {
+      matchingCards.sort((a, b) => {
+        const pa = parseInt(a.getAttribute('data-price') || '0');
+        const pb = parseInt(b.getAttribute('data-price') || '0');
+        if (sort === 'price-asc') return pa - pb;
+        if (sort === 'price-desc') return pb - pa;
+        return 0;
+      });
+      matchingCards.forEach(c => grid.appendChild(c));
+    }
 
-    const visible = cards.filter(c => c.style.display !== 'none').length;
+    const totalMatching = matchingCards.length;
+    const countToDisplay = Math.min(visibleProductLimit, totalMatching);
+
+    matchingCards.forEach((card, idx) => {
+      if (idx < countToDisplay) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
     const countEl = document.getElementById('product-count');
     const countSub = document.getElementById('shop-product-subtext');
     const countMob = document.getElementById('product-count-mobile');
     const emptyState = document.getElementById('empty-state');
-    if (countEl) countEl.innerText = `${visible} item${visible !== 1 ? 's' : ''}`;
-    if (countSub) countSub.innerText = `${visible} product${visible !== 1 ? 's' : ''}`;
-    if (countMob) countMob.innerText = `Showing ${visible} items`;
-    if (emptyState) emptyState.style.display = visible === 0 ? 'flex' : 'none';
+
+    const countText = totalMatching === 0
+      ? '0 items'
+      : (countToDisplay < totalMatching ? `Showing ${countToDisplay} of ${totalMatching} items` : `${totalMatching} items`);
+    const countSubText = totalMatching === 0
+      ? '0 products'
+      : (countToDisplay < totalMatching ? `Showing ${countToDisplay} of ${totalMatching} products` : `${totalMatching} products`);
+
+    if (countEl) countEl.innerText = countText;
+    if (countSub) countSub.innerText = countSubText;
+    if (countMob) countMob.innerText = countText;
+    if (emptyState) emptyState.style.display = totalMatching === 0 ? 'flex' : 'none';
+
+    // Sentinel visibility
+    const sentinel = document.getElementById('pagination-sentinel');
+    if (sentinel) {
+      if (countToDisplay < totalMatching) {
+        sentinel.classList.remove('hidden');
+        sentinel.style.display = 'flex';
+      } else {
+        sentinel.classList.add('hidden');
+        sentinel.style.display = 'none';
+      }
+    }
+
+    if (!paginationObserver) {
+      initPaginationObserver();
+    }
+  }
+  window.applyAdvancedFilters = applyAdvancedFilters;
+
+  function sortProducts() {
+    applyAdvancedFilters(true);
   }
 </script>
 
