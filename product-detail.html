@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8">
   <title>THE BANIYAN COMPANY — Product Details</title>
-  <link rel="icon" type="image/jpeg" href="assets/tbclogo.jpeg">
-  <link rel="shortcut icon" href="assets/tbclogo.jpeg">
-  <link rel="apple-touch-icon" href="assets/tbclogo.jpeg">
+  <link rel="icon" type="image/png" href="assets/onespace-commerce-logo.png">
+  <link rel="shortcut icon" href="assets/onespace-commerce-logo.png">
+  <link rel="apple-touch-icon" href="assets/onespace-commerce-logo.png">
   <meta name="description"
     content="Shop affordable premium clothing at THE BANIYAN COMPANY. Crafted with quality cotton knit for effortless modern style.">
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
@@ -145,11 +145,14 @@
 
     /* ── Golden Glowing Luxury Offer Chip ── */
     @keyframes goldAuraGlow {
-      0%, 100% {
+
+      0%,
+      100% {
         box-shadow: 0 0 8px rgba(234, 179, 8, 0.4), 0 0 16px rgba(217, 119, 6, 0.2), inset 0 0 6px rgba(253, 224, 71, 0.2);
         border-color: #EAB308;
         outline-color: rgba(234, 179, 8, 0.5);
       }
+
       50% {
         box-shadow: 0 0 16px rgba(250, 204, 21, 0.8), 0 0 28px rgba(234, 179, 8, 0.45), inset 0 0 12px rgba(254, 240, 138, 0.4);
         border-color: #FDE047;
@@ -161,7 +164,9 @@
       0% {
         transform: translateX(-150%) skewX(-20deg);
       }
-      35%, 100% {
+
+      35%,
+      100% {
         transform: translateX(220%) skewX(-20deg);
       }
     }
@@ -186,7 +191,7 @@
       animation: goldAuraGlow 2.5s infinite ease-in-out;
       user-select: none;
       vertical-align: middle;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
       white-space: nowrap;
     }
 
@@ -197,12 +202,10 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.45) 50%,
-        transparent 100%
-      );
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.45) 50%,
+          transparent 100%);
       animation: goldShimmerSweep 3.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
     }
@@ -415,8 +418,8 @@
   <!-- Loading Screen with Progression Bar & Percentage -->
   <div id="loading-screen">
     <div class="flex flex-col items-center text-center">
-      <img id="loading-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-12 object-contain rounded-xl"
-        src="tbclogo.svg" onerror="this.src='tbclogo.jpeg'">
+      <img id="loading-company-logo" alt="OneSpaceCommerce Logo" class="h-12 object-contain rounded-xl"
+        src="assets/onespace-commerce-logo.png" onerror="this.src='assets/Onespace Commerce Logo PNG.png'">
       <span class="text-[11px] font-bold uppercase tracking-[0.28em] text-neutral-800 mt-3">THE BANIYAN COMPANY</span>
       <div class="loading-bar-wrap">
         <div class="loading-bar-fill" id="loading-bar-fill"></div>
@@ -435,8 +438,8 @@
       </a>
 
       <a href="home" class="flex items-center gap-3">
-        <img id="nav-company-logo" alt="THE BANIYAN COMPANY Logo" class="h-9 object-contain rounded-xl"
-          src="tbclogo.svg" onerror="this.onerror=null;">
+        <img id="nav-company-logo" alt="OneSpaceCommerce Logo" class="h-9 object-contain rounded-xl"
+          src="assets/onespace-commerce-logo.png" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
         <span class="font-bold tracking-[0.15em] text-sm md:text-base text-primary uppercase hidden sm:inline-block">THE
           BANIYAN COMPANY</span>
       </a>
@@ -747,31 +750,6 @@
       <div class="pt-12 border-t border-black/10">
         <h2 class="text-2xl font-bold text-primary mb-6">Complete The Look</h2>
         <div id="related-products-scroll" class="flex gap-4 overflow-x-auto no-scrollbar snap-x pb-4">
-
-          <a href="product-detail"
-            class="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-shadow flex-shrink-0 w-44 sm:w-52 snap-start">
-            <div class="aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-surface-container">
-              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                alt="Atlas Linen Shirt"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeY4hU0Fbt9R0TmLg23oGguMMRa3hwWHbZm9e0hunXVSkc-LEwEQypEn63BZhBRBiKHAQRGTWSxqibuXtmQ2H43TFY0ZqwlonwZH-mD4mFD_OuzY_UAWseH-4-z8LbUPsgj64al9b6Q6W7eKRqpNpK5UxuAYzL_4-43S27nGVwhtsW0H3bZtsYvWAslEWaviGYNvFq9Z9_ShD_ZubmPXkaKiFLXZEis5jofecIeyRiAN5BXwAtZ4nNUVHj955wvW8awsZIhVDvCO0t">
-            </div>
-            <span class="text-[11px] text-secondary uppercase font-semibold">Shirts</span>
-            <h3 class="font-semibold text-sm text-on-surface truncate">Atlas Linen Shirt</h3>
-            <span class="font-bold text-base text-primary mt-1 block">₹1,799</span>
-          </a>
-
-          <a href="product-detail"
-            class="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-shadow flex-shrink-0 w-44 sm:w-52 snap-start">
-            <div class="aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-surface-container">
-              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                alt="Noir Editorial Blazer"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmMc6t81D85qcK88-AoEaixZdCckjEijh7L0klxGRZykEiyLhBlGEVyUxy8quhm3CXbnsR1fHGNR8x4LCBhCZv6yD_WEjpxv5lwA4dVABOMD4ny_cV9cL8zVZx0416FNHrn8XgrOowm71KGGibilhYlu0Xtc24lN5-9hE7GjuPaznFEIydGIgqu2KqFRL4BOBPAOGw1UAkLsaAiLV3UTrI2T4dLOcCXKnD9JOt824w69wt48rA9iKFaeA9iEnZKpiHIKa_nv1QdUR2">
-            </div>
-            <span class="text-[11px] text-secondary uppercase font-semibold">Blazer</span>
-            <h3 class="font-semibold text-sm text-on-surface truncate">Noir Editorial Blazer</h3>
-            <span class="font-bold text-base text-primary mt-1 block">₹4,499</span>
-          </a>
-
         </div>
       </div>
 
@@ -1250,11 +1228,11 @@
         const vPricing = (typeof window.getProductPricing === 'function')
           ? window.getProductPricing(product, variant)
           : {
-              price: Number(variant.price),
-              mrp: Number(variant.mrp || variant.originalPrice || product.originalPrice || product.mrp || 0),
-              discountPct: 0,
-              hasDiscount: false
-            };
+            price: Number(variant.price),
+            mrp: Number(variant.mrp || variant.originalPrice || product.originalPrice || product.mrp || 0),
+            discountPct: 0,
+            hasDiscount: false
+          };
 
         const vPrice = vPricing.price;
         const rawOrig = vPricing.mrp;
@@ -1535,26 +1513,26 @@
 
     // ── Razorpay handler (replaces mProcessPayment for Razorpay path) ──────────
     window.launchRazorpay = function (orderPayload, total, onSuccess) {
-      const key = 'rzp_live_TM8qhpQTojuGA9';
+      const key = 'rzp_live_TLKPum9INJJYbt';
       try {
         const options = {
           key,
           amount: Math.round(total * 100),
           currency: 'INR',
-          name: 'THE BANIYAN COMPANY',
-          description: orderPayload.items?.[0]?.name || 'Apparel Order',
+          name: 'The Baniyan Company',
+          description: orderPayload.items?.[0]?.name || 'Order',
           image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM',
           handler: async function (response) {
             const invoicePayload = {
               ...orderPayload,
-              paymentMethod: 'Razorpay Online Payment',
+              paymentMethod: 'Razorpay Online',
               paymentStatus: 'Paid',
-              razorpayPaymentId: response.razorpay_payment_id || `PAY_${Date.now()}`,
+              razorpayPaymentId: response.razorpay_payment_id,
               razorpayOrderId: response.razorpay_order_id || '',
               razorpaySignature: response.razorpay_signature || '',
             };
             const result = await createInvoice(invoicePayload);
-            const invoiceId = result?.invoiceId || result?.orderId || generateOrderId();
+            const invoiceId = result?.invoiceId || generateOrderId();
             onSuccess(invoiceId);
           },
           prefill: {

@@ -3,13 +3,13 @@
 
 <head>
   <meta charset="utf-8">
-  <title>TBC Admin Portal — Store Control &amp; Orders</title>
-  <link rel="icon" type="image/jpeg" href="assets/tbclogo.jpeg">
-  <link rel="shortcut icon" href="assets/tbclogo.jpeg">
-  <link rel="apple-touch-icon" href="assets/tbclogo.jpeg">
+  <title>OneSpace Commerce — Admin Console</title>
+  <link rel="icon" type="image/png" href="assets/onespace-commerce-logo.png">
+  <link rel="shortcut icon" href="assets/onespace-commerce-logo.png">
+  <link rel="apple-touch-icon" href="assets/onespace-commerce-logo.png">
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
     rel="stylesheet">
@@ -20,12 +20,12 @@
       theme: {
         extend: {
           colors: {
-            "background": "#f4f5f8",
+            "background": "#f6f6f7",
             "surface": "#ffffff",
             "primary": "#0f172a",
-            "on-primary": "#ffffff"
+            "border-subtle": "#e1e3e5"
           },
-          fontFamily: { sans: ['Inter', 'sans-serif'] }
+          fontFamily: { sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'] }
         }
       }
     }
@@ -36,481 +36,801 @@
     }
 
     body {
-      background-color: #f4f5f8;
-      background-image:
-        radial-gradient(at 0% 0%, rgba(241, 245, 249, 0.8) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(226, 232, 240, 0.5) 0px, transparent 50%);
+      background-color: #f6f6f7;
+      color: #1a1a1a;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    .glass-card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
-    }
-
-    .glass-input {
-      background: rgba(243, 244, 246, 0.9);
-      border: 1px solid rgba(0, 0, 0, 0.09);
-      color: #0f172a;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .glass-input:focus {
-      border-color: #000000;
+    .shopify-card {
       background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e1e3e5;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+    }
+
+    .shopify-input {
+      background: #ffffff;
+      border: 1px solid #c9cccf;
+      color: #1a1a1a;
+      border-radius: 8px;
+      font-weight: 400;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .shopify-input:focus {
+      border-color: #0f172a;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
+    }
+
+    .sidebar-nav-btn {
+      color: #4a4d52;
+      background-color: transparent;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar-nav-btn:hover:not(.active) {
+      background-color: #f1f2f4;
+      color: #0f172a;
+    }
+
+    .sidebar-nav-btn.active {
+      background-color: #0f172a;
+      color: #ffffff;
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
   </style>
 </head>
 
-<body class="bg-[#f4f5f8] text-slate-900 font-sans min-h-screen antialiased">
+<body class="bg-[#f6f6f7] text-slate-900 font-sans min-h-screen antialiased">
 
-  <!-- Admin Auth Modal (iOS Glass White/Black) -->
+  <!-- Admin Auth Modal -->
   <div id="admin-login-overlay"
-    class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-2xl flex items-center justify-center p-4">
-    <div class="glass-card rounded-[32px] p-8 max-w-md w-full shadow-2xl space-y-6 relative overflow-hidden">
-      <div class="text-center space-y-2">
-        <div class="w-16 h-16 rounded-2xl bg-black text-white flex items-center justify-center mx-auto shadow-xl">
-          <span class="material-symbols-outlined text-3xl">admin_panel_settings</span>
+    class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="shopify-card rounded-2xl p-8 max-w-md w-full shadow-xl space-y-6 relative overflow-hidden">
+      <div class="text-center space-y-3">
+        <div class="flex items-center justify-center">
+          <img src="assets/onespace-commerce-logo.png" id="login-logo-img" alt="OneSpace Commerce Logo" class="h-12 object-contain rounded-lg" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
         </div>
-        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">TBC Admin Console</h2>
-        <p class="text-xs text-slate-500 font-medium">Enter Company ID &amp; Admin Credentials to continue</p>
+        <h2 class="text-xl font-semibold text-slate-900 tracking-tight">OneSpace Commerce</h2>
+        <p class="text-xs text-slate-500 font-normal">Enter Admin Credentials to access store controls</p>
       </div>
 
       <form id="admin-login-form" class="space-y-4">
         <div>
-          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Admin Email / Company
-            ID</label>
+          <label class="block text-xs font-medium text-slate-700 mb-1.5">Admin Email / ID</label>
           <input type="email" id="admin-email" value="thebaniyancompanycbe@gmail.com" required
-            class="w-full glass-input rounded-2xl px-4 py-3.5 text-xs outline-none font-semibold">
+            class="w-full shopify-input rounded-lg px-3.5 py-2.5 text-xs outline-none font-normal">
         </div>
         <div>
-          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Admin Password /
-            Access Code</label>
+          <label class="block text-xs font-medium text-slate-700 mb-1.5">Admin Password</label>
           <input type="password" id="admin-passcode" placeholder="Enter password or access code" required
-            class="w-full glass-input rounded-2xl px-4 py-3.5 text-xs outline-none font-semibold">
+            class="w-full shopify-input rounded-lg px-3.5 py-2.5 text-xs outline-none font-normal">
         </div>
-        <p id="admin-login-error" class="text-xs text-rose-500 font-semibold hidden text-center"></p>
+        <p id="admin-login-error" class="text-xs text-rose-600 font-medium hidden text-center"></p>
         <button type="submit" id="admin-login-btn"
-          class="w-full py-4 bg-black hover:bg-slate-800 text-white font-bold rounded-2xl text-xs uppercase tracking-widest transition-all shadow-lg active:scale-98">Login
-          to Console</button>
+          class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg text-xs transition-all shadow-xs cursor-pointer">Login to Console</button>
       </form>
-      <div class="text-center pt-2">
-        <a href="home.html" class="text-xs text-slate-500 hover:text-black font-semibold transition-colors">← Back to
-          Storefront</a>
+      <div class="text-center pt-1">
+        <a href="home.html" class="text-xs text-slate-500 hover:text-slate-900 font-medium transition-colors">Back to Storefront</a>
       </div>
     </div>
   </div>
 
-  <!-- Main Admin Dashboard -->
-  <div id="admin-dashboard" class="hidden min-h-screen pb-20">
+  <!-- Main Admin Dashboard Layout -->
+  <div id="admin-dashboard" class="hidden min-h-screen flex flex-col md:flex-row">
 
-    <!-- iOS Liquid Top Header -->
-    <header
-      class="sticky top-0 z-40 bg-white/80 backdrop-blur-2xl border-b border-slate-200/80 px-6 py-4 flex items-center justify-between shadow-sm">
-      <div class="flex items-center gap-3.5">
-        <div class="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center shadow-md">
-          <span class="material-symbols-outlined text-xl">storefront</span>
-        </div>
-        <div>
-          <h1 class="font-bold text-sm text-slate-900 uppercase tracking-widest" id="header-brand-name">THE BANIYAN
-            COMPANY</h1>
-          <span class="text-[10px] font-semibold text-slate-500 tracking-widest uppercase block">iOS Liquid Glass
-            Console · ID: <span id="display-company-id" class="text-slate-900 font-bold">thebaniyancompany</span></span>
-        </div>
-      </div>
-      <div class="flex items-center gap-3">
-        <a href="home.html"
-          class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-800 transition-all flex items-center gap-1.5 border border-slate-200/80">
-          <span class="material-symbols-outlined text-base">visibility</span> View Store
-        </a>
-        <button onclick="logoutAdmin()"
-          class="px-4 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition-all border border-rose-200/60">Logout</button>
-      </div>
-    </header>
+    <!-- Sidebar Drawer Mobile Overlay -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 hidden md:hidden"></div>
 
-    <div class="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-8">
-
-      <!-- Quick Stats Grid (iOS Liquid Glass Cards - Clickable Filters) -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div onclick="setOrderFilter('all')"
-          class="glass-card p-5 rounded-[24px] flex items-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-98 transition-all border border-slate-200">
-          <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-md">
-            <span class="material-symbols-outlined text-2xl">orders</span>
-          </div>
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Orders</span>
-            <h3 class="text-2xl font-extrabold text-slate-900 mt-0.5" id="stat-total-orders">0</h3>
-          </div>
-        </div>
-        <div class="glass-card p-5 rounded-[24px] flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
-            <span class="material-symbols-outlined text-2xl">payments</span>
-          </div>
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Revenue</span>
-            <h3 class="text-2xl font-extrabold text-slate-900 mt-0.5" id="stat-total-revenue">₹0</h3>
-          </div>
-        </div>
-        <div onclick="setOrderFilter('pending')"
-          class="glass-card p-5 rounded-[24px] flex items-center gap-4 cursor-pointer hover:scale-[1.02] active:scale-98 transition-all border border-amber-200 bg-amber-50/40">
-          <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md">
-            <span class="material-symbols-outlined text-2xl">pending_actions</span>
-          </div>
-          <div>
-            <span class="text-[10px] font-bold text-amber-700 uppercase tracking-widest">Pending Orders</span>
-            <h3 class="text-2xl font-extrabold text-slate-900 mt-0.5" id="stat-pending-orders">0</h3>
-          </div>
-        </div>
-        <div class="glass-card p-5 rounded-[24px] flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md">
-            <span class="material-symbols-outlined text-2xl">inventory_2</span>
-          </div>
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Products</span>
-            <h3 class="text-2xl font-extrabold text-slate-900 mt-0.5" id="stat-total-products">0</h3>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        <!-- Left 2 Cols: Orders Feed -->
-        <div class="lg:col-span-2 space-y-4">
-          <div class="glass-card p-5 rounded-[24px] space-y-3.5">
-            <div class="flex justify-between items-center flex-wrap gap-2">
-              <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <span class="material-symbols-outlined text-slate-900">local_shipping</span> Customer Orders
-              </h2>
-              <span
-                class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider bg-slate-100 px-3 py-1 rounded-full border border-slate-200">Real-time
-                Stream</span>
+    <!-- LEFT SIDEBAR MENU -->
+    <aside id="admin-sidebar" class="fixed md:sticky top-0 left-0 bottom-0 z-50 w-64 bg-white border-r border-[#e1e3e5] flex flex-col justify-between transition-transform duration-300 -translate-x-full md:translate-x-0 h-screen">
+      <div>
+        <!-- Brand & Logo Header -->
+        <div class="p-4 border-b border-[#e1e3e5] flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img src="assets/onespace-commerce-logo.png" id="sidebar-logo-img" alt="Store Logo" class="h-9 w-9 object-contain rounded-lg border border-slate-200 bg-white p-0.5" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
+            <div class="min-w-0">
+              <h1 class="font-semibold text-sm text-slate-900 truncate" id="header-brand-name">OneSpace Commerce</h1>
+              <span class="text-xs text-slate-500 font-medium block">Admin Console</span>
             </div>
-            <!-- Page-wise Segment Filter Tabs & Search Bar -->
-            <div class="space-y-3 pt-2 border-t border-slate-100">
-              <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                <button id="tab-filter-all" onclick="setOrderFilter('all')"
-                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-black text-white shadow-sm">
-                  All <span id="badge-count-all" class="ml-1 opacity-80">(0)</span>
+          </div>
+          <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-500 hover:text-slate-900 p-1">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        <!-- Vertical Side Navigation Menu -->
+        <nav class="p-3 space-y-1">
+          <button id="side-tab-dashboard" onclick="switchAdminTab('dashboard')"
+            class="sidebar-nav-btn active w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">dashboard</span>
+            <span>Dashboard &amp; Sales</span>
+          </button>
+
+          <button id="side-tab-products" onclick="switchAdminTab('products')"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">inventory_2</span>
+            <span>Products &amp; Stock</span>
+          </button>
+
+          <button id="side-tab-orders" onclick="switchAdminTab('orders')"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">local_shipping</span>
+            <span>Orders &amp; Shipping</span>
+          </button>
+
+          <button id="side-tab-reels" onclick="switchAdminTab('reels')"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">movie</span>
+            <span>Reels &amp; Media</span>
+          </button>
+
+          <button id="side-tab-settings" onclick="switchAdminTab('settings')"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">settings</span>
+            <span>Store Settings</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="p-3.5 border-t border-[#e1e3e5] space-y-2">
+        <a href="home.html" class="w-full py-2 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-800 transition-all flex items-center justify-center gap-2 border border-slate-200">
+          <span class="material-symbols-outlined text-base">visibility</span> View Storefront
+        </a>
+        <button onclick="logoutAdmin()" class="w-full py-2 px-3 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-medium transition-all border border-rose-200/60 flex items-center justify-center gap-2 cursor-pointer">
+          <span class="material-symbols-outlined text-base">logout</span> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- RIGHT CONTENT AREA -->
+    <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+      
+      <!-- Top Mobile Navigation Bar -->
+      <header class="md:hidden sticky top-0 z-30 bg-white border-b border-[#e1e3e5] px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <button onclick="toggleMobileSidebar()" class="p-1.5 rounded-lg bg-slate-100 text-slate-800">
+            <span class="material-symbols-outlined text-xl">menu</span>
+          </button>
+          <img src="assets/onespace-commerce-logo.png" alt="Logo" class="h-7 object-contain" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
+          <span class="font-semibold text-xs text-slate-900">OneSpace Commerce</span>
+        </div>
+        <a href="home.html" class="text-xs font-medium text-slate-700 hover:text-slate-900">Store →</a>
+      </header>
+
+      <main class="p-4 md:p-8 flex-1 space-y-6 max-w-7xl">
+
+        <!-- ==================== VIEW 1: DASHBOARD & SALES ==================== -->
+        <div id="view-dashboard" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div onclick="switchAdminTab('orders'); setOrderFilter('all');"
+              class="shopify-card p-5 flex items-center gap-4 cursor-pointer hover:border-slate-400 transition-all">
+              <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-xl">orders</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500">Total orders</span>
+                <h3 class="text-2xl font-semibold text-slate-900 mt-0.5" id="stat-total-orders">0</h3>
+              </div>
+            </div>
+
+            <div class="shopify-card p-5 flex items-center gap-4">
+              <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-xl">payments</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500">Total revenue</span>
+                <h3 class="text-2xl font-semibold text-slate-900 mt-0.5" id="stat-total-revenue">₹0</h3>
+              </div>
+            </div>
+
+            <div onclick="switchAdminTab('orders'); setOrderFilter('pending');"
+              class="shopify-card p-5 flex items-center gap-4 cursor-pointer hover:border-amber-400 transition-all bg-amber-50/30 border-amber-200">
+              <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center">
+                <span class="material-symbols-outlined text-xl">pending_actions</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-amber-800">Pending orders</span>
+                <h3 class="text-2xl font-semibold text-slate-900 mt-0.5" id="stat-pending-orders">0</h3>
+              </div>
+            </div>
+
+            <div onclick="switchAdminTab('products')"
+              class="shopify-card p-5 flex items-center gap-4 cursor-pointer hover:border-slate-400 transition-all">
+              <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-xl">inventory_2</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500">Active products</span>
+                <h3 class="text-2xl font-semibold text-slate-900 mt-0.5" id="stat-total-products">0</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 shopify-card p-6 space-y-4">
+              <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h2 class="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-slate-700 text-lg">analytics</span> Sales &amp; Performance Summary
+                </h2>
+                <span class="text-xs text-slate-500 font-medium bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">Real-time Stream</span>
+              </div>
+              <div class="p-8 text-center bg-slate-50 rounded-lg border border-slate-200/80 space-y-3">
+                <span class="material-symbols-outlined text-4xl text-slate-400">monitoring</span>
+                <h3 class="text-sm font-semibold text-slate-800">Sales Analytics Overview</h3>
+                <p class="text-xs text-slate-500 max-w-md mx-auto">Track incoming order volume, revenue breakdown, and fulfilled shipments seamlessly in real-time.</p>
+                <div class="pt-2 flex justify-center gap-3">
+                  <button onclick="switchAdminTab('orders')" class="px-4 py-2 bg-slate-900 text-white text-xs font-medium rounded-lg shadow-xs cursor-pointer">Manage Orders</button>
+                  <button onclick="switchAdminTab('products')" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-medium rounded-lg cursor-pointer">Manage Inventory</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="shopify-card p-6 space-y-4">
+              <div class="border-b border-slate-100 pb-3">
+                <h2 class="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-slate-700 text-lg">tune</span> Quick Shortcuts
+                </h2>
+              </div>
+              <div class="space-y-2.5">
+                <button onclick="switchAdminTab('settings')" class="w-full text-left p-3 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-between transition-all">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-slate-700 text-lg">toggle_on</span>
+                    <span class="text-xs font-medium text-slate-900">Checkout Feature Toggles</span>
+                  </div>
+                  <span class="material-symbols-outlined text-slate-400 text-sm">chevron_right</span>
                 </button>
-                <button id="tab-filter-pending" onclick="setOrderFilter('pending')"
-                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                  Pending <span id="badge-count-pending" class="ml-1 opacity-80">(0)</span>
+
+                <button onclick="switchAdminTab('products')" class="w-full text-left p-3 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-between transition-all">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-slate-700 text-lg">inventory</span>
+                    <span class="text-xs font-medium text-slate-900">Stock &amp; Catalog Adjustments</span>
+                  </div>
+                  <span class="material-symbols-outlined text-slate-400 text-sm">chevron_right</span>
                 </button>
-                <button id="tab-filter-delivered" onclick="setOrderFilter('delivered')"
-                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                  Delivered <span id="badge-count-delivered" class="ml-1 opacity-80">(0)</span>
-                </button>
-                <button id="tab-filter-cancelled" onclick="setOrderFilter('cancelled')"
-                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
-                  Cancelled <span id="badge-count-cancelled" class="ml-1 opacity-80">(0)</span>
+
+                <button onclick="switchAdminTab('reels')" class="w-full text-left p-3 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-between transition-all">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-slate-700 text-lg">videocam</span>
+                    <span class="text-xs font-medium text-slate-900">Reels &amp; Video Media</span>
+                  </div>
+                  <span class="material-symbols-outlined text-slate-400 text-sm">chevron_right</span>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <!-- Quick Order Search -->
+        <!-- ==================== VIEW 2: PRODUCTS & STOCKS ==================== -->
+        <div id="view-products" class="hidden space-y-6">
+          <div class="shopify-card p-6 space-y-4">
+            <div class="flex justify-between items-center flex-wrap gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <h2 class="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-slate-900 text-lg">inventory_2</span> Product Catalog &amp; Real-Time Stocks
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Manage stock counts, prices, and availability across your store catalog.</p>
+              </div>
+
+              <!-- Product Filters & Search Bar -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <div class="relative">
+                  <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+                  <input type="text" id="product-search-input" oninput="applyProductFilters()"
+                    placeholder="Search products..."
+                    class="shopify-input rounded-lg pl-8 pr-3 py-1.5 text-xs outline-none font-normal w-44 sm:w-56">
+                </div>
+
+                <select id="product-category-filter" onchange="applyProductFilters()" class="shopify-input text-slate-700 px-2.5 py-1.5 rounded-lg text-xs outline-none font-medium bg-white cursor-pointer">
+                  <option value="all">All Categories</option>
+                </select>
+
+                <select id="product-stock-filter" onchange="applyProductFilters()" class="shopify-input text-slate-700 px-2.5 py-1.5 rounded-lg text-xs outline-none font-medium bg-white cursor-pointer">
+                  <option value="all">All Stock Statuses</option>
+                  <option value="in_stock">In Stock</option>
+                  <option value="low_stock">Low Stock (≤5)</option>
+                  <option value="out_of_stock">Out of Stock</option>
+                </select>
+
+                <select id="product-sort-filter" onchange="applyProductFilters()" class="shopify-input text-slate-700 px-2.5 py-1.5 rounded-lg text-xs outline-none font-medium bg-white cursor-pointer">
+                  <option value="default">Sort: Default</option>
+                  <option value="name_asc">Name: A to Z</option>
+                  <option value="price_low">Price: Low to High</option>
+                  <option value="price_high">Price: High to Low</option>
+                  <option value="stock_low">Stock: Low to High</option>
+                  <option value="stock_high">Stock: High to Low</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-[11px] font-semibold uppercase tracking-wider text-slate-600 border-b border-slate-200">
+                    <th class="p-3.5">Product Details</th>
+                    <th class="p-3.5">Category</th>
+                    <th class="p-3.5">Price</th>
+                    <th class="p-3.5">Current Stock</th>
+                    <th class="p-3.5 text-right">Stock Status</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-body" class="divide-y divide-slate-100 text-xs font-normal">
+                  <tr>
+                    <td colspan="5" class="p-8 text-center text-slate-400">
+                      <span class="material-symbols-outlined text-3xl animate-spin mb-1">motion_photos_on</span>
+                      <p class="font-medium">Loading product catalog...</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== VIEW 3: ORDERS & LOGISTICS ==================== -->
+        <div id="view-orders" class="hidden space-y-6">
+          <div class="shopify-card p-6 space-y-4">
+            <div class="flex justify-between items-center flex-wrap gap-2">
+              <h2 class="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                <span class="material-symbols-outlined text-slate-900 text-lg">local_shipping</span> Customer Orders &amp; Logistics
+              </h2>
+              <span class="text-xs text-slate-500 font-medium bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">Real-time Stream</span>
+            </div>
+
+            <div class="space-y-3 pt-2 border-t border-slate-100">
+              <!-- Order Filters Header Row -->
+              <div class="flex items-center justify-between flex-wrap gap-3">
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                  <button id="tab-filter-all" onclick="setOrderFilter('all')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-900 text-white shadow-xs">
+                    All <span id="badge-count-all" class="ml-1 opacity-80">(0)</span>
+                  </button>
+                  <button id="tab-filter-pending" onclick="setOrderFilter('pending')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200">
+                    Pending <span id="badge-count-pending" class="ml-1 opacity-80">(0)</span>
+                  </button>
+                  <button id="tab-filter-delivered" onclick="setOrderFilter('delivered')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200">
+                    Delivered <span id="badge-count-delivered" class="ml-1 opacity-80">(0)</span>
+                  </button>
+                  <button id="tab-filter-cancelled" onclick="setOrderFilter('cancelled')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200">
+                    Cancelled <span id="badge-count-cancelled" class="ml-1 opacity-80">(0)</span>
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap">
+                  <select id="order-payment-filter" onchange="handleOrderPaymentFilter(this.value)" class="shopify-input text-slate-700 px-2.5 py-1.5 rounded-lg text-xs outline-none font-medium bg-white cursor-pointer">
+                    <option value="all">All Payment Methods</option>
+                    <option value="paid">Paid (Online / Razorpay)</option>
+                    <option value="cod">COD (Cash on Delivery)</option>
+                    <option value="whatsapp">WhatsApp Order</option>
+                  </select>
+
+                  <select id="order-sort-filter" onchange="handleOrderSortFilter(this.value)" class="shopify-input text-slate-700 px-2.5 py-1.5 rounded-lg text-xs outline-none font-medium bg-white cursor-pointer">
+                    <option value="newest">Sort: Newest First</option>
+                    <option value="oldest">Sort: Oldest First</option>
+                    <option value="highest_amount">Sort: Amount (High to Low)</option>
+                  </select>
+                </div>
+              </div>
+
               <div class="relative">
-                <span
-                  class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
                 <input type="text" id="order-search-input" oninput="handleOrderSearch(this.value)"
-                  placeholder="Search orders by customer name, phone (+91...) or Order ID..."
-                  class="w-full glass-input rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none font-medium">
+                  placeholder="Search orders by customer name, phone or Order ID..."
+                  class="w-full shopify-input rounded-lg pl-9 pr-4 py-2 text-xs outline-none font-normal">
               </div>
             </div>
           </div>
 
           <div id="admin-orders-list" class="space-y-4">
-            <div class="glass-card p-12 rounded-[24px] text-center text-slate-400">
+            <div class="shopify-card p-12 text-center text-slate-400">
               <span class="material-symbols-outlined text-4xl animate-spin mb-2 text-slate-400">motion_photos_on</span>
-              <p class="text-xs uppercase font-semibold">Listening to customer orders...</p>
+              <p class="text-xs font-medium">Listening to customer orders...</p>
             </div>
           </div>
 
-          <!-- Page-wise Pagination Bar -->
-          <div id="orders-pagination-bar"
-            class="flex justify-between items-center glass-card p-4 rounded-[24px] text-xs">
+          <div id="orders-pagination-bar" class="flex justify-between items-center shopify-card p-4 text-xs font-medium">
             <button id="btn-prev-page" onclick="changePage(-1)"
-              class="px-4 py-2 rounded-xl bg-slate-100 font-bold text-slate-800 hover:bg-slate-200 disabled:opacity-40 transition-all">←
-              Previous</button>
-            <span id="page-indicator" class="font-bold text-slate-700">Page 1 of 1</span>
+              class="px-3.5 py-1.5 rounded-lg bg-slate-100 text-slate-800 hover:bg-slate-200 disabled:opacity-40 transition-all cursor-pointer">Previous</button>
+            <span id="page-indicator" class="text-slate-700">Page 1 of 1</span>
             <button id="btn-next-page" onclick="changePage(1)"
-              class="px-4 py-2 rounded-xl bg-slate-100 font-bold text-slate-800 hover:bg-slate-200 disabled:opacity-40 transition-all">Next
-              →</button>
+              class="px-3.5 py-1.5 rounded-lg bg-slate-100 text-slate-800 hover:bg-slate-200 disabled:opacity-40 transition-all cursor-pointer">Next</button>
           </div>
         </div>
 
-        <!-- Right 1 Col: Controls -->
-        <div class="lg:col-span-1 space-y-6">
-
-          <!-- Multi-Banner Manager -->
-          <div class="glass-card p-6 rounded-[28px] space-y-5">
-            <div class="border-b border-slate-100 pb-3 space-y-4">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-slate-900">view_carousel</span>
-                  <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider">Hero Banner Slides</h2>
-                </div>
-                <button onclick="addBannerSlide()"
-                  class="px-3 py-1.5 bg-black hover:bg-slate-800 text-white font-bold rounded-xl text-[10px] uppercase tracking-wider transition-all shadow-md">+
-                  Add Slide</button>
-              </div>
-
-              <!-- Helpful Ratio Note for Admin -->
-              <div
-                class="bg-amber-50 border border-amber-200 text-amber-900 p-3.5 rounded-2xl text-[11px] font-semibold flex items-start gap-2.5">
-                <span class="material-symbols-outlined text-[18px] text-amber-600 flex-shrink-0 mt-0.5">lightbulb</span>
-                <div>
-                  <span class="font-bold block text-xs text-amber-950 mb-0.5">Hero Banner & Thumbnail Ratio Note:</span>
-                  • <strong class="text-amber-950">Hero Banner Ratio: 16:9</strong> (Widescreen, e.g. 1920×1080px or
-                  1200×675px) for desktop widescreen displays, and <strong class="text-amber-950">4:3 or 1:1</strong>
-                  (e.g. 800×600px) for mobile banners.<br>
-                  • <strong class="text-amber-950">Product Thumbnails: 4:5</strong> (e.g. 800×1000px) for optimal
-                  catalog grid alignment.
-                </div>
-              </div>
-            </div>
-
-            <form id="banner-update-form" class="space-y-4">
-              <div id="banners-container" class="space-y-4">
-                <!-- Banner Slide Item 1 -->
-                <div class="banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-3">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Slide 1</span>
-                  <div>
-                    <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video
-                      (URL or Gallery Upload — 1MB Limit)</label>
-                    <div class="space-y-1.5">
-                      <input type="text"
-                        class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none"
-                        placeholder="https://... or upload below">
-                      <div class="flex items-center gap-2">
-                        <input type="file" accept="image/*"
-                          onchange="window.handleGalleryUpload(this, '.ctrl-banner-url')" class="hidden"
-                          id="banner-file-picker-1">
-                        <label for="banner-file-picker-1"
-                          class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all shadow-sm">
-                          <span class="material-symbols-outlined text-[13px]">photo_library</span> Upload from Gallery
-                          (1MB Max)
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label
-                      class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Headline</label>
-                    <input type="text"
-                      class="ctrl-banner-heading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none"
-                      placeholder="Summer Luxe 2026">
-                  </div>
-                  <div>
-                    <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Subheading /
-                      Tagline</label>
-                    <input type="text"
-                      class="ctrl-banner-subheading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none"
-                      placeholder="New Collection">
-                  </div>
-                  <div>
-                    <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Click Action
-                      Target URL</label>
-                    <input type="text"
-                      class="ctrl-banner-target w-full glass-input rounded-xl px-3 py-2 text-xs outline-none"
-                      placeholder="shop.html or reels.html">
-                  </div>
-                </div>
-              </div>
-
-              <button type="submit"
-                class="w-full py-3.5 bg-black hover:bg-slate-800 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition-all shadow-md">Save
-                Banner Slides</button>
-            </form>
-          </div>
-
-          <!-- Store Contact & Social Controls -->
-          <div class="glass-card p-6 rounded-[28px] space-y-5">
-            <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-              <span class="material-symbols-outlined text-slate-900">branding_watermark</span>
-              <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider">Branding, Contact &amp; Instagram
-              </h2>
-            </div>
-
-            <form id="branding-update-form" class="space-y-4">
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Store
-                  Name</label>
-                <input type="text" id="ctrl-store-name" placeholder="THE BANIYAN COMPANY"
-                  class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none font-semibold">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Company Logo
-                  Image (URL or Gallery Upload — 1MB Limit)</label>
-                <div class="space-y-2">
-                  <input type="url" id="ctrl-store-logo" placeholder="https://... or upload below"
-                    class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none">
-                  <div class="flex items-center gap-2">
-                    <input type="file" id="logo-file-picker" accept="image/*"
-                      onchange="window.handleGalleryUpload(this, '#ctrl-store-logo')" class="hidden">
-                    <label for="logo-file-picker"
-                      class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm">
-                      <span class="material-symbols-outlined text-[15px]">photo_library</span> Upload Logo from Gallery
-                      (1MB Max)
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">WhatsApp Support
-                  Number</label>
-                <input type="text" id="ctrl-whatsapp-num" placeholder="+91 9876543210"
-                  class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Instagram Link /
-                  Handle</label>
-                <input type="text" id="ctrl-instagram-link" placeholder="https://instagram.com/thebaniyancompany"
-                  class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none">
-              </div>
-              <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-100">
-                <div>
-                  <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Delivery
-                    (Tamil Nadu)</label>
-                  <input type="number" id="ctrl-delivery-tn" placeholder="0 (Free)" value="0"
-                    class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none font-bold">
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Delivery
-                    (Outside TN)</label>
-                  <input type="number" id="ctrl-delivery-non-tn" placeholder="60" value="60"
-                    class="w-full glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none font-bold">
-                </div>
-              </div>
-
-              <!-- ENHANCED iOS LIQUID TOGGLE: WhatsApp Direct Order -->
-              <div
-                class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-9 h-9 rounded-xl bg-[#25D366]/10 text-[#25D366] flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">chat</span>
-                  </div>
-                  <div>
-                    <div class="flex items-center">
-                      <span class="font-bold text-xs text-slate-900 block">WhatsApp Direct Order</span>
-                      <span id="ctrl-whatsapp-status-pill"
-                        class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
-                    </div>
-                    <span class="text-[10px] text-slate-500">Allow customers to complete purchases directly via
-                      WhatsApp</span>
-                  </div>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="ctrl-whatsapp-toggle" class="sr-only peer" checked
-                    onchange="window.updateToggleLabel(this, 'ctrl-whatsapp-status-pill')">
-                  <div
-                    class="w-12 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500">
-                  </div>
-                </label>
-              </div>
-
-              <!-- ENHANCED iOS LIQUID TOGGLE: Cash on Delivery (COD) -->
-              <div
-                class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">payments</span>
-                  </div>
-                  <div>
-                    <div class="flex items-center">
-                      <span class="font-bold text-xs text-slate-900 block">Cash on Delivery (COD)</span>
-                      <span id="ctrl-cod-status-pill"
-                        class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
-                    </div>
-                    <span class="text-[10px] text-slate-500">Accept pay-on-delivery orders across India</span>
-                  </div>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="ctrl-cod-toggle" class="sr-only peer" checked
-                    onchange="window.updateToggleLabel(this, 'ctrl-cod-status-pill')">
-                  <div
-                    class="w-12 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500">
-                  </div>
-                </label>
-              </div>
-
-              <!-- ENHANCED iOS LIQUID TOGGLE: Promo Discount Coupon -->
-              <div
-                class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">loyalty</span>
-                  </div>
-                  <div>
-                    <div class="flex items-center">
-                      <span class="font-bold text-xs text-slate-900 block">Promo Discount Coupon Box</span>
-                      <span id="ctrl-coupon-status-pill"
-                        class="ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
-                    </div>
-                    <span class="text-[10px] text-slate-500">Display promo code input field on Checkout &amp; Bag</span>
-                  </div>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="ctrl-coupon-toggle" class="sr-only peer" checked
-                    onchange="window.updateToggleLabel(this, 'ctrl-coupon-status-pill')">
-                  <div
-                    class="w-12 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500">
-                  </div>
-                </label>
-              </div>
-
-              <button type="submit"
-                class="w-full py-3.5 bg-black hover:bg-slate-800 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition-all shadow-md">Save
-                Store Controls</button>
-            </form>
-          </div>
-
-          <!-- YouTube Reels Feed Manager -->
-          <div class="glass-card p-6 rounded-[28px] space-y-5">
+        <!-- ==================== VIEW 4: REELS & MEDIA ==================== -->
+        <div id="view-reels" class="hidden space-y-6">
+          <div class="shopify-card p-6 space-y-5">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-red-600">smart_display</span>
-                <h2 class="font-bold text-xs text-slate-900 uppercase tracking-wider">YouTube Shorts Reels</h2>
+                <span class="material-symbols-outlined text-rose-600 text-lg">smart_display</span>
+                <h2 class="font-semibold text-sm text-slate-900">YouTube Shorts &amp; Video Reels Feed</h2>
               </div>
               <button onclick="addYouTubeLinkInput()"
-                class="px-3 py-1.5 bg-black hover:bg-slate-800 text-white font-bold rounded-xl text-[10px] uppercase tracking-wider transition-all shadow-md">+
-                Add Video</button>
+                class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg text-xs transition-all shadow-xs cursor-pointer">+ Add Video Link</button>
             </div>
 
             <form id="youtube-links-form" class="space-y-4">
-              <p class="text-[11px] text-slate-500 leading-relaxed">Paste YouTube Video or YouTube Shorts URLs (e.g.
-                <code class="text-red-600 font-mono font-bold">https://youtube.com/shorts/xyz123</code>). They will
-                shuffle randomly and play in the Reels feed!
-              </p>
+              <p class="text-xs text-slate-500 leading-relaxed">Paste YouTube Video or Shorts URLs (e.g. <code class="text-rose-600 font-mono">https://youtube.com/shorts/xyz123</code>). They will play in the Reels feed!</p>
               <div id="youtube-links-container" class="space-y-3">
                 <!-- Dynamically populated YouTube links -->
               </div>
               <button type="submit"
-                class="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2">
-                <span class="material-symbols-outlined text-sm">save</span> Save YouTube Shorts Links
+                class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-lg text-xs transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer">
+                <span class="material-symbols-outlined text-sm">save</span> Save Shorts &amp; Reels Links
               </button>
             </form>
           </div>
-
         </div>
 
-      </div>
+        <!-- ==================== VIEW 5: STORE SETTINGS ==================== -->
+        <div id="view-settings" class="hidden space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
+            <div class="shopify-card p-6 space-y-5">
+              <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <span class="material-symbols-outlined text-slate-900 text-lg">branding_watermark</span>
+                <h2 class="font-semibold text-sm text-slate-900">Branding &amp; Checkout Toggles</h2>
+              </div>
+
+              <form id="branding-update-form" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-medium text-slate-700 mb-1">Store Name</label>
+                  <input type="text" id="ctrl-store-name" placeholder="OneSpace Commerce"
+                    class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none font-normal">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-700 mb-1">Company Logo Image (URL or Gallery Upload)</label>
+                  <div class="space-y-2">
+                    <input type="url" id="ctrl-store-logo" placeholder="https://... or upload below"
+                      class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none">
+                    <div class="flex items-center gap-2">
+                      <input type="file" id="logo-file-picker" accept="image/*"
+                        onchange="window.handleGalleryUpload(this, '#ctrl-store-logo')" class="hidden">
+                      <label for="logo-file-picker"
+                        class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all shadow-xs">
+                        <span class="material-symbols-outlined text-[15px]">photo_library</span> Upload Logo (1MB Max)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-700 mb-1">WhatsApp Support Number</label>
+                  <input type="text" id="ctrl-whatsapp-num" placeholder="+91 9876543210"
+                    class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-700 mb-1">Instagram Link / Handle</label>
+                  <input type="text" id="ctrl-instagram-link" placeholder="https://instagram.com/onespacecommerce"
+                    class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-100">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Delivery (Tamil Nadu)</label>
+                    <input type="number" id="ctrl-delivery-tn" placeholder="0 (Free)" value="0"
+                      class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none font-medium">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Delivery (Outside TN)</label>
+                    <input type="number" id="ctrl-delivery-non-tn" placeholder="60" value="60"
+                      class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none font-medium">
+                  </div>
+                </div>
+
+                <!-- TOGGLE: WhatsApp Direct Order -->
+                <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-[#25D366]/10 text-[#25D366] flex items-center justify-center flex-shrink-0">
+                      <span class="material-symbols-outlined text-[18px]">chat</span>
+                    </div>
+                    <div>
+                      <div class="flex items-center">
+                        <span class="font-medium text-xs text-slate-900 block">WhatsApp Direct Order</span>
+                        <span id="ctrl-whatsapp-status-pill"
+                          class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
+                      </div>
+                      <span class="text-[11px] text-slate-500">Allow customers to complete purchases via WhatsApp</span>
+                    </div>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="ctrl-whatsapp-toggle" class="sr-only peer" checked
+                      onchange="window.updateToggleLabel(this, 'ctrl-whatsapp-status-pill')">
+                    <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                  </label>
+                </div>
+
+                <!-- TOGGLE: Cash on Delivery (COD) -->
+                <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center flex-shrink-0">
+                      <span class="material-symbols-outlined text-[18px]">payments</span>
+                    </div>
+                    <div>
+                      <div class="flex items-center">
+                        <span class="font-medium text-xs text-slate-900 block">Cash on Delivery (COD)</span>
+                        <span id="ctrl-cod-status-pill"
+                          class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
+                      </div>
+                      <span class="text-[11px] text-slate-500">Accept pay-on-delivery orders across India</span>
+                    </div>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="ctrl-cod-toggle" class="sr-only peer" checked
+                      onchange="window.updateToggleLabel(this, 'ctrl-cod-status-pill')">
+                    <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                  </label>
+                </div>
+
+                <!-- TOGGLE: Promo Discount Coupon -->
+                <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                      <span class="material-symbols-outlined text-[18px]">loyalty</span>
+                    </div>
+                    <div>
+                      <div class="flex items-center">
+                        <span class="font-medium text-xs text-slate-900 block">Promo Discount Coupon Box</span>
+                        <span id="ctrl-coupon-status-pill"
+                          class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
+                      </div>
+                      <span class="text-[11px] text-slate-500">Display promo code input on Checkout</span>
+                    </div>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="ctrl-coupon-toggle" class="sr-only peer" checked
+                      onchange="window.updateToggleLabel(this, 'ctrl-coupon-status-pill')">
+                    <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                  </label>
+                </div>
+
+                <button type="submit"
+                  class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg text-xs transition-all shadow-xs cursor-pointer">Save Store Controls</button>
+              </form>
+            </div>
+
+            <!-- Multi-Banner Manager -->
+            <div class="shopify-card p-6 space-y-5">
+              <div class="border-b border-slate-100 pb-3 space-y-4">
+                <div class="flex justify-between items-center">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-900 text-lg">view_carousel</span>
+                    <h2 class="font-semibold text-sm text-slate-900">Hero Banner Slides</h2>
+                  </div>
+                  <button onclick="addBannerSlide()"
+                    class="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg text-[11px] transition-all shadow-xs cursor-pointer">+ Add Slide</button>
+                </div>
+              </div>
+
+              <form id="banner-update-form" class="space-y-4">
+                <div id="banners-container" class="space-y-4">
+                  <div class="banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-lg space-y-3">
+                    <span class="text-xs font-medium text-slate-500 block">Slide 1</span>
+                    <div>
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Image / Video URL</label>
+                      <input type="text" class="ctrl-banner-url w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="https://...">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Headline</label>
+                      <input type="text" class="ctrl-banner-heading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="Summer Collection 2026">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Subheading / Tagline</label>
+                      <input type="text" class="ctrl-banner-subheading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="Explore new essentials">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Click Action Target URL</label>
+                      <input type="text" class="ctrl-banner-target w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="shop.html">
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit"
+                  class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg text-xs transition-all shadow-xs cursor-pointer">Save Banner Slides</button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
     </div>
   </div>
 
   <script type="module">
-    import { db, collection, getDocs, doc, getDoc, auth } from './js/firebase-config.js';
+    import { db, collection, getDocs, doc, getDoc, auth, updateDoc } from './js/firebase-config.js';
     import { signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getCompany, revalidateCompany, subscribeToOnlineOrders, setOrderStatus, updateCompanyBanner, updateCompanySettings, getOrderTimestamp } from './js/products-service.js';
 
     const COMPANY_ID = 'thebaniyancompany';
 
-    // Upload thumbnail from device gallery with strict 1MB size limit check
+    window.toggleMobileSidebar = function() {
+      const sidebar = document.getElementById('admin-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (!sidebar) return;
+      if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        if (backdrop) backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        if (backdrop) backdrop.classList.add('hidden');
+      }
+    };
+
+    window.switchAdminTab = function(tabName) {
+      const tabs = ['dashboard', 'products', 'orders', 'reels', 'settings'];
+      tabs.forEach(t => {
+        const viewEl = document.getElementById(`view-${t}`);
+        const sideBtn = document.getElementById(`side-tab-${t}`);
+        if (viewEl) viewEl.classList.add('hidden');
+        if (sideBtn) sideBtn.classList.remove('active');
+      });
+
+      const activeView = document.getElementById(`view-${tabName}`);
+      const activeSideBtn = document.getElementById(`side-tab-${tabName}`);
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeSideBtn) activeSideBtn.classList.add('active');
+
+      const sidebar = document.getElementById('admin-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar && window.innerWidth < 768) {
+        sidebar.classList.add('-translate-x-full');
+        if (backdrop) backdrop.classList.add('hidden');
+      }
+
+      if (tabName === 'products') {
+        loadProductsCatalog();
+      }
+    };
+
+    window.allProductsData = [];
+    async function loadProductsCatalog() {
+      const tbody = document.getElementById('products-table-body');
+      if (!tbody) return;
+
+      try {
+        const snap = await getDocs(collection(db, 'products'));
+        window.allProductsData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // Populate Category Filter dropdown dynamically
+        populateCategoryDropdown(window.allProductsData);
+        
+        applyProductFilters();
+      } catch (err) {
+        console.error('Error loading products catalog:', err);
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-600 font-medium">Error loading products catalog.</td></tr>`;
+      }
+    }
+
+    function populateCategoryDropdown(products) {
+      const catSelect = document.getElementById('product-category-filter');
+      if (!catSelect) return;
+      const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean))).sort();
+      
+      const currentVal = catSelect.value || 'all';
+      catSelect.innerHTML = `<option value="all">All Categories (${products.length})</option>` +
+        categories.map(c => `<option value="${c}">${c}</option>`).join('');
+      if (categories.includes(currentVal)) catSelect.value = currentVal;
+    }
+
+    window.applyProductFilters = function() {
+      const searchQuery = String(document.getElementById('product-search-input')?.value || '').trim().toLowerCase();
+      const categoryFilter = document.getElementById('product-category-filter')?.value || 'all';
+      const stockFilter = document.getElementById('product-stock-filter')?.value || 'all';
+      const sortFilter = document.getElementById('product-sort-filter')?.value || 'default';
+
+      let filtered = [...(window.allProductsData || [])];
+
+      // 1. Category Filter
+      if (categoryFilter !== 'all') {
+        filtered = filtered.filter(p => String(p.category || '').toLowerCase() === categoryFilter.toLowerCase());
+      }
+
+      // 2. Stock Status Filter
+      if (stockFilter !== 'all') {
+        filtered = filtered.filter(p => {
+          let stockCount = 0;
+          if (Array.isArray(p.variants) && p.variants.length > 0) {
+            stockCount = p.variants.reduce((acc, v) => acc + (Number(v.stock?.main || v.stock || 0)), 0);
+          } else {
+            stockCount = Number(p.availableStock || p.stock || 0);
+          }
+
+          if (stockFilter === 'in_stock') return stockCount > 5;
+          if (stockFilter === 'low_stock') return stockCount > 0 && stockCount <= 5;
+          if (stockFilter === 'out_of_stock') return stockCount <= 0;
+          return true;
+        });
+      }
+
+      // 3. Search Query
+      if (searchQuery) {
+        filtered = filtered.filter(p =>
+          String(p.name || '').toLowerCase().includes(searchQuery) ||
+          String(p.category || '').toLowerCase().includes(searchQuery) ||
+          String(p.id || '').toLowerCase().includes(searchQuery)
+        );
+      }
+
+      // 4. Sorting
+      if (sortFilter === 'name_asc') {
+        filtered.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+      } else if (sortFilter === 'price_low') {
+        filtered.sort((a, b) => (Number(a.price || 0) - Number(b.price || 0)));
+      } else if (sortFilter === 'price_high') {
+        filtered.sort((a, b) => (Number(b.price || 0) - Number(a.price || 0)));
+      } else if (sortFilter === 'stock_low') {
+        filtered.sort((a, b) => {
+          const sA = Number(a.availableStock || a.stock || 0);
+          const sB = Number(b.availableStock || b.stock || 0);
+          return sA - sB;
+        });
+      } else if (sortFilter === 'stock_high') {
+        filtered.sort((a, b) => {
+          const sA = Number(a.availableStock || a.stock || 0);
+          const sB = Number(b.availableStock || b.stock || 0);
+          return sB - sA;
+        });
+      }
+
+      renderProductsTable(filtered);
+    };
+
+    function renderProductsTable(products) {
+      const tbody = document.getElementById('products-table-body');
+      if (!tbody) return;
+
+      if (!products || products.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">No products matching the selected filters found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = products.map(p => {
+        const name = p.name || 'Untitled Product';
+        const category = p.category || 'General';
+        const img = (Array.isArray(p.imageUrls) && p.imageUrls[0]) || p.imageUrl || p.image || 'https://placehold.co/100x120/f0f0f0/999?text=Product';
+        
+        let stockCount = 0;
+        if (Array.isArray(p.variants) && p.variants.length > 0) {
+          stockCount = p.variants.reduce((acc, v) => acc + (Number(v.stock?.main || v.stock || 0)), 0);
+        } else {
+          stockCount = Number(p.availableStock || p.stock || 0);
+        }
+
+        const price = p.price || (p.variants && p.variants[0]?.price) || 0;
+        const isLow = stockCount > 0 && stockCount <= 5;
+        const isOut = stockCount <= 0;
+
+        let statusBadge = `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full text-xs font-medium">In Stock</span>`;
+        if (isOut) statusBadge = `<span class="bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded-full text-xs font-medium">Out of Stock</span>`;
+        else if (isLow) statusBadge = `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-medium">Low Stock</span>`;
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100">
+            <td class="p-3.5 flex items-center gap-3">
+              <img src="${img}" alt="${name}" class="w-10 h-12 object-cover rounded-md bg-slate-100 border border-slate-200 flex-shrink-0" onerror="this.src='https://placehold.co/100x120/f0f0f0/999?text=Product'">
+              <div>
+                <span class="font-medium text-slate-900 block truncate max-w-xs">${name}</span>
+                <span class="text-[11px] text-slate-400 font-mono">ID: ${p.id}</span>
+              </div>
+            </td>
+            <td class="p-3.5 font-medium text-slate-600">${category}</td>
+            <td class="p-3.5 font-semibold text-slate-900">₹${Number(price).toLocaleString('en-IN')}</td>
+            <td class="p-3.5 font-semibold text-slate-900">${stockCount} units</td>
+            <td class="p-3.5 text-right">${statusBadge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
     window.handleGalleryUpload = function (fileInput, targetSelector) {
       const file = fileInput.files && fileInput.files[0];
       if (!file) return;
@@ -518,7 +838,7 @@
       const MAX_MB = 1;
       const MAX_BYTES = MAX_MB * 1024 * 1024;
       if (file.size > MAX_BYTES) {
-        alert(`⚠️ File size is ${(file.size / (1024 * 1024)).toFixed(2)} MB, which exceeds the ${MAX_MB}MB limit.\nPlease select an image under 1MB.`);
+        alert(`File size is ${(file.size / (1024 * 1024)).toFixed(2)} MB, which exceeds the ${MAX_MB}MB limit.\nPlease select an image under 1MB.`);
         fileInput.value = '';
         return;
       }
@@ -532,25 +852,23 @@
           target.value = dataUrl;
           target.dispatchEvent(new Event('input', { bubbles: true }));
         }
-        alert(`✓ Image successfully uploaded from gallery! (Size: ${(file.size / 1024).toFixed(1)} KB — within 1MB limit)`);
+        alert(`Image uploaded from gallery successfully.`);
       };
       reader.readAsDataURL(file);
     };
 
-    // Toggle label helper
     window.updateToggleLabel = function (checkboxEl, pillId) {
       const pill = document.getElementById(pillId);
       if (!pill) return;
       if (checkboxEl.checked) {
         pill.textContent = 'ENABLED';
-        pill.className = 'ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-200/60';
+        pill.className = 'ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60';
       } else {
         pill.textContent = 'DISABLED';
-        pill.className = 'ml-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-rose-100 text-rose-800 border border-rose-200/60';
+        pill.className = 'ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800 border border-rose-200/60';
       }
     };
 
-    // Login handler with Firebase Authentication & Firestore Admin verification
     document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('admin-email').value.trim();
@@ -565,9 +883,7 @@
         try {
           const userCred = await signInWithEmailAndPassword(auth, email, pass);
           if (userCred && userCred.user) authed = true;
-        } catch (authErr) {
-          console.warn('[TBC Admin Auth] Firebase Auth sign-in notice:', authErr);
-        }
+        } catch (authErr) { }
 
         try {
           const adminDocSnap = await getDoc(doc(db, 'users', 'o5FZBnjRl6T6YDGrwEEFWukBZzW2'));
@@ -588,7 +904,6 @@
           if (errEl) { errEl.textContent = 'Invalid credentials or non-admin account.'; errEl.classList.remove('hidden'); }
         }
       } catch (err) {
-        console.error('[TBC Admin Login Error]', err);
         localStorage.setItem('tbc_admin_authed', 'true');
         document.getElementById('admin-login-overlay').classList.add('hidden');
         document.getElementById('admin-dashboard').classList.remove('hidden');
@@ -607,54 +922,45 @@
       const container = document.getElementById('banners-container');
       const idx = container.children.length + 1;
       const div = document.createElement('div');
-      div.className = 'banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-3 relative';
+      div.className = 'banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-lg space-y-3 relative';
       div.innerHTML = `
       <div class="flex justify-between items-center">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Slide ${idx}</span>
-        <button type="button" onclick="this.closest('.banner-slide-box').remove()" class="text-rose-500 text-xs font-bold uppercase">Remove</button>
+        <span class="text-xs font-medium text-slate-500 block">Slide ${idx}</span>
+        <button type="button" onclick="this.closest('.banner-slide-box').remove()" class="text-rose-600 text-xs font-medium cursor-pointer">Remove</button>
       </div>
       <div>
-        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video (URL or Gallery Upload — 1MB Limit)</label>
-        <div class="space-y-1.5">
-          <input type="text" class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="https://... or upload below">
-          <div class="flex items-center gap-2">
-            <input type="file" accept="image/*" onchange="window.handleGalleryUpload(this, '.ctrl-banner-url')" class="hidden" id="banner-file-picker-${idx}">
-            <label for="banner-file-picker-${idx}" class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all shadow-sm">
-              <span class="material-symbols-outlined text-[13px]">photo_library</span> Upload from Gallery (1MB Max)
-            </label>
-          </div>
-        </div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Image / Video URL</label>
+        <input type="text" class="ctrl-banner-url w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="https://...">
       </div>
       <div>
-        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Headline</label>
-        <input type="text" class="ctrl-banner-heading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="New Season Drop">
+        <label class="block text-xs font-medium text-slate-600 mb-1">Headline</label>
+        <input type="text" class="ctrl-banner-heading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="New Season Drop">
       </div>
       <div>
-        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Subheading / Tagline</label>
-        <input type="text" class="ctrl-banner-subheading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="Limited Edition">
+        <label class="block text-xs font-medium text-slate-600 mb-1">Subheading / Tagline</label>
+        <input type="text" class="ctrl-banner-subheading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="Limited Edition">
       </div>
       <div>
-        <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Click Action Target URL</label>
-        <input type="text" class="ctrl-banner-target w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" placeholder="shop.html">
+        <label class="block text-xs font-medium text-slate-600 mb-1">Click Action Target URL</label>
+        <input type="text" class="ctrl-banner-target w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="shop.html">
       </div>
     `;
       container.appendChild(div);
     };
 
     async function initDashboard() {
-      // 1. Fetch fresh company profile & settings directly from database
       const comp = await revalidateCompany(COMPANY_ID);
       if (comp) {
-        if (document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = comp.name || 'THE BANIYAN COMPANY';
-        if (document.getElementById('display-company-id')) document.getElementById('display-company-id').textContent = comp.id || COMPANY_ID;
-        if (document.getElementById('ctrl-store-name')) document.getElementById('ctrl-store-name').value = comp.name || '';
+        if (document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = comp.name || 'OneSpace Commerce';
+        if (document.getElementById('ctrl-store-name')) document.getElementById('ctrl-store-name').value = comp.name || 'OneSpace Commerce';
         if (document.getElementById('ctrl-store-logo')) document.getElementById('ctrl-store-logo').value = comp.logo || '';
+        if (document.getElementById('sidebar-logo-img') && comp.logo) document.getElementById('sidebar-logo-img').src = comp.logo;
+        if (document.getElementById('login-logo-img') && comp.logo) document.getElementById('login-logo-img').src = comp.logo;
         if (document.getElementById('ctrl-whatsapp-num')) document.getElementById('ctrl-whatsapp-num').value = comp.whatsappNumber || '';
         if (document.getElementById('ctrl-instagram-link')) document.getElementById('ctrl-instagram-link').value = comp.instagramLink || '';
         if (document.getElementById('ctrl-delivery-tn')) document.getElementById('ctrl-delivery-tn').value = comp.deliveryTnPrice !== undefined ? comp.deliveryTnPrice : (comp.deliveryTnFee !== undefined ? comp.deliveryTnFee : 0);
         if (document.getElementById('ctrl-delivery-non-tn')) document.getElementById('ctrl-delivery-non-tn').value = comp.deliveryNonTnPrice !== undefined ? comp.deliveryNonTnPrice : (comp.deliveryFee !== undefined ? comp.deliveryFee : 60);
 
-        // Set iOS liquid toggles
         const waToggle = document.getElementById('ctrl-whatsapp-toggle');
         const codToggle = document.getElementById('ctrl-cod-toggle');
         const couponToggle = document.getElementById('ctrl-coupon-toggle');
@@ -674,26 +980,26 @@
         if (comp.banners && Array.isArray(comp.banners) && comp.banners.length > 0) {
           const container = document.getElementById('banners-container');
           container.innerHTML = comp.banners.map((b, i) => `
-          <div class="banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-3 relative">
+          <div class="banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-lg space-y-3 relative">
             <div class="flex justify-between items-center">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Slide ${i + 1}</span>
-              ${i > 0 ? `<button type="button" onclick="this.closest('.banner-slide-box').remove()" class="text-rose-500 text-xs font-bold uppercase">Remove</button>` : ''}
+              <span class="text-xs font-medium text-slate-500 block">Slide ${i + 1}</span>
+              ${i > 0 ? `<button type="button" onclick="this.closest('.banner-slide-box').remove()" class="text-rose-600 text-xs font-medium cursor-pointer">Remove</button>` : ''}
             </div>
             <div>
-              <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Image / Video URL</label>
-              <input type="url" class="ctrl-banner-url w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" value="${b.heroMediaUrl || ''}" placeholder="https://...">
+              <label class="block text-xs font-medium text-slate-600 mb-1">Image / Video URL</label>
+              <input type="url" class="ctrl-banner-url w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" value="${b.heroMediaUrl || ''}" placeholder="https://...">
             </div>
             <div>
-              <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Headline</label>
-              <input type="text" class="ctrl-banner-heading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" value="${b.heroHeading || ''}" placeholder="Summer Luxe 2026">
+              <label class="block text-xs font-medium text-slate-600 mb-1">Headline</label>
+              <input type="text" class="ctrl-banner-heading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" value="${b.heroHeading || ''}" placeholder="Summer Luxe 2026">
             </div>
             <div>
-              <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Subheading / Tagline</label>
-              <input type="text" class="ctrl-banner-subheading w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" value="${b.heroSubheading || ''}" placeholder="New Collection">
+              <label class="block text-xs font-medium text-slate-600 mb-1">Subheading / Tagline</label>
+              <input type="text" class="ctrl-banner-subheading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" value="${b.heroSubheading || ''}" placeholder="New Collection">
             </div>
             <div>
-              <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1">Click Action Target URL</label>
-              <input type="text" class="ctrl-banner-target w-full glass-input rounded-xl px-3 py-2 text-xs outline-none" value="${b.targetUrl || 'shop.html'}" placeholder="shop.html">
+              <label class="block text-xs font-medium text-slate-600 mb-1">Click Action Target URL</label>
+              <input type="text" class="ctrl-banner-target w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" value="${b.targetUrl || 'shop.html'}" placeholder="shop.html">
             </div>
           </div>
         `).join('');
@@ -715,13 +1021,11 @@
         }
       }
 
-      // 2. Fetch products count
       try {
         const snap = await getDocs(collection(db, 'products'));
         document.getElementById('stat-total-products').textContent = snap.size;
       } catch (e) { }
 
-      // 3. Real-time orders listener
       subscribeToOnlineOrders(orders => {
         renderOrders(orders);
       });
@@ -729,12 +1033,26 @@
 
     window.currentAllOrders = [];
     window.currentFilter = 'all';
+    window.paymentFilter = 'all';
+    window.sortOrderFilter = 'newest';
     window.searchQuery = '';
     window.currentPage = 1;
     window.pageSize = 10;
 
     window.setOrderFilter = function (filterName) {
       window.currentFilter = filterName;
+      window.currentPage = 1;
+      renderOrders(window.currentAllOrders);
+    };
+
+    window.handleOrderPaymentFilter = function (val) {
+      window.paymentFilter = val;
+      window.currentPage = 1;
+      renderOrders(window.currentAllOrders);
+    };
+
+    window.handleOrderSortFilter = function (val) {
+      window.sortOrderFilter = val;
       window.currentPage = 1;
       renderOrders(window.currentAllOrders);
     };
@@ -756,9 +1074,6 @@
       const listEl = document.getElementById('admin-orders-list');
       if (!listEl) return;
 
-      // Always sort newest first with fallback timestamp resolution
-      rawList.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
-
       let rev = 0;
       let pendingCount = 0;
       let deliveredCount = 0;
@@ -775,7 +1090,6 @@
       document.getElementById('stat-total-revenue').textContent = `₹${rev.toLocaleString('en-IN')}`;
       document.getElementById('stat-pending-orders').textContent = pendingCount;
 
-      // Update tab badges
       const badgeAll = document.getElementById('badge-count-all');
       const badgePending = document.getElementById('badge-count-pending');
       const badgeDelivered = document.getElementById('badge-count-delivered');
@@ -786,28 +1100,42 @@
       if (badgeDelivered) badgeDelivered.textContent = `(${deliveredCount})`;
       if (badgeCancelled) badgeCancelled.textContent = `(${cancelledCount})`;
 
-      // Update tab styling
       ['all', 'pending', 'delivered', 'cancelled'].forEach(f => {
         const tab = document.getElementById(`tab-filter-${f}`);
         if (!tab) return;
         if (f === window.currentFilter) {
-          tab.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-black text-white shadow-sm';
+          tab.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-900 text-white shadow-xs cursor-pointer';
         } else {
-          tab.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-slate-100 text-slate-600 hover:bg-slate-200';
+          tab.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer';
         }
       });
 
-      // Filter array by status tab
-      let filtered = rawList;
+      let filtered = [...rawList];
+
+      // 1. Order Status Filter
       if (window.currentFilter === 'pending') {
-        filtered = rawList.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+        filtered = filtered.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
       } else if (window.currentFilter === 'delivered') {
-        filtered = rawList.filter(o => o.status === 'Delivered');
+        filtered = filtered.filter(o => o.status === 'Delivered');
       } else if (window.currentFilter === 'cancelled') {
-        filtered = rawList.filter(o => o.status === 'Cancelled');
+        filtered = filtered.filter(o => o.status === 'Cancelled');
       }
 
-      // Filter array by search query (name, phone, orderId)
+      // 2. Payment Method Filter
+      if (window.paymentFilter !== 'all') {
+        filtered = filtered.filter(o => {
+          const isPaid = (o.paymentStatus === 'Paid') || (String(o.paymentMethod || '').toLowerCase().includes('razorpay') && o.razorpayPaymentId);
+          const payMethod = String(o.paymentMethod || '').toLowerCase();
+          const isWhatsApp = payMethod.includes('whatsapp') || Boolean(o.whatsappOrder);
+
+          if (window.paymentFilter === 'paid') return isPaid;
+          if (window.paymentFilter === 'cod') return !isPaid && !isWhatsApp;
+          if (window.paymentFilter === 'whatsapp') return isWhatsApp;
+          return true;
+        });
+      }
+
+      // 3. Search Query Filter
       if (window.searchQuery) {
         const q = window.searchQuery;
         filtered = filtered.filter(o => {
@@ -819,11 +1147,21 @@
         });
       }
 
+      // 4. Order Sorting Filter
+      if (window.sortOrderFilter === 'oldest') {
+        filtered.sort((a, b) => getOrderTimestamp(a) - getOrderTimestamp(b));
+      } else if (window.sortOrderFilter === 'highest_amount') {
+        filtered.sort((a, b) => Number(b.totalAmount || 0) - Number(a.totalAmount || 0));
+      } else {
+        // Default: newest first
+        filtered.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
+      }
+
       if (filtered.length === 0) {
         listEl.innerHTML = `
-        <div class="glass-card p-12 rounded-[24px] text-center text-slate-400">
+        <div class="shopify-card p-12 text-center text-slate-400">
           <span class="material-symbols-outlined text-4xl mb-2 text-slate-400">inbox</span>
-          <p class="text-xs uppercase font-semibold">No orders matching "${window.searchQuery || window.currentFilter}" found</p>
+          <p class="text-xs font-medium">No orders matching the active filters found</p>
         </div>`;
         const pagBar = document.getElementById('orders-pagination-bar');
         if (pagBar) pagBar.classList.add('hidden');
@@ -833,7 +1171,6 @@
       const pagBar = document.getElementById('orders-pagination-bar');
       if (pagBar) pagBar.classList.remove('hidden');
 
-      // Calculate Pagination
       const totalPages = Math.ceil(filtered.length / window.pageSize) || 1;
       if (window.currentPage > totalPages) window.currentPage = totalPages;
       if (window.currentPage < 1) window.currentPage = 1;
@@ -841,7 +1178,6 @@
       const startIdx = (window.currentPage - 1) * window.pageSize;
       const pageSlice = filtered.slice(startIdx, startIdx + window.pageSize);
 
-      // Update page controls
       const prevBtn = document.getElementById('btn-prev-page');
       const nextBtn = document.getElementById('btn-next-page');
       const pageIndicator = document.getElementById('page-indicator');
@@ -869,11 +1205,11 @@
 
         let payBadgeHtml = '';
         if (isPaid) {
-          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-emerald-200"><span class="material-symbols-outlined text-[13px]">verified</span> PAID (${payMethod})</span>`;
+          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-medium border border-emerald-200"><span class="material-symbols-outlined text-[13px]">verified</span> PAID (${payMethod})</span>`;
         } else if (String(payMethod).toLowerCase().includes('whatsapp')) {
-          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-emerald-200"><span class="material-symbols-outlined text-[13px]">chat</span> WHATSAPP ORDER</span>`;
+          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-medium border border-emerald-200"><span class="material-symbols-outlined text-[13px]">chat</span> WHATSAPP ORDER</span>`;
         } else {
-          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-amber-200"><span class="material-symbols-outlined text-[13px]">pending</span> COD (PENDING)</span>`;
+          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-medium border border-amber-200"><span class="material-symbols-outlined text-[13px]">pending</span> COD (PENDING)</span>`;
         }
 
         const itemsDetailHtml = items.length > 0 ? items.map(i => {
@@ -881,55 +1217,54 @@
           const qty = i.qty || i.quantity || 1;
           const price = Number(i.price || 0);
           return `
-            <div class="flex items-center gap-3 bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/70">
-              <img src="${img}" alt="${i.name || 'Item'}" class="w-12 h-14 object-cover rounded-lg bg-white border border-slate-200 flex-shrink-0" onerror="this.src='https://placehold.co/100x120/f0f0f0/999?text=Product'">
+            <div class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
+              <img src="${img}" alt="${i.name || 'Item'}" class="w-12 h-14 object-cover rounded-md bg-white border border-slate-200 flex-shrink-0" onerror="this.src='https://placehold.co/100x120/f0f0f0/999?text=Product'">
               <div class="flex-1 min-w-0">
-                <span class="font-bold text-xs text-slate-900 block truncate">${i.name || 'Product'}</span>
-                <span class="text-[11px] text-slate-500 font-semibold block">Size: <strong class="text-slate-800">${String(i.size || 'M').toUpperCase()}</strong> · Color: <strong class="text-slate-800">${i.color || 'Default'}</strong> · Qty: <strong class="text-slate-900">${qty}</strong></span>
-                <span class="text-xs font-bold text-slate-900 block mt-0.5">₹${(price * qty).toLocaleString('en-IN')}</span>
+                <span class="font-medium text-xs text-slate-900 block truncate">${i.name || 'Product'}</span>
+                <span class="text-[11px] text-slate-500 block">Size: <strong class="text-slate-800 font-semibold">${String(i.size || 'M').toUpperCase()}</strong> · Color: <strong class="text-slate-800 font-semibold">${i.color || 'Default'}</strong> · Qty: <strong class="text-slate-900 font-semibold">${qty}</strong></span>
+                <span class="text-xs font-semibold text-slate-900 block mt-0.5">₹${(price * qty).toLocaleString('en-IN')}</span>
               </div>
             </div>
           `;
         }).join('') : `<p class="text-xs text-slate-500 italic">Merchandise Package Order</p>`;
 
         return `
-        <div class="glass-card p-6 rounded-[24px] space-y-4 border border-slate-200 shadow-sm">
+        <div class="shopify-card p-6 space-y-4">
           <div class="flex justify-between items-start flex-wrap gap-2">
             <div>
               <div class="flex items-center gap-2 mb-1 flex-wrap">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">📦 ORDER #${o.id}</span>
-                <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">📅 ${dateStr}</span>
+                <span class="text-xs font-semibold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">ORDER #${o.id}</span>
+                <span class="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">${dateStr}</span>
                 ${payBadgeHtml}
               </div>
               <p class="text-xs text-slate-700 mt-2">
-                Customer: <strong class="text-slate-900 text-sm">${name}</strong> · Phone: <strong class="text-slate-900 text-sm">${phone}</strong>
+                Customer: <strong class="text-slate-900 text-sm font-semibold">${name}</strong> · Phone: <strong class="text-slate-900 text-sm font-semibold">${phone}</strong>
               </p>
               <p class="text-xs text-slate-600 mt-1">
-                📍 Delivery Address: <strong class="text-slate-900">${door ? door + ', ' : ''}${street ? street + ', ' : ''}${address}</strong>${landmark ? ' (Landmark: ' + landmark + ')' : ''}, ${city}, ${state} - <strong>${pin}</strong>
+                Delivery Address: <strong class="text-slate-900 font-medium">${door ? door + ', ' : ''}${street ? street + ', ' : ''}${address}</strong>${landmark ? ' (Landmark: ' + landmark + ')' : ''}, ${city}, ${state} - <strong>${pin}</strong>
               </p>
             </div>
             <div class="text-right flex-shrink-0">
-              <span class="text-xl font-extrabold text-slate-900 block">₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">${items.length} Item${items.length !== 1 ? 's' : ''}</span>
+              <span class="text-xl font-semibold text-slate-900 block">₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+              <span class="text-xs font-medium text-slate-500">${items.length} Item${items.length !== 1 ? 's' : ''}</span>
             </div>
           </div>
 
-          <!-- Items Breakdown -->
           <div class="space-y-2 pt-1 border-t border-slate-100">
             ${itemsDetailHtml}
           </div>
 
           <div class="flex items-center justify-between pt-3 border-t border-slate-100 flex-wrap gap-3 text-xs">
             <div class="flex items-center gap-2">
-              <span class="text-slate-600 font-bold uppercase tracking-wider text-[10px]">Order Status:</span>
-              <select onchange="updateStatus('${o.id}', this.value)" class="glass-input text-slate-900 px-3.5 py-2 rounded-xl outline-none font-bold bg-white border border-slate-300 shadow-2xs">
+              <span class="text-slate-600 font-medium text-xs">Order Status:</span>
+              <select onchange="updateStatus('${o.id}', this.value)" class="shopify-input text-slate-900 px-3 py-1.5 rounded-lg outline-none font-medium bg-white border border-slate-300">
                 ${['Awaiting Acceptance', 'Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].map(s => `
                   <option value="${s}" ${o.status === s ? 'selected' : ''} class="bg-white text-slate-900">${s}</option>
                 `).join('')}
               </select>
             </div>
             ${phone !== 'Not Provided' ? `
-            <a href="https://wa.me/91${phone}?text=Hi%20${encodeURIComponent(name)}%2C%20regarding%20your%20Order%20%23${o.id}%20from%20The%20Baniyan%20Company" target="_blank" class="px-4 py-2.5 bg-[#25D366] hover:opacity-90 text-white font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-sm">
+            <a href="https://wa.me/91${phone}?text=Hi%20${encodeURIComponent(name)}%2C%20regarding%20your%20Order%20%23${o.id}%20from%20OneSpace%20Commerce" target="_blank" class="px-3.5 py-2 bg-[#25D366] hover:opacity-95 text-white font-medium rounded-lg flex items-center gap-1.5 transition-all shadow-xs">
               <span class="material-symbols-outlined text-sm">chat</span> Contact Customer via WhatsApp
             </a>` : ''}
           </div>
@@ -947,7 +1282,6 @@
       }
     };
 
-    // Banner Form submit
     document.getElementById('banner-update-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const slides = Array.from(document.querySelectorAll('.banner-slide-box')).map(box => ({
@@ -972,7 +1306,6 @@
       }
     });
 
-    // Branding & Store Settings Form submit
     document.getElementById('branding-update-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('ctrl-store-name').value.trim();
@@ -982,7 +1315,6 @@
       const deliveryTnPrice = Number(document.getElementById('ctrl-delivery-tn').value || 0);
       const deliveryNonTnPrice = Number(document.getElementById('ctrl-delivery-non-tn').value || 60);
 
-      // Read from enhanced iOS toggle switches
       const isWhatsappEnabled = document.getElementById('ctrl-whatsapp-toggle').checked;
       const isCodEnabled = document.getElementById('ctrl-cod-toggle').checked;
       const isCouponEnabled = document.getElementById('ctrl-coupon-toggle').checked;
@@ -991,6 +1323,7 @@
       if (res.success) {
         alert('Branding, Contact, WhatsApp, COD & Promo Coupon settings updated successfully!');
         document.getElementById('header-brand-name').textContent = name;
+        if (document.getElementById('sidebar-logo-img') && logo) document.getElementById('sidebar-logo-img').src = logo;
       } else {
         alert('Error updating branding: ' + res.error);
       }
@@ -1002,8 +1335,8 @@
       const div = document.createElement('div');
       div.className = 'yt-link-row flex items-center gap-2';
       div.innerHTML = `
-      <input type="url" class="ctrl-yt-link flex-1 glass-input rounded-2xl px-3.5 py-2.5 text-xs outline-none text-slate-900 font-mono font-semibold" placeholder="https://youtube.com/shorts/..." value="${urlVal}">
-      <button type="button" onclick="this.closest('.yt-link-row').remove()" class="w-9 h-9 rounded-2xl bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center font-bold transition-all border border-rose-200/80">
+      <input type="url" class="ctrl-yt-link flex-1 shopify-input rounded-lg px-3.5 py-2 text-xs outline-none text-slate-900 font-mono font-medium" placeholder="https://youtube.com/shorts/..." value="${urlVal}">
+      <button type="button" onclick="this.closest('.yt-link-row').remove()" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center font-medium transition-all border border-rose-200/80 cursor-pointer">
         <span class="material-symbols-outlined text-[18px]">delete</span>
       </button>
     `;
@@ -1024,7 +1357,6 @@
       }
     });
 
-    // Auto auth check
     if (localStorage.getItem('tbc_admin_authed') === 'true') {
       document.getElementById('admin-login-overlay').classList.add('hidden');
       document.getElementById('admin-dashboard').classList.remove('hidden');

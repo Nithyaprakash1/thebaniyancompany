@@ -1,7 +1,7 @@
 /**
  * THE BANIYAN COMPANY — Firebase Configuration & Initialization
  * Uses Firebase Modular Web SDK v10 (CDN Module)
- * Project: shoespot1-56237783-59577
+ * Project: onespacebillingpro
  */
 
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -24,15 +24,14 @@ import {
   onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Real Firebase Project Configuration
+// Real Firebase Project Configuration (onespacebillingpro)
 const firebaseConfig = {
-  apiKey: "AIzaSyC_uFXsHvXc3sYgq5fDhHMU4aQd-RNpWMQ",
-  authDomain: "shoespot1-56237783-59577.firebaseapp.com",
-  databaseURL: "https://shoespot1-56237783-59577-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "shoespot1-56237783-59577",
-  storageBucket: "shoespot1-56237783-59577.firebasestorage.app",
-  messagingSenderId: "700646716884",
-  appId: "1:700646716884:web:5779e725bb44bfdbc11241"
+  apiKey: "AIzaSyAK-gAr9AHukJb7qrlSabsW7MlB_3LvB5E",
+  authDomain: "onespacebillingpro.firebaseapp.com",
+  projectId: "onespacebillingpro",
+  storageBucket: "onespacebillingpro.firebasestorage.app",
+  messagingSenderId: "653289419687",
+  appId: "1:653289419687:web:e6f4aca6f91b15645c7c82"
 };
 
 // Initialize Firebase App instance safely (prevent duplicate init)

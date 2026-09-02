@@ -701,15 +701,13 @@ export function getOrderTimestamp(o) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 3.  INVOICES (ORDERS) — CREATE  —  /invoices
-//     orderType: 'online'
-//     status: 'Awaiting Acceptance'
-//     createdAt: serverTimestamp()
-//     items[]: product details
+// 3.  INVOICES (ORDERS) — CREATE  —  Dual Location (Subcollection & Root)
+//     1. /companies/{companyId}/invoices/{orderId}
+//     2. /invoices/{orderId}
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Create a new order document in /invoices on checkout.
+ * Create a new order document in BOTH company subcollection and root /invoices on checkout.
  * Guaranteed zero-failure schema with atomic stock reduction.
  *
  * @param {object} orderData
@@ -738,6 +736,12 @@ export async function createInvoice(orderData = {}) {
       paymentStatus = 'Pending';
     }
   }
+
+  // Resolve target companyId
+  const companyId = orderData.companyId || COMPANY_ID;
+
+  // Generate unique order ID if not already generated
+  const orderId = orderData.id || orderData.orderId || orderData.invoiceId || `INV_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
   // Sanitize customer contact
   const rawPhone = String(orderData.customerPhoneNumber || orderData.customerPhone || orderData.phone || cd.phone || cd.customerPhone || '').trim();
@@ -798,14 +802,17 @@ export async function createInvoice(orderData = {}) {
   const nowMs = Date.now();
   const rawPayload = {
     // ── Identity ──────────────────────────────────────────
-    companyId:           COMPANY_ID,
-    branchId:            BRANCH_ID,
-    orderType:           'online',
+    id:                  orderId,
+    orderId:             orderId,
+    invoiceId:           orderId,
+    companyId:           companyId,
+    branchId:            orderData.branchId || BRANCH_ID,
+    orderType:           orderData.orderType || 'online',
     customerSource:      'website',
     source:              'website',
 
     // ── Status ────────────────────────────────────────────
-    status:              orderData.status || (isOnlinePayment ? 'Awaiting Acceptance' : 'Awaiting Acceptance'),
+    status:              orderData.status || 'Awaiting Acceptance',
     paymentStatus:       paymentStatus,
     paymentMethod:       methodRaw,
 
@@ -855,29 +862,43 @@ export async function createInvoice(orderData = {}) {
 
   const payload = cleanFirestoreDoc(rawPayload);
 
-  // Attempt Firestore Write with 3 retries
-  let docRef = null;
+  // References for Dual-Location Persistence:
+  // 1. Company subcollection: companies/${companyId}/invoices/${orderId}
+  // 2. Root collection: invoices/${orderId}
+  const companyInvoiceRef = doc(db, `companies/${companyId}/invoices`, orderId);
+  const rootInvoiceRef = doc(db, 'invoices', orderId);
+
+  let success = false;
   let lastError = null;
 
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      docRef = await addDoc(collection(db, 'invoices'), payload);
-      console.info(`[TBC] Order invoice successfully created on attempt ${attempt}: ${docRef.id}`);
+      await Promise.all([
+        setDoc(companyInvoiceRef, payload),
+        setDoc(rootInvoiceRef, payload)
+      ]);
+      console.info(`[TBC] Order invoice successfully saved in dual locations (company subcollection + root collection) on attempt ${attempt}: ${orderId}`);
+      success = true;
       break;
     } catch (err) {
       lastError = err;
-      console.warn(`[TBC] createInvoice attempt ${attempt} failed:`, err);
-      if (attempt < 3) await new Promise(r => setTimeout(r, 300 * attempt));
+      console.warn(`[TBC] createInvoice dual-write attempt ${attempt} failed:`, err);
+      // Resilient Fallback: attempt sequential setDoc writes
+      try {
+        await setDoc(companyInvoiceRef, payload);
+        await setDoc(rootInvoiceRef, payload);
+        success = true;
+        break;
+      } catch (err2) {
+        if (attempt < 3) await new Promise(r => setTimeout(r, 300 * attempt));
+      }
     }
   }
 
-  if (!docRef) {
+  if (!success) {
     console.error('[TBC] createInvoice critical failure after 3 attempts:', lastError);
-    const fallbackId = `TBC-${Date.now()}`;
-    return { success: false, invoiceId: fallbackId, orderId: fallbackId, error: lastError?.message || 'Database write error' };
+    return { success: false, invoiceId: orderId, orderId: orderId, error: lastError?.message || 'Database write error' };
   }
-
-  const generatedId = docRef.id;
 
   // Automatically decrement product & variant stock atomically in Firestore
   try {
@@ -888,7 +909,12 @@ export async function createInvoice(orderData = {}) {
     console.warn('[TBC] Stock decrement background notice:', stockErr);
   }
 
-  return { success: true, invoiceId: generatedId, orderId: generatedId };
+  return { success: true, invoiceId: orderId, orderId: orderId };
+}
+
+// Function matching user's exact requested signature: saveEcomOrder(db, companyId, orderData)
+export async function saveEcomOrder(dbInstance, companyId, orderData = {}) {
+  return createInvoice({ ...orderData, companyId: companyId || COMPANY_ID });
 }
 
 // Alias kept for backwards compatibility with existing checkout.html
@@ -1049,37 +1075,46 @@ export async function decrementStockForOrder(items = [], branchId = BRANCH_ID) {
 
 
 // ═══════════════════════════════════════════════════════════════
-// 5.  CUSTOMER ORDER HISTORY  —  /invoices
-//     Query by customerPhoneNumber. Render with status + totalAmount.
+// 5.  CUSTOMER ORDER HISTORY  —  Dual Collection Queries
+//     Queries both /invoices and /companies/{companyId}/invoices.
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Fetch all orders for a customer identified by phone number.
+ * Fetch all orders for a customer identified by phone number across all collections.
  * Returns orders sorted newest-first.
  * @param {string} phoneNumber
+ * @param {string} [companyId]
  * @returns {Promise<object[]>}
  */
-export async function getCustomerOrders(phoneNumber) {
+export async function getCustomerOrders(phoneNumber, companyId = COMPANY_ID) {
   if (!phoneNumber) return [];
   const cleanPhone = String(phoneNumber).replace(/\D/g, '').slice(-10);
   if (!cleanPhone) return [];
 
   try {
-    const q = query(
-      collection(db, 'invoices'),
-      where('customerPhoneNumber', '==', cleanPhone)
-    );
-    const snapshot = await getDocs(q);
-    let orders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const q1 = query(collection(db, 'invoices'), where('customerPhoneNumber', '==', cleanPhone));
+    const q2 = query(collection(db, 'invoices'), where('customerPhone', '==', cleanPhone));
+    const q3 = query(collection(db, `companies/${companyId}/invoices`), where('customerPhoneNumber', '==', cleanPhone));
+    const q4 = query(collection(db, `companies/${companyId}/invoices`), where('customerPhone', '==', cleanPhone));
 
-    // Fallback: some docs may use 'customerPhone' or 'phone' key
-    if (orders.length === 0) {
-      const q2 = query(collection(db, 'invoices'), where('customerPhone', '==', cleanPhone));
-      const snap2 = await getDocs(q2);
-      orders = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
-    }
+    const snaps = await Promise.allSettled([
+      getDocs(q1), getDocs(q2), getDocs(q3), getDocs(q4)
+    ]);
 
-    const sorted = orders.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
+    const orderMap = new Map();
+    snaps.forEach(res => {
+      if (res.status === 'fulfilled' && res.value?.docs) {
+        res.value.docs.forEach(d => {
+          const data = d.data();
+          const id = data.id || d.id;
+          if (!orderMap.has(id)) {
+            orderMap.set(id, { id, ...data });
+          }
+        });
+      }
+    });
+
+    const sorted = Array.from(orderMap.values()).sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
     return sorted;
 
   } catch (err) {
@@ -1089,28 +1124,34 @@ export async function getCustomerOrders(phoneNumber) {
 }
 
 /**
- * Real-time live listener for customer order updates.
- * Returns ONLY the specific customer's orders (never leaks all store invoices).
+ * Real-time live listener for customer order updates across dual collections.
+ * Returns ONLY the specific customer's orders.
  * @param {string} identifier (phone or email)
  * @param {Function} onUpdate
+ * @param {string} [companyId]
  * @returns {Function} Unsubscribe function
  */
-export function subscribeToCustomerOrders(identifier, onUpdate) {
+export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMPANY_ID) {
   if (typeof onUpdate !== 'function') return () => {};
 
   try {
-    const ref = collection(db, 'invoices');
-    return onSnapshot(ref, (snapshot) => {
-      const allDocs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const ref1 = collection(db, 'invoices');
+    const ref2 = collection(db, `companies/${companyId}/invoices`);
 
+    const docsMap1 = new Map();
+    const docsMap2 = new Map();
+
+    const combineAndNotify = () => {
       if (!identifier) {
-        // If customer is not logged in / has no phone yet, do not return random offline invoices
         onUpdate([]);
         return;
       }
 
       const cleanPhone = String(identifier).replace(/\D/g, '').slice(-10);
       const cleanEmail = String(identifier).toLowerCase().trim();
+
+      const combinedMap = new Map([...docsMap1, ...docsMap2]);
+      const allDocs = Array.from(combinedMap.values());
 
       const matched = allDocs.filter(doc => {
         const p1 = String(doc.customerPhoneNumber || '').replace(/\D/g, '').slice(-10);
@@ -1131,12 +1172,34 @@ export function subscribeToCustomerOrders(identifier, onUpdate) {
       });
 
       matched.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
-
       console.info(`[TBC Real-Time] Streamed ${matched.length} customer order(s) for "${identifier}".`);
       onUpdate(matched);
-    }, (err) => {
-      console.error('[TBC Real-Time] subscribeToCustomerOrders error:', err);
-    });
+    };
+
+    const unsub1 = onSnapshot(ref1, (snapshot) => {
+      docsMap1.clear();
+      snapshot.docs.forEach(d => {
+        const data = d.data();
+        const id = data.id || d.id;
+        docsMap1.set(id, { id, ...data });
+      });
+      combineAndNotify();
+    }, (err) => console.error('[TBC Real-Time] subscribeToCustomerOrders ref1 error:', err));
+
+    const unsub2 = onSnapshot(ref2, (snapshot) => {
+      docsMap2.clear();
+      snapshot.docs.forEach(d => {
+        const data = d.data();
+        const id = data.id || d.id;
+        docsMap2.set(id, { id, ...data });
+      });
+      combineAndNotify();
+    }, (err) => console.warn('[TBC Real-Time] subscribeToCustomerOrders ref2 warning:', err));
+
+    return () => {
+      unsub1();
+      unsub2();
+    };
   } catch (err) {
     console.error('[TBC Real-Time] subscribeToCustomerOrders exception:', err);
     return () => {};
@@ -1167,27 +1230,32 @@ export function renderStatusBadge(status) {
 
 
 // ═══════════════════════════════════════════════════════════════
-// 6.  REAL-TIME ORDER LISTENER  —  /invoices  (onSnapshot)
+// 6.  REAL-TIME ORDER LISTENER  —  Dual Collection Stream (onSnapshot)
 //     Listens to all online and e-commerce orders in real time.
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Subscribe to all online invoices in real time using onSnapshot.
+ * Subscribe to all online invoices in real time across dual collections.
  * Ideal for an admin dashboard order feed.
  *
  * @param {Function} onUpdate   Called with (orders: object[]) on every change
  * @param {Function} [onError]  Called with (error) on subscription failure
  * @param {object}   [options]
+ * @param {string}   [companyId]
  * @returns {Function} Unsubscribe function — call this to stop listening
  */
-export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
+export function subscribeToOnlineOrders(onUpdate, onError, options = {}, companyId = COMPANY_ID) {
   try {
-    const ref = collection(db, 'invoices');
-    return onSnapshot(ref, (snapshot) => {
-      let orders = snapshot.docs
-        .map(d => ({ id: d.id, ...d.data() }))
+    const ref1 = collection(db, 'invoices');
+    const ref2 = collection(db, `companies/${companyId}/invoices`);
+
+    const docsMap1 = new Map();
+    const docsMap2 = new Map();
+
+    const combineAndNotify = () => {
+      const combinedMap = new Map([...docsMap1, ...docsMap2]);
+      let orders = Array.from(combinedMap.values())
         .filter(d => {
-          // Include all web orders, online orders, Razorpay orders, WhatsApp orders, or COD orders
           const orderType = String(d.orderType || '').toLowerCase().trim();
           const source = String(d.customerSource || d.source || '').toLowerCase().trim();
           const method = String(d.paymentMethod || '').toLowerCase().trim();
@@ -1209,12 +1277,39 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
         })
         .sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
 
-      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s).`);
+      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s) across dual collections.`);
       onUpdate(orders);
+    };
+
+    const unsub1 = onSnapshot(ref1, (snapshot) => {
+      docsMap1.clear();
+      snapshot.docs.forEach(d => {
+        const data = d.data();
+        const id = data.id || d.id;
+        docsMap1.set(id, { id, ...data });
+      });
+      combineAndNotify();
     }, (err) => {
-      console.error('[TBC Ecom Admin] subscribeToOnlineOrders error:', err);
+      console.error('[TBC Ecom Admin] subscribeToOnlineOrders ref1 error:', err);
       if (typeof onError === 'function') onError(err);
     });
+
+    const unsub2 = onSnapshot(ref2, (snapshot) => {
+      docsMap2.clear();
+      snapshot.docs.forEach(d => {
+        const data = d.data();
+        const id = data.id || d.id;
+        docsMap2.set(id, { id, ...data });
+      });
+      combineAndNotify();
+    }, (err) => {
+      console.warn('[TBC Ecom Admin] subscribeToOnlineOrders ref2 warning:', err);
+    });
+
+    return () => {
+      unsub1();
+      unsub2();
+    };
   } catch (err) {
     console.error('[TBC Ecom Admin] subscribeToOnlineOrders exception:', err);
     return () => {};
@@ -1222,60 +1317,84 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}) {
 }
 
 /**
- * Subscribe to a SINGLE invoice document in real time.
- * Use this on the order-tracking page to show live status updates.
+ * Subscribe to a SINGLE invoice document in real time across dual locations.
  *
  * @param {string}   invoiceId
  * @param {Function} onUpdate  Called with the order object on every change
  * @param {Function} [onError]
+ * @param {string}   [companyId]
  * @returns {Function} Unsubscribe function
  */
-export function subscribeToInvoice(invoiceId, onUpdate, onError) {
+export function subscribeToInvoice(invoiceId, onUpdate, onError, companyId = COMPANY_ID) {
   if (!invoiceId) return () => {};
 
-  const unsubscribe = onSnapshot(
-    doc(db, 'invoices', invoiceId),
+  const ref1 = doc(db, 'invoices', invoiceId);
+  const ref2 = doc(db, `companies/${companyId}/invoices`, invoiceId);
+
+  let doc1 = null;
+  let doc2 = null;
+
+  const notify = () => {
+    const active = doc1 || doc2;
+    if (active) {
+      onUpdate(active);
+    }
+  };
+
+  const unsub1 = onSnapshot(
+    ref1,
     (snap) => {
       if (snap.exists()) {
-        onUpdate({ id: snap.id, ...snap.data() });
-      } else {
-        console.warn(`[TBC] Invoice ${invoiceId} does not exist.`);
+        doc1 = { id: snap.id, ...snap.data() };
+        notify();
       }
     },
-    (err) => {
-      console.error(`[TBC] subscribeToInvoice(${invoiceId}) error:`, err);
-      if (typeof onError === 'function') onError(err);
-    }
+    (err) => console.error(`[TBC] subscribeToInvoice(${invoiceId}) ref1 error:`, err)
   );
 
-  return unsubscribe;
+  const unsub2 = onSnapshot(
+    ref2,
+    (snap) => {
+      if (snap.exists()) {
+        doc2 = { id: snap.id, ...snap.data() };
+        notify();
+      }
+    },
+    (err) => console.warn(`[TBC] subscribeToInvoice(${invoiceId}) ref2 warning:`, err)
+  );
+
+  return () => {
+    unsub1();
+    unsub2();
+  };
 }
 
 
 // ═══════════════════════════════════════════════════════════════
-// 7.  ORDER STATUS STATE MACHINE  —  /invoices
-//     Advance status through the defined lifecycle.
+// 7.  ORDER STATUS STATE MACHINE  —  Dual Collection Updates
+//     Advance status through the defined lifecycle on all stores.
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Advance an invoice to the next logical status in the lifecycle.
+ * Advance an invoice to the next logical status in the lifecycle across all database collections.
  *
  * Flow: Awaiting Acceptance → Processing → Packed → Shipped → Out for Delivery → Delivered
  *
  * @param {string} invoiceId  Firestore document ID
+ * @param {string} [companyId]
  * @returns {Promise<{ success: boolean, previousStatus: string, newStatus: string | null }>}
- *
- * @example
- *   const result = await advanceOrderStatus('abc123');
- *   // result: { success: true, previousStatus: 'Processing', newStatus: 'Packed' }
  */
-export async function advanceOrderStatus(invoiceId) {
+export async function advanceOrderStatus(invoiceId, companyId = COMPANY_ID) {
   if (!invoiceId) return { success: false, error: 'No invoiceId provided.' };
 
-  const invoiceRef = doc(db, 'invoices', invoiceId);
+  const rootRef = doc(db, 'invoices', invoiceId);
+  const companyRef = doc(db, `companies/${companyId}/invoices`, invoiceId);
 
   try {
-    const snap = await getDoc(invoiceRef);
+    let snap = await getDoc(rootRef);
+    if (!snap.exists()) {
+      snap = await getDoc(companyRef);
+    }
     if (!snap.exists()) throw new Error(`Invoice ${invoiceId} not found.`);
 
     const currentStatus = snap.data().status;
@@ -1294,14 +1413,18 @@ export async function advanceOrderStatus(invoiceId) {
     }
 
     const newStatus = ORDER_STATUS_FLOW[currentIndex + 1];
-
-    await updateDoc(invoiceRef, {
+    const updatePayload = {
       status:    newStatus,
       updatedAt: serverTimestamp(),
-      [`statusHistory.${newStatus}`]: serverTimestamp(), // audit trail
-    });
+      [`statusHistory.${newStatus}`]: serverTimestamp(),
+    };
 
-    console.info(`[TBC] Invoice ${invoiceId}: "${currentStatus}" → "${newStatus}"`);
+    await Promise.allSettled([
+      updateDoc(rootRef, updatePayload),
+      updateDoc(companyRef, updatePayload)
+    ]);
+
+    console.info(`[TBC] Invoice ${invoiceId}: "${currentStatus}" → "${newStatus}" updated across collections`);
     return { success: true, previousStatus: currentStatus, newStatus };
 
   } catch (err) {
@@ -1311,24 +1434,44 @@ export async function advanceOrderStatus(invoiceId) {
 }
 
 /**
- * Set an invoice to a specific status directly (for admin overrides).
+ * Set an invoice to a specific status directly in dual collections.
  *
  * @param {string} invoiceId
- * @param {string} status   Must be a value from ORDER_STATUS_FLOW or 'Cancelled'
+ * @param {string} status   Must be a value from ORDER_STATUS_FLOW or 'Cancelled' / 'Pending' / 'Paid'
+ * @param {string} [companyId]
  * @returns {Promise<{ success: boolean }>}
  */
-export async function setOrderStatus(invoiceId, status) {
+export async function setOrderStatus(invoiceId, status, companyId = COMPANY_ID) {
   const allowed = [...ORDER_STATUS_FLOW, 'Cancelled', 'Pending', 'Paid'];
   if (!allowed.includes(status)) {
     return { success: false, error: `Invalid status "${status}".` };
   }
 
+  const updatePayload = {
+    status,
+    updatedAt: serverTimestamp(),
+    [`statusHistory.${status}`]: serverTimestamp(),
+  };
+
+  const rootRef = doc(db, 'invoices', invoiceId);
+  const companyRef = doc(db, `companies/${companyId}/invoices`, invoiceId);
+
   try {
-    await updateDoc(doc(db, 'invoices', invoiceId), {
-      status,
-      updatedAt: serverTimestamp(),
-      [`statusHistory.${status}`]: serverTimestamp(),
-    });
+    const results = await Promise.allSettled([
+      updateDoc(rootRef, updatePayload),
+      updateDoc(companyRef, updatePayload)
+    ]);
+
+    const isSuccess = results.some(r => r.status === 'fulfilled');
+    if (isSuccess) {
+      return { success: true };
+    }
+
+    // Fallback: merge if documents need creation/merge
+    await Promise.allSettled([
+      setDoc(rootRef, updatePayload, { merge: true }),
+      setDoc(companyRef, updatePayload, { merge: true })
+    ]);
     return { success: true };
   } catch (err) {
     console.error('[TBC] setOrderStatus error:', err);
@@ -1377,8 +1520,8 @@ export async function revalidateCompany(companyId = COMPANY_ID) {
 
     if (!raw) return null;
 
-    const name = raw.name || raw.companyName || raw.brandName || 'THE BANIYAN COMPANY';
-    const logo = raw.logo || raw.logoUrl || raw.imageUrl || raw.image || raw.icon || 'tbclogo.svg';
+    const name = raw.name || raw.companyName || raw.brandName || 'OneSpace Commerce';
+    const logo = raw.logo || raw.logoUrl || raw.imageUrl || raw.image || raw.icon || 'assets/onespace-commerce-logo.png';
     const handle = raw.handle || raw.username || ('@' + name.toLowerCase().replace(/[^a-z0-9]/g, ''));
 
     const result = {

@@ -6,6 +6,26 @@
 (function () {
   'use strict';
 
+  // Apply cached logo instantly to prevent flickering
+  try {
+    const rawCache = localStorage.getItem('tbc_cache_company');
+    if (rawCache) {
+      const parsed = JSON.parse(rawCache);
+      const logoUrl = parsed && parsed.data && parsed.data.logo;
+      if (logoUrl) {
+        const style = document.createElement('style');
+        style.innerHTML = `
+          #nav-company-logo, #loading-company-logo { content: url("${logoUrl}") !important; }
+        `;
+        if (document.head) {
+          document.head.appendChild(style);
+        } else {
+          document.addEventListener('DOMContentLoaded', () => document.head.appendChild(style));
+        }
+      }
+    }
+  } catch(e) {}
+
   function createPageLoader(options) {
     const opts = Object.assign({
       screenId: 'loading-screen',
