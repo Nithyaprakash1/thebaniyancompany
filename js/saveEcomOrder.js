@@ -1,109 +1,101 @@
-import { doc, writeBatch, serverTimestamp } from './firebase-config.js';
+import { db, doc, writeBatch, serverTimestamp } from './firebase-config.js';
 
 /**
  * Save E-Commerce Order into Dual Firestore Locations atomically using writeBatch:
  * 1. Subcollection: companies/{companyId}/invoices/{orderId}
  * 2. Root Collection: invoices/{orderId}
  *
- * @param {import('firebase/firestore').Firestore} db
- * @param {string} [companyId]
- * @param {object} [orderData]
+ * @param {object|import('firebase/firestore').Firestore} arg1 EcomOrderInput object OR db instance
+ * @param {string} [arg2] companyId if db is arg1
+ * @param {object} [arg3] orderData if db is arg1
  * @returns {Promise<string>} orderId
  */
-export async function saveEcomOrder(db, companyId, orderData = {}) {
-  const targetCompanyId = companyId || 'thebaniyancompany';
-  
-  // 1. Generate Unique Order ID if not provided
-  const orderId = orderData.orderId || orderData.id || orderData.invoiceId || 
-    `INV_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+export async function saveEcomOrder(arg1, arg2, arg3) {
+  let targetDb = db;
+  let targetCompanyId = 'thebaniyancompany';
+  let orderData = {};
+
+  // Case 1: saveEcomOrder(input) - single EcomOrderInput object argument
+  if (arg1 && typeof arg1 === 'object' && !arg1.getDocs && !arg1.type && (arg1.companyId || arg1.customerName || arg1.items)) {
+    orderData = arg1;
+    targetCompanyId = arg1.companyId || 'thebaniyancompany';
+  }
+  // Case 2: saveEcomOrder(db, companyId, orderData)
+  else if (arg1 && typeof arg1 === 'object' && (arg1.type === 'firestore' || arg1._delegate || typeof arg1.app === 'object')) {
+    targetDb = arg1;
+    targetCompanyId = typeof arg2 === 'string' ? arg2 : (arg2?.companyId || 'thebaniyancompany');
+    orderData = arg3 || arg2 || {};
+  }
+  // Case 3: saveEcomOrder(companyId, orderData)
+  else if (typeof arg1 === 'string') {
+    targetCompanyId = arg1;
+    orderData = arg2 || {};
+  }
+  // Fallback
+  else {
+    orderData = arg1 || {};
+    targetCompanyId = orderData.companyId || 'thebaniyancompany';
+  }
+
+  // 1. Generate Unique Order ID (Format: INV-1725283200000-492)
+  const orderId = orderData.id || orderData.orderId || orderData.invoiceId || 
+    `INV-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
 
   // 2. Sanitize Customer Details
   const cd = orderData.customerDetails || {};
   const rawPhone = String(
     orderData.customerPhoneNumber || orderData.customerPhone || orderData.phone || cd.phone || ''
   ).trim();
-  const cleanPhone = rawPhone.replace(/\D/g, '').slice(-10);
 
-  // 3. Calculate Financial Totals
+  // 3. Financial Breakdown
   const subtotal = Number(orderData.subtotal || 0);
-  const deliveryFee = Number(orderData.deliveryFee || orderData.shippingCharge || 0);
+  const deliveryCharge = Number(orderData.deliveryCharge ?? orderData.deliveryFee ?? orderData.shippingCharge ?? 0);
+  const shippingCharge = Number(orderData.shippingCharge ?? orderData.deliveryCharge ?? orderData.deliveryFee ?? 0);
   const discountAmount = Number(orderData.discountAmount || 0);
-  const totalAmount = Number(orderData.totalAmount || (subtotal + deliveryFee - discountAmount));
+  const totalAmount = Number(orderData.totalAmount ?? (subtotal + deliveryCharge - discountAmount));
 
-  // 4. Construct Unified Payload
+  // 4. Construct Unified Dual-Write Payload matching OneSpace POS Schema
   const payload = {
-    // Identifiers
     id: orderId,
-    orderId: orderId,
-    invoiceId: orderId,
     companyId: targetCompanyId,
     branchId: orderData.branchId || 'online',
-    orderType: 'online',
-    customerSource: 'website',
-    source: 'website',
-
-    // Status & Payment
-    status: orderData.status || 'Awaiting Acceptance',
-    paymentStatus: orderData.paymentStatus || (orderData.razorpayPaymentId ? 'Paid' : 'Pending'),
-    paymentMethod: orderData.paymentMethod || 'Razorpay Online Payment',
-
-    // Customer Information
+    branchName: orderData.branchName || 'Online Store',
+    createdBy: orderData.createdBy || 'ecom-checkout',
     customerName: String(orderData.customerName || cd.name || 'Valued Customer').trim(),
-    customerPhoneNumber: cleanPhone,
-    customerPhone: cleanPhone,
-    phone: cleanPhone,
+    customerPhoneNumber: rawPhone,
     customerEmail: String(orderData.customerEmail || cd.email || '').trim(),
-    email: String(orderData.customerEmail || cd.email || '').trim(),
-    
-    // Delivery Address
-    customerAddress: orderData.customerAddress || cd.address || `${orderData.doorNo || cd.doorNo || ''}, ${orderData.streetName || cd.streetName || ''}`.trim(),
-    doorNo: orderData.doorNo || cd.doorNo || '',
-    streetName: orderData.streetName || cd.streetName || '',
-    landmark: orderData.landmark || cd.landmark || '',
-    city: orderData.city || cd.city || 'Coimbatore',
-    state: orderData.state || cd.state || 'Tamil Nadu',
-    pincode: orderData.pincode || cd.pincode || '',
-
-    // Financial Breakdown
-    subtotal: subtotal,
-    deliveryFee: deliveryFee,
-    shippingCharge: deliveryFee,
-    discountAmount: discountAmount,
-    cgstAmount: Number(orderData.cgstAmount || 0),
-    sgstAmount: Number(orderData.sgstAmount || 0),
-    totalAmount: totalAmount,
-
-    // Payment References
-    razorpayOrderId: orderData.razorpayOrderId || null,
-    razorpayPaymentId: orderData.razorpayPaymentId || null,
-    razorpaySignature: orderData.razorpaySignature || null,
-    whatsappOrder: Boolean(orderData.whatsappOrder),
-
-    // Items List
+    customerAddress: String(orderData.customerAddress || cd.address || `${orderData.doorNo || cd.doorNo || ''}, ${orderData.streetName || cd.streetName || ''}`).trim(),
+    customerCity: String(orderData.customerCity || orderData.city || cd.city || '').trim(),
+    customerState: String(orderData.customerState || orderData.state || cd.state || '').trim(),
+    customerZip: String(orderData.customerZip || orderData.pincode || cd.pincode || '').trim(),
+    customerSource: orderData.customerSource || 'website',
+    orderType: orderData.orderType || 'online',
+    status: orderData.status || 'Awaiting Acceptance',
     items: Array.isArray(orderData.items) ? orderData.items.map(item => ({
       productId: item.productId || item.id || '',
       name: item.name || 'Apparel Item',
-      color: item.color || 'Default',
       size: String(item.size || 'M').toUpperCase(),
+      color: item.color || 'Default',
+      qty: Number(item.qty ?? item.quantity ?? 1),
       price: Number(item.price || 0),
-      qty: Number(item.qty || item.quantity || 1),
-      quantity: Number(item.qty || item.quantity || 1),
-      originalPrice: Number(item.originalPrice || item.mrp || item.price || 0),
-      mrp: Number(item.mrp || item.originalPrice || item.price || 0),
-      variantKey: item.variantKey || `${String(item.size || 'M').toUpperCase()}::${item.color || 'Default'}`,
-      imageUrl: item.imageUrl || item.image || ''
+      imageUrl: item.imageUrl || item.image || (Array.isArray(item.imageUrls) ? item.imageUrls[0] : '') || ''
     })) : [],
-
-    // Timestamps
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
+    subtotal: subtotal,
+    discountAmount: discountAmount,
+    deliveryCharge: deliveryCharge,
+    shippingCharge: shippingCharge,
+    totalAmount: totalAmount,
+    paymentMethod: orderData.paymentMethod || 'cod',
+    paymentStatus: orderData.paymentStatus || 'PENDING',
+    stockAdjusted: orderData.stockAdjusted !== undefined ? Boolean(orderData.stockAdjusted) : false,
+    createdAt: serverTimestamp()
   };
 
   // 5. Execute Atomic Write Batch
-  const batch = writeBatch(db);
+  const batch = writeBatch(targetDb);
   
-  const companyInvoiceRef = doc(db, `companies/${targetCompanyId}/invoices`, orderId);
-  const rootInvoiceRef = doc(db, 'invoices', orderId);
+  const companyInvoiceRef = doc(targetDb, `companies/${targetCompanyId}/invoices`, orderId);
+  const rootInvoiceRef = doc(targetDb, 'invoices', orderId);
 
   batch.set(companyInvoiceRef, payload);
   batch.set(rootInvoiceRef, payload);
@@ -112,3 +104,4 @@ export async function saveEcomOrder(db, companyId, orderData = {}) {
 
   return orderId;
 }
+

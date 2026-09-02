@@ -69,35 +69,32 @@ export function formatMoney(value) {
 }
 
 /**
- * Safely extract a numeric stock count from a variant's stock map or attributes.
- * Supports numbers, numeric strings, and multi-branch objects.
- * @param {object} variant
+ * Safely extract total numeric stock count from a variant's stock map, number, or variant object.
+ * Sums all numbers in stock objects (e.g. { "main": 10, "branch_2": 5 } => 15) or returns raw number.
+ * @param {Record<string, number>|number|object|undefined} stock
  * @param {string} [branchId]
  * @returns {number}
  */
-export function getVariantStock(variant, branchId = BRANCH_ID) {
-  if (!variant) return 0;
-  if (typeof variant.stock === 'number') return Math.max(0, variant.stock);
-  if (typeof variant.stock === 'string') {
-    const n = Number(variant.stock.replace(/[^0-9.-]+/g, ''));
+export function getVariantStock(stock, branchId = BRANCH_ID) {
+  if (!stock) return 0;
+  if (typeof stock === 'number') return Math.max(0, stock);
+  if (typeof stock === 'string') {
+    const n = Number(stock.replace(/[^0-9.-]+/g, ''));
     return !isNaN(n) ? Math.max(0, n) : 0;
   }
-  if (typeof variant.stock === 'object' && variant.stock !== null) {
-    const candidateKeys = [branchId, 'main', 'online', 'tbc_main', 'default', 'warehouse', 'store'];
-    for (const key of candidateKeys) {
-      if (variant.stock[key] !== undefined && variant.stock[key] !== null) {
-        const val = Number(String(variant.stock[key]).replace(/[^0-9.-]+/g, ''));
-        if (!isNaN(val)) return Math.max(0, val);
-      }
-    }
-    const vals = Object.values(variant.stock).map(v => Number(String(v).replace(/[^0-9.-]+/g, ''))).filter(n => !isNaN(n));
-    if (vals.length > 0) return Math.max(0, Math.max(...vals));
+  // If passed a variant object containing stock property (e.g. getVariantStock(variant))
+  if (typeof stock === 'object' && stock !== null && 'stock' in stock && stock.stock !== undefined) {
+    return getVariantStock(stock.stock, branchId);
   }
-  if (typeof variant.availableStock === 'number') return Math.max(0, variant.availableStock);
-  if (typeof variant.quantity === 'number') return Math.max(0, variant.quantity);
-  if (typeof variant.inventory === 'number') return Math.max(0, variant.inventory);
+  if (typeof stock === 'object' && stock !== null) {
+    return Object.values(stock).reduce((acc, val) => {
+      const num = typeof val === 'number' ? val : Number(String(val).replace(/[^0-9.-]+/g, ''));
+      return acc + (!isNaN(num) && num > 0 ? num : 0);
+    }, 0);
+  }
   return 0;
 }
+
 
 /**
  * Normalise a raw variants array from Firestore into a consistent shape.
@@ -480,6 +477,39 @@ export async function revalidateCategories(companyId = COMPANY_ID) {
 }
 
 /**
+ * Fetches all categories enabled for E-Commerce
+ * Path: categories (Query where companyId == companyId)
+ * @param {string} [companyId]
+ * @returns {Promise<object[]>}
+ */
+export async function getEcomCategories(companyId = COMPANY_ID) {
+  try {
+    const targetCompanyId = companyId || COMPANY_ID;
+    const categoriesRef = collection(db, 'categories');
+    const q = query(categoriesRef, where('companyId', '==', targetCompanyId));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    }
+
+    const allSnapshot = await getDocs(categoriesRef);
+    return allSnapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .filter(c => !c.companyId || c.companyId === targetCompanyId);
+  } catch (err) {
+    console.error('[TBC] getEcomCategories error:', err);
+    return [];
+  }
+}
+
+/**
  * Real-time live listener for all store products, stock quantity & visibility.
  * Whenever an admin uploads a product, edits stock, or changes details,
  * all subscribed pages update instantly in real time.
@@ -545,6 +575,44 @@ export async function revalidateProducts(companyId = COMPANY_ID) {
     return _cachedProducts || [];
   }
 }
+
+/**
+ * Fetches all products enabled for E-Commerce (where showInEcom == true)
+ * Path: companies/{companyId}/products (or global products collection where companyId == companyId)
+ * @param {string} [companyId]
+ * @returns {Promise<object[]>}
+ */
+export async function getEcomProducts(companyId = COMPANY_ID) {
+  try {
+    const targetCompanyId = companyId || COMPANY_ID;
+    const companyProductsRef = collection(db, `companies/${targetCompanyId}/products`);
+    const q1 = query(companyProductsRef, where('showInEcom', '==', true));
+    const snapshot1 = await getDocs(q1);
+
+    let products = snapshot1.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    if (products.length === 0) {
+      const rootRef = collection(db, 'products');
+      const q2 = query(rootRef, where('showInEcom', '==', true));
+      const snapshot2 = await getDocs(q2);
+      products = snapshot2.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(p => !p.companyId || p.companyId === targetCompanyId);
+    }
+
+    return products;
+  } catch (err) {
+    console.error('[TBC] getEcomProducts error:', err);
+    return [];
+  }
+}
+
 
 /**
  * Fetch a single product by its Firestore document ID or productId field live from Firestore.
