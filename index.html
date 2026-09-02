@@ -1,13 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>THE BANIYAN COMPANY</title>
-    <meta http-equiv="refresh" content="0;url=home.html">
-    <script>
-        window.location.replace('home.html');
-    </script>
+  <meta charset="utf-8">
+  <title>THE BANIYAN COMPANY — Coming Soon | Becoming Bigger</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Favicon Logo -->
+  <link rel="icon" type="image/png" href="assets/onespace-commerce-logo.png">
+  <link rel="shortcut icon" href="assets/onespace-commerce-logo.png">
+  <link rel="apple-touch-icon" href="assets/onespace-commerce-logo.png">
+  <meta name="description" content="THE BANIYAN COMPANY — Coming Soon. Something bigger is on the way. Premium Everyday Luxury & Streetwear Essentials.">
+  
+  <!-- Fonts & Material Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,300;1,700;1,900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            montserrat: ['Montserrat', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100vh;
+      background-color: #050505;
+      color: #ffffff;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Background Radial Glows */
+    .bg-glow-main {
+      position: fixed;
+      width: 750px;
+      height: 750px;
+      background: radial-gradient(circle, rgba(234, 179, 8, 0.12) 0%, rgba(217, 119, 6, 0.05) 35%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+      animation: pulseGlow 7s infinite ease-in-out;
+    }
+
+    .bg-glow-subtle {
+      position: fixed;
+      width: 900px;
+      height: 900px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 65%);
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
+    }
+
+    /* Shimmer Gradient Text Effect */
+    .shimmer-text-gold {
+      background: linear-gradient(135deg, #ffffff 0%, #fef08a 35%, #eab308 65%, #ffffff 100%);
+      background-size: 250% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: shineGold 4s linear infinite;
+    }
+
+    @keyframes shineGold {
+      to {
+        background-position: 250% center;
+      }
+    }
+
+    .shimmer-text-white {
+      background: linear-gradient(135deg, #ffffff 0%, #94a3b8 50%, #ffffff 100%);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: shineGold 5s linear infinite;
+    }
+
+    /* Animated Gold Luxury Line */
+    .glow-line {
+      height: 2px;
+      width: 100%;
+      max-width: 320px;
+      background: linear-gradient(90deg, transparent 0%, #eab308 30%, #fde047 50%, #eab308 70%, transparent 100%);
+      box-shadow: 0 0 16px rgba(234, 179, 8, 0.7);
+      animation: lineExpand 2.2s ease-out forwards;
+    }
+
+    @keyframes lineExpand {
+      0% { transform: scaleX(0); opacity: 0; }
+      100% { transform: scaleX(1); opacity: 1; }
+    }
+
+    /* Entrance Fade & Grow Animations */
+    .animate-grow-title {
+      opacity: 0;
+      animation: growTitle 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+    }
+
+    .animate-fade-up {
+      opacity: 0;
+      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+    }
+
+    .animate-fade-up-delayed {
+      opacity: 0;
+      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+    }
+
+    @keyframes growTitle {
+      0% {
+        opacity: 0;
+        transform: scale(0.88);
+        letter-spacing: 0.15em;
+        filter: blur(12px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Floating Badge Animation */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .animate-float {
+      animation: floatSlow 4s ease-in-out infinite;
+    }
+
+    /* Golden Chip Glow */
+    .gold-glow-chip {
+      box-shadow: 0 0 15px rgba(234, 179, 8, 0.25), inset 0 0 10px rgba(254, 240, 138, 0.15);
+      border: 1px solid rgba(234, 179, 8, 0.5);
+    }
+  </style>
 </head>
-<body style="background:#0a0a0a;">
+<body class="flex flex-col justify-between items-center min-h-screen px-4 py-8 relative selection:bg-yellow-500 selection:text-black">
+
+  <!-- Background Glow Elements -->
+  <div class="bg-glow-main"></div>
+  <div class="bg-glow-subtle"></div>
+
+  <!-- Top Header Navigation / Brand Badge -->
+  <header class="relative z-10 w-full max-w-screen-xl flex justify-between items-center py-2 px-2 md:px-6">
+    <div class="flex items-center gap-3">
+      <img 
+        src="assets/onespace-commerce-logo.png" 
+        onerror="this.src='assets/Onespace Commerce Logo PNG.png'" 
+        alt="The Baniyan Company Logo" 
+        class="h-10 md:h-12 w-auto object-contain rounded-xl shadow-lg border border-white/10"
+      >
+      <span class="text-xs md:text-sm font-extrabold tracking-[0.25em] uppercase text-white/90">
+        THE BANIYAN COMPANY
+      </span>
+    </div>
+
+    <!-- Direct Store Entry Button -->
+    <a 
+      href="home" 
+      class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 active:scale-95 shadow-md"
+    >
+      <span>ENTER STORE</span>
+      <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+    </a>
+  </header>
+
+  <!-- Main Hero Content Center -->
+  <main class="relative z-10 flex-1 flex flex-col justify-center items-center text-center max-w-4xl mx-auto py-12 px-2">
+    
+    <!-- Top Pill Badge -->
+    <div class="animate-float mb-6">
+      <div class="gold-glow-chip inline-flex items-center gap-2 bg-black/60 backdrop-blur-xl px-4 py-1.5 rounded-full text-yellow-300 text-[10px] md:text-xs font-extrabold uppercase tracking-[0.3em]">
+        <span class="w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span>
+        OFFICIAL LAUNCHING SOON
+      </div>
+    </div>
+
+    <!-- Brand Name Highlight -->
+    <h2 class="text-xs sm:text-sm md:text-base font-extrabold tracking-[0.4em] uppercase text-neutral-400 mb-3 animate-fade-up">
+      THE BANIYAN COMPANY
+    </h2>
+
+    <!-- HUGE "COMING SOON" TITLE -->
+    <h1 class="animate-grow-title text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-none mb-4 shimmer-text-gold drop-shadow-[0_10px_35px_rgba(234,179,8,0.3)]">
+      COMING SOON
+    </h1>
+
+    <!-- BIG "BECOMING BIGGER" SUBTEXT -->
+    <div class="animate-fade-up">
+      <p class="text-xl sm:text-3xl md:text-4xl font-extrabold tracking-[0.2em] text-white uppercase mb-6 shimmer-text-white">
+        BECOMING BIGGER. STAY TUNED.
+      </p>
+    </div>
+
+    <!-- Glowing Divider Line -->
+    <div class="glow-line my-4 mx-auto"></div>
+
+    <!-- Description Paragraph -->
+    <p class="animate-fade-up-delayed text-sm sm:text-base md:text-lg font-medium text-neutral-300 max-w-2xl leading-relaxed mt-4 mb-8">
+      We are redefining everyday fashion, basic luxury, and streetwear essentials with unprecedented quality &amp; design. 
+    </p>
+
+    <!-- Action Buttons -->
+    <div class="animate-fade-up-delayed flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md">
+      <a 
+        href="home" 
+        class="w-full sm:w-auto min-w-[200px] bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-600 hover:from-yellow-300 hover:to-amber-500 text-black font-extrabold text-xs md:text-sm tracking-[0.15em] uppercase px-8 py-4 rounded-2xl shadow-[0_0_25px_rgba(234,179,8,0.4)] transition-all duration-300 hover:scale-105 active:scale-95 text-center flex items-center justify-center gap-2"
+      >
+        <span>EXPLORE STORE PREVIEW</span>
+        <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+      </a>
+
+      <a 
+        href="reels" 
+        class="w-full sm:w-auto min-w-[180px] bg-neutral-900/90 hover:bg-neutral-800 backdrop-blur-md text-white font-bold text-xs md:text-sm tracking-[0.15em] uppercase px-7 py-4 rounded-2xl border border-white/15 shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 text-center flex items-center justify-center gap-2"
+      >
+        <span>WATCH LOOKBOOK</span>
+        <span class="material-symbols-outlined text-[18px]">movie</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer Info -->
+  <footer class="relative z-10 w-full max-w-screen-xl flex flex-col sm:flex-row justify-between items-center gap-4 py-4 px-4 text-center sm:text-left border-t border-white/10 text-neutral-500 text-[11px] font-semibold tracking-wider uppercase">
+    <div>
+      © 2026 THE BANIYAN COMPANY. All rights reserved.
+    </div>
+    <div class="flex items-center gap-6 text-neutral-400">
+      <a href="home" class="hover:text-white transition-colors">Home</a>
+      <a href="shop" class="hover:text-white transition-colors">Catalog</a>
+      <a href="https://instagram.com" target="_blank" class="hover:text-white transition-colors">Instagram</a>
+    </div>
+  </footer>
+
 </body>
 </html>
