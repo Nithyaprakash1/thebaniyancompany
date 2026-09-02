@@ -35,6 +35,7 @@ import {
   serverTimestamp,
   runTransaction,
   onSnapshot,
+  writeBatch,
 } from './firebase-config.js';
 
 // ─────────────────────────────────────────────────────────────
@@ -873,25 +874,17 @@ export async function createInvoice(orderData = {}) {
 
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      await Promise.all([
-        setDoc(companyInvoiceRef, payload),
-        setDoc(rootInvoiceRef, payload)
-      ]);
-      console.info(`[TBC] Order invoice successfully saved in dual locations (company subcollection + root collection) on attempt ${attempt}: ${orderId}`);
+      const batch = writeBatch(db);
+      batch.set(companyInvoiceRef, payload);
+      batch.set(rootInvoiceRef, payload);
+      await batch.commit();
+      console.info(`[TBC] Order invoice successfully saved atomically via writeBatch in dual locations (attempt ${attempt}): ${orderId}`);
       success = true;
       break;
     } catch (err) {
       lastError = err;
-      console.warn(`[TBC] createInvoice dual-write attempt ${attempt} failed:`, err);
-      // Resilient Fallback: attempt sequential setDoc writes
-      try {
-        await setDoc(companyInvoiceRef, payload);
-        await setDoc(rootInvoiceRef, payload);
-        success = true;
-        break;
-      } catch (err2) {
-        if (attempt < 3) await new Promise(r => setTimeout(r, 300 * attempt));
-      }
+      console.warn(`[TBC] createInvoice writeBatch attempt ${attempt} failed:`, err);
+      if (attempt < 3) await new Promise(r => setTimeout(r, 300 * attempt));
     }
   }
 
@@ -914,11 +907,106 @@ export async function createInvoice(orderData = {}) {
 
 // Function matching user's exact requested signature: saveEcomOrder(db, companyId, orderData)
 export async function saveEcomOrder(dbInstance, companyId, orderData = {}) {
-  return createInvoice({ ...orderData, companyId: companyId || COMPANY_ID });
+  const targetDb = dbInstance || db;
+  const targetCompanyId = companyId || COMPANY_ID;
+  
+  const orderId = orderData.orderId || orderData.id || orderData.invoiceId || 
+    `INV_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+
+  const cd = orderData.customerDetails || {};
+  const rawPhone = String(
+    orderData.customerPhoneNumber || orderData.customerPhone || orderData.phone || cd.phone || ''
+  ).trim();
+  const cleanPhone = rawPhone.replace(/\D/g, '').slice(-10);
+
+  const subtotal = Number(orderData.subtotal || 0);
+  const deliveryFee = Number(orderData.deliveryFee || orderData.shippingCharge || 0);
+  const discountAmount = Number(orderData.discountAmount || 0);
+  const totalAmount = Number(orderData.totalAmount || (subtotal + deliveryFee - discountAmount));
+
+  const payload = {
+    id: orderId,
+    orderId: orderId,
+    invoiceId: orderId,
+    companyId: targetCompanyId,
+    branchId: orderData.branchId || 'online',
+    orderType: 'online',
+    customerSource: 'website',
+    source: 'website',
+
+    status: orderData.status || 'Awaiting Acceptance',
+    paymentStatus: orderData.paymentStatus || (orderData.razorpayPaymentId ? 'Paid' : 'Pending'),
+    paymentMethod: orderData.paymentMethod || 'Razorpay Online Payment',
+
+    customerName: String(orderData.customerName || cd.name || 'Valued Customer').trim(),
+    customerPhoneNumber: cleanPhone,
+    customerPhone: cleanPhone,
+    phone: cleanPhone,
+    customerEmail: String(orderData.customerEmail || cd.email || '').trim(),
+    email: String(orderData.customerEmail || cd.email || '').trim(),
+    
+    customerAddress: orderData.customerAddress || cd.address || `${orderData.doorNo || cd.doorNo || ''}, ${orderData.streetName || cd.streetName || ''}`.trim(),
+    doorNo: orderData.doorNo || cd.doorNo || '',
+    streetName: orderData.streetName || cd.streetName || '',
+    landmark: orderData.landmark || cd.landmark || '',
+    city: orderData.city || cd.city || 'Coimbatore',
+    state: orderData.state || cd.state || 'Tamil Nadu',
+    pincode: orderData.pincode || cd.pincode || '',
+
+    subtotal: subtotal,
+    deliveryFee: deliveryFee,
+    shippingCharge: deliveryFee,
+    discountAmount: discountAmount,
+    cgstAmount: Number(orderData.cgstAmount || 0),
+    sgstAmount: Number(orderData.sgstAmount || 0),
+    totalAmount: totalAmount,
+
+    razorpayOrderId: orderData.razorpayOrderId || null,
+    razorpayPaymentId: orderData.razorpayPaymentId || null,
+    razorpaySignature: orderData.razorpaySignature || null,
+    whatsappOrder: Boolean(orderData.whatsappOrder),
+
+    items: Array.isArray(orderData.items) ? orderData.items.map(item => ({
+      productId: item.productId || item.id || '',
+      name: item.name || 'Apparel Item',
+      color: item.color || 'Default',
+      size: String(item.size || 'M').toUpperCase(),
+      price: Number(item.price || 0),
+      qty: Number(item.qty || item.quantity || 1),
+      quantity: Number(item.qty || item.quantity || 1),
+      originalPrice: Number(item.originalPrice || item.mrp || item.price || 0),
+      mrp: Number(item.mrp || item.originalPrice || item.price || 0),
+      variantKey: item.variantKey || `${String(item.size || 'M').toUpperCase()}::${item.color || 'Default'}`,
+      imageUrl: item.imageUrl || item.image || ''
+    })) : [],
+
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
+  const batch = writeBatch(targetDb);
+  
+  const companyInvoiceRef = doc(targetDb, `companies/${targetCompanyId}/invoices`, orderId);
+  const rootInvoiceRef = doc(targetDb, 'invoices', orderId);
+
+  batch.set(companyInvoiceRef, payload);
+  batch.set(rootInvoiceRef, payload);
+
+  await batch.commit();
+
+  // Return string orderId, with attached compatibility properties if checked as an object
+  const resStr = String(orderId);
+  Object.defineProperties(resStr, {
+    invoiceId: { value: orderId, enumerable: false },
+    orderId: { value: orderId, enumerable: false },
+    success: { value: true, enumerable: false }
+  });
+
+  return orderId;
 }
 
 // Alias kept for backwards compatibility with existing checkout.html
-export const saveOrderToFirestore = createInvoice;
+export const saveOrderToFirestore = saveEcomOrder;
 
 
 // ═══════════════════════════════════════════════════════════════
