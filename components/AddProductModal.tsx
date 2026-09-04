@@ -462,9 +462,9 @@ export default function AddProductModal({
         {/* =========================================================
             FIXED TOP HEADER
         ========================================================= */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/70 shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-md shadow-indigo-100">
+            <div className="p-2.5 bg-black text-white rounded-xl shadow-xs">
               <Package className="w-5 h-5" />
             </div>
             <div>
@@ -475,7 +475,7 @@ export default function AddProductModal({
           <button
             onClick={onClose}
             type="button"
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -497,8 +497,8 @@ export default function AddProductModal({
           ========================================================= */}
           <section className="space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold flex items-center justify-center">1</span>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">Basic Information & Media</h3>
+              <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center">1</span>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800">Basic Information & Media</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -513,7 +513,7 @@ export default function AddProductModal({
                   placeholder="e.g. Oversized Heavyweight Cotton T-Shirt"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-black transition font-medium"
                 />
               </div>
 
@@ -524,7 +524,7 @@ export default function AddProductModal({
                   <button
                     type="button"
                     onClick={generateSku}
-                    className="text-[11px] font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                    className="text-[11px] font-semibold text-slate-800 hover:text-black flex items-center gap-1"
                   >
                     <Sparkles className="w-3 h-3" /> Auto-generate
                   </button>
@@ -535,7 +535,7 @@ export default function AddProductModal({
                     placeholder="e.g. TBC-TEE-001"
                     value={productId}
                     onChange={(e) => setProductId(e.target.value.toUpperCase())}
-                    className="w-full px-3.5 py-2.5 font-mono text-sm uppercase bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    className="w-full px-3.5 py-2.5 font-mono text-sm uppercase bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-black transition"
                   />
                 </div>
               </div>
@@ -657,9 +657,9 @@ export default function AddProductModal({
                         setTag(t);
                         setCustomTagInput('');
                       }}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition ${
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-xl border transition ${
                         isSelected
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                          ? 'bg-black text-white border-black shadow-xs'
                           : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
@@ -672,7 +672,7 @@ export default function AddProductModal({
                   placeholder="+ Custom tag..."
                   value={customTagInput}
                   onChange={(e) => setCustomTagInput(e.target.value)}
-                  className="px-2.5 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg w-32 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="px-2.5 py-1 text-xs bg-slate-50 border border-slate-200 rounded-xl w-32 focus:bg-white focus:outline-none focus:border-black"
                 />
               </div>
             </div>
@@ -825,7 +825,7 @@ export default function AddProductModal({
                       onClick={() => toggleColor(col)}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border transition ${
                         isChecked
-                          ? 'bg-indigo-50/80 border-indigo-500 text-indigo-900 ring-1 ring-indigo-500 shadow-xs'
+                          ? 'bg-black text-white border-black shadow-xs ring-1 ring-black'
                           : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
                     >
@@ -834,7 +834,7 @@ export default function AddProductModal({
                         style={{ backgroundColor: col.hex }}
                       />
                       <span>{col.name}</span>
-                      {isChecked && <Check className="w-3 h-3 text-indigo-600 ml-0.5" />}
+                      {isChecked && <Check className="w-3 h-3 text-white ml-0.5" />}
                     </button>
                   );
                 })}
@@ -872,10 +872,10 @@ export default function AddProductModal({
           <section className="space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold flex items-center justify-center">3</span>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">Variant Matrix & Branch Inventory</h3>
+                <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center">3</span>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800">Variant Matrix & Branch Inventory</h3>
               </div>
-              <span className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full">
+              <span className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full border border-slate-200">
                 {variants.length} Matrix Combinations ({selectedSizes.length} sizes × {selectedColors.length} colors)
               </span>
             </div>
@@ -884,12 +884,12 @@ export default function AddProductModal({
             <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <Sliders className="w-3.5 h-3.5 text-indigo-600" /> Quick Bulk Apply
+                  <Sliders className="w-3.5 h-3.5 text-black" /> Quick Bulk Apply
                 </span>
                 <button
                   type="button"
                   onClick={copyFirstRowToAll}
-                  className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                  className="text-[11px] font-semibold text-slate-800 hover:text-black flex items-center gap-1"
                 >
                   <Copy className="w-3 h-3" /> Copy Row 1 to All
                 </button>
@@ -933,7 +933,7 @@ export default function AddProductModal({
                 <button
                   type="button"
                   onClick={applyBulkPrices}
-                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition"
+                  className="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-lg transition cursor-pointer"
                 >
                   Apply Prices to All
                 </button>
@@ -1173,7 +1173,7 @@ export default function AddProductModal({
               </div>
               <div className="w-1 h-1 rounded-full bg-slate-300" />
               <div className="text-xs text-slate-500">
-                Total Initial Stock: <strong className="text-indigo-600">{totalStockCount} units</strong>
+                Total Initial Stock: <strong className="text-slate-900 font-bold">{totalStockCount} units</strong>
               </div>
             </div>
 
@@ -1189,7 +1189,7 @@ export default function AddProductModal({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-xl shadow-md shadow-indigo-200 flex items-center gap-1.5 transition"
+                className="px-5 py-2 text-xs font-semibold text-white bg-black hover:bg-neutral-800 disabled:opacity-50 rounded-xl shadow-xs flex items-center gap-1.5 transition cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
@@ -1197,7 +1197,7 @@ export default function AddProductModal({
                   </>
                 ) : (
                   <>
-                    <Check className="w-4 h-4" /> Save Product & Variants
+                    <Check className="w-4 h-4" /> Save Product &amp; Variants
                   </>
                 )}
               </button>

@@ -159,6 +159,15 @@
             <span>Products &amp; Stock</span>
           </button>
 
+          <a href="stock-availabilities.html"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center justify-between group hover:bg-slate-100 text-slate-700">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-lg text-amber-500">warehouse</span>
+              <span class="font-semibold text-slate-900">Stock Availabilities</span>
+            </div>
+            <span class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full font-bold">Live</span>
+          </a>
+
           <button id="side-tab-orders" onclick="switchAdminTab('orders')"
             class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
             <span class="material-symbols-outlined text-lg">local_shipping</span>
@@ -426,6 +435,9 @@
 
               <!-- Product Filters & Search Bar -->
               <div class="flex items-center gap-2 flex-wrap">
+                <a href="stock-availabilities.html" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 transition">
+                  <span class="material-symbols-outlined text-sm">warehouse</span> Stock Availabilities Page →
+                </a>
                 <div class="relative">
                   <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
                   <input type="text" id="product-search-input" oninput="applyProductFilters()"

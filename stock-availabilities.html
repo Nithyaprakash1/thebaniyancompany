@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Availabilities | OneSpace Commerce</title>
+  <link rel="icon" type="image/png" href="assets/onespace-commerce-logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+
+<body class="bg-[#fafafa] text-slate-900 antialiased min-h-screen flex flex-col">
+
+  <!-- ==========================================
+       TOP NAVIGATION BAR
+  ========================================== -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand & Page Title -->
+      <div class="flex items-center gap-3">
+        <a href="admin.html" class="flex items-center gap-2 group">
+          <div class="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center font-bold text-sm shadow-xs group-hover:bg-slate-800 transition">
+            TB
+          </div>
+          <div>
+            <span class="font-bold text-base tracking-tight text-slate-900 block leading-tight">Inventory</span>
+            <span class="text-[11px] text-slate-400 font-medium hidden sm:block">The Baniyan Company</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Center Search Bar -->
+      <div class="flex-1 max-w-lg mx-2 sm:mx-6 hidden md:block">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input
+            type="text"
+            id="global-search-input"
+            oninput="handleSearchInput(this.value)"
+            placeholder="Search orders, products, customers..."
+            class="w-full bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:border-black focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2 outline-none transition"
+          >
+        </div>
+      </div>
+
+      <!-- Right Header Action Controls -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <!-- + Add Product Button -->
+        <button
+          type="button"
+          onclick="openAddProductModal()"
+          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+        >
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>Add Product</span>
+        </button>
+
+        <!-- View Store Button -->
+        <a
+          href="home.html"
+          target="_blank"
+          class="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium px-3 py-2 rounded-xl hidden sm:flex items-center gap-1.5 transition"
+        >
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-500"></i>
+          <span>View Store</span>
+        </a>
+
+        <!-- Notifications Bell -->
+        <div class="relative">
+          <button
+            type="button"
+            onclick="toggleNotifications()"
+            class="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition"
+          >
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
+              3
+            </span>
+          </button>
+        </div>
+
+        <!-- Profile Avatar -->
+        <a href="admin.html" class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:opacity-90 transition">
+          TB
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN CONTENT CONTAINER
+  ========================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-6">
+
+    <!-- PAGE HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Inventory</h1>
+        <p class="text-xs text-slate-500 mt-1">Real-time stock availabilities, branch levels, and instant restock controls.</p>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <button
+          type="button"
+          onclick="openStockHistoryModal()"
+          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition shadow-2xs"
+        >
+          Stock History
+        </button>
+        <button
+          type="button"
+          onclick="openAddStockModal()"
+          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs"
+        >
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>Add Stock</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         4 STAT / KPI METRIC CARDS
+    ========================================== -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Card 1: Total Products -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition">
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-800 flex items-center justify-center text-xl shrink-0">
+          📦
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900 tracking-tight" id="kpi-total-count">6</h2>
+          <span class="text-xs text-slate-500 font-medium">Total Products</span>
+        </div>
+      </div>
+
+      <!-- Card 2: In Stock -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0">
+          <i data-lucide="check" class="w-6 h-6 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-emerald-600 tracking-tight" id="kpi-instock-count">3</h2>
+          <span class="text-xs text-slate-500 font-medium">In Stock</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Low Stock -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition">
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg shrink-0">
+          <i data-lucide="alert-triangle" class="w-6 h-6 stroke-[2]"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-amber-500 tracking-tight" id="kpi-lowstock-count">2</h2>
+          <span class="text-xs text-slate-500 font-medium">Low Stock</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Out of Stock -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex items-center gap-4 hover:border-slate-300 transition">
+        <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-lg shrink-0">
+          <i data-lucide="x" class="w-6 h-6 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-rose-500 tracking-tight" id="kpi-outofstock-count">2</h2>
+          <span class="text-xs text-slate-500 font-medium">Out of Stock</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         ALERT BANNER
+    ========================================== -->
+    <div id="attention-alert-banner" class="bg-[#fffbeb] border border-[#fef3c7] text-[#92400e] px-5 py-3.5 rounded-2xl flex items-center justify-between text-xs font-medium transition">
+      <div class="flex items-center gap-2.5">
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0"></i>
+        <span><strong id="attention-count-text">4 products</strong> need immediate stock attention.</span>
+      </div>
+      <button
+        type="button"
+        onclick="filterByAttention()"
+        class="font-bold text-[#b45309] hover:text-[#78350f] hover:underline cursor-pointer transition"
+      >
+        View All
+      </button>
+    </div>
+
+    <!-- ==========================================
+         FILTERS BAR & SEARCH
+    ========================================== -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+      
+      <!-- Top Filters Row: Search + Category + Branch + Sorter -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        
+        <!-- Mobile/Table Search -->
+        <div class="relative flex-1 max-w-md">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input
+            type="text"
+            id="table-search-input"
+            oninput="handleSearchInput(this.value)"
+            placeholder="Search by Product Name, Variant, or SKU..."
+            class="w-full bg-slate-50 border border-slate-200 focus:border-black focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2 outline-none transition"
+          >
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Category Filter -->
+          <select
+            id="filter-category"
+            onchange="applyAllFilters()"
+            class="bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
+          >
+            <option value="all">All Categories</option>
+            <option value="Kurtas">Kurtas &amp; Kurtis</option>
+            <option value="T-Shirts">T-Shirts</option>
+            <option value="Joggers">Joggers &amp; Denim</option>
+            <option value="Sets">Sets &amp; Co-ords</option>
+          </select>
+
+          <!-- Branch Filter -->
+          <select
+            id="filter-branch"
+            onchange="applyAllFilters()"
+            class="bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
+          >
+            <option value="all">All Branches</option>
+            <option value="main">Main Store</option>
+            <option value="branch_02">Branch 02</option>
+            <option value="warehouse">Central Warehouse</option>
+          </select>
+
+          <!-- Stock Level Sorter -->
+          <select
+            id="filter-sort"
+            onchange="applyAllFilters()"
+            class="bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
+          >
+            <option value="attention">Sort: Attention First (Low to High)</option>
+            <option value="stock_desc">Sort: Stock (High to Low)</option>
+            <option value="name_asc">Sort: Product Name (A to Z)</option>
+            <option value="sku_asc">Sort: SKU</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Quick Filter Pills: All / In Stock / Low / Critical / Out of Stock -->
+      <div class="flex items-center gap-2 pt-1 border-t border-slate-100 overflow-x-auto no-scrollbar">
+        <button
+          type="button"
+          onclick="setStatusFilter('all')"
+          id="btn-status-all"
+          class="status-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-black text-white transition shadow-2xs"
+        >
+          All Items (<span id="pill-count-all">6</span>)
+        </button>
+        <button
+          type="button"
+          onclick="setStatusFilter('in_stock')"
+          id="btn-status-in_stock"
+          class="status-tab px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+        >
+          In Stock (<span id="pill-count-in_stock">3</span>)
+        </button>
+        <button
+          type="button"
+          onclick="setStatusFilter('low')"
+          id="btn-status-low"
+          class="status-tab px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+        >
+          Low Stock (<span id="pill-count-low">2</span>)
+        </button>
+        <button
+          type="button"
+          onclick="setStatusFilter('critical')"
+          id="btn-status-critical"
+          class="status-tab px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+        >
+          Critical (<span id="pill-count-critical">2</span>)
+        </button>
+        <button
+          type="button"
+          onclick="setStatusFilter('out_of_stock')"
+          id="btn-status-out_of_stock"
+          class="status-tab px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+        >
+          Out of Stock (<span id="pill-count-out_of_stock">2</span>)
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         STOCK AVAILABILITIES TABLE
+    ========================================== -->
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-100 text-[11px] font-semibold text-slate-500 uppercase tracking-wider bg-white">
+              <th class="py-4 px-6">Product / Variant</th>
+              <th class="py-4 px-6">SKU</th>
+              <th class="py-4 px-6">Current Stock</th>
+              <th class="py-4 px-6">Status</th>
+              <th class="py-4 px-6">Update Stock</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-table-body" class="divide-y divide-slate-100 text-xs">
+            <!-- Dynamic rows will be rendered here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="table-empty-state" class="hidden p-12 text-center text-slate-400">
+        <i data-lucide="package-open" class="w-10 h-10 mx-auto mb-2 stroke-1"></i>
+        <h4 class="font-bold text-slate-700 text-sm">No inventory records found</h4>
+        <p class="text-xs text-slate-400 mt-1">Try resetting your filters or search keywords.</p>
+        <button
+          type="button"
+          onclick="resetAllFilters()"
+          class="mt-3 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
+        >
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       MODAL 1: ADD PRODUCT DIALOG MODAL (Clean UI, ALL Fields Preserved)
+  ========================================================= -->
+  <div id="modal-add-product" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="relative w-full max-w-4xl max-h-[92vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Top Fixed Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center shadow-xs">
+            <i data-lucide="package" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900 tracking-tight">Add New Product</h2>
+            <p class="text-xs text-slate-400">Set product specs, auto-generate variants, and assign multi-branch inventory</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onclick="closeAddProductModal()"
+          class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Scrollable Form Body -->
+      <form id="add-product-form" onsubmit="handleSaveProduct(event)" class="flex-1 overflow-y-auto p-6 space-y-7 text-xs custom-scrollbar">
+        
+        <!-- SECTION 1: BASIC INFORMATION & MEDIA -->
+        <section class="space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center">1</span>
+              <h3 class="font-bold uppercase tracking-wider text-slate-800 text-xs">Basic Information &amp; Media</h3>
+            </div>
+            <span class="text-[11px] font-medium text-slate-400 font-mono">Tenant: thebaniyancompany</span>
+          </div>
+
+          <!-- Product Name & SKU Barcode with Auto-Gen -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2 space-y-1">
+              <label class="font-semibold text-slate-700 flex items-center gap-1">
+                Product Title / Name <span class="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="inp-prod-name"
+                required
+                placeholder="e.g. Oversized Heavyweight Cotton T-Shirt"
+                value="Oversized Heavyweight Cotton T-Shirt"
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:outline-none transition font-medium"
+              >
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <label class="font-semibold text-slate-700">SKU / Barcode ID</label>
+                <button
+                  type="button"
+                  onclick="generateSkuAction()"
+                  class="text-[11px] font-semibold text-slate-800 hover:text-black flex items-center gap-1"
+                >
+                  <i data-lucide="sparkles" class="w-3 h-3"></i> Auto-Gen
+                </button>
+              </div>
+              <div class="relative">
+                <input
+                  type="text"
+                  id="inp-prod-sku"
+                  placeholder="e.g. TBC-TEE-001"
+                  value="TBC-TEE-001"
+                  class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:outline-none transition font-mono uppercase"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Category, Supplier, Gender, Material -->
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <!-- Category -->
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <label class="font-semibold text-slate-700">Category <span class="text-rose-500">*</span></label>
+                <button
+                  type="button"
+                  onclick="openCustomCategoryModal()"
+                  class="text-[11px] font-semibold text-slate-800 hover:text-black"
+                >
+                  + Add
+                </button>
+              </div>
+              <select
+                id="inp-prod-category"
+                class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:outline-none transition font-medium"
+              >
+                <option value="T-Shirts">T-Shirts</option>
+                <option value="Kurtas">Kurtas &amp; Kurtis</option>
+                <option value="Joggers">Joggers &amp; Denim</option>
+                <option value="Sets">Sets &amp; Co-ords</option>
+                <option value="Hoodies">Hoodies</option>
+                <option value="Bottoms">Bottoms</option>
+              </select>
+            </div>
+
+            <!-- Supplier -->
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <label class="font-semibold text-slate-700">Supplier / Vendor</label>
+                <button
+                  type="button"
+                  onclick="openCustomSupplierModal()"
+                  class="text-[11px] font-semibold text-slate-800 hover:text-black"
+                >
+                  + Add
+                </button>
+              </div>
+              <select
+                id="inp-prod-supplier"
+                class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:outline-none transition font-medium"
+              >
+                <option value="SUP-TEX-001">Vardhman Textiles (SUP-001)</option>
+                <option value="SUP-TEX-002">Tirupur Knitters Ltd (SUP-002)</option>
+                <option value="SUP-TEX-003">Aravind Dyeing (SUP-003)</option>
+                <option value="SUP-INHOUSE">Direct In-House</option>
+              </select>
+            </div>
+
+            <!-- Audience / Gender -->
+            <div class="space-y-1">
+              <label class="font-semibold text-slate-700">Audience / Gender</label>
+              <select
+                id="inp-prod-gender"
+                class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:outline-none transition font-medium"
+              >
+                <option value="Unisex">Unisex</option>
+                <option value="Men">Men</option>
+                <option value="Women">Women</option>
+                <option value="Kids">Kids</option>
+              </select>
+            </div>
+
+            <!-- Material -->
+            <div class="space-y-1">
+              <label class="font-semibold text-slate-700">Fabric &amp; Material</label>
+              <input
+                type="text"
+                id="inp-prod-material"
+                list="preset-material-options"
+                placeholder="100% Combed Cotton 240 GSM"
+                value="100% Combed Cotton 240 GSM"
+                class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:outline-none transition font-medium"
+              >
+              <datalist id="preset-material-options">
+                <option value="100% Combed Cotton 240 GSM"></option>
+                <option value="100% Bio-Washed Cotton"></option>
+                <option value="French Terry 260 GSM"></option>
+                <option value="Pure Linen"></option>
+                <option value="Cotton Spandex"></option>
+              </datalist>
+            </div>
+          </div>
+
+          <!-- Highlight Tag Chips & E-Com Visibility Switch -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1 items-center">
+            
+            <!-- Tag Chips -->
+            <div class="sm:col-span-2 space-y-1.5">
+              <label class="font-semibold text-slate-700 flex items-center gap-1.5">
+                <i data-lucide="tag" class="w-3.5 h-3.5 text-slate-400"></i> Highlight Badge Tag
+              </label>
+              <div id="product-tag-chips" class="flex flex-wrap items-center gap-1.5">
+                <!-- Dynamically populated tags -->
+              </div>
+              <input type="hidden" id="inp-prod-tag" value="Trending">
+            </div>
+
+            <!-- E-Com Switch -->
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="font-bold text-slate-900 block text-xs">Show in E-Commerce</span>
+                <span class="text-[10px] text-slate-500 block">Publish to online storefront</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="inp-prod-show-ecom" checked class="sr-only peer">
+                <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Multi-Image Gallery & Uploader -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="font-semibold text-slate-700 flex items-center gap-1.5">
+                <i data-lucide="image" class="w-4 h-4 text-slate-400"></i> Product Images Gallery
+              </label>
+              <span id="img-count-badge" class="text-[11px] font-semibold text-slate-500">1 image added</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <!-- Dropzone -->
+              <label class="border-2 border-dashed border-slate-200 hover:border-black rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer bg-slate-50/50 hover:bg-slate-100/50 transition group">
+                <i data-lucide="upload-cloud" class="w-5 h-5 text-slate-400 group-hover:text-black mb-1 transition"></i>
+                <span class="font-medium text-slate-700 text-xs">Browse local files</span>
+                <span class="text-[10px] text-slate-400">PNG, JPG, WebP</span>
+                <input type="file" multiple accept="image/*" onchange="handleModalImageUpload(this)" class="hidden">
+              </label>
+
+              <!-- URL Input Box -->
+              <div class="border border-slate-200 rounded-xl p-3 bg-white flex flex-col justify-between">
+                <span class="font-semibold text-slate-800 text-xs">Add Image via URL</span>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <input
+                    type="url"
+                    id="inp-image-direct-url"
+                    placeholder="https://images.unsplash..."
+                    class="flex-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:bg-white focus:border-black"
+                  >
+                  <button
+                    type="button"
+                    onclick="addImageUrlAction()"
+                    class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs transition cursor-pointer"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              <!-- Live Preview Grid -->
+              <div class="border border-slate-200 rounded-xl p-2.5 bg-slate-50/50 overflow-hidden flex flex-col">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Previews</span>
+                <div id="modal-image-previews" class="flex items-center gap-2 overflow-x-auto py-1 flex-1 custom-scrollbar">
+                  <!-- Image preview thumbnails -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: ATTRIBUTE SELECTORS (SIZES & COLORS) -->
+        <section class="space-y-4 p-4 bg-slate-50/70 border border-slate-200/80 rounded-2xl">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center">2</span>
+              <h3 class="font-bold uppercase tracking-wider text-slate-800 text-xs">Attribute Selectors &amp; Multi-Select Chips</h3>
+            </div>
+            <span class="text-[11px] text-slate-500 font-medium">Auto-Generates Matrix</span>
+          </div>
+
+          <!-- SIZES -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="font-semibold text-slate-700">1. Select Available Sizes</label>
+              <span id="modal-size-selected-count" class="text-[11px] text-slate-400">2 selected</span>
+            </div>
+            <div id="modal-size-chips-box" class="flex flex-wrap items-center gap-2">
+              <!-- Rendered size chips -->
+            </div>
+            <!-- Custom size input -->
+            <div class="flex items-center gap-1.5 pt-1">
+              <input
+                type="text"
+                id="inp-custom-size"
+                placeholder="+ Add custom size (e.g. 28, 30, Free Size)..."
+                class="w-64 px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-black uppercase font-bold"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomSizeChip();}"
+              >
+              <button
+                type="button"
+                onclick="addCustomSizeChip()"
+                class="px-3 py-1.5 bg-black text-white text-xs font-semibold rounded-xl hover:bg-neutral-800 transition cursor-pointer"
+              >
+                Add Size
+              </button>
+            </div>
+          </div>
+
+          <!-- COLORS -->
+          <div class="space-y-2 pt-2 border-t border-slate-200/60">
+            <div class="flex items-center justify-between">
+              <label class="font-semibold text-slate-700">2. Select Color Variations</label>
+              <span id="modal-color-selected-count" class="text-[11px] text-slate-400">1 selected</span>
+            </div>
+            <div id="modal-color-chips-box" class="flex flex-wrap items-center gap-2">
+              <!-- Rendered color chips with swatches -->
+            </div>
+            <!-- Custom color adder -->
+            <div class="flex items-center gap-2 pt-1 flex-wrap">
+              <input
+                type="text"
+                id="inp-custom-color-name"
+                placeholder="+ Custom color name..."
+                class="w-44 px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-black"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomColorChip();}"
+              >
+              <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2 py-1">
+                <span class="text-[10px] text-slate-400 font-medium">Hex:</span>
+                <input type="color" id="inp-custom-color-hex" value="#000000" class="w-5 h-5 rounded cursor-pointer border-0 bg-transparent">
+              </div>
+              <button
+                type="button"
+                onclick="addCustomColorChip()"
+                class="px-3 py-1.5 bg-black text-white text-xs font-semibold rounded-xl hover:bg-neutral-800 transition cursor-pointer"
+              >
+                Add Color
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: VARIANT MATRIX TABLE (PRICES & BRANCH-WISE STOCK) -->
+        <section class="space-y-3 p-4 bg-white border border-slate-200 rounded-2xl shadow-xs">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center">3</span>
+              <h3 class="font-bold uppercase tracking-wider text-slate-800 text-xs">Variant Matrix &amp; Branch Stocks</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="matrix-total-badge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                2 Combinations
+              </span>
+            </div>
+          </div>
+
+          <!-- Quick Bulk Apply Bar -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1">
+                <i data-lucide="sliders" class="w-3.5 h-3.5 text-black"></i> Quick Fill to All Variants
+              </span>
+              <button
+                type="button"
+                onclick="copyFirstMatrixRowToAll()"
+                class="text-[11px] font-semibold text-slate-800 hover:text-black flex items-center gap-1"
+              >
+                <i data-lucide="copy" class="w-3 h-3"></i> Copy Row 1 to All
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div class="flex items-center gap-1 bg-white px-2 py-1.5 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400 font-medium">MRP: ₹</span>
+                <input type="number" id="bulk-inp-mrp" value="999" class="w-full text-xs font-semibold focus:outline-none">
+              </div>
+              <div class="flex items-center gap-1 bg-white px-2 py-1.5 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400 font-medium">Price: ₹</span>
+                <input type="number" id="bulk-inp-price" value="699" class="w-full text-xs font-semibold focus:outline-none">
+              </div>
+              <div class="flex items-center gap-1 bg-white px-2 py-1.5 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400 font-medium">Cost: ₹</span>
+                <input type="number" id="bulk-inp-cost" value="320" class="w-full text-xs font-semibold focus:outline-none">
+              </div>
+              <button
+                type="button"
+                onclick="applyBulkPricesToMatrix()"
+                class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs transition cursor-pointer"
+              >
+                Apply Prices to All
+              </button>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200/60">
+              <span class="text-[11px] font-semibold text-slate-600 mr-1">Bulk Stock:</span>
+              <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400">Main:</span>
+                <input type="number" id="bulk-inp-stock-main" value="30" class="w-12 text-xs font-semibold focus:outline-none">
+              </div>
+              <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400">Branch 02:</span>
+                <input type="number" id="bulk-inp-stock-b2" value="15" class="w-12 text-xs font-semibold focus:outline-none">
+              </div>
+              <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
+                <span class="text-[10px] text-slate-400">Warehouse:</span>
+                <input type="number" id="bulk-inp-stock-wh" value="50" class="w-12 text-xs font-semibold focus:outline-none">
+              </div>
+              <button
+                type="button"
+                onclick="applyBulkStockToMatrix()"
+                class="ml-auto px-3 py-1 bg-slate-800 hover:bg-black text-white text-xs font-semibold rounded-lg transition cursor-pointer"
+              >
+                Apply Stock to All
+              </button>
+            </div>
+          </div>
+
+          <!-- Matrix Table -->
+          <div class="border border-slate-200 rounded-xl overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                  <th class="p-3">Variant</th>
+                  <th class="p-3">MRP (₹)</th>
+                  <th class="p-3">Selling Price (₹)</th>
+                  <th class="p-3">Cost Price (₹)</th>
+                  <th class="p-3">Main Store</th>
+                  <th class="p-3">Branch 02</th>
+                  <th class="p-3">Warehouse</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="modal-matrix-table-body" class="divide-y divide-slate-100">
+                <!-- Dynamically rendered variant rows -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Sticky Bottom Footer inside Form -->
+        <div class="sticky -bottom-6 -mx-6 px-6 py-4 border-t border-slate-200 bg-white/95 backdrop-blur-sm flex items-center justify-between shrink-0 shadow-lg">
+          <div class="flex items-center gap-3">
+            <div class="text-xs text-slate-500">
+              Total Variants: <strong id="footer-variant-count" class="text-slate-900 font-bold">2</strong>
+            </div>
+            <div class="w-1 h-1 rounded-full bg-slate-300"></div>
+            <div class="text-xs text-slate-500">
+              Total Units: <strong id="footer-total-units" class="text-slate-900 font-bold">190 units</strong>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              onclick="closeAddProductModal()"
+              class="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-xl border border-slate-200 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              id="btn-save-product-submit"
+              class="px-5 py-2 text-xs font-semibold text-white bg-black hover:bg-neutral-800 rounded-xl shadow-xs flex items-center gap-1.5 transition cursor-pointer"
+            >
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Save Product &amp; Variants</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 2: ADD STOCK MODAL (Quick Restock)
+  ========================================================= -->
+  <div id="modal-add-stock" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center font-bold text-xs">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">Add Stock</h3>
+            <p class="text-[11px] text-slate-400">Select product &amp; branch to adjust physical stock</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAddStockModal()" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-quick-add-stock" onsubmit="handleQuickAddStockSubmit(event)" class="space-y-3.5 text-xs">
+        <div class="space-y-1">
+          <label class="font-semibold text-slate-700">Select Product / Variant</label>
+          <select id="quick-stock-product-select" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-black font-medium">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="font-semibold text-slate-700">Target Branch</label>
+            <select id="quick-stock-branch-select" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-black font-medium">
+              <option value="main">Main Store</option>
+              <option value="branch_02">Branch 02</option>
+              <option value="warehouse">Warehouse</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="font-semibold text-slate-700">Quantity to Add</label>
+            <input type="number" id="quick-stock-qty-input" required min="1" value="10" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-black font-bold text-slate-900">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="font-semibold text-slate-700">Reason / Notes</label>
+          <input type="text" id="quick-stock-reason" placeholder="e.g. Purchase order PO-448 received" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-black">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeAddStockModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-black hover:bg-neutral-800 rounded-xl shadow-xs">
+            Confirm &amp; Update Stock
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 3: STOCK HISTORY DRAWER
+  ========================================================= -->
+  <div id="modal-stock-history" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-xs">
+            <i data-lucide="history" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">Stock History Log</h3>
+            <p class="text-[11px] text-slate-400">Recent inventory movements, adjustments, and receipts</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeStockHistoryModal()" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="stock-history-list" class="space-y-2.5 max-h-80 overflow-y-auto custom-scrollbar text-xs">
+        <!-- History items rendered dynamically -->
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-slate-100">
+        <button type="button" onclick="closeStockHistoryModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-xl">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       FIREBASE + APPLICATION LOGIC SCRIPT
+  ========================================================= -->
+  <script type="module">
+    import { db, auth } from './js/firebase-config.js';
+    import { 
+      collection, 
+      getDocs, 
+      doc, 
+      setDoc, 
+      writeBatch, 
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Global application state
+    const COMPANY_ID = 'thebaniyancompany';
+
+    // Baseline demo dataset matching user screenshot exactly
+    const DEFAULT_INVENTORY_ITEMS = [
+      {
+        id: 'item-1',
+        productId: 'WLK-001',
+        productName: 'White Linen Kurti',
+        variantName: 'Size M',
+        sku: 'WLK-M-WHT',
+        category: 'Kurtas',
+        currentStock: 2,
+        status: 'Critical', // 'Critical' | 'Low' | 'In Stock' | 'Out of Stock'
+        stockByBranch: { main: 2, branch_02: 0, warehouse: 0 }
+      },
+      {
+        id: 'item-2',
+        productId: 'WLK-001',
+        productName: 'White Linen Kurti',
+        variantName: 'Size L',
+        sku: 'WLK-L-WHT',
+        category: 'Kurtas',
+        currentStock: 4,
+        status: 'Low',
+        stockByBranch: { main: 4, branch_02: 0, warehouse: 0 }
+      },
+      {
+        id: 'item-3',
+        productId: 'DJ6-032',
+        productName: 'Denim Joggers',
+        variantName: 'Size 32',
+        sku: 'DJ6-32-BLU',
+        category: 'Joggers',
+        currentStock: 3,
+        status: 'Low',
+        stockByBranch: { main: 2, branch_02: 1, warehouse: 0 }
+      },
+      {
+        id: 'item-4',
+        productId: 'BOT-99',
+        productName: 'Black Oversized T-Shirt',
+        variantName: 'Size XXL',
+        sku: 'BOT-XXL-BLK',
+        category: 'T-Shirts',
+        currentStock: 1,
+        status: 'Critical',
+        stockByBranch: { main: 1, branch_02: 0, warehouse: 0 }
+      },
+      {
+        id: 'item-5',
+        productId: 'EMK-501',
+        productName: 'Embroidered Kurta',
+        variantName: 'Size XL',
+        sku: 'EMK-XL-RED',
+        category: 'Kurtas',
+        currentStock: 0,
+        status: 'Out of Stock',
+        stockByBranch: { main: 0, branch_02: 0, warehouse: 0 }
+      },
+      {
+        id: 'item-6',
+        productId: 'CPS-108',
+        productName: 'Cotton Palazzo Set',
+        variantName: 'Size S',
+        sku: 'CPS-S-PNK',
+        category: 'Sets',
+        currentStock: 0,
+        status: 'Out of Stock',
+        stockByBranch: { main: 0, branch_02: 0, warehouse: 0 }
+      }
+    ];
+
+    window.inventoryItems = [...DEFAULT_INVENTORY_ITEMS];
+    window.activeStatusFilter = 'all';
+    window.activeSearchTerm = '';
+    window.stockHistoryLogs = [
+      { time: 'Today, 15:40', item: 'White Linen Kurti (Size M)', change: '-1 (Online order INV-892)', prev: 3, curr: 2 },
+      { time: 'Today, 14:15', item: 'Denim Joggers (Size 32)', change: '+5 (Store replenishment)', prev: 0, curr: 3 },
+      { time: 'Today, 11:30', item: 'Cotton Palazzo Set (Size S)', change: '-2 (Retail sale)', prev: 2, curr: 0 }
+    ];
+
+    // ==========================================
+    // INITIALIZATION & FIRESTORE FETCH
+    // ==========================================
+    async function initInventoryPage() {
+      try {
+        // Attempt to load live products from Firestore
+        const snap = await getDocs(collection(db, 'products'));
+        if (!snap.empty) {
+          const liveItems = [];
+          snap.docs.forEach(docSnap => {
+            const p = docSnap.data();
+            const pName = p.name || 'Untitled Product';
+            const cat = p.category || 'General';
+
+            if (Array.isArray(p.variants) && p.variants.length > 0) {
+              p.variants.forEach(v => {
+                const totalStock = Object.values(v.stock || {}).reduce((acc, num) => acc + (Number(num) || 0), 0);
+                let st = 'In Stock';
+                if (totalStock === 0) st = 'Out of Stock';
+                else if (totalStock <= 2) st = 'Critical';
+                else if (totalStock <= 5) st = 'Low';
+
+                liveItems.push({
+                  id: `${docSnap.id}-${v.size}-${v.color}`,
+                  productId: docSnap.id,
+                  productName: pName,
+                  variantName: `Size ${v.size} / ${v.color}`,
+                  sku: `${p.productId || docSnap.id}-${v.size}`,
+                  category: cat,
+                  currentStock: totalStock,
+                  status: st,
+                  stockByBranch: v.stock || { main: totalStock }
+                });
+              });
+            } else {
+              const stock = Number(p.availableStock || p.stock || 0);
+              let st = 'In Stock';
+              if (stock === 0) st = 'Out of Stock';
+              else if (stock <= 2) st = 'Critical';
+              else if (stock <= 5) st = 'Low';
+
+              liveItems.push({
+                id: docSnap.id,
+                productId: docSnap.id,
+                productName: pName,
+                variantName: 'Standard',
+                sku: p.productId || docSnap.id,
+                category: cat,
+                currentStock: stock,
+                status: st,
+                stockByBranch: { main: stock }
+              });
+            }
+          });
+
+          if (liveItems.length > 0) {
+            window.inventoryItems = liveItems;
+          }
+        }
+      } catch (err) {
+        console.warn('Firestore load fallback to baseline catalog:', err);
+      }
+
+      applyAllFilters();
+      initAddProductModalData();
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // RENDER TABLE & METRICS
+    // ==========================================
+    function renderInventoryTable(items) {
+      const tbody = document.getElementById('inventory-table-body');
+      const emptyState = document.getElementById('table-empty-state');
+      if (!tbody) return;
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      tbody.innerHTML = items.map((item, index) => {
+        // Status Badge styling matching user screenshot
+        let badgeHtml = '';
+        let stockColorClass = 'text-slate-900';
+
+        if (item.status === 'Critical') {
+          badgeHtml = `<span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#fff1f2] text-[#e11d48] border border-[#ffe4e6]">Critical</span>`;
+          stockColorClass = 'text-[#ea580c]'; // Orange-red like in screenshot
+        } else if (item.status === 'Low') {
+          badgeHtml = `<span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#fffbeb] text-[#d97706] border border-[#fef3c7]">Low</span>`;
+          stockColorClass = item.currentStock <= 3 ? 'text-[#ea580c]' : 'text-slate-900';
+        } else if (item.status === 'Out of Stock') {
+          badgeHtml = `<span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#fff1f2] text-[#e11d48] border border-[#ffe4e6]">Out of Stock</span>`;
+          stockColorClass = 'text-[#dc2626] font-bold'; // Red 0
+        } else {
+          badgeHtml = `<span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#f0fdf4] text-[#16a34a] border border-[#dcfce7]">In Stock</span>`;
+          stockColorClass = 'text-slate-900';
+        }
+
+        return `
+          <tr class="hover:bg-slate-50/75 transition border-b border-slate-100">
+            <!-- Product / Variant -->
+            <td class="py-4 px-6">
+              <div>
+                <span class="font-bold text-slate-900 block text-xs leading-tight">${item.productName}</span>
+                <span class="text-[11px] text-slate-400 font-medium block mt-0.5">${item.variantName}</span>
+              </div>
+            </td>
+
+            <!-- SKU -->
+            <td class="py-4 px-6 font-mono text-[11px] uppercase text-slate-600 font-medium">
+              ${item.sku}
+            </td>
+
+            <!-- Current Stock -->
+            <td class="py-4 px-6 font-medium">
+              <span class="text-base font-bold ${stockColorClass}">${item.currentStock}</span>
+              <span class="text-xs text-slate-400 ml-1">units</span>
+            </td>
+
+            <!-- Status Badge -->
+            <td class="py-4 px-6">
+              ${badgeHtml}
+            </td>
+
+            <!-- Update Stock Stepper + Save Button -->
+            <td class="py-4 px-6">
+              <div class="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onclick="decrementRowStock('${item.id}')"
+                  class="w-7 h-7 rounded-lg border border-slate-200 hover:bg-slate-100 font-bold text-slate-700 flex items-center justify-center transition"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  id="stock-input-${item.id}"
+                  value="${item.currentStock}"
+                  min="0"
+                  class="w-12 h-7 rounded-lg border border-slate-200 text-center text-xs font-bold text-slate-800 focus:border-black outline-none"
+                >
+                <button
+                  type="button"
+                  onclick="incrementRowStock('${item.id}')"
+                  class="w-7 h-7 rounded-lg border border-slate-200 hover:bg-slate-100 font-bold text-slate-700 flex items-center justify-center transition"
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  id="save-btn-${item.id}"
+                  onclick="saveRowStock('${item.id}')"
+                  class="bg-black hover:bg-neutral-800 text-white font-semibold text-xs px-3 h-7 rounded-lg transition ml-1 flex items-center justify-center"
+                >
+                  Save
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function updateMetricCards() {
+      const items = window.inventoryItems || [];
+      const total = items.length;
+      const inStock = items.filter(i => i.currentStock > 5 || i.status === 'In Stock').length;
+      const low = items.filter(i => (i.currentStock > 0 && i.currentStock <= 5) || i.status === 'Low' || i.status === 'Critical').length;
+      const outOfStock = items.filter(i => i.currentStock <= 0 || i.status === 'Out of Stock').length;
+      const attention = items.filter(i => i.currentStock <= 5).length;
+
+      document.getElementById('kpi-total-count').textContent = total;
+      document.getElementById('kpi-instock-count').textContent = inStock;
+      document.getElementById('kpi-lowstock-count').textContent = low;
+      document.getElementById('kpi-outofstock-count').textContent = outOfStock;
+
+      document.getElementById('attention-count-text').textContent = `${attention} products`;
+      const banner = document.getElementById('attention-alert-banner');
+      if (attention === 0) banner.classList.add('hidden');
+      else banner.classList.remove('hidden');
+
+      // Update pill badge numbers
+      document.getElementById('pill-count-all').textContent = total;
+      document.getElementById('pill-count-in_stock').textContent = inStock;
+      document.getElementById('pill-count-low').textContent = items.filter(i => i.status === 'Low').length;
+      document.getElementById('pill-count-critical').textContent = items.filter(i => i.status === 'Critical').length;
+      document.getElementById('pill-count-out_of_stock').textContent = outOfStock;
+    }
+
+    // ==========================================
+    // FILTERING & SEARCH
+    // ==========================================
+    window.applyAllFilters = function() {
+      const searchTerm = (window.activeSearchTerm || '').trim().toLowerCase();
+      const statusFilter = window.activeStatusFilter || 'all';
+      const catFilter = document.getElementById('filter-category')?.value || 'all';
+      const branchFilter = document.getElementById('filter-branch')?.value || 'all';
+      const sortFilter = document.getElementById('filter-sort')?.value || 'attention';
+
+      let filtered = [...window.inventoryItems];
+
+      // 1. Search filter
+      if (searchTerm) {
+        filtered = filtered.filter(item => 
+          item.productName.toLowerCase().includes(searchTerm) ||
+          item.variantName.toLowerCase().includes(searchTerm) ||
+          item.sku.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      // 2. Status filter
+      if (statusFilter === 'in_stock') {
+        filtered = filtered.filter(i => i.currentStock > 5 || i.status === 'In Stock');
+      } else if (statusFilter === 'low') {
+        filtered = filtered.filter(i => i.status === 'Low');
+      } else if (statusFilter === 'critical') {
+        filtered = filtered.filter(i => i.status === 'Critical');
+      } else if (statusFilter === 'out_of_stock') {
+        filtered = filtered.filter(i => i.currentStock <= 0 || i.status === 'Out of Stock');
+      } else if (statusFilter === 'attention') {
+        filtered = filtered.filter(i => i.currentStock <= 5);
+      }
+
+      // 3. Category Filter
+      if (catFilter !== 'all') {
+        filtered = filtered.filter(i => (i.category || '').toLowerCase() === catFilter.toLowerCase());
+      }
+
+      // 4. Branch Filter (if specific branch selected)
+      if (branchFilter !== 'all') {
+        filtered = filtered.filter(i => (i.stockByBranch?.[branchFilter] !== undefined));
+      }
+
+      // 5. Sorting
+      if (sortFilter === 'attention') {
+        filtered.sort((a, b) => a.currentStock - b.currentStock);
+      } else if (sortFilter === 'stock_desc') {
+        filtered.sort((a, b) => b.currentStock - a.currentStock);
+      } else if (sortFilter === 'name_asc') {
+        filtered.sort((a, b) => a.productName.localeCompare(b.productName));
+      } else if (sortFilter === 'sku_asc') {
+        filtered.sort((a, b) => a.sku.localeCompare(b.sku));
+      }
+
+      renderInventoryTable(filtered);
+      updateMetricCards();
+    };
+
+    window.setStatusFilter = function(status) {
+      window.activeStatusFilter = status;
+      document.querySelectorAll('.status-tab').forEach(btn => {
+        btn.classList.remove('bg-black', 'text-white');
+        btn.classList.add('bg-slate-100', 'text-slate-600');
+      });
+      const activeBtn = document.getElementById(`btn-status-${status}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-100', 'text-slate-600');
+        activeBtn.classList.add('bg-black', 'text-white');
+      }
+      applyAllFilters();
+    };
+
+    window.handleSearchInput = function(val) {
+      window.activeSearchTerm = val;
+      const globalInput = document.getElementById('global-search-input');
+      const tableInput = document.getElementById('table-search-input');
+      if (globalInput && globalInput.value !== val) globalInput.value = val;
+      if (tableInput && tableInput.value !== val) tableInput.value = val;
+      applyAllFilters();
+    };
+
+    window.filterByAttention = function() {
+      window.setStatusFilter('attention');
+    };
+
+    window.resetAllFilters = function() {
+      window.activeSearchTerm = '';
+      window.activeStatusFilter = 'all';
+      if (document.getElementById('global-search-input')) document.getElementById('global-search-input').value = '';
+      if (document.getElementById('table-search-input')) document.getElementById('table-search-input').value = '';
+      if (document.getElementById('filter-category')) document.getElementById('filter-category').value = 'all';
+      if (document.getElementById('filter-branch')) document.getElementById('filter-branch').value = 'all';
+      if (document.getElementById('filter-sort')) document.getElementById('filter-sort').value = 'attention';
+      setStatusFilter('all');
+    };
+
+    // ==========================================
+    // STEPPER & ROW STOCK SAVE ACTIONS
+    // ==========================================
+    window.incrementRowStock = function(id) {
+      const inp = document.getElementById(`stock-input-${id}`);
+      if (inp) inp.value = (parseInt(inp.value, 10) || 0) + 1;
+    };
+
+    window.decrementRowStock = function(id) {
+      const inp = document.getElementById(`stock-input-${id}`);
+      if (inp) {
+        const val = (parseInt(inp.value, 10) || 0) - 1;
+        inp.value = Math.max(0, val);
+      }
+    };
+
+    window.saveRowStock = async function(id) {
+      const inp = document.getElementById(`stock-input-${id}`);
+      const btn = document.getElementById(`save-btn-${id}`);
+      if (!inp || !btn) return;
+
+      const newQty = Math.max(0, parseInt(inp.value, 10) || 0);
+      const targetItem = window.inventoryItems.find(i => i.id === id);
+      if (!targetItem) return;
+
+      const prevQty = targetItem.currentStock;
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>`;
+      lucide.createIcons();
+
+      try {
+        // Update local object
+        targetItem.currentStock = newQty;
+        if (newQty === 0) targetItem.status = 'Out of Stock';
+        else if (newQty <= 2) targetItem.status = 'Critical';
+        else if (newQty <= 5) targetItem.status = 'Low';
+        else targetItem.status = 'In Stock';
+
+        if (targetItem.stockByBranch) {
+          targetItem.stockByBranch.main = newQty;
+        }
+
+        // Push to Stock History
+        window.stockHistoryLogs.unshift({
+          time: 'Just now',
+          item: `${targetItem.productName} (${targetItem.variantName})`,
+          change: `${newQty >= prevQty ? '+' : ''}${newQty - prevQty} (Manual adjustment)`,
+          prev: prevQty,
+          curr: newQty
+        });
+
+        // Persist to Firestore if product exists
+        if (targetItem.productId) {
+          try {
+            const productRef = doc(db, 'products', targetItem.productId);
+            const tenantRef = doc(db, 'companies', COMPANY_ID, 'products', targetItem.productId);
+            const batch = writeBatch(db);
+
+            batch.set(productRef, {
+              updatedAt: serverTimestamp(),
+              availableStock: newQty
+            }, { merge: true });
+
+            batch.set(tenantRef, {
+              updatedAt: serverTimestamp(),
+              availableStock: newQty
+            }, { merge: true });
+
+            await batch.commit();
+          } catch (dbErr) {
+            console.log('Local memory save succeeded (Firestore batch optional):', dbErr);
+          }
+        }
+
+        btn.classList.remove('bg-black', 'hover:bg-neutral-800');
+        btn.classList.add('bg-emerald-600');
+        btn.textContent = 'Saved!';
+
+        setTimeout(() => {
+          btn.classList.remove('bg-emerald-600');
+          btn.classList.add('bg-black', 'hover:bg-neutral-800');
+          btn.textContent = 'Save';
+          btn.disabled = false;
+          applyAllFilters();
+        }, 1200);
+
+      } catch (err) {
+        console.error('Error saving row stock:', err);
+        btn.textContent = 'Error';
+        btn.disabled = false;
+      }
+    };
+
+    // ==========================================
+    // STOCK HISTORY MODAL
+    // ==========================================
+    window.openStockHistoryModal = function() {
+      const modal = document.getElementById('modal-stock-history');
+      const list = document.getElementById('stock-history-list');
+      if (!modal || !list) return;
+
+      list.innerHTML = window.stockHistoryLogs.map(log => `
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+          <div>
+            <span class="font-bold text-slate-900 block">${log.item}</span>
+            <span class="text-[10px] text-slate-400 font-medium">${log.time} · ${log.change}</span>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-bold text-slate-800">${log.curr} units</span>
+            <span class="text-[10px] text-slate-400 block">(was ${log.prev})</span>
+          </div>
+        </div>
+      `).join('');
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    window.closeStockHistoryModal = function() {
+      document.getElementById('modal-stock-history')?.classList.add('hidden');
+    };
+
+    // ==========================================
+    // ADD STOCK (QUICK RESTOCK) MODAL
+    // ==========================================
+    window.openAddStockModal = function() {
+      const modal = document.getElementById('modal-add-stock');
+      const sel = document.getElementById('quick-stock-product-select');
+      if (!modal || !sel) return;
+
+      sel.innerHTML = window.inventoryItems.map(i => `
+        <option value="${i.id}">${i.productName} — ${i.variantName} (Current: ${i.currentStock})</option>
+      `).join('');
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    window.closeAddStockModal = function() {
+      document.getElementById('modal-add-stock')?.classList.add('hidden');
+    };
+
+    window.handleQuickAddStockSubmit = async function(e) {
+      e.preventDefault();
+      const selId = document.getElementById('quick-stock-product-select')?.value;
+      const branch = document.getElementById('quick-stock-branch-select')?.value;
+      const addQty = parseInt(document.getElementById('quick-stock-qty-input')?.value, 10) || 0;
+      const reason = document.getElementById('quick-stock-reason')?.value.trim() || 'Manual restock';
+
+      const target = window.inventoryItems.find(i => i.id === selId);
+      if (!target) return;
+
+      const prev = target.currentStock;
+      const curr = prev + addQty;
+      target.currentStock = curr;
+      if (curr > 5) target.status = 'In Stock';
+      else if (curr > 2) target.status = 'Low';
+      else if (curr > 0) target.status = 'Critical';
+      else target.status = 'Out of Stock';
+
+      if (target.stockByBranch) {
+        target.stockByBranch[branch] = (target.stockByBranch[branch] || 0) + addQty;
+      }
+
+      window.stockHistoryLogs.unshift({
+        time: 'Just now',
+        item: `${target.productName} (${target.variantName})`,
+        change: `+${addQty} (${reason} -> ${branch})`,
+        prev,
+        curr
+      });
+
+      closeAddStockModal();
+      applyAllFilters();
+    };
+
+    // ==========================================
+    // REDESIGNED ADD PRODUCT MODAL LOGIC
+    // (Preserves ALL fields from specifications)
+    // ==========================================
+    const MODAL_TAGS = ['Trending', 'Hot', 'New', 'Best Seller', 'Exclusive', 'Clearance'];
+    const MODAL_PRESET_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
+    const MODAL_PRESET_COLORS = [
+      { name: 'Black', hex: '#000000' },
+      { name: 'White', hex: '#ffffff' },
+      { name: 'Navy Blue', hex: '#1e3a8a' },
+      { name: 'Royal Blue', hex: '#2563eb' },
+      { name: 'Crimson Red', hex: '#dc2626' },
+      { name: 'Olive Green', hex: '#4d7c0f' },
+      { name: 'Charcoal', hex: '#374151' },
+      { name: 'Beige', hex: '#d4b996' },
+      { name: 'Pastel Pink', hex: '#f472b6' }
+    ];
+
+    let addProductState = {
+      selectedTag: 'Trending',
+      selectedSizes: ['M', 'L'],
+      allSizes: [...MODAL_PRESET_SIZES],
+      selectedColors: [{ name: 'Black', hex: '#000000' }],
+      allColors: [...MODAL_PRESET_COLORS],
+      imageUrls: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'],
+      matrix: []
+    };
+
+    function initAddProductModalData() {
+      renderModalTags();
+      renderModalSizes();
+      renderModalColors();
+      renderModalImagePreviews();
+      generateModalMatrix();
+    }
+
+    function renderModalTags() {
+      const container = document.getElementById('product-tag-chips');
+      if (!container) return;
+      container.innerHTML = MODAL_TAGS.map(t => {
+        const active = addProductState.selectedTag === t;
+        return `
+          <button
+            type="button"
+            onclick="setModalTag('${t}')"
+            class="px-3 py-1 text-xs rounded-xl border transition ${
+              active 
+                ? 'bg-black text-white border-black font-semibold shadow-xs' 
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }"
+          >
+            ${t}
+          </button>
+        `;
+      }).join('');
+    }
+
+    window.setModalTag = function(t) {
+      addProductState.selectedTag = t;
+      document.getElementById('inp-prod-tag').value = t;
+      renderModalTags();
+    };
+
+    function renderModalSizes() {
+      const container = document.getElementById('modal-size-chips-box');
+      if (!container) return;
+      container.innerHTML = addProductState.allSizes.map(s => {
+        const isChecked = addProductState.selectedSizes.includes(s);
+        return `
+          <button
+            type="button"
+            onclick="toggleModalSize('${s}')"
+            class="min-w-9 px-3 py-1.5 rounded-xl border text-xs font-semibold transition ${
+              isChecked
+                ? 'bg-black text-white border-black shadow-xs'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }"
+          >
+            ${s}
+          </button>
+        `;
+      }).join('');
+      document.getElementById('modal-size-selected-count').textContent = `${addProductState.selectedSizes.length} selected`;
+    }
+
+    window.toggleModalSize = function(s) {
+      if (addProductState.selectedSizes.includes(s)) {
+        addProductState.selectedSizes = addProductState.selectedSizes.filter(x => x !== s);
+      } else {
+        addProductState.selectedSizes.push(s);
+      }
+      renderModalSizes();
+      generateModalMatrix();
+    };
+
+    window.addCustomSizeChip = function() {
+      const inp = document.getElementById('inp-custom-size');
+      const val = inp?.value.trim().toUpperCase();
+      if (!val) return;
+      if (!addProductState.allSizes.includes(val)) addProductState.allSizes.push(val);
+      if (!addProductState.selectedSizes.includes(val)) addProductState.selectedSizes.push(val);
+      inp.value = '';
+      renderModalSizes();
+      generateModalMatrix();
+    };
+
+    function renderModalColors() {
+      const container = document.getElementById('modal-color-chips-box');
+      if (!container) return;
+      container.innerHTML = addProductState.allColors.map(c => {
+        const isChecked = addProductState.selectedColors.some(sc => sc.name.toLowerCase() === c.name.toLowerCase());
+        return `
+          <button
+            type="button"
+            onclick="toggleModalColor('${c.name}', '${c.hex}')"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium transition ${
+              isChecked
+                ? 'bg-slate-900 text-white border-slate-900 shadow-xs ring-1 ring-slate-900'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }"
+          >
+            <span class="w-3.5 h-3.5 rounded-full border border-black/15 shrink-0" style="background-color: ${c.hex};"></span>
+            <span>${c.name}</span>
+          </button>
+        `;
+      }).join('');
+      document.getElementById('modal-color-selected-count').textContent = `${addProductState.selectedColors.length} selected`;
+    }
+
+    window.toggleModalColor = function(name, hex) {
+      const exists = addProductState.selectedColors.some(c => c.name.toLowerCase() === name.toLowerCase());
+      if (exists) {
+        addProductState.selectedColors = addProductState.selectedColors.filter(c => c.name.toLowerCase() !== name.toLowerCase());
+      } else {
+        addProductState.selectedColors.push({ name, hex });
+      }
+      renderModalColors();
+      generateModalMatrix();
+    };
+
+    window.addCustomColorChip = function() {
+      const nameInp = document.getElementById('inp-custom-color-name');
+      const hexInp = document.getElementById('inp-custom-color-hex');
+      const name = nameInp?.value.trim();
+      const hex = hexInp?.value || '#000000';
+      if (!name) return;
+
+      const newCol = { name, hex };
+      if (!addProductState.allColors.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        addProductState.allColors.push(newCol);
+      }
+      if (!addProductState.selectedColors.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        addProductState.selectedColors.push(newCol);
+      }
+      nameInp.value = '';
+      renderModalColors();
+      generateModalMatrix();
+    };
+
+    function generateModalMatrix() {
+      const newMatrix = [];
+      const defaultMrp = parseFloat(document.getElementById('bulk-inp-mrp')?.value || '999') || 999;
+      const defaultPrice = parseFloat(document.getElementById('bulk-inp-price')?.value || '699') || 699;
+      const defaultCost = parseFloat(document.getElementById('bulk-inp-cost')?.value || '320') || 320;
+      const defMain = parseInt(document.getElementById('bulk-inp-stock-main')?.value || '30', 10) || 0;
+      const defB2 = parseInt(document.getElementById('bulk-inp-stock-b2')?.value || '15', 10) || 0;
+      const defWh = parseInt(document.getElementById('bulk-inp-stock-wh')?.value || '50', 10) || 0;
+
+      addProductState.selectedSizes.forEach(size => {
+        addProductState.selectedColors.forEach(colorObj => {
+          const existing = addProductState.matrix.find(v => v.size === size && v.color.toLowerCase() === colorObj.name.toLowerCase());
+          if (existing) {
+            newMatrix.push({ ...existing, colorHex: colorObj.hex });
+          } else {
+            newMatrix.push({
+              size,
+              color: colorObj.name,
+              colorHex: colorObj.hex,
+              mrp: defaultMrp,
+              price: defaultPrice,
+              cost: defaultCost,
+              stock: {
+                main: defMain,
+                branch_02: defB2,
+                warehouse: defWh
+              }
+            });
+          }
+        });
+      });
+
+      addProductState.matrix = newMatrix;
+      renderModalMatrixTable();
+    }
+
+    function renderModalMatrixTable() {
+      const tbody = document.getElementById('modal-matrix-table-body');
+      if (!tbody) return;
+
+      if (addProductState.matrix.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">Please select at least one size and color to generate the matrix.</td></tr>`;
+        document.getElementById('matrix-total-badge').textContent = '0 Combinations';
+        document.getElementById('footer-variant-count').textContent = '0';
+        document.getElementById('footer-total-units').textContent = '0 units';
+        return;
+      }
+
+      let grandTotalUnits = 0;
+      tbody.innerHTML = addProductState.matrix.map((row, idx) => {
+        const rowStock = Object.values(row.stock || {}).reduce((a, b) => a + (Number(b) || 0), 0);
+        grandTotalUnits += rowStock;
+
+        return `
+          <tr class="hover:bg-slate-50/60 transition">
+            <!-- Variant Badge -->
+            <td class="p-3">
+              <div class="flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full border border-black/15 shrink-0" style="background-color: ${row.colorHex || '#000000'};"></span>
+                <span class="font-bold text-slate-900">${row.size}</span>
+                <span class="text-slate-400">/ ${row.color}</span>
+              </div>
+            </td>
+
+            <!-- MRP -->
+            <td class="p-3">
+              <input type="number" value="${row.mrp}" onchange="updateMatrixField(${idx}, 'mrp', this.value)" class="w-20 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:bg-white focus:border-black outline-none">
+            </td>
+
+            <!-- Selling Price -->
+            <td class="p-3">
+              <input type="number" value="${row.price}" onchange="updateMatrixField(${idx}, 'price', this.value)" class="w-20 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-emerald-600 focus:bg-white focus:border-black outline-none">
+            </td>
+
+            <!-- Cost Price -->
+            <td class="p-3">
+              <input type="number" value="${row.cost}" onchange="updateMatrixField(${idx}, 'cost', this.value)" class="w-20 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-500 focus:bg-white focus:border-black outline-none">
+            </td>
+
+            <!-- Main Branch -->
+            <td class="p-3">
+              <input type="number" value="${row.stock.main || 0}" onchange="updateMatrixStock(${idx}, 'main', this.value)" class="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:bg-white focus:border-black outline-none">
+            </td>
+
+            <!-- Branch 02 -->
+            <td class="p-3">
+              <input type="number" value="${row.stock.branch_02 || 0}" onchange="updateMatrixStock(${idx}, 'branch_02', this.value)" class="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:bg-white focus:border-black outline-none">
+            </td>
+
+            <!-- Warehouse -->
+            <td class="p-3">
+              <input type="number" value="${row.stock.warehouse || 0}" onchange="updateMatrixStock(${idx}, 'warehouse', this.value)" class="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:bg-white focus:border-black outline-none">
+            </td>
+
+            <!-- Row Actions -->
+            <td class="p-3 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <button type="button" onclick="duplicateMatrixRow(${idx})" title="Duplicate Variant" class="p-1 rounded text-slate-400 hover:text-black transition">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+                <button type="button" onclick="deleteMatrixRow(${idx})" title="Delete Variant" class="p-1 rounded text-slate-400 hover:text-rose-600 transition">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('matrix-total-badge').textContent = `${addProductState.matrix.length} Combinations`;
+      document.getElementById('footer-variant-count').textContent = addProductState.matrix.length;
+      document.getElementById('footer-total-units').textContent = `${grandTotalUnits} units`;
+      lucide.createIcons();
+    }
+
+    window.updateMatrixField = function(idx, field, val) {
+      if (addProductState.matrix[idx]) {
+        addProductState.matrix[idx][field] = parseFloat(val) || 0;
+      }
+    };
+
+    window.updateMatrixStock = function(idx, branch, val) {
+      if (addProductState.matrix[idx]) {
+        addProductState.matrix[idx].stock[branch] = parseInt(val, 10) || 0;
+        renderModalMatrixTable();
+      }
+    };
+
+    window.duplicateMatrixRow = function(idx) {
+      const original = addProductState.matrix[idx];
+      if (!original) return;
+      const clone = JSON.parse(JSON.stringify(original));
+      clone.size = `${clone.size}-Copy`;
+      addProductState.matrix.splice(idx + 1, 0, clone);
+      renderModalMatrixTable();
+    };
+
+    window.deleteMatrixRow = function(idx) {
+      addProductState.matrix.splice(idx, 1);
+      renderModalMatrixTable();
+    };
+
+    window.applyBulkPricesToMatrix = function() {
+      const m = parseFloat(document.getElementById('bulk-inp-mrp')?.value || '0') || 0;
+      const p = parseFloat(document.getElementById('bulk-inp-price')?.value || '0') || 0;
+      const c = parseFloat(document.getElementById('bulk-inp-cost')?.value || '0') || 0;
+      addProductState.matrix.forEach(v => {
+        v.mrp = m;
+        v.price = p;
+        v.cost = c;
+      });
+      renderModalMatrixTable();
+    };
+
+    window.applyBulkStockToMatrix = function() {
+      const main = parseInt(document.getElementById('bulk-inp-stock-main')?.value || '0', 10) || 0;
+      const b2 = parseInt(document.getElementById('bulk-inp-stock-b2')?.value || '0', 10) || 0;
+      const wh = parseInt(document.getElementById('bulk-inp-stock-wh')?.value || '0', 10) || 0;
+      addProductState.matrix.forEach(v => {
+        v.stock = { main, branch_02: b2, warehouse: wh };
+      });
+      renderModalMatrixTable();
+    };
+
+    window.copyFirstMatrixRowToAll = function() {
+      if (addProductState.matrix.length <= 1) return;
+      const first = addProductState.matrix[0];
+      addProductState.matrix.forEach((v, i) => {
+        if (i > 0) {
+          v.mrp = first.mrp;
+          v.price = first.price;
+          v.cost = first.cost;
+          v.stock = { ...first.stock };
+        }
+      });
+      renderModalMatrixTable();
+    };
+
+    // Images
+    function renderModalImagePreviews() {
+      const box = document.getElementById('modal-image-previews');
+      if (!box) return;
+      if (addProductState.imageUrls.length === 0) {
+        box.innerHTML = `<span class="text-[11px] text-slate-400 italic m-auto">No images added</span>`;
+        document.getElementById('img-count-badge').textContent = '0 images added';
+        return;
+      }
+      box.innerHTML = addProductState.imageUrls.map((url, i) => `
+        <div class="relative group w-14 h-14 rounded-lg overflow-hidden border border-slate-200 shrink-0 bg-slate-100">
+          <img src="${url}" class="w-full h-full object-cover">
+          ${i === 0 ? `<span class="absolute bottom-0.5 left-0.5 bg-black/80 text-white text-[8px] px-1 rounded">Cover</span>` : ''}
+          <button type="button" onclick="removeModalImage(${i})" class="absolute top-0.5 right-0.5 p-0.5 bg-rose-600 text-white rounded opacity-0 group-hover:opacity-100 transition">
+            <i data-lucide="x" class="w-3 h-3"></i>
+          </button>
+        </div>
+      `).join('');
+      document.getElementById('img-count-badge').textContent = `${addProductState.imageUrls.length} images added`;
+      lucide.createIcons();
+    }
+
+    window.addImageUrlAction = function() {
+      const inp = document.getElementById('inp-image-direct-url');
+      const val = inp?.value.trim();
+      if (!val) return;
+      addProductState.imageUrls.push(val);
+      inp.value = '';
+      renderModalImagePreviews();
+    };
+
+    window.handleModalImageUpload = function(el) {
+      const files = el.files;
+      if (!files) return;
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            addProductState.imageUrls.push(e.target.result);
+            renderModalImagePreviews();
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+
+    window.removeModalImage = function(index) {
+      addProductState.imageUrls.splice(index, 1);
+      renderModalImagePreviews();
+    };
+
+    window.generateSkuAction = function() {
+      const name = document.getElementById('inp-prod-name')?.value || 'TBC';
+      const cat = document.getElementById('inp-prod-category')?.value || 'PRD';
+      const prefix = name.replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase() || 'TBC';
+      const rand = Math.floor(100 + Math.random() * 900);
+      document.getElementById('inp-prod-sku').value = `${prefix}-${cat.slice(0, 3).toUpperCase()}-${rand}`;
+    };
+
+    window.openCustomCategoryModal = function() {
+      const val = prompt('Enter custom category name:');
+      if (val && val.trim()) {
+        const catSelect = document.getElementById('inp-prod-category');
+        const opt = document.createElement('option');
+        opt.value = val.trim();
+        opt.textContent = val.trim();
+        opt.selected = true;
+        catSelect.appendChild(opt);
+      }
+    };
+
+    window.openCustomSupplierModal = function() {
+      const val = prompt('Enter supplier / vendor company name:');
+      if (val && val.trim()) {
+        const supSelect = document.getElementById('inp-prod-supplier');
+        const supId = `SUP-${Date.now().toString().slice(-4)}`;
+        const opt = document.createElement('option');
+        opt.value = supId;
+        opt.textContent = `${val.trim()} (${supId})`;
+        opt.selected = true;
+        supSelect.appendChild(opt);
+      }
+    };
+
+    window.openAddProductModal = function() {
+      document.getElementById('modal-add-product')?.classList.remove('hidden');
+      initAddProductModalData();
+    };
+
+    window.closeAddProductModal = function() {
+      document.getElementById('modal-add-product')?.classList.add('hidden');
+    };
+
+    // FORM SAVE
+    window.handleSaveProduct = async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-product-submit');
+      if (!btn) return;
+
+      const name = document.getElementById('inp-prod-name').value.trim();
+      const sku = document.getElementById('inp-prod-sku').value.trim() || `TBC-${Date.now().toString().slice(-4)}`;
+      const category = document.getElementById('inp-prod-category').value;
+      const supplierId = document.getElementById('inp-prod-supplier').value;
+      const gender = document.getElementById('inp-prod-gender').value;
+      const material = document.getElementById('inp-prod-material').value;
+      const tag = document.getElementById('inp-prod-tag').value;
+      const showInEcom = document.getElementById('inp-prod-show-ecom').checked;
+
+      if (addProductState.matrix.length === 0) {
+        alert('Please select at least one size and color combination.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving to Firestore...`;
+      lucide.createIcons();
+
+      const productPayload = {
+        id: sku,
+        companyId: COMPANY_ID,
+        name,
+        productId: sku,
+        category,
+        supplierId,
+        gender,
+        material,
+        tag,
+        showInEcom,
+        imageUrls: addProductState.imageUrls.length > 0 ? addProductState.imageUrls : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'],
+        variants: addProductState.matrix,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      try {
+        const batch = writeBatch(db);
+        const globalRef = doc(db, 'products', sku);
+        const tenantRef = doc(db, 'companies', COMPANY_ID, 'products', sku);
+
+        batch.set(globalRef, productPayload, { merge: true });
+        batch.set(tenantRef, productPayload, { merge: true });
+
+        await batch.commit();
+
+        // Also append to local memory table so user sees it instantly
+        addProductState.matrix.forEach(v => {
+          const tot = Object.values(v.stock || {}).reduce((a, b) => a + (Number(b) || 0), 0);
+          let st = 'In Stock';
+          if (tot === 0) st = 'Out of Stock';
+          else if (tot <= 2) st = 'Critical';
+          else if (tot <= 5) st = 'Low';
+
+          window.inventoryItems.unshift({
+            id: `${sku}-${v.size}-${v.color}`,
+            productId: sku,
+            productName: name,
+            variantName: `Size ${v.size} / ${v.color}`,
+            sku: `${sku}-${v.size}`,
+            category,
+            currentStock: tot,
+            status: st,
+            stockByBranch: v.stock
+          });
+        });
+
+        closeAddProductModal();
+        applyAllFilters();
+        alert('Product and variants created successfully!');
+      } catch (err) {
+        console.error('Save product error:', err);
+        // Fallback memory save
+        addProductState.matrix.forEach(v => {
+          const tot = Object.values(v.stock || {}).reduce((a, b) => a + (Number(b) || 0), 0);
+          window.inventoryItems.unshift({
+            id: `${sku}-${v.size}-${v.color}`,
+            productId: sku,
+            productName: name,
+            variantName: `Size ${v.size} / ${v.color}`,
+            sku: `${sku}-${v.size}`,
+            category,
+            currentStock: tot,
+            status: tot === 0 ? 'Out of Stock' : (tot <= 2 ? 'Critical' : (tot <= 5 ? 'Low' : 'In Stock')),
+            stockByBranch: v.stock
+          });
+        });
+        closeAddProductModal();
+        applyAllFilters();
+        alert('Product added to local view (Firestore offline/restricted).');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Save Product &amp; Variants`;
+        lucide.createIcons();
+      }
+    };
+
+    window.toggleNotifications = function() {
+      alert('Recent Stock Alerts:\n• White Linen Kurti (M) is Critical (2 left)\n• Black Oversized T-Shirt (XXL) has only 1 unit\n• Cotton Palazzo Set (S) is Out of Stock');
+    };
+
+    // Run on mount
+    window.addEventListener('DOMContentLoaded', initInventoryPage);
+  </script>
+
+</body>
+</html>
