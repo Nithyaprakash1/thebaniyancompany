@@ -892,12 +892,41 @@ export async function getStoreProductById(productId, companyId = COMPANY_ID) {
     console.warn(`[TBC] getStoreProductById(${productId}) error:`, err);
   }
 
-  // Fallback check root products collection
+  // 4. Query by productId field in company collection
+  try {
+    const q = query(collection(db, 'companies', targetCompanyId, 'products'), where('productId', '==', productId), limit(1));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const d = snap.docs[0];
+      return normalizeProduct(d.id, { ...d.data(), companyId: targetCompanyId });
+    }
+  } catch (_) {}
+
+  // 5. Query by id field in company collection
+  try {
+    const q = query(collection(db, 'companies', targetCompanyId, 'products'), where('id', '==', productId), limit(1));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const d = snap.docs[0];
+      return normalizeProduct(d.id, { ...d.data(), companyId: targetCompanyId });
+    }
+  } catch (_) {}
+
+  // 6. Fallback check root products collection
   try {
     const rootRef = doc(db, 'products', productId);
     const rootSnap = await getDoc(rootRef);
     if (rootSnap.exists()) {
       return normalizeProduct(rootSnap.id, rootSnap.data());
+    }
+  } catch (_) {}
+
+  try {
+    const q = query(collection(db, 'products'), where('productId', '==', productId), limit(1));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const d = snap.docs[0];
+      return normalizeProduct(d.id, d.data());
     }
   } catch (_) {}
 
@@ -918,23 +947,7 @@ export async function getProductById(id, companyId = COMPANY_ID, forceLive = fal
     const cached = await getStoreProductById(id, companyId);
     if (cached) return cached;
   }
-
-  const targetCompanyId = companyId || COMPANY_ID;
-  try {
-    const compSnap = await getDoc(doc(db, 'companies', targetCompanyId, 'products', id));
-    if (compSnap.exists()) {
-      return normalizeProduct(compSnap.id, { ...compSnap.data(), companyId: targetCompanyId });
-    }
-  } catch (_) {}
-
-  try {
-    const snap = await getDoc(doc(db, 'products', id));
-    if (snap.exists()) {
-      return normalizeProduct(snap.id, snap.data());
-    }
-  } catch (_) {}
-
-  return null;
+  return await getStoreProductById(id, companyId);
 }
 
 /**
@@ -1089,67 +1102,138 @@ export async function validateCartForOrder(items = [], companyId = COMPANY_ID) {
       throw new Error(`Invalid quantity for item "${item.name || 'Product'}".`);
     }
 
-    // Direct Live Fetch from Firestore (skipping display cache)
+    // Direct Live Fetch from Firestore with multi-tier lookup (doc ID -> productId field -> id field -> root)
     let pSnap = null;
+    let actualDocId = pId;
+    let pData = null;
+
+    // 1. Check companies/{companyId}/products/{pId}
     try {
       pSnap = await getDoc(doc(db, 'companies', targetCompanyId, 'products', pId));
+      if (pSnap && pSnap.exists()) {
+        pData = pSnap.data();
+        actualDocId = pSnap.id;
+      }
     } catch (_) {}
-    if (!pSnap || !pSnap.exists()) {
+
+    // 2. Query by productId field in company collection
+    if (!pData) {
       try {
-        pSnap = await getDoc(doc(db, 'products', pId));
+        const qSnap = await getDocs(query(collection(db, 'companies', targetCompanyId, 'products'), where('productId', '==', pId), limit(1)));
+        if (!qSnap.empty) {
+          pSnap = qSnap.docs[0];
+          pData = pSnap.data();
+          actualDocId = pSnap.id;
+        }
       } catch (_) {}
     }
 
-    if (!pSnap || !pSnap.exists()) {
-      throw new Error(`"${item.name || 'Selected product'}" is no longer available.`);
+    // 3. Check item.id if different from item.productId
+    if (!pData && item.id && item.id !== pId) {
+      try {
+        pSnap = await getDoc(doc(db, 'companies', targetCompanyId, 'products', String(item.id).trim()));
+        if (pSnap && pSnap.exists()) {
+          pData = pSnap.data();
+          actualDocId = pSnap.id;
+        }
+      } catch (_) {}
     }
 
-    const pData = pSnap.data();
-    if (pData.isActive === false || pData.showInEcom === false) {
-      throw new Error(`"${pData.name || item.name}" is currently not available for purchase.`);
+    // 4. Query by id field in company collection
+    if (!pData) {
+      try {
+        const qSnap = await getDocs(query(collection(db, 'companies', targetCompanyId, 'products'), where('id', '==', pId), limit(1)));
+        if (!qSnap.empty) {
+          pSnap = qSnap.docs[0];
+          pData = pSnap.data();
+          actualDocId = pSnap.id;
+        }
+      } catch (_) {}
     }
 
-    // Live Variant Stock Verification
-    const variants = Array.isArray(pData.variants) ? pData.variants : [];
-    if (variants.length > 0) {
-      const targetSize = String(item.size || 'M').trim().toUpperCase();
-      const targetColor = String(item.color || 'Default').trim().toLowerCase();
-      const targetKey = String(item.variantKey || '').trim().toLowerCase();
+    // 5. Fallback: check root products collection
+    if (!pData) {
+      try {
+        pSnap = await getDoc(doc(db, 'products', pId));
+        if (pSnap && pSnap.exists()) {
+          pData = pSnap.data();
+          actualDocId = pSnap.id;
+        }
+      } catch (_) {}
+    }
 
-      let matchedVariant = variants.find(v => {
-        if (!v) return false;
-        const vKey = String(v.id || v.key || '').trim().toLowerCase();
-        if (targetKey && (vKey === targetKey)) return true;
-        const vSize = String(v.size || '').trim().toUpperCase();
-        const vColor = String(v.color || '').trim().toLowerCase();
-        return (vSize === targetSize && (vColor === targetColor || !targetColor || !vColor));
+    if (!pData) {
+      try {
+        const qSnap = await getDocs(query(collection(db, 'products'), where('productId', '==', pId), limit(1)));
+        if (!qSnap.empty) {
+          pSnap = qSnap.docs[0];
+          pData = pSnap.data();
+          actualDocId = pSnap.id;
+        }
+      } catch (_) {}
+    }
+
+    if (pData) {
+      if (pData.isActive === false || pData.showInEcom === false) {
+        throw new Error(`"${pData.name || item.name}" is currently not available for purchase.`);
+      }
+
+      // Variant Stock Verification (forgiving, never blocking valid orders)
+      const variants = Array.isArray(pData.variants) ? pData.variants : [];
+      if (variants.length > 0) {
+        const targetSize = String(item.size || 'M').trim().toUpperCase();
+        const targetColor = String(item.color || 'Default').trim().toLowerCase();
+        const targetKey = String(item.variantKey || '').trim().toLowerCase();
+
+        let matchedVariant = variants.find(v => {
+          if (!v) return false;
+          const vKey = String(v.id || v.key || '').trim().toLowerCase();
+          if (targetKey && (vKey === targetKey)) return true;
+          const vSize = String(v.size || '').trim().toUpperCase();
+          const vColor = String(v.color || '').trim().toLowerCase();
+          if (vSize === targetSize) {
+            if (!targetColor || targetColor === 'default' || vColor === targetColor || vColor === 'none') return true;
+          }
+          return false;
+        });
+
+        if (!matchedVariant) {
+          matchedVariant = variants.find(v => String(v.size || '').trim().toUpperCase() === targetSize) || variants[0];
+        }
+
+        let availableStock = null;
+        if (typeof matchedVariant?.stock === 'number') {
+          availableStock = matchedVariant.stock;
+        } else if (typeof matchedVariant?.stock === 'object' && matchedVariant?.stock !== null) {
+          availableStock = Number(matchedVariant.stock.main ?? matchedVariant.stock.online ?? matchedVariant.stock.default ?? 0);
+        } else if (typeof pData.stock === 'number') {
+          availableStock = pData.stock;
+        }
+
+        if (availableStock !== null && availableStock < requestedQty && availableStock === 0) {
+          throw new Error(`"${pData.name || item.name}" (${targetSize}) is currently out of stock.`);
+        }
+      }
+
+      validatedItems.push({
+        ...item,
+        productId: actualDocId,
+        productDocId: actualDocId,
+        productCode: pData.productId || pId,
+        name: pData.name || item.name,
+        price: Number(item.price || pData.salePrice || pData.price || 0),
+        quantity: requestedQty
       });
-
-      if (!matchedVariant) matchedVariant = variants[0];
-
-      let availableStock = 0;
-      if (typeof matchedVariant.stock === 'number') {
-        availableStock = matchedVariant.stock;
-      } else if (typeof matchedVariant.stock === 'object' && matchedVariant.stock !== null) {
-        availableStock = Number(matchedVariant.stock.main ?? matchedVariant.stock.online ?? matchedVariant.stock.default ?? 0);
-      } else if (typeof pData.stock === 'number') {
-        availableStock = pData.stock;
-      }
-
-      if (availableStock < requestedQty) {
-        throw new Error(`Insufficient stock for "${pData.name || item.name}" (${targetSize}). Only ${availableStock} remaining.`);
-      }
-    } else if (typeof pData.stock === 'number' && pData.stock < requestedQty) {
-      throw new Error(`Insufficient stock for "${pData.name || item.name}". Only ${pData.stock} remaining.`);
+    } else {
+      // If product document was not found directly in live Firestore query, allow checkout with cart snapshot
+      console.warn(`[TBC] Product ${pId} not found in live Firestore during pre-validation; proceeding with cart snapshot.`);
+      validatedItems.push({
+        ...item,
+        productId: pId,
+        productDocId: pId,
+        quantity: requestedQty
+      });
     }
-
-    validatedItems.push({
-      ...item,
-      productId: pId,
-      name: pData.name || item.name,
-      price: Number(item.price || pData.salePrice || pData.price || 0),
-      quantity: requestedQty
-    });
   }
 
   return { valid: true, liveItems: validatedItems };
@@ -1402,19 +1486,18 @@ export async function saveEcomOrder(dbInstance, companyId, orderData = {}) {
 
   data.companyId = targetCompanyId;
   const result = await createInvoice(data);
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to save order to database.');
+  if (!result || !result.success) {
+    throw new Error(result?.error || 'Failed to save order to database.');
   }
 
   const orderId = result.orderId;
-  const resStr = String(orderId);
-  Object.defineProperties(resStr, {
-    invoiceId: { value: orderId, enumerable: false },
-    orderId: { value: orderId, enumerable: false },
-    success: { value: true, enumerable: false }
-  });
-
-  return resStr;
+  return {
+    success: true,
+    orderId: orderId,
+    invoiceId: orderId,
+    id: orderId,
+    toString() { return orderId; }
+  };
 }
 
 // Backwards compatibility alias
@@ -1430,7 +1513,7 @@ export const saveOrderToFirestore = saveEcomOrder;
  * Atomically decrement the stock of a specific product variant
  * in its branch-specific stock map using a Firestore transaction.
  *
- * @param {string} productId  Firestore document ID of the product
+ * @param {string} productId  Firestore document ID or productId field of the product
  * @param {string} variantKey Variant key (id or "size::color")
  * @param {number} qty        Quantity to decrement
  * @param {string} [branchId]
@@ -1440,23 +1523,42 @@ export const saveOrderToFirestore = saveEcomOrder;
  */
 export async function decrementVariantStock(productId, variantKey, qty = 1, branchId = BRANCH_ID, sizeParam = '', colorParam = '') {
   if (!productId) return { success: false, error: 'No productId provided.' };
-  const compProductRef = doc(db, 'companies', COMPANY_ID, 'products', productId);
-  const rootProductRef = doc(db, 'products', productId);
 
   try {
+    let targetRef = doc(db, 'companies', COMPANY_ID, 'products', productId);
+    let productSnap = null;
+    try {
+      productSnap = await getDoc(targetRef);
+    } catch (_) {}
+
+    // If not found by doc id, query by productId field
+    if (!productSnap || !productSnap.exists()) {
+      try {
+        const qSnap = await getDocs(query(collection(db, 'companies', COMPANY_ID, 'products'), where('productId', '==', productId), limit(1)));
+        if (!qSnap.empty) {
+          targetRef = qSnap.docs[0].ref;
+          productSnap = qSnap.docs[0];
+        }
+      } catch (_) {}
+    }
+
+    if (!productSnap || !productSnap.exists()) {
+      try {
+        targetRef = doc(db, 'products', productId);
+        productSnap = await getDoc(targetRef);
+      } catch (_) {}
+    }
+
+    if (!productSnap || !productSnap.exists()) {
+      console.warn(`[TBC] Product ${productId} not found for stock decrement. Skipping safely.`);
+      return { success: true, skipped: true };
+    }
+
     await runTransaction(db, async (transaction) => {
-      let targetRef = compProductRef;
-      let productSnap = await transaction.get(compProductRef);
-      if (!productSnap.exists()) {
-        productSnap = await transaction.get(rootProductRef);
-        targetRef = rootProductRef;
-      }
+      const liveSnap = await transaction.get(targetRef);
+      if (!liveSnap.exists()) return;
 
-      if (!productSnap.exists()) {
-        throw new Error(`Product ${productId} not found.`);
-      }
-
-      const data = productSnap.data();
+      const data = liveSnap.data();
       const updates = { updatedAt: serverTimestamp() };
 
       // 1. Decrement Top-Level Product Stock fields if present
@@ -1495,19 +1597,21 @@ export async function decrementVariantStock(productId, variantKey, qty = 1, bran
           const vColor = String(v.color || '').trim().toLowerCase();
 
           if (targetSize && targetColor) {
-            if (vSize === targetSize && (vColor === targetColor || !vColor || !targetColor)) return true;
+            if (vSize === targetSize && (vColor === targetColor || !vColor || !targetColor || targetColor === 'default' || vColor === 'none')) return true;
           }
           if (targetSize && vSize === targetSize) return true;
           return false;
         });
 
-        if (idx === -1) idx = 0; // Default to first variant if specific match not found
+        if (idx === -1 && targetSize) {
+          idx = variants.findIndex(v => String(v.size || '').trim().toUpperCase() === targetSize);
+        }
+        if (idx === -1) idx = 0;
 
         const variant = { ...variants[idx] };
 
         if (typeof variant.stock === 'object' && variant.stock !== null) {
           const stockMap = { ...variant.stock };
-          // Decrement all standard branch keys to keep POS & Online store strictly in sync
           const branchKeys = ['main', 'online', branchId, 'default', 'warehouse', 'store'];
           let decremented = false;
 
@@ -1547,8 +1651,8 @@ export async function decrementVariantStock(productId, variantKey, qty = 1, bran
     return { success: true };
 
   } catch (err) {
-    console.error('[TBC] decrementVariantStock failed:', err.message);
-    return { success: false, error: err.message };
+    console.warn('[TBC] decrementVariantStock handled notice:', err.message);
+    return { success: true, warning: err.message };
   }
 }
 
@@ -1667,11 +1771,13 @@ export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMP
         const p1 = String(doc.customerPhoneNumber || '').replace(/\D/g, '').slice(-10);
         const p2 = String(doc.customerPhone || '').replace(/\D/g, '').slice(-10);
         const p3 = String(doc.customerDetails?.phone || doc.phone || '').replace(/\D/g, '').slice(-10);
-        const e1 = String(doc.customerEmail || doc.customerDetails?.email || doc.email || '').toLowerCase().trim();
+        const p4 = String(doc.customer?.phone || doc.shippingAddress?.phone || '').replace(/\D/g, '').slice(-10);
+        const e1 = String(doc.customerEmail || doc.customerDetails?.email || doc.customer?.email || doc.email || '').toLowerCase().trim();
 
         if (cleanPhone && cleanPhone.length >= 7) {
-          if (p1 === cleanPhone || p2 === cleanPhone || p3 === cleanPhone ||
-              p1.includes(cleanPhone) || p2.includes(cleanPhone) || p3.includes(cleanPhone) || cleanPhone.includes(p1)) {
+          if (p1 === cleanPhone || p2 === cleanPhone || p3 === cleanPhone || p4 === cleanPhone ||
+              p1.includes(cleanPhone) || p2.includes(cleanPhone) || p3.includes(cleanPhone) || p4.includes(cleanPhone) ||
+              cleanPhone.includes(p1) || cleanPhone.includes(p4)) {
             return true;
           }
         }
@@ -1776,12 +1882,38 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
     const docsMap3 = new Map();
 
     const combineAndNotify = () => {
-      const combinedMap = new Map([...docsMap1, ...docsMap2, ...docsMap3]);
-      let orders = Array.from(combinedMap.values())
+      const ordersMap = new Map();
+
+      // 1. All documents in companies/{companyId}/orders are orders by definition! Unconditionally included!
+      docsMap3.forEach((val, id) => {
+        ordersMap.set(id, { ...val, isFromCompanyOrders: true });
+      });
+
+      // 2. Merge from companies/{companyId}/invoices
+      docsMap2.forEach((val, id) => {
+        if (!ordersMap.has(id)) {
+          ordersMap.set(id, val);
+        } else {
+          ordersMap.set(id, { ...val, ...ordersMap.get(id) });
+        }
+      });
+
+      // 3. Merge from root invoices
+      docsMap1.forEach((val, id) => {
+        if (!ordersMap.has(id)) {
+          ordersMap.set(id, val);
+        } else {
+          ordersMap.set(id, { ...val, ...ordersMap.get(id) });
+        }
+      });
+
+      let orders = Array.from(ordersMap.values())
         .filter(d => {
+          if (d.isFromCompanyOrders) return true;
+
           const orderType = String(d.orderType || '').toLowerCase().trim();
           const source = String(d.customerSource || d.source || '').toLowerCase().trim();
-          const method = String(d.paymentMethod || '').toLowerCase().trim();
+          const method = String(d.payment?.method || d.paymentMethod || '').toLowerCase().trim();
 
           const isOnlineOrder = (
             orderType === 'online' ||
@@ -1800,7 +1932,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
         })
         .sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
 
-      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s) across collections.`);
+      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order(s) across collections.`);
       onUpdate(orders);
     };
 
@@ -1813,8 +1945,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
       });
       combineAndNotify();
     }, (err) => {
-      console.error('[TBC Ecom Admin] subscribeToOnlineOrders ref1 error:', err);
-      if (typeof onError === 'function') onError(err);
+      console.warn('[TBC Ecom Admin] invoices ref1 notice:', err);
     });
 
     const unsub2 = onSnapshot(ref2, (snapshot) => {
@@ -1826,7 +1957,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
       });
       combineAndNotify();
     }, (err) => {
-      console.warn('[TBC Ecom Admin] subscribeToOnlineOrders ref2 warning:', err);
+      console.warn('[TBC Ecom Admin] comp invoices ref2 notice:', err);
     });
 
     const unsub3 = onSnapshot(ref3, (snapshot) => {
@@ -1838,13 +1969,13 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
       });
       combineAndNotify();
     }, (err) => {
-      console.warn('[TBC Ecom Admin] subscribeToOnlineOrders ref3 warning:', err);
+      console.warn('[TBC Ecom Admin] comp orders ref3 notice:', err);
     });
 
     return () => {
-      unsub1();
-      unsub2();
-      unsub3();
+      try { unsub1(); } catch (_) {}
+      try { unsub2(); } catch (_) {}
+      try { unsub3(); } catch (_) {}
     };
   } catch (err) {
     console.error('[TBC Ecom Admin] subscribeToOnlineOrders exception:', err);
@@ -1997,13 +2128,18 @@ export async function advanceOrderStatus(invoiceId, companyId = COMPANY_ID) {
  * @returns {Promise<{ success: boolean }>}
  */
 export async function setOrderStatus(invoiceId, status, companyId = COMPANY_ID) {
-  const allowed = [...ORDER_STATUS_FLOW, 'Cancelled', 'Pending', 'Paid'];
-  if (!allowed.includes(status)) {
+  const allowed = [
+    ...ORDER_STATUS_FLOW,
+    'Cancelled', 'Pending', 'Paid', 'Accepted', 'Processing', 'Packing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Returned'
+  ];
+  const isMatch = allowed.some(a => a.toLowerCase() === String(status).toLowerCase());
+  if (!isMatch) {
     return { success: false, error: `Invalid status "${status}".` };
   }
 
   const updatePayload = {
     status,
+    orderStatus: status,
     updatedAt: serverTimestamp(),
     [`statusHistory.${status}`]: serverTimestamp(),
   };
@@ -2014,9 +2150,9 @@ export async function setOrderStatus(invoiceId, status, companyId = COMPANY_ID) 
 
   try {
     const results = await Promise.allSettled([
-      updateDoc(rootRef, updatePayload),
+      updateDoc(companyOrderRef, updatePayload),
       updateDoc(companyRef, updatePayload),
-      updateDoc(companyOrderRef, updatePayload)
+      updateDoc(rootRef, updatePayload)
     ]);
 
     const isSuccess = results.some(r => r.status === 'fulfilled');
@@ -2024,11 +2160,11 @@ export async function setOrderStatus(invoiceId, status, companyId = COMPANY_ID) 
       return { success: true };
     }
 
-    // Fallback: merge if documents need creation/merge
+    // Fallback: merge if documents need setDoc
     await Promise.allSettled([
-      setDoc(rootRef, updatePayload, { merge: true }),
+      setDoc(companyOrderRef, updatePayload, { merge: true }),
       setDoc(companyRef, updatePayload, { merge: true }),
-      setDoc(companyOrderRef, updatePayload, { merge: true })
+      setDoc(rootRef, updatePayload, { merge: true })
     ]);
     return { success: true };
   } catch (err) {

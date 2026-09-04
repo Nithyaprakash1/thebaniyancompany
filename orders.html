@@ -457,7 +457,8 @@
       updateDoc, 
       serverTimestamp,
       query,
-      orderBy
+      orderBy,
+      onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const COMPANY_ID = 'thebaniyancompany';
@@ -467,84 +468,120 @@
     window.activeOrderStatusFilter = 'all';
     window.activeOrderSearch = '';
 
-    // Load from Firestore (Multi-tenant subcollections & root)
-    async function loadOrdersFromFirestore() {
-      try {
-        const [compSnap, ordersSnap, rootSnap] = await Promise.allSettled([
-          getDocs(collection(db, 'companies', COMPANY_ID, 'invoices')),
-          getDocs(collection(db, 'companies', COMPANY_ID, 'orders')),
-          getDocs(collection(db, 'invoices'))
-        ]);
-        const allDocsMap = new Map();
+    const ordersDocMap1 = new Map();
+    const ordersDocMap2 = new Map();
+    const ordersDocMap3 = new Map();
 
-        if (rootSnap.status === 'fulfilled' && rootSnap.value) {
-          rootSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
-        }
-        if (compSnap.status === 'fulfilled' && compSnap.value) {
-          compSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
-        }
-        if (ordersSnap.status === 'fulfilled' && ordersSnap.value) {
-          ordersSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
-        }
+    function processAndRenderOrders() {
+      const allDocsMap = new Map();
 
-        const list = [];
-        allDocsMap.forEach((data, docId) => {
-          let dateText = '';
-          if (data.createdAt?.seconds) {
-            const dt = new Date(data.createdAt.seconds * 1000);
-            dateText = dt.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-          } else if (data.orderDateStr) {
-            dateText = data.orderDateStr;
-          } else if (data.createdAt) {
-            try {
-              dateText = new Date(data.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-            } catch(e) {
-              dateText = 'Recently';
-            }
-          } else {
+      // 1. Root invoices
+      ordersDocMap1.forEach((data, id) => allDocsMap.set(id, { id, ...data }));
+      // 2. Company invoices
+      ordersDocMap2.forEach((data, id) => allDocsMap.set(id, { id, ...data }));
+      // 3. Company orders (primary)
+      ordersDocMap3.forEach((data, id) => allDocsMap.set(id, { id, ...data }));
+
+      const list = [];
+      allDocsMap.forEach((data, docId) => {
+        let dateText = '';
+        if (data.createdAt?.seconds) {
+          const dt = new Date(data.createdAt.seconds * 1000);
+          dateText = dt.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+        } else if (data.orderDateStr) {
+          dateText = data.orderDateStr;
+        } else if (data.createdAt) {
+          try {
+            dateText = new Date(data.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+          } catch(e) {
             dateText = 'Recently';
           }
+        } else {
+          dateText = 'Recently';
+        }
 
-          list.push({
-            id: docId,
-            customerName: data.customer?.name || data.customerName || data.customerDetails?.name || 'Customer',
-            phone: data.customer?.phone || data.customerPhoneNumber || data.customerPhone || 'Not provided',
-            email: data.customer?.email || data.customerEmail || '',
-            address: data.shippingAddress?.addressLine1 || data.customerAddress || data.customerDetails?.address || '',
-            city: data.shippingAddress?.city || data.city || data.customerDetails?.city || '',
-            state: data.shippingAddress?.state || data.state || data.customerDetails?.state || '',
-            pincode: data.shippingAddress?.pincode || data.pincode || data.customerDetails?.pincode || '',
-            totalAmount: Number(data.pricing?.total ?? data.totalAmount ?? data.finalAmount ?? data.grandTotal ?? 0),
-            paymentMethod: data.payment?.method || data.paymentMethod || 'Online',
-            paymentStatus: data.payment?.status || data.paymentStatus || 'Paid',
-            status: data.orderStatus || data.status || 'Pending',
-            createdAtFormatted: dateText,
-            createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : (data.createdAt ? new Date(data.createdAt).getTime() : 0),
-            items: data.items || data.orderItems || []
-          });
+        const rawStatus = data.orderStatus || data.status || 'Pending';
+        const rawPaymentMethod = data.payment?.method || data.paymentMethod || 'Online';
+        const rawPaymentStatus = data.payment?.status || data.paymentStatus || 'Pending';
+
+        const rawItems = Array.isArray(data.items) ? data.items : (Array.isArray(data.orderItems) ? data.orderItems : []);
+        const cleanItems = rawItems.map(i => ({
+          name: i.name || 'Apparel Item',
+          size: i.size || 'M',
+          color: i.color || 'Standard',
+          qty: Number(i.qty || i.quantity || 1),
+          price: Number(i.price || 0),
+          imageUrl: i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'https://placehold.co/80x100?text=Product'
+        }));
+
+        list.push({
+          id: docId,
+          customerName: data.customer?.name || data.customerName || data.customerDetails?.name || 'Customer',
+          phone: data.customer?.phone || data.customerPhoneNumber || data.customerPhone || 'Not provided',
+          email: data.customer?.email || data.customerEmail || '',
+          address: data.shippingAddress?.addressLine1 || data.customerAddress || data.customerDetails?.address || '',
+          city: data.shippingAddress?.city || data.city || data.customerDetails?.city || '',
+          state: data.shippingAddress?.state || data.state || data.customerDetails?.state || '',
+          pincode: data.shippingAddress?.pincode || data.pincode || data.customerDetails?.pincode || '',
+          totalAmount: Number(data.pricing?.total ?? data.totalAmount ?? data.finalAmount ?? data.grandTotal ?? 0),
+          paymentMethod: rawPaymentMethod,
+          paymentStatus: rawPaymentStatus,
+          status: rawStatus,
+          createdAtFormatted: dateText,
+          createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : (data.createdAt ? new Date(data.createdAt).getTime() : (data.timestamp || 0)),
+          items: cleanItems
         });
+      });
 
-        // Sort newest first
-        list.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
-        window.liveOrders = list;
-      } catch (err) {
-        console.warn('Firestore orders fetch error:', err);
-        window.liveOrders = [];
-      }
-
+      // Sort newest first
+      list.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
+      window.liveOrders = list;
       applyOrderFilters();
+    }
+
+    // Real-Time Live Listener for Orders across collections
+    function initRealtimeOrders() {
+      try {
+        const refRoot = collection(db, 'invoices');
+        const refCompInv = collection(db, 'companies', COMPANY_ID, 'invoices');
+        const refCompOrd = collection(db, 'companies', COMPANY_ID, 'orders');
+
+        onSnapshot(refRoot, (snap) => {
+          ordersDocMap1.clear();
+          snap.docs.forEach(d => ordersDocMap1.set(d.id, d.data()));
+          processAndRenderOrders();
+        }, (err) => console.warn('[Orders Admin] Root invoices snapshot notice:', err));
+
+        onSnapshot(refCompInv, (snap) => {
+          ordersDocMap2.clear();
+          snap.docs.forEach(d => ordersDocMap2.set(d.id, d.data()));
+          processAndRenderOrders();
+        }, (err) => console.warn('[Orders Admin] Company invoices snapshot notice:', err));
+
+        onSnapshot(refCompOrd, (snap) => {
+          ordersDocMap3.clear();
+          snap.docs.forEach(d => ordersDocMap3.set(d.id, d.data()));
+          processAndRenderOrders();
+        }, (err) => console.warn('[Orders Admin] Company orders snapshot notice:', err));
+      } catch (err) {
+        console.error('[Orders Admin] Failed to initialize live onSnapshot listeners:', err);
+      }
+    }
+
+    async function loadOrdersFromFirestore() {
+      initRealtimeOrders();
     }
 
     // Format badge based on status
     function getStatusBadge(status) {
-      const s = String(status || '').toLowerCase();
-      if (s === 'pending') {
+      const s = String(status || '').trim().toLowerCase();
+      if (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">Pending Acceptance</span>`;
-      } else if (s === 'accepted') {
+      } else if (s === 'accepted' || s === 'processing') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">Accepted</span>`;
-      } else if (s === 'packing') {
+      } else if (s === 'packing' || s === 'packed') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">Packing</span>`;
-      } else if (s === 'shipped') {
+      } else if (s === 'shipped' || s === 'out for delivery') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">Shipped</span>`;
       } else if (s === 'delivered') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>`;
@@ -570,7 +607,7 @@
       emptyState.classList.add('hidden');
 
       container.innerHTML = orders.map(o => {
-        const isPaid = (o.paymentStatus === 'Paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
+        const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
         const payBadge = isPaid 
           ? `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">PAID (${o.paymentMethod})</span>`
           : `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">${o.paymentMethod}</span>`;
@@ -656,21 +693,23 @@
         `;
       }).join('');
 
-      lucide.createIcons();
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
     }
 
     function renderStatusActionButtons(orderId, currentStatus) {
-      const s = String(currentStatus || '').toLowerCase();
+      const s = String(currentStatus || '').trim().toLowerCase();
       let html = '';
 
-      if (s === 'pending') {
+      if (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed') {
         html += `<button onclick="updateOrderStatus('${orderId}', 'Accepted')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Accept Order</button>`;
         html += `<button onclick="updateOrderStatus('${orderId}', 'Cancelled')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs border border-rose-200 transition cursor-pointer">Cancel</button>`;
-      } else if (s === 'accepted') {
+      } else if (s === 'accepted' || s === 'processing') {
         html += `<button onclick="updateOrderStatus('${orderId}', 'Packing')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Mark Packing</button>`;
-      } else if (s === 'packing') {
+      } else if (s === 'packing' || s === 'packed') {
         html += `<button onclick="updateOrderStatus('${orderId}', 'Shipped')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Mark Shipped</button>`;
-      } else if (s === 'shipped') {
+      } else if (s === 'shipped' || s === 'out for delivery') {
         html += `<button onclick="updateOrderStatus('${orderId}', 'Delivered')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Mark Delivered</button>`;
         html += `<button onclick="updateOrderStatus('${orderId}', 'Returned')" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-semibold rounded-lg text-xs border border-orange-200 transition cursor-pointer">Mark Returned</button>`;
       } else if (s === 'delivered') {
@@ -683,10 +722,10 @@
     // Update Status Handler
     window.updateOrderStatus = async function(orderId, newStatus) {
       const order = window.liveOrders.find(o => o.id === orderId);
-      if (!order) return;
-
-      order.status = newStatus;
-      applyOrderFilters();
+      if (order) {
+        order.status = newStatus;
+        applyOrderFilters();
+      }
 
       try {
         const orderRef1 = doc(db, 'companies', COMPANY_ID, 'orders', orderId);
@@ -709,7 +748,7 @@
 
     // Filter Logic
     window.applyOrderFilters = function() {
-      const statusFilter = window.activeOrderStatusFilter || 'all';
+      const statusFilter = (window.activeOrderStatusFilter || 'all').trim().toLowerCase();
       const search = (window.activeOrderSearch || '').trim().toLowerCase();
       const paymentFilter = document.getElementById('order-payment-filter')?.value || 'all';
       const sortFilter = document.getElementById('order-sort-filter')?.value || 'newest';
@@ -719,9 +758,19 @@
       // Update counters for all 8 tabs
       updateTabCounters();
 
-      // 1. Status Filter
+      // 1. Status Filter with full state machine aliasing
       if (statusFilter !== 'all') {
-        filtered = filtered.filter(o => String(o.status || '').toLowerCase() === statusFilter.toLowerCase());
+        filtered = filtered.filter(o => {
+          const s = String(o.status || '').trim().toLowerCase();
+          if (statusFilter === 'pending') return (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed');
+          if (statusFilter === 'accepted') return (s === 'accepted' || s === 'processing');
+          if (statusFilter === 'packing') return (s === 'packing' || s === 'packed');
+          if (statusFilter === 'shipped') return (s === 'shipped' || s === 'out for delivery');
+          if (statusFilter === 'delivered') return s === 'delivered';
+          if (statusFilter === 'cancelled') return s === 'cancelled';
+          if (statusFilter === 'returned') return s === 'returned';
+          return s === statusFilter;
+        });
       }
 
       // 2. Search
@@ -736,8 +785,8 @@
 
       // 3. Payment
       if (paymentFilter !== 'all') {
-        if (paymentFilter === 'paid') filtered = filtered.filter(o => o.paymentStatus === 'Paid' || String(o.paymentMethod || '').toLowerCase().includes('razorpay'));
-        else if (paymentFilter === 'cod') filtered = filtered.filter(o => String(o.paymentMethod || '').toLowerCase().includes('cod') || o.paymentStatus !== 'Paid');
+        if (paymentFilter === 'paid') filtered = filtered.filter(o => String(o.paymentStatus || '').toLowerCase() === 'paid' || String(o.paymentMethod || '').toLowerCase().includes('razorpay'));
+        else if (paymentFilter === 'cod') filtered = filtered.filter(o => String(o.paymentMethod || '').toLowerCase().includes('cod') || String(o.paymentStatus || '').toLowerCase() !== 'paid');
         else if (paymentFilter === 'whatsapp') filtered = filtered.filter(o => String(o.paymentMethod || '').toLowerCase().includes('whatsapp'));
       }
 
@@ -752,7 +801,17 @@
 
     function updateTabCounters() {
       const all = window.liveOrders;
-      const countFor = (st) => all.filter(o => String(o.status || '').toLowerCase() === st.toLowerCase()).length;
+      const countFor = (st) => all.filter(o => {
+        const s = String(o.status || '').trim().toLowerCase();
+        if (st === 'pending') return (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed');
+        if (st === 'accepted') return (s === 'accepted' || s === 'processing');
+        if (st === 'packing') return (s === 'packing' || s === 'packed');
+        if (st === 'shipped') return (s === 'shipped' || s === 'out for delivery');
+        if (st === 'delivered') return s === 'delivered';
+        if (st === 'cancelled') return s === 'cancelled';
+        if (st === 'returned') return s === 'returned';
+        return s === st;
+      }).length;
 
       document.getElementById('count-all').textContent = all.length;
       document.getElementById('count-pending').textContent = countFor('pending');
