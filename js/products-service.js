@@ -1676,8 +1676,10 @@ export async function revalidateCompany(companyId = COMPANY_ID) {
 
     if (!raw) return null;
 
-    const name = raw.name || raw.companyName || raw.brandName || 'OneSpace Commerce';
-    const logo = raw.logo || raw.logoUrl || raw.imageUrl || raw.image || raw.icon || 'assets/onespace-commerce-logo.png';
+    const cachedName = typeof window !== 'undefined' ? (localStorage.getItem('onespace_shop_name') || 'THE BANIYAN COMPANY') : 'THE BANIYAN COMPANY';
+    const name = raw.name || raw.companyName || raw.brandName || cachedName;
+    const cachedLogo = typeof window !== 'undefined' ? (localStorage.getItem('onespace_shop_logo') || '') : '';
+    const logo = raw.logo || raw.logoUrl || raw.imageUrl || raw.image || raw.icon || cachedLogo || 'assets/tbclogo.jpeg';
     const handle = raw.handle || raw.username || ('@' + name.toLowerCase().replace(/[^a-z0-9]/g, ''));
 
     const result = {

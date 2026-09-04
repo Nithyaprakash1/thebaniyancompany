@@ -40,21 +40,24 @@
     body {
       background-color: #f6f6f7;
       color: #1a1a1a;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .shopify-card {
       background: #ffffff;
       border: 1px solid #e1e3e5;
-      border-radius: 12px;
+      border-radius: 16px;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .shopify-input {
       background: #ffffff;
       border: 1px solid #c9cccf;
       color: #1a1a1a;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: 400;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
@@ -65,24 +68,43 @@
       box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
     }
 
+    /* Dark Obsidian iOS-Style Sidebar Navigation */
     .sidebar-nav-btn {
-      color: #4a4d52;
+      color: #94a3b8;
       background-color: transparent;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.15s ease;
+      border-radius: 12px;
+      font-weight: 400;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .sidebar-nav-btn:hover:not(.active) {
-      background-color: #f1f2f4;
-      color: #0f172a;
+      background-color: #161822;
+      color: #ffffff;
+      border-color: #232736;
+      transform: translateX(2px);
     }
 
     .sidebar-nav-btn.active {
-      background-color: #0f172a;
+      background-color: #191b26;
       color: #ffffff;
       font-weight: 500;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      border-color: #2c3042;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+
+    .sidebar-nav-btn .nav-chevron {
+      opacity: 0;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-nav-btn.active .nav-chevron {
+      opacity: 0.6;
+    }
+
+    .sidebar-nav-btn:hover .nav-chevron {
+      opacity: 0.9;
+      transform: translateX(1px);
     }
   </style>
 </head>
@@ -128,99 +150,144 @@
     <!-- Sidebar Drawer Mobile Overlay -->
     <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 hidden md:hidden"></div>
 
-    <!-- LEFT SIDEBAR MENU -->
-    <aside id="admin-sidebar" class="fixed md:sticky top-0 left-0 bottom-0 z-50 w-64 bg-white border-r border-[#e1e3e5] flex flex-col justify-between transition-transform duration-300 -translate-x-full md:translate-x-0 h-screen">
-      <div>
+    <!-- LEFT SIDEBAR MENU (Dark Obsidian iOS-Style Theme) -->
+    <aside id="admin-sidebar" class="fixed md:sticky top-0 left-0 bottom-0 z-50 w-64 bg-[#0b0d13] border-r border-[#1a1c25] flex flex-col justify-between transition-transform duration-300 -translate-x-full md:translate-x-0 h-screen text-white shrink-0">
+      <div class="flex-1 min-h-0 flex flex-col">
         <!-- Brand & Logo Header -->
-        <div class="p-4 border-b border-[#e1e3e5] flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <img src="assets/onespace-commerce-logo.png" id="sidebar-logo-img" alt="Store Logo" class="h-9 w-9 object-contain rounded-lg border border-slate-200 bg-white p-0.5" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
-            <div class="min-w-0">
-              <h1 class="font-semibold text-sm text-slate-900 truncate" id="header-brand-name">OneSpace Commerce</h1>
-              <span class="text-xs text-slate-500 font-medium block">Admin Console</span>
+        <div class="p-4 border-b border-[#1a1c25] space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <img src="assets/onespace-commerce-logo.png" id="sidebar-logo-img" alt="OneSpace Commerce" class="h-8 w-8 object-contain rounded-lg p-0.5 bg-white/5 border border-white/10" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
+              <div class="flex items-baseline gap-1">
+                <span class="text-sm font-medium text-white tracking-tight">OneSpace</span>
+                <span class="text-sm font-medium text-emerald-400 tracking-tight">Commerce</span>
+              </div>
             </div>
+            <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">
+              <span class="material-symbols-outlined text-lg">close</span>
+            </button>
           </div>
-          <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-500 hover:text-slate-900 p-1">
-            <span class="material-symbols-outlined text-xl">close</span>
-          </button>
+
+          <!-- Shop Capsule Pill (The Baniyan Company with Logo) -->
+          <div class="w-full bg-[#151720] border border-[#222634] rounded-xl px-3 py-2 flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <img id="sidebar-shop-logo-img" src="assets/tbclogo.jpeg" alt="TBC" class="w-6 h-6 rounded-full object-cover border border-white/20 shrink-0" onerror="this.src='assets/tbclogo.jpg';">
+              <span class="text-[11px] font-medium tracking-wider text-slate-200 uppercase truncate" id="sidebar-shop-name">THE BANIYAN COMPANY</span>
+            </div>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+          </div>
         </div>
 
-        <!-- Vertical Side Navigation Menu -->
-        <nav class="p-3 space-y-1">
+        <!-- Vertical Side Navigation Menu (Exact Order) -->
+        <nav class="p-3 space-y-1 overflow-y-auto custom-scrollbar flex-1">
+          <!-- 1. Home -->
           <button id="side-tab-dashboard" onclick="switchAdminTab('dashboard')"
-            class="sidebar-nav-btn active w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
-            <span class="material-symbols-outlined text-lg">dashboard</span>
-            <span>Dashboard &amp; Sales</span>
+            class="sidebar-nav-btn active w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-emerald-400">grid_view</span>
+              <span>Home</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
           </button>
 
-          <a href="analytics.html" id="side-tab-analytics"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3 hover:bg-slate-100 text-slate-700">
-            <span class="material-symbols-outlined text-lg text-indigo-600">query_stats</span>
-            <span>Analytics</span>
-          </a>
-
-          <button id="side-tab-products" onclick="switchAdminTab('products')"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
-            <span class="material-symbols-outlined text-lg">inventory_2</span>
-            <span>Products &amp; Stock</span>
-          </button>
-
-          <a href="stock-availabilities.html" id="side-tab-stock"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3 hover:bg-slate-100 text-slate-700">
-            <span class="material-symbols-outlined text-lg text-amber-500">warehouse</span>
-            <span>Stock Availabilities</span>
-          </a>
-
+          <!-- 2. Orders -->
           <a href="orders.html" id="side-tab-orders"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3 hover:bg-slate-100 text-slate-700">
-            <span class="material-symbols-outlined text-lg text-blue-600">local_shipping</span>
-            <span>Orders &amp; Shipping</span>
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-blue-400">local_shipping</span>
+              <span>Orders</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
           </a>
 
+          <!-- 3. Products -->
+          <button id="side-tab-products" onclick="switchAdminTab('products')"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-amber-400">inventory_2</span>
+              <span>Products</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </button>
+
+          <!-- 4. Stock Check -->
+          <a href="stock-availabilities.html" id="side-tab-stock"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-emerald-400">check_circle</span>
+              <span>Stock Check</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </a>
+
+          <!-- 5. Customers -->
           <button id="side-tab-customers" onclick="switchAdminTab('customers')"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
-            <span class="material-symbols-outlined text-lg">group</span>
-            <span>Customers</span>
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-purple-400">group</span>
+              <span>Customers</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
           </button>
 
-          <button id="side-tab-returns" onclick="switchAdminTab('returns')"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
-            <span class="material-symbols-outlined text-lg">published_with_changes</span>
-            <span>Returns &amp; Refunds</span>
-          </button>
-
+          <!-- 6. Payments -->
           <button id="side-tab-payments" onclick="switchAdminTab('payments')"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
-            <span class="material-symbols-outlined text-lg">payments</span>
-            <span>Payments</span>
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-teal-400">payments</span>
+              <span>Payments</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
           </button>
 
+          <!-- 7. Returns -->
+          <button id="side-tab-returns" onclick="switchAdminTab('returns')"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-rose-400">published_with_changes</span>
+              <span>Returns</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </button>
+
+          <!-- 8. Reels & Photos -->
           <button id="side-tab-reels" onclick="switchAdminTab('reels')"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
-            <span class="material-symbols-outlined text-lg">movie</span>
-            <span>Reels &amp; Media</span>
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-pink-400">movie</span>
+              <span>Reels &amp; Photos</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
           </button>
 
+          <!-- 9. Website Banners -->
           <a href="banners.html" id="side-tab-banners"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3 hover:bg-slate-100 text-slate-700">
-            <span class="material-symbols-outlined text-lg text-indigo-600">view_carousel</span>
-            <span>Hero Banners</span>
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-indigo-400">view_carousel</span>
+              <span>Website Banners</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
           </a>
 
+          <!-- 10. Store Settings -->
           <button id="side-tab-settings" onclick="switchAdminTab('settings')"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
-            <span class="material-symbols-outlined text-lg">settings</span>
-            <span>Store Settings</span>
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-slate-400">settings</span>
+              <span>Store Settings</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
           </button>
         </nav>
       </div>
 
       <!-- Sidebar Footer -->
-      <div class="p-3.5 border-t border-[#e1e3e5] space-y-2">
-        <a href="home.html" class="w-full py-2 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-800 transition-all flex items-center justify-center gap-2 border border-slate-200">
-          <span class="material-symbols-outlined text-base">visibility</span> View Storefront
+      <div class="p-3.5 border-t border-[#1a1c25] space-y-2 bg-[#0b0d13]">
+        <a href="home.html" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-[#151720] hover:bg-[#1e2230] text-xs font-normal text-slate-200 transition-all flex items-center justify-center gap-2 border border-[#232736]">
+          <span class="material-symbols-outlined text-base text-slate-400">visibility</span> View Storefront
         </a>
-        <button onclick="logoutAdmin()" class="w-full py-2 px-3 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-medium transition-all border border-rose-200/60 flex items-center justify-center gap-2 cursor-pointer">
+        <button onclick="logoutAdmin()" class="w-full py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-normal transition-all border border-rose-500/20 flex items-center justify-center gap-2 cursor-pointer">
           <span class="material-symbols-outlined text-base">logout</span> Logout
         </button>
       </div>
@@ -658,106 +725,236 @@
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Store Settings</h1>
           </div>
 
-          <!-- Horizontal Sub-Tabs Row (Matching screenshot media_1788523312896.png) -->
+          <!-- Horizontal Sub-Tabs Row: General, Payments, Shipping, Controls -->
           <div class="flex items-center gap-6 border-b border-slate-200 overflow-x-auto custom-scrollbar">
             <button type="button" id="tab-settings-general" onclick="switchSettingsSubTab('general')"
-              class="settings-subtab-btn pb-3 text-sm font-semibold text-slate-900 border-b-2 border-black transition cursor-pointer shrink-0">
+              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-900 border-b-2 border-black transition cursor-pointer shrink-0">
               General
             </button>
             <button type="button" id="tab-settings-payments" onclick="switchSettingsSubTab('payments')"
-              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
+              class="settings-subtab-btn pb-3 text-sm font-normal text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
               Payments
             </button>
             <button type="button" id="tab-settings-shipping" onclick="switchSettingsSubTab('shipping')"
-              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
+              class="settings-subtab-btn pb-3 text-sm font-normal text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
               Shipping
             </button>
-            <button type="button" id="tab-settings-notifications" onclick="switchSettingsSubTab('notifications')"
-              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
-              Notifications
-            </button>
             <button type="button" id="tab-settings-controls" onclick="switchSettingsSubTab('controls')"
-              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
+              class="settings-subtab-btn pb-3 text-sm font-normal text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
               Controls
-            </button>
-            <button type="button" id="tab-settings-seo" onclick="switchSettingsSubTab('seo')"
-              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
-              SEO
-            </button>
-            <button type="button" id="tab-settings-legal" onclick="switchSettingsSubTab('legal')"
-              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
-              Legal
             </button>
           </div>
 
-          <!-- TAB 1: GENERAL (Matching screenshot media_1788523312896.png, with Instagram Link/Handle completely removed) -->
+          <!-- TAB 1: GENERAL -->
           <div id="panel-settings-general" class="settings-panel space-y-6">
             <form id="general-settings-form" class="space-y-6 max-w-4xl">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store Name</label>
+                  <label class="block text-xs font-medium text-slate-700 mb-1.5">Store Name</label>
                   <input type="text" id="ctrl-store-name" placeholder="The Baniyan Company"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-medium">
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-normal">
                 </div>
 
                 <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store URL</label>
+                  <label class="block text-xs font-medium text-slate-700 mb-1.5">Store URL</label>
                   <input type="text" id="ctrl-store-url" placeholder="thebaniyancompany.onespace.in"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-medium">
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-normal">
                 </div>
 
                 <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Support Email</label>
+                  <label class="block text-xs font-medium text-slate-700 mb-1.5">Support Email</label>
                   <input type="email" id="ctrl-support-email" placeholder="support@yourbrand.com"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-normal">
                 </div>
 
                 <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Support Phone</label>
+                  <label class="block text-xs font-medium text-slate-700 mb-1.5">Support Phone</label>
                   <input type="text" id="ctrl-support-phone" placeholder="+91 98765 43210"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-normal">
                 </div>
 
                 <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">WhatsApp Number</label>
+                  <label class="block text-xs font-medium text-slate-700 mb-1.5">WhatsApp Number</label>
                   <input type="text" id="ctrl-whatsapp-num" placeholder="+91 98765 43210"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-normal">
                 </div>
 
                 <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store Logo Image (URL or Gallery Upload)</label>
+                  <label class="block text-xs font-medium text-slate-700 mb-1.5">Store Logo Image (URL or Gallery Upload)</label>
                   <div class="flex items-center gap-2">
                     <input type="url" id="ctrl-store-logo" placeholder="https://... or upload"
-                      class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                      class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-normal">
                     <input type="file" id="logo-file-picker" accept="image/*"
                       onchange="window.handleGalleryUpload(this, '#ctrl-store-logo')" class="hidden">
                     <label for="logo-file-picker"
-                      class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-xs shrink-0">
+                      class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition shadow-xs shrink-0">
                       <span class="material-symbols-outlined text-[16px]">upload</span> Upload
                     </label>
                   </div>
                 </div>
 
                 <div class="md:col-span-2">
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store Address</label>
+                  <label class="block text-xs font-medium text-slate-700 mb-1.5">Store Address</label>
                   <input type="text" id="ctrl-store-address" placeholder="14, Anna Nagar, Chennai - 600040"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-normal">
                 </div>
               </div>
 
               <div>
                 <button type="submit"
-                  class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
+                  class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-medium rounded-xl shadow-xs transition cursor-pointer">
                   Save Changes
                 </button>
               </div>
             </form>
           </div>
 
-          <!-- TAB 2: CONTROLS (WhatsApp Direct Order ENABLED, Cash on Delivery ENABLED, Promo Discount Coupon Box ENABLED, Hero Banners page link) -->
+          <!-- TAB 2: PAYMENTS (UPI Only) -->
+          <div id="panel-settings-payments" class="settings-panel hidden space-y-6 max-w-4xl">
+            <form id="payments-settings-form" class="space-y-6">
+              <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-xs">
+                <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-xl">qr_code_2</span>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-medium text-slate-900">UPI Instant Payments</h3>
+                    <p class="text-xs text-slate-500">Configure direct UPI payments, VPA Virtual Payment Address, and QR code.</p>
+                  </div>
+                </div>
+
+                <!-- UPI Active Toggle -->
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <div class="flex items-center">
+                      <span class="font-medium text-xs text-slate-900 block">Direct UPI Payments</span>
+                      <span id="ctrl-upi-status-pill" class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500">Enable Google Pay, PhonePe, Paytm, and BHIM QR scan at checkout</span>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="ctrl-upi-toggle" class="sr-only peer" checked onchange="window.updateToggleLabel(this, 'ctrl-upi-status-pill')">
+                    <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                  </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1.5">Store UPI VPA / ID <span class="text-rose-500">*</span></label>
+                    <input type="text" id="ctrl-upi-id" placeholder="thebaniyancompany@okhdfcbank" value="thebaniyancompany@okhdfcbank" required
+                      class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black transition">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1.5">UPI Payee / Merchant Name</label>
+                    <input type="text" id="ctrl-upi-merchant-name" placeholder="The Baniyan Company" value="The Baniyan Company"
+                      class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                  </div>
+                  <div class="md:col-span-2">
+                    <label class="block text-xs font-medium text-slate-700 mb-1.5">UPI QR Code Image (URL or Upload)</label>
+                    <div class="flex items-center gap-2">
+                      <input type="url" id="ctrl-upi-qr" placeholder="https://... or upload QR code"
+                        class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-mono">
+                      <input type="file" id="upi-qr-picker" accept="image/*"
+                        onchange="window.handleGalleryUpload(this, '#ctrl-upi-qr')" class="hidden">
+                      <label for="upi-qr-picker"
+                        class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition shadow-xs shrink-0">
+                        <span class="material-symbols-outlined text-[16px]">upload</span> Upload QR
+                      </label>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1.5">Default Currency</label>
+                    <input type="text" readonly value="INR (₹) - Indian Rupee"
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-600 outline-none font-normal">
+                  </div>
+                </div>
+
+                <div class="pt-2">
+                  <button type="submit"
+                    class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-medium rounded-xl shadow-xs transition cursor-pointer">
+                    Save Payment Settings
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 3: SHIPPING (With Inside TN & Outside TN Delivery Fees) -->
+          <div id="panel-settings-shipping" class="settings-panel hidden space-y-6 max-w-4xl">
+            <form id="shipping-settings-form" class="space-y-6">
+              <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-xs">
+                <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                  <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-xl">local_shipping</span>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-medium text-slate-900">Shipping &amp; Delivery Rates</h3>
+                    <p class="text-xs text-slate-500">Configure regional delivery fees, courier partner, and thresholds.</p>
+                  </div>
+                </div>
+
+                <!-- Regional Delivery Fees (Moved from Controls) -->
+                <div>
+                  <h4 class="text-xs font-medium uppercase tracking-wider text-slate-500 mb-3">Regional Delivery Charges</h4>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-slate-50/70 border border-slate-200 shadow-2xs">
+                      <label class="block text-xs font-medium text-slate-700 mb-1.5">Delivery Fee (Inside Tamil Nadu)</label>
+                      <div class="relative">
+                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400">₹</span>
+                        <input type="number" id="ctrl-delivery-tn" placeholder="0" value="0"
+                          class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-black font-medium">
+                      </div>
+                      <span class="text-[11px] text-slate-400 mt-1 block">Set 0 for free delivery within Tamil Nadu</span>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50/70 border border-slate-200 shadow-2xs">
+                      <label class="block text-xs font-medium text-slate-700 mb-1.5">Delivery Fee (Outside Tamil Nadu)</label>
+                      <div class="relative">
+                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400">₹</span>
+                        <input type="number" id="ctrl-delivery-non-tn" placeholder="60" value="60"
+                          class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-black font-medium">
+                      </div>
+                      <span class="text-[11px] text-slate-400 mt-1 block">Standard shipping for all other Indian states</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1.5">Free Shipping Minimum Order (₹)</label>
+                    <input type="number" id="ctrl-free-shipping-min" value="999"
+                      class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-medium outline-none focus:border-black">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1.5">Primary Courier Partner</label>
+                    <select id="ctrl-courier-partner" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-normal outline-none focus:border-black cursor-pointer">
+                      <option value="shiprocket" selected>Shiprocket (Aggregator)</option>
+                      <option value="dtdc">DTDC Express</option>
+                      <option value="delhivery">Delhivery Surface</option>
+                      <option value="bluedart">Blue Dart</option>
+                    </select>
+                  </div>
+                  <div class="md:col-span-2">
+                    <label class="block text-xs font-medium text-slate-700 mb-1.5">Tracking Link URL Pattern</label>
+                    <input type="text" id="ctrl-tracking-pattern" value="https://track.shiprocket.in/{AWB}"
+                      class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black">
+                  </div>
+                </div>
+
+                <div class="pt-2">
+                  <button type="submit"
+                    class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-medium rounded-xl shadow-xs transition cursor-pointer">
+                    Save Shipping Settings
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 4: CONTROLS (Checkout & Storefront Toggles) -->
           <div id="panel-settings-controls" class="settings-panel hidden space-y-6 max-w-4xl">
             
-            <!-- Hero Banner Slides Notice / Redirection Card -->
+            <!-- Hero Banner Slides Redirection Card -->
             <div class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between flex-wrap gap-4 shadow-sm">
               <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
@@ -765,20 +962,20 @@
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
-                    <h3 class="text-sm font-bold tracking-tight">Hero Banners &amp; Carousel Slides</h3>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900">Separate Page</span>
+                    <h3 class="text-sm font-medium tracking-tight">Website Banners</h3>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-400 text-slate-900">Separate Page</span>
                   </div>
-                  <p class="text-xs text-slate-300 mt-0.5">Hero slides (16:6) and promo banners (4:1) have moved to a dedicated management dashboard.</p>
+                  <p class="text-xs text-slate-300 mt-0.5">Hero slides (16:6) and promo banners (4:1) are managed in their dedicated section.</p>
                 </div>
               </div>
-              <a href="banners.html" class="px-4 py-2 bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 shrink-0">
+              <a href="banners.html" class="px-4 py-2 bg-white text-slate-900 hover:bg-slate-100 font-medium text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 shrink-0">
                 <span>Manage Banners</span>
                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
               </a>
             </div>
 
             <form id="branding-update-form" class="space-y-4">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Platform Controls &amp; Checkout Toggles</h3>
+              <h3 class="text-xs font-medium uppercase tracking-wider text-slate-500 mb-2">Platform Controls &amp; Checkout Toggles</h3>
 
               <!-- TOGGLE: WhatsApp Direct Order -->
               <div class="p-4 rounded-xl bg-white border border-slate-200 flex items-center justify-between transition shadow-2xs">
@@ -788,9 +985,9 @@
                   </div>
                   <div>
                     <div class="flex items-center">
-                      <span class="font-semibold text-xs text-slate-900 block">WhatsApp Direct Order</span>
+                      <span class="font-medium text-xs text-slate-900 block">WhatsApp Direct Order</span>
                       <span id="ctrl-whatsapp-status-pill"
-                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
+                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
                     </div>
                     <span class="text-[11px] text-slate-500">Allow customers to complete checkout and order placement via WhatsApp</span>
                   </div>
@@ -810,9 +1007,9 @@
                   </div>
                   <div>
                     <div class="flex items-center">
-                      <span class="font-semibold text-xs text-slate-900 block">Cash on Delivery (COD)</span>
+                      <span class="font-medium text-xs text-slate-900 block">Cash on Delivery (COD)</span>
                       <span id="ctrl-cod-status-pill"
-                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
+                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
                     </div>
                     <span class="text-[11px] text-slate-500">Accept pay-on-delivery orders across India</span>
                   </div>
@@ -832,9 +1029,9 @@
                   </div>
                   <div>
                     <div class="flex items-center">
-                      <span class="font-semibold text-xs text-slate-900 block">Promo Discount Coupon Box</span>
+                      <span class="font-medium text-xs text-slate-900 block">Promo Discount Coupon Box</span>
                       <span id="ctrl-coupon-status-pill"
-                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
+                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
                     </div>
                     <span class="text-[11px] text-slate-500">Display promo code input box during Cart and Checkout flows</span>
                   </div>
@@ -846,7 +1043,7 @@
                 </label>
               </div>
 
-              <!-- TOGGLE: Online Payments (Razorpay) -->
+              <!-- TOGGLE: Online Payments -->
               <div class="p-4 rounded-xl bg-white border border-slate-200 flex items-center justify-between transition shadow-2xs">
                 <div class="flex items-center gap-3.5">
                   <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center flex-shrink-0">
@@ -854,11 +1051,11 @@
                   </div>
                   <div>
                     <div class="flex items-center">
-                      <span class="font-semibold text-xs text-slate-900 block">Online Payment (Razorpay &amp; UPI)</span>
+                      <span class="font-medium text-xs text-slate-900 block">Online Payment (UPI &amp; Cards)</span>
                       <span id="ctrl-razorpay-status-pill"
-                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
+                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
                     </div>
-                    <span class="text-[11px] text-slate-500">Accept Credit/Debit Cards, UPI, Netbanking, and Wallets</span>
+                    <span class="text-[11px] text-slate-500">Accept direct UPI payments and digital transactions</span>
                   </div>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
@@ -868,218 +1065,13 @@
                 </label>
               </div>
 
-              <!-- Shipping Charges Grid -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Delivery Fee (Tamil Nadu)</label>
-                  <div class="relative">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">₹</span>
-                    <input type="number" id="ctrl-delivery-tn" placeholder="0 (Free)" value="0"
-                      class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-black font-semibold">
-                  </div>
-                </div>
-
-                <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Delivery Fee (Outside Tamil Nadu)</label>
-                  <div class="relative">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">₹</span>
-                    <input type="number" id="ctrl-delivery-non-tn" placeholder="60" value="60"
-                      class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-black font-semibold">
-                  </div>
-                </div>
-              </div>
-
               <div class="pt-2">
                 <button type="submit"
-                  class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
+                  class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-medium rounded-xl shadow-xs transition cursor-pointer">
                   Save Controls
                 </button>
               </div>
             </form>
-          </div>
-
-          <!-- TAB 3: PAYMENTS -->
-          <div id="panel-settings-payments" class="settings-panel hidden space-y-6 max-w-4xl">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
-              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
-                <span class="material-symbols-outlined text-emerald-600 text-xl">account_balance</span>
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Payment Gateway Integrations</h3>
-                  <p class="text-xs text-slate-500">Configure Razorpay credentials and instant settlement settings.</p>
-                </div>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Razorpay Key ID</label>
-                  <input type="text" id="ctrl-razorpay-key-id" placeholder="rzp_live_xxxxxxxxxxxx" value="rzp_live_tbc_store"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Razorpay Key Secret</label>
-                  <input type="password" id="ctrl-razorpay-key-secret" placeholder="••••••••••••••••••••" value="encrypted_key_secret"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store UPI VPA / ID</label>
-                  <input type="text" id="ctrl-upi-id" placeholder="thebaniyancompany@okhdfcbank" value="thebaniyancompany@okhdfcbank"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Default Currency</label>
-                  <input type="text" readonly value="INR (₹) - Indian Rupee"
-                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-600 outline-none font-medium">
-                </div>
-              </div>
-              <button type="button" onclick="alert('Payment gateway configurations saved successfully!')"
-                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
-                Save Payment Settings
-              </button>
-            </div>
-          </div>
-
-          <!-- TAB 4: SHIPPING -->
-          <div id="panel-settings-shipping" class="settings-panel hidden space-y-6 max-w-4xl">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
-              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
-                <span class="material-symbols-outlined text-indigo-600 text-xl">local_shipping</span>
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Shipping &amp; Fulfillment Rules</h3>
-                  <p class="text-xs text-slate-500">Configure logistics partners and free shipping thresholds.</p>
-                </div>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Free Shipping Minimum Amount (₹)</label>
-                  <input type="number" id="ctrl-free-shipping-min" value="999"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-semibold outline-none focus:border-black">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Primary Courier Partner</label>
-                  <select class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-medium outline-none focus:border-black cursor-pointer">
-                    <option value="shiprocket" selected>Shiprocket (Aggregator)</option>
-                    <option value="dtdc">DTDC Express</option>
-                    <option value="delhivery">Delhivery Surface</option>
-                    <option value="bluedart">Blue Dart</option>
-                  </select>
-                </div>
-                <div class="md:col-span-2">
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Tracking Link URL Pattern</label>
-                  <input type="text" value="https://track.shiprocket.in/{AWB}"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black">
-                </div>
-              </div>
-              <button type="button" onclick="alert('Shipping rules updated successfully!')"
-                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
-                Save Shipping Rules
-              </button>
-            </div>
-          </div>
-
-          <!-- TAB 5: NOTIFICATIONS -->
-          <div id="panel-settings-notifications" class="settings-panel hidden space-y-6 max-w-4xl">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
-              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
-                <span class="material-symbols-outlined text-purple-600 text-xl">notifications_active</span>
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Automated Customer Notifications</h3>
-                  <p class="text-xs text-slate-500">Configure order updates sent to customers via WhatsApp and SMS.</p>
-                </div>
-              </div>
-              <div class="space-y-3">
-                <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <div>
-                    <span class="text-xs font-bold text-slate-900 block">WhatsApp Order Placed Confirmation</span>
-                    <span class="text-[11px] text-slate-500">Send an instant receipt and tracking link via WhatsApp when order is created</span>
-                  </div>
-                  <input type="checkbox" checked class="w-4 h-4 rounded text-black accent-black">
-                </label>
-                <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <div>
-                    <span class="text-xs font-bold text-slate-900 block">Dispatch &amp; AWB Tracking SMS</span>
-                    <span class="text-[11px] text-slate-500">Send dispatch notification with courier tracking number when order is shipped</span>
-                  </div>
-                  <input type="checkbox" checked class="w-4 h-4 rounded text-black accent-black">
-                </label>
-                <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <div>
-                    <span class="text-xs font-bold text-slate-900 block">Admin New Order Alert</span>
-                    <span class="text-[11px] text-slate-500">Send admin notification to +91 98765 43210 upon every new customer order</span>
-                  </div>
-                  <input type="checkbox" checked class="w-4 h-4 rounded text-black accent-black">
-                </label>
-              </div>
-              <button type="button" onclick="alert('Notification triggers updated!')"
-                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
-                Save Notification Settings
-              </button>
-            </div>
-          </div>
-
-          <!-- TAB 6: SEO -->
-          <div id="panel-settings-seo" class="settings-panel hidden space-y-6 max-w-4xl">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
-              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
-                <span class="material-symbols-outlined text-teal-600 text-xl">travel_explore</span>
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">SEO &amp; Analytics</h3>
-                  <p class="text-xs text-slate-500">Search engine meta tags and Google Analytics integration.</p>
-                </div>
-              </div>
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Meta Title</label>
-                  <input type="text" value="The Baniyan Company | Premium 100% Combed Cotton Apparel"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Meta Description</label>
-                  <textarea rows="3" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">Shop highest quality combed cotton t-shirts, oversized tees, polos, and loungewear crafted in Tiruppur with pan-India fast shipping.</textarea>
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Google Analytics Measurement ID</label>
-                  <input type="text" placeholder="G-XXXXXXXXXX" value="G-TBCSTORE99"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black">
-                </div>
-              </div>
-              <button type="button" onclick="alert('SEO metadata saved successfully!')"
-                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
-                Save SEO Settings
-              </button>
-            </div>
-          </div>
-
-          <!-- TAB 7: LEGAL -->
-          <div id="panel-settings-legal" class="settings-panel hidden space-y-6 max-w-4xl">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
-              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
-                <span class="material-symbols-outlined text-rose-600 text-xl">gavel</span>
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Legal &amp; Store Policies</h3>
-                  <p class="text-xs text-slate-500">Manage terms, privacy policy, and return &amp; refund clauses displayed on checkout.</p>
-                </div>
-              </div>
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Terms &amp; Conditions Page URL</label>
-                  <input type="text" value="terms.html"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Privacy Policy URL</label>
-                  <input type="text" value="privacy.html"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Return &amp; Refund Policy URL</label>
-                  <input type="text" value="returns-policy.html"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
-                </div>
-              </div>
-              <button type="button" onclick="alert('Store policies updated successfully!')"
-                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
-                Save Policies
-              </button>
-            </div>
           </div>
 
         </div>
@@ -3804,15 +3796,15 @@
     };
 
     window.switchSettingsSubTab = function (tabName) {
-      const allTabs = ['general', 'payments', 'shipping', 'notifications', 'controls', 'seo', 'legal'];
+      const allTabs = ['general', 'payments', 'shipping', 'controls'];
       allTabs.forEach(t => {
         const btn = document.getElementById(`tab-settings-${t}`);
         const panel = document.getElementById(`panel-settings-${t}`);
         if (btn) {
           if (t === tabName) {
-            btn.className = 'settings-subtab-btn pb-3 text-sm font-semibold text-slate-900 border-b-2 border-black transition cursor-pointer shrink-0';
+            btn.className = 'settings-subtab-btn pb-3 text-sm font-medium text-slate-900 border-b-2 border-black transition cursor-pointer shrink-0';
           } else {
-            btn.className = 'settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0';
+            btn.className = 'settings-subtab-btn pb-3 text-sm font-normal text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0';
           }
         }
         if (panel) {
@@ -3829,6 +3821,7 @@
       const comp = await revalidateCompany(COMPANY_ID);
       if (comp) {
         if (document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = comp.name || 'OneSpace Commerce';
+        if (document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = comp.name || 'The Baniyan Company';
         if (document.getElementById('ctrl-store-name')) document.getElementById('ctrl-store-name').value = comp.name || 'The Baniyan Company';
         if (document.getElementById('ctrl-store-url')) document.getElementById('ctrl-store-url').value = comp.storeUrl || 'thebaniyancompany.onespace.in';
         if (document.getElementById('ctrl-support-email')) document.getElementById('ctrl-support-email').value = comp.supportEmail || 'support@yourbrand.com';
@@ -3836,10 +3829,29 @@
         if (document.getElementById('ctrl-whatsapp-num')) document.getElementById('ctrl-whatsapp-num').value = comp.whatsappNumber || '+91 98765 43210';
         if (document.getElementById('ctrl-store-address')) document.getElementById('ctrl-store-address').value = comp.storeAddress || '14, Anna Nagar, Chennai - 600040';
         if (document.getElementById('ctrl-store-logo')) document.getElementById('ctrl-store-logo').value = comp.logo || '';
+        if (document.getElementById('sidebar-shop-logo-img') && comp.logo) document.getElementById('sidebar-shop-logo-img').src = comp.logo;
         if (document.getElementById('sidebar-logo-img') && comp.logo) document.getElementById('sidebar-logo-img').src = comp.logo;
         if (document.getElementById('login-logo-img') && comp.logo) document.getElementById('login-logo-img').src = comp.logo;
+        if (comp.logo) {
+          try {
+            localStorage.setItem('onespace_shop_logo', comp.logo);
+            localStorage.setItem('tbc_shop_logo', comp.logo);
+          } catch(e) {}
+        }
         if (document.getElementById('ctrl-delivery-tn')) document.getElementById('ctrl-delivery-tn').value = comp.deliveryTnPrice !== undefined ? comp.deliveryTnPrice : (comp.deliveryTnFee !== undefined ? comp.deliveryTnFee : 0);
         if (document.getElementById('ctrl-delivery-non-tn')) document.getElementById('ctrl-delivery-non-tn').value = comp.deliveryNonTnPrice !== undefined ? comp.deliveryNonTnPrice : (comp.deliveryFee !== undefined ? comp.deliveryFee : 60);
+        if (document.getElementById('ctrl-free-shipping-min') && comp.freeShippingMin !== undefined) document.getElementById('ctrl-free-shipping-min').value = comp.freeShippingMin;
+        if (document.getElementById('ctrl-courier-partner') && comp.courierPartner) document.getElementById('ctrl-courier-partner').value = comp.courierPartner;
+        if (document.getElementById('ctrl-tracking-pattern') && comp.trackingPattern) document.getElementById('ctrl-tracking-pattern').value = comp.trackingPattern;
+
+        if (document.getElementById('ctrl-upi-id') && comp.upiId) document.getElementById('ctrl-upi-id').value = comp.upiId;
+        if (document.getElementById('ctrl-upi-merchant-name') && comp.upiName) document.getElementById('ctrl-upi-merchant-name').value = comp.upiName;
+        if (document.getElementById('ctrl-upi-qr') && comp.upiQr) document.getElementById('ctrl-upi-qr').value = comp.upiQr;
+        const upiToggle = document.getElementById('ctrl-upi-toggle');
+        if (upiToggle) {
+          upiToggle.checked = comp.isUpiEnabled !== false;
+          window.updateToggleLabel(upiToggle, 'ctrl-upi-status-pill');
+        }
 
         const waToggle = document.getElementById('ctrl-whatsapp-toggle');
         const codToggle = document.getElementById('ctrl-cod-toggle');
@@ -4199,27 +4211,79 @@
 
       const res = await updateCompanySettings({ name, storeUrl, supportEmail, supportPhone, whatsappNumber, storeAddress, logo }, COMPANY_ID);
       if (res.success) {
+        if (logo) {
+          try {
+            localStorage.setItem('onespace_shop_logo', logo);
+            localStorage.setItem('tbc_shop_logo', logo);
+          } catch(e) {}
+        }
+        if (name) {
+          try {
+            localStorage.setItem('onespace_shop_name', name);
+          } catch(e) {}
+        }
         alert('General store settings saved successfully!');
         if (document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = name;
+        if (document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = name;
+        if (document.getElementById('sidebar-shop-logo-img') && logo) document.getElementById('sidebar-shop-logo-img').src = logo;
         if (document.getElementById('sidebar-logo-img') && logo) document.getElementById('sidebar-logo-img').src = logo;
       } else {
         alert('Error updating settings: ' + res.error);
       }
     });
 
-    document.getElementById('branding-update-form')?.addEventListener('submit', async (e) => {
+    document.getElementById('payments-settings-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const upiId = document.getElementById('ctrl-upi-id')?.value?.trim() || '';
+      const upiName = document.getElementById('ctrl-upi-merchant-name')?.value?.trim() || '';
+      const upiQr = document.getElementById('ctrl-upi-qr')?.value?.trim() || '';
+      const isUpiEnabled = document.getElementById('ctrl-upi-toggle')?.checked ?? true;
+
+      const res = await updateCompanySettings({
+        upiId,
+        upiName,
+        upiQr,
+        isUpiEnabled
+      }, COMPANY_ID);
+
+      if (res.success) {
+        alert('UPI Payment settings saved successfully!');
+      } else {
+        alert('Error saving payment settings: ' + res.error);
+      }
+    });
+
+    document.getElementById('shipping-settings-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const deliveryTnPrice = Number(document.getElementById('ctrl-delivery-tn')?.value || 0);
       const deliveryNonTnPrice = Number(document.getElementById('ctrl-delivery-non-tn')?.value || 60);
+      const freeShippingMin = Number(document.getElementById('ctrl-free-shipping-min')?.value || 999);
+      const courierPartner = document.getElementById('ctrl-courier-partner')?.value || 'shiprocket';
+      const trackingPattern = document.getElementById('ctrl-tracking-pattern')?.value || '';
 
+      const res = await updateCompanySettings({
+        deliveryTnPrice,
+        deliveryNonTnPrice,
+        freeShippingMin,
+        courierPartner,
+        trackingPattern
+      }, COMPANY_ID);
+
+      if (res.success) {
+        alert('Shipping delivery rates & courier rules saved successfully!');
+      } else {
+        alert('Error updating shipping settings: ' + res.error);
+      }
+    });
+
+    document.getElementById('branding-update-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
       const isWhatsappEnabled = document.getElementById('ctrl-whatsapp-toggle')?.checked ?? true;
       const isCodEnabled = document.getElementById('ctrl-cod-toggle')?.checked ?? true;
       const isCouponEnabled = document.getElementById('ctrl-coupon-toggle')?.checked ?? true;
       const isRazorpayEnabled = document.getElementById('ctrl-razorpay-toggle')?.checked ?? true;
 
       const res = await updateCompanySettings({
-        deliveryTnPrice,
-        deliveryNonTnPrice,
         isWhatsappEnabled,
         isCodEnabled,
         isCouponEnabled,
@@ -4227,7 +4291,7 @@
       }, COMPANY_ID);
 
       if (res.success) {
-        alert('Platform controls, COD, WhatsApp & Promo Coupon settings updated successfully!');
+        alert('Platform controls updated successfully!');
       } else {
         alert('Error updating controls: ' + res.error);
       }

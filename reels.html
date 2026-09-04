@@ -192,8 +192,8 @@
       <span class="material-symbols-outlined text-[22px]">arrow_back</span>
     </a>
     <div class="flex items-center gap-2">
-      <img id="nav-company-logo" alt="OneSpaceCommerce Logo" class="h-8 object-contain" src="assets/onespace-commerce-logo.png" onerror="this.src='assets/Onespace Commerce Logo PNG.png'">
-      <span class="font-bold tracking-[0.2em] text-xs uppercase text-white hidden sm:inline-block">Reels</span>
+      <img id="nav-company-logo" alt="The Baniyan Company" class="h-8 w-8 object-cover rounded-full border border-white/20" src="assets/tbclogo.jpeg" onerror="this.src='assets/tbclogo.jpg'">
+      <span class="font-normal tracking-[0.2em] text-xs uppercase text-white hidden sm:inline-block">Reels</span>
     </div>
   </div>
 </header>
@@ -383,6 +383,12 @@
       const companyNameStr = company?.name || 'OneSpace Commerce';
       const companyHandleStr = company?.handle || '@thebaniyancompany';
       const companyLogoStr = company?.logo || '';
+      if (companyLogoStr) {
+        try { localStorage.setItem('onespace_shop_logo', companyLogoStr); } catch (_) {}
+      }
+      if (companyNameStr) {
+        try { localStorage.setItem('onespace_shop_name', companyNameStr); } catch (_) {}
+      }
 
       // Update header logo / name if element exists
       const logoEl = document.getElementById('nav-company-logo');

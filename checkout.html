@@ -83,10 +83,10 @@
         <span class="material-symbols-outlined text-[20px] sm:text-[22px]">arrow_back</span>
       </a>
 
-      <a href="home" class="flex items-center gap-3">
-        <img id="nav-company-logo" alt="OneSpaceCommerce Logo" class="h-7 sm:h-8 object-contain"
-          src="assets/onespace-commerce-logo.png" onerror="this.src='assets/Onespace Commerce Logo PNG.png'">
-        <span class="font-bold tracking-[0.15em] text-xs sm:text-sm uppercase text-primary">CHECKOUT</span>
+      <a href="home" class="flex items-center gap-2.5">
+        <img id="nav-company-logo" alt="The Baniyan Company" class="h-8 w-8 object-cover rounded-full border border-black/10"
+          src="assets/tbclogo.jpeg" onerror="this.src='assets/tbclogo.jpg'">
+        <span class="font-normal tracking-[0.15em] text-xs sm:text-sm uppercase text-primary">CHECKOUT</span>
       </a>
 
       <div class="flex items-center gap-1 text-emerald-600 font-semibold text-[11px] sm:text-xs uppercase">
@@ -770,8 +770,12 @@
     getCompany().then(comp => {
       if (comp) {
         if (comp.logo) {
+          try { localStorage.setItem('onespace_shop_logo', comp.logo); } catch (_) {}
           const logoEl = document.getElementById('nav-company-logo');
           if (logoEl) logoEl.src = comp.logo;
+        }
+        if (comp.name) {
+          try { localStorage.setItem('onespace_shop_name', comp.name); } catch (_) {}
         }
         if (comp.deliveryTnPrice !== undefined) deliveryTnPrice = Number(comp.deliveryTnPrice);
         if (comp.deliveryNonTnPrice !== undefined) deliveryNonTnPrice = Number(comp.deliveryNonTnPrice);

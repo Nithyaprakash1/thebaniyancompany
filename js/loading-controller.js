@@ -8,20 +8,28 @@
 
   // Apply cached logo instantly to prevent flickering
   try {
-    const rawCache = localStorage.getItem('tbc_cache_company');
-    if (rawCache) {
-      const parsed = JSON.parse(rawCache);
-      const logoUrl = parsed && parsed.data && parsed.data.logo;
-      if (logoUrl) {
-        const style = document.createElement('style');
-        style.innerHTML = `
-          #nav-company-logo, #loading-company-logo { content: url("${logoUrl}") !important; }
-        `;
-        if (document.head) {
-          document.head.appendChild(style);
-        } else {
-          document.addEventListener('DOMContentLoaded', () => document.head.appendChild(style));
-        }
+    let logoUrl = localStorage.getItem('onespace_shop_logo') || localStorage.getItem('tbc_shop_logo');
+    if (!logoUrl) {
+      const rawCache = localStorage.getItem('tbc_cache_company');
+      if (rawCache) {
+        const parsed = JSON.parse(rawCache);
+        logoUrl = parsed && parsed.data && parsed.data.logo;
+      }
+    }
+    if (!logoUrl) {
+      logoUrl = 'assets/tbclogo.jpeg';
+    }
+    if (logoUrl) {
+      const applyLogoImg = () => {
+        const logoImg = document.getElementById('nav-company-logo');
+        if (logoImg && !logoImg.src.includes(logoUrl)) logoImg.src = logoUrl;
+        const loadImg = document.getElementById('loading-company-logo');
+        if (loadImg && !loadImg.src.includes(logoUrl)) loadImg.src = logoUrl;
+      };
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyLogoImg);
+      } else {
+        applyLogoImg();
       }
     }
   } catch(e) {}

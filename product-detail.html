@@ -437,10 +437,10 @@
         <span class="material-symbols-outlined text-[22px]">arrow_back</span>
       </a>
 
-      <a href="home" class="flex items-center gap-3">
-        <img id="nav-company-logo" alt="OneSpaceCommerce Logo" class="h-9 object-contain rounded-xl"
-          src="assets/onespace-commerce-logo.png" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
-        <span class="font-bold tracking-[0.15em] text-sm md:text-base text-primary uppercase hidden sm:inline-block">THE
+      <a href="home" class="flex items-center gap-2.5">
+        <img id="nav-company-logo" alt="The Baniyan Company" class="h-9 w-9 object-cover rounded-full border border-black/10"
+          src="assets/tbclogo.jpeg" onerror="this.src='assets/tbclogo.jpg';">
+        <span class="font-normal tracking-[0.12em] text-sm md:text-base text-primary uppercase hidden sm:inline-block">THE
           BANIYAN COMPANY</span>
       </a>
 
@@ -1449,10 +1449,14 @@
 
     getCompany().then(comp => {
       if (comp?.logo) {
+        try { localStorage.setItem('onespace_shop_logo', comp.logo); } catch (_) {}
         const el = document.getElementById('nav-company-logo');
         if (el) el.src = comp.logo;
         const lEl = document.getElementById('loading-company-logo');
         if (lEl) lEl.src = comp.logo;
+      }
+      if (comp?.name) {
+        try { localStorage.setItem('onespace_shop_name', comp.name); } catch (_) {}
       }
     }).catch(() => { });
 

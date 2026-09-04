@@ -239,11 +239,11 @@
       </a>
 
       <!-- Center Logo & Store Name -->
-      <a href="home" class="flex items-center gap-3">
-        <img id="nav-company-logo" alt="OneSpaceCommerce Logo" class="h-9 object-contain rounded-xl"
-          src="assets/onespace-commerce-logo.png" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
+      <a href="home" class="flex items-center gap-2.5">
+        <img id="nav-company-logo" alt="The Baniyan Company" class="h-9 w-9 object-cover rounded-full border border-black/10"
+          src="assets/tbclogo.jpeg" onerror="this.src='assets/tbclogo.jpg';">
         <span id="nav-company-name"
-          class="font-bold tracking-[0.15em] text-sm md:text-base text-primary uppercase hidden sm:inline-block">THE
+          class="font-semibold tracking-[0.12em] text-sm md:text-base text-primary uppercase hidden sm:inline-block">THE
           BANIYAN COMPANY</span>
       </a>
 
@@ -1178,9 +1178,15 @@
           const logoEl = document.getElementById('nav-company-logo');
           const fLogoEl = document.getElementById('footer-company-logo');
           const nameEl = document.getElementById('nav-company-name');
-          if (logoEl && c.logo) logoEl.src = c.logo;
-          if (fLogoEl && c.logo) fLogoEl.src = c.logo;
-          if (nameEl && c.name) nameEl.textContent = c.name;
+          if (c.logo) {
+            try { localStorage.setItem('onespace_shop_logo', c.logo); } catch (_) {}
+            if (logoEl) logoEl.src = c.logo;
+            if (fLogoEl) fLogoEl.src = c.logo;
+          }
+          if (c.name) {
+            try { localStorage.setItem('onespace_shop_name', c.name); } catch (_) {}
+            if (nameEl) nameEl.textContent = c.name;
+          }
 
           // Dynamic Hero Banner update if set by Admin
           if (c.heroMediaUrl) {
