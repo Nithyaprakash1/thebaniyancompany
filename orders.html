@@ -289,6 +289,11 @@
       </div>
 
       <div class="flex items-center gap-2.5">
+        <div id="sync-status-indicator" class="hidden sm:inline-flex items-center gap-2 text-[11px] font-medium text-slate-600 bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-2xs">
+          <span id="sync-pulse-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="sync-status-text">Auto-sync: 1 min</span>
+        </div>
+
         <a
           href="stock-availabilities.html"
           class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition shadow-2xs flex items-center gap-1.5"
@@ -298,11 +303,12 @@
         </a>
         <button
           type="button"
+          id="refresh-feed-btn"
           onclick="refreshOrdersFeed()"
           class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
         >
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-          <span>Refresh Feed</span>
+          <i data-lucide="refresh-cw" id="refresh-icon" class="w-3.5 h-3.5"></i>
+          <span id="refresh-btn-label">Refresh Feed</span>
         </button>
       </div>
     </div>
@@ -442,6 +448,20 @@
       <h3 class="font-bold text-sm text-slate-700">No orders found</h3>
       <p class="text-xs text-slate-400 mt-1">There are no orders matching your selected status or filter.</p>
     </div>
+
+    <!-- New Order Live Notification Toast -->
+    <div id="new-order-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 pointer-events-none transition-all duration-300 bg-[#0f172a] text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3.5 border border-slate-800 max-w-sm">
+      <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+        <i data-lucide="bell-ring" class="w-4 h-4"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs font-bold text-white truncate" id="toast-order-title">New Order Received!</p>
+          <span class="text-[10px] text-emerald-400 font-mono font-bold" id="toast-order-amount">₹0</span>
+        </div>
+        <p class="text-[11px] text-slate-400 truncate" id="toast-order-desc">#ORD-...</p>
+      </div>
+    </div>
   </main>
 
   <!-- ==========================================
@@ -458,118 +478,197 @@
       serverTimestamp,
       query,
       orderBy,
-      onSnapshot
+      limit
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { 
+      COMPANY_ID,
+      getCachedOrders,
+      getCachedOrdersInfo,
+      setCachedOrders,
+      fetchOnlineOrders
+    } from './js/products-service.js';
 
-    const COMPANY_ID = 'thebaniyancompany';
-
-    // Real orders list (strictly zero mock data)
+    // State
     window.liveOrders = [];
     window.activeOrderStatusFilter = 'all';
     window.activeOrderSearch = '';
 
-    const ordersDocMap1 = new Map();
-    const ordersDocMap2 = new Map();
-    const ordersDocMap3 = new Map();
+    let isSyncing = false;
+    let syncIntervalTimer = null;
+    let lastSyncTimestamp = 0;
 
-    function processAndRenderOrders() {
-      const allDocsMap = new Map();
-
-      // 1. Root invoices
-      ordersDocMap1.forEach((data, id) => allDocsMap.set(id, { id, ...data }));
-      // 2. Company invoices
-      ordersDocMap2.forEach((data, id) => allDocsMap.set(id, { id, ...data }));
-      // 3. Company orders (primary)
-      ordersDocMap3.forEach((data, id) => allDocsMap.set(id, { id, ...data }));
-
-      const list = [];
-      allDocsMap.forEach((data, docId) => {
-        let dateText = '';
-        if (data.createdAt?.seconds) {
-          const dt = new Date(data.createdAt.seconds * 1000);
-          dateText = dt.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-        } else if (data.orderDateStr) {
-          dateText = data.orderDateStr;
-        } else if (data.createdAt) {
-          try {
-            dateText = new Date(data.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-          } catch(e) {
-            dateText = 'Recently';
-          }
-        } else {
+    // Clean order normalizer
+    function normalizeOrderDoc(docId, data = {}) {
+      let dateText = '';
+      if (data.createdAt?.seconds) {
+        const dt = new Date(data.createdAt.seconds * 1000);
+        dateText = dt.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+      } else if (data.orderDateStr) {
+        dateText = data.orderDateStr;
+      } else if (data.createdAt) {
+        try {
+          dateText = new Date(data.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+        } catch(e) {
           dateText = 'Recently';
         }
+      } else {
+        dateText = 'Recently';
+      }
 
-        const rawStatus = data.orderStatus || data.status || 'Pending';
-        const rawPaymentMethod = data.payment?.method || data.paymentMethod || 'Online';
-        const rawPaymentStatus = data.payment?.status || data.paymentStatus || 'Pending';
+      const rawStatus = data.orderStatus || data.status || 'Pending';
+      const rawPaymentMethod = data.payment?.method || data.paymentMethod || 'Online';
+      const rawPaymentStatus = data.payment?.status || data.paymentStatus || 'Pending';
 
-        const rawItems = Array.isArray(data.items) ? data.items : (Array.isArray(data.orderItems) ? data.orderItems : []);
-        const cleanItems = rawItems.map(i => ({
-          name: i.name || 'Apparel Item',
-          size: i.size || 'M',
-          color: i.color || 'Standard',
-          qty: Number(i.qty || i.quantity || 1),
-          price: Number(i.price || 0),
-          imageUrl: i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'https://placehold.co/80x100?text=Product'
-        }));
+      const rawItems = Array.isArray(data.items) ? data.items : (Array.isArray(data.orderItems) ? data.orderItems : []);
+      const cleanItems = rawItems.map(i => ({
+        name: i.name || 'Apparel Item',
+        size: i.size || 'M',
+        color: i.color || 'Standard',
+        qty: Number(i.qty || i.quantity || 1),
+        price: Number(i.price || 0),
+        imageUrl: i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'https://placehold.co/80x100?text=Product'
+      }));
 
-        list.push({
-          id: docId,
-          customerName: data.customer?.name || data.customerName || data.customerDetails?.name || 'Customer',
-          phone: data.customer?.phone || data.customerPhoneNumber || data.customerPhone || 'Not provided',
-          email: data.customer?.email || data.customerEmail || '',
-          address: data.shippingAddress?.addressLine1 || data.customerAddress || data.customerDetails?.address || '',
-          city: data.shippingAddress?.city || data.city || data.customerDetails?.city || '',
-          state: data.shippingAddress?.state || data.state || data.customerDetails?.state || '',
-          pincode: data.shippingAddress?.pincode || data.pincode || data.customerDetails?.pincode || '',
-          totalAmount: Number(data.pricing?.total ?? data.totalAmount ?? data.finalAmount ?? data.grandTotal ?? 0),
-          paymentMethod: rawPaymentMethod,
-          paymentStatus: rawPaymentStatus,
-          status: rawStatus,
-          createdAtFormatted: dateText,
-          createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : (data.createdAt ? new Date(data.createdAt).getTime() : (data.timestamp || 0)),
-          items: cleanItems
-        });
-      });
-
-      // Sort newest first
-      list.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
-      window.liveOrders = list;
-      applyOrderFilters();
+      return {
+        id: docId || data.id || data.orderId || data.invoiceId,
+        customerName: data.customer?.name || data.customerName || data.customerDetails?.name || 'Customer',
+        phone: data.customer?.phone || data.customerPhoneNumber || data.customerPhone || 'Not provided',
+        email: data.customer?.email || data.customerEmail || '',
+        address: data.shippingAddress?.addressLine1 || data.customerAddress || data.customerDetails?.address || '',
+        city: data.shippingAddress?.city || data.city || data.customerDetails?.city || '',
+        state: data.shippingAddress?.state || data.state || data.customerDetails?.state || '',
+        pincode: data.shippingAddress?.pincode || data.pincode || data.customerDetails?.pincode || '',
+        totalAmount: Number(data.pricing?.total ?? data.totalAmount ?? data.finalAmount ?? data.grandTotal ?? 0),
+        paymentMethod: rawPaymentMethod,
+        paymentStatus: rawPaymentStatus,
+        status: rawStatus,
+        orderStatus: rawStatus,
+        createdAtFormatted: dateText,
+        createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : (data.createdAt ? new Date(data.createdAt).getTime() : (data.timestamp || 0)),
+        items: cleanItems
+      };
     }
 
-    // Real-Time Live Listener for Orders across collections
-    function initRealtimeOrders() {
+    // 0ms Synchronous Cache Hydration
+    function loadCachedOrders() {
       try {
-        const refRoot = collection(db, 'invoices');
-        const refCompInv = collection(db, 'companies', COMPANY_ID, 'invoices');
-        const refCompOrd = collection(db, 'companies', COMPANY_ID, 'orders');
+        const cached = getCachedOrders(COMPANY_ID);
+        if (Array.isArray(cached) && cached.length > 0) {
+          window.liveOrders = cached.map(o => normalizeOrderDoc(o.id, o));
+          window.liveOrders.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
+          applyOrderFilters();
+          updateSyncUI('Loaded from cache', false);
+          return true;
+        }
+      } catch (e) {
+        console.warn('[Orders Admin] Cache load warning:', e);
+      }
+      return false;
+    }
 
-        onSnapshot(refRoot, (snap) => {
-          ordersDocMap1.clear();
-          snap.docs.forEach(d => ordersDocMap1.set(d.id, d.data()));
-          processAndRenderOrders();
-        }, (err) => console.warn('[Orders Admin] Root invoices snapshot notice:', err));
+    // UI Status Indicator updater
+    function updateSyncUI(text, isSpinning = false) {
+      const statusText = document.getElementById('sync-status-text');
+      const pulseDot = document.getElementById('sync-pulse-dot');
+      const refreshIcon = document.getElementById('refresh-icon');
 
-        onSnapshot(refCompInv, (snap) => {
-          ordersDocMap2.clear();
-          snap.docs.forEach(d => ordersDocMap2.set(d.id, d.data()));
-          processAndRenderOrders();
-        }, (err) => console.warn('[Orders Admin] Company invoices snapshot notice:', err));
-
-        onSnapshot(refCompOrd, (snap) => {
-          ordersDocMap3.clear();
-          snap.docs.forEach(d => ordersDocMap3.set(d.id, d.data()));
-          processAndRenderOrders();
-        }, (err) => console.warn('[Orders Admin] Company orders snapshot notice:', err));
-      } catch (err) {
-        console.error('[Orders Admin] Failed to initialize live onSnapshot listeners:', err);
+      if (statusText) statusText.textContent = text;
+      if (pulseDot) {
+        if (isSpinning) {
+          pulseDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+        } else {
+          pulseDot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+        }
+      }
+      if (refreshIcon) {
+        if (isSpinning) refreshIcon.classList.add('animate-spin');
+        else refreshIcon.classList.remove('animate-spin');
       }
     }
 
-    async function loadOrdersFromFirestore() {
-      initRealtimeOrders();
+    // Smart Sync & 1-Minute Polling ("in a next min")
+    async function syncOrders(force = false) {
+      if (isSyncing) return;
+
+      // Read optimization: skip network if cache is fresh (< 30s) and not forced
+      const cacheInfo = getCachedOrdersInfo(COMPANY_ID, 30000);
+      if (!force && cacheInfo.isFresh && window.liveOrders.length > 0) {
+        updateSyncUI('Cached (Up to date)', false);
+        return;
+      }
+
+      isSyncing = true;
+      updateSyncUI(force ? 'Syncing orders...' : 'Checking updates...', true);
+
+      try {
+        const rawOrders = await fetchOnlineOrders(COMPANY_ID, force);
+        const normalized = rawOrders.map(o => normalizeOrderDoc(o.id, o));
+        normalized.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
+
+        // Detect newly placed orders
+        const previousIds = new Set(window.liveOrders.map(o => o.id));
+        const newArrivals = normalized.filter(o => !previousIds.has(o.id));
+
+        window.liveOrders = normalized;
+        setCachedOrders(normalized, COMPANY_ID);
+        applyOrderFilters();
+
+        lastSyncTimestamp = Date.now();
+        const nowTimeStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+        updateSyncUI(`Synced ${nowTimeStr} · Auto 1m`, false);
+
+        // Alert user if newly placed orders arrived
+        if (newArrivals.length > 0 && previousIds.size > 0) {
+          notifyNewOrderArrival(newArrivals[0]);
+        }
+      } catch (err) {
+        console.warn('[Orders Admin] syncOrders notice:', err);
+        updateSyncUI('Sync notice (cached)', false);
+      } finally {
+        isSyncing = false;
+      }
+    }
+
+    // New Order Toast Notification
+    function notifyNewOrderArrival(order) {
+      try {
+        const toast = document.getElementById('new-order-toast');
+        const title = document.getElementById('toast-order-title');
+        const amount = document.getElementById('toast-order-amount');
+        const desc = document.getElementById('toast-order-desc');
+
+        if (title) title.textContent = `New Order from ${order.customerName || 'Customer'}!`;
+        if (amount) amount.textContent = `₹${Number(order.totalAmount || 0).toLocaleString('en-IN')}`;
+        if (desc) desc.textContent = `#${order.id} · ${order.city || 'Standard Delivery'}`;
+
+        if (toast) {
+          toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+          setTimeout(() => {
+            toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+          }, 6000);
+        }
+
+        // Subtle audio beep
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.value = 880;
+          gain.gain.value = 0.1;
+          osc.start();
+          setTimeout(() => { osc.stop(); ctx.close(); }, 180);
+        } catch (_) {}
+      } catch (e) {}
+    }
+
+    // 1-Minute Polling Cycle ("in a next min")
+    function startAutoSync() {
+      if (syncIntervalTimer) clearInterval(syncIntervalTimer);
+      syncIntervalTimer = setInterval(() => {
+        syncOrders(true);
+      }, 60000);
     }
 
     // Format badge based on status
@@ -724,7 +823,9 @@
       const order = window.liveOrders.find(o => o.id === orderId);
       if (order) {
         order.status = newStatus;
+        order.orderStatus = newStatus;
         applyOrderFilters();
+        setCachedOrders(window.liveOrders, COMPANY_ID);
       }
 
       try {
@@ -848,8 +949,8 @@
       applyOrderFilters();
     };
 
-    window.refreshOrdersFeed = function() {
-      loadOrdersFromFirestore();
+    window.refreshOrdersFeed = async function() {
+      await syncOrders(true);
     };
 
     window.toggleMobileSidebar = function() {
@@ -870,15 +971,51 @@
       window.location.href = 'admin.html';
     };
 
-    window.addEventListener('DOMContentLoaded', () => {
+    // Robust Application Startup
+    function startOrdersApp() {
       try {
         const cachedLogo = localStorage.getItem('onespace_shop_logo') || localStorage.getItem('tbc_shop_logo');
         if (cachedLogo && document.getElementById('sidebar-shop-logo-img')) document.getElementById('sidebar-shop-logo-img').src = cachedLogo;
         const cachedName = localStorage.getItem('onespace_shop_name');
         if (cachedName && document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = cachedName;
       } catch(e) {}
-      loadOrdersFromFirestore();
-    });
+
+      // 1. Instantly load from cache in 0ms (no waiting, no network lag)
+      const hasCached = loadCachedOrders();
+
+      // 2. Fetch from Firestore if cache is stale or missing
+      syncOrders(!hasCached);
+
+      // 3. Start 1-minute auto-poll ("in a next min")
+      startAutoSync();
+
+      // 4. Tab focus & visibility change listener
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          if (Date.now() - lastSyncTimestamp >= 60000) {
+            syncOrders(false);
+          }
+        }
+      });
+
+      // 5. Cross-tab storage listeners for instant updates when checkout completes
+      window.addEventListener('storage', (e) => {
+        if (e.key === `tbc_cache_orders_${COMPANY_ID}`) {
+          loadCachedOrders();
+        }
+      });
+
+      window.addEventListener('tbc_orders_updated', () => {
+        loadCachedOrders();
+      });
+    }
+
+    // Never miss execution: if DOM is already parsed (typical with module scripts), run immediately!
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startOrdersApp);
+    } else {
+      startOrdersApp();
+    }
   </script>
     </div>
   </div>

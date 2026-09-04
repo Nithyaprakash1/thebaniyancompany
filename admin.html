@@ -2118,7 +2118,7 @@
   <script type="module">
     import { db, collection, getDocs, doc, getDoc, auth, updateDoc, setDoc, writeBatch, serverTimestamp } from './js/firebase-config.js';
     import { signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getCompany, revalidateCompany, subscribeToOnlineOrders, setOrderStatus, updateCompanyBanner, updateCompanySettings } from './js/products-service.js';
+    import { getCompany, revalidateCompany, subscribeToOnlineOrders, setOrderStatus, updateCompanyBanner, updateCompanySettings, getCachedOrders, setCachedOrders } from './js/products-service.js';
 
     const COMPANY_ID = 'thebaniyancompany';
 
@@ -4104,6 +4104,18 @@
         }
       } catch(e) {}
 
+      // 0ms instant display from local cache
+      try {
+        const cached = getCachedOrders(COMPANY_ID);
+        if (Array.isArray(cached) && cached.length > 0) {
+          renderOrders(cached);
+          renderSalesChart();
+          renderCustomersTable();
+          renderPaymentsTable();
+          renderReturnsTable();
+        }
+      } catch (e) {}
+
       subscribeToOnlineOrders(orders => {
         renderOrders(orders);
         renderSalesChart();
@@ -4153,6 +4165,9 @@
     function renderOrders(orders) {
       window.currentAllOrders = orders || [];
       const rawList = window.currentAllOrders;
+      if (rawList.length > 0) {
+        try { setCachedOrders(rawList, COMPANY_ID); } catch(e) {}
+      }
       const listEl = document.getElementById('admin-orders-list');
       if (!listEl) return;
 

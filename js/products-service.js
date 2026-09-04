@@ -403,9 +403,84 @@ export function clearTbcCache(companyId = COMPANY_ID) {
     localStorage.removeItem('tbc_cache_products');
     localStorage.removeItem('tbc_cache_categories');
     localStorage.removeItem('tbc_cache_company');
+    localStorage.removeItem(`tbc_cache_orders_${companyId}`);
   } catch (e) {}
   _cachedProducts = null;
   _cachedCategories = null;
+}
+
+/**
+ * Retrieve cached orders from localStorage for 0ms instant loading.
+ * @param {string} [companyId]
+ * @returns {Array} List of cached order objects
+ */
+export function getCachedOrders(companyId = COMPANY_ID) {
+  try {
+    const raw = localStorage.getItem(`tbc_cache_orders_${companyId}`);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+    if (parsed && Array.isArray(parsed.data)) return parsed.data;
+    return [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * Retrieve cached orders metadata (orders, timestamp, and freshness status).
+ * @param {string} [companyId]
+ * @param {number} [freshDurationMs=60000]
+ * @returns {{ orders: Array, timestamp: number, isFresh: boolean }}
+ */
+export function getCachedOrdersInfo(companyId = COMPANY_ID, freshDurationMs = 60000) {
+  try {
+    const raw = localStorage.getItem(`tbc_cache_orders_${companyId}`);
+    if (!raw) return { orders: [], timestamp: 0, isFresh: false };
+    const parsed = JSON.parse(raw);
+    const orders = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.data) ? parsed.data : []);
+    const timestamp = Number(parsed?.time || 0);
+    const isFresh = Boolean(timestamp && (Date.now() - timestamp < freshDurationMs));
+    return { orders, timestamp, isFresh };
+  } catch (e) {
+    return { orders: [], timestamp: 0, isFresh: false };
+  }
+}
+
+/**
+ * Persist orders into localStorage cache and notify any active UI listeners.
+ * @param {Array} orders
+ * @param {string} [companyId]
+ */
+export function setCachedOrders(orders, companyId = COMPANY_ID) {
+  try {
+    if (!Array.isArray(orders)) return;
+    const payload = {
+      time: Date.now(),
+      data: orders.slice(0, 250) // Cap to recent 250 orders for storage hygiene
+    };
+    localStorage.setItem(`tbc_cache_orders_${companyId}`, JSON.stringify(payload));
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new CustomEvent('tbc_orders_updated', { detail: { count: orders.length, companyId } }));
+    }
+  } catch (e) {
+    console.warn('[TBC Orders Cache] Failed to write cache:', e);
+  }
+}
+
+/**
+ * Prepend a newly placed order into the local cache immediately.
+ * @param {object} order
+ * @param {string} [companyId]
+ */
+export function prependCachedOrder(order, companyId = COMPANY_ID) {
+  try {
+    if (!order || !order.id) return;
+    const current = getCachedOrders(companyId);
+    const filtered = current.filter(o => o.id !== order.id);
+    filtered.unshift(order);
+    setCachedOrders(filtered, companyId);
+  } catch (e) {}
 }
 
 /**
@@ -1451,6 +1526,13 @@ export async function createInvoice(orderData = {}) {
     return { success: false, invoiceId: orderId, orderId: orderId, error: lastError?.message || 'Database write error' };
   }
 
+  // Update local cache immediately
+  try {
+    prependCachedOrder(payload, companyId);
+  } catch (cacheErr) {
+    console.warn('[TBC] Cache prepend notice:', cacheErr);
+  }
+
   // Atomically decrement stock in Firestore
   try {
     if (Array.isArray(payload.items) && payload.items.length > 0) {
@@ -1932,6 +2014,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
         })
         .sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
 
+      setCachedOrders(orders, companyId);
       console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order(s) across collections.`);
       onUpdate(orders);
     };
@@ -1981,6 +2064,105 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
     console.error('[TBC Ecom Admin] subscribeToOnlineOrders exception:', err);
     return () => {};
   }
+}
+
+/**
+ * Fetch online orders with read optimization and intelligent local caching.
+ * If force is false and cache is fresh (< 60s), returns cached orders without Firestore reads.
+ * Otherwise fetches latest orders from company orders subcollection and fallback collections.
+ *
+ * @param {string} [companyId]
+ * @param {boolean} [force=false]
+ * @returns {Promise<Array>}
+ */
+export async function fetchOnlineOrders(companyId = COMPANY_ID, force = false) {
+  if (!force) {
+    const info = getCachedOrdersInfo(companyId);
+    if (info.isFresh && Array.isArray(info.orders) && info.orders.length > 0) {
+      return info.orders;
+    }
+  }
+
+  const ordersMap = new Map();
+
+  // 1. Primary: companies/{companyId}/orders
+  try {
+    const ordCol = collection(db, `companies/${companyId}/orders`);
+    let snap;
+    try {
+      snap = await getDocs(query(ordCol, orderBy('createdAt', 'desc'), limit(100)));
+    } catch (_) {
+      snap = await getDocs(ordCol);
+    }
+    snap.docs.forEach(d => {
+      const data = d.data();
+      const id = data.id || d.id;
+      ordersMap.set(id, { id, ...data, isFromCompanyOrders: true });
+    });
+  } catch (err) {
+    console.warn('[TBC Orders] Fetch company orders notice:', err);
+  }
+
+  // 2. Secondary: companies/{companyId}/invoices
+  try {
+    const invCol = collection(db, `companies/${companyId}/invoices`);
+    let invSnap;
+    try {
+      invSnap = await getDocs(query(invCol, orderBy('createdAt', 'desc'), limit(50)));
+    } catch (_) {
+      invSnap = await getDocs(invCol);
+    }
+    invSnap.docs.forEach(d => {
+      const data = d.data();
+      const id = data.id || d.id;
+      if (!ordersMap.has(id)) {
+        ordersMap.set(id, { id, ...data });
+      }
+    });
+  } catch (err) {
+    console.warn('[TBC Orders] Fetch company invoices notice:', err);
+  }
+
+  // 3. Fallback: root invoices (only if empty or limited to 30)
+  if (ordersMap.size === 0) {
+    try {
+      const rootCol = collection(db, 'invoices');
+      const rootSnap = await getDocs(query(rootCol, limit(30)));
+      rootSnap.docs.forEach(d => {
+        const data = d.data();
+        const id = data.id || d.id;
+        if (!ordersMap.has(id)) {
+          ordersMap.set(id, { id, ...data });
+        }
+      });
+    } catch (err) {
+      console.warn('[TBC Orders] Fetch root invoices notice:', err);
+    }
+  }
+
+  const orders = Array.from(ordersMap.values())
+    .filter(d => {
+      if (d.isFromCompanyOrders) return true;
+      const orderType = String(d.orderType || '').toLowerCase().trim();
+      const source = String(d.customerSource || d.source || '').toLowerCase().trim();
+      const method = String(d.payment?.method || d.paymentMethod || '').toLowerCase().trim();
+      return (
+        orderType === 'online' ||
+        source === 'website' ||
+        Boolean(d.razorpayPaymentId) ||
+        Boolean(d.razorpayOrderId) ||
+        Boolean(d.whatsappOrder) ||
+        method.includes('razorpay') ||
+        method.includes('online') ||
+        method.includes('whatsapp') ||
+        method.includes('cod') ||
+        method.includes('cash on delivery')
+      );
+    })
+    .sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
+
+  setCachedOrders(orders, companyId);
+  return orders;
 }
 
 /**

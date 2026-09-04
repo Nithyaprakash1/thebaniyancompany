@@ -175,6 +175,27 @@ export async function saveEcomOrder(arg1, arg2, arg3) {
 
   await batch.commit();
 
+  // Update local browser cache if running client-side
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const key = `tbc_cache_orders_${targetCompanyId}`;
+      const raw = localStorage.getItem(key);
+      let list = [];
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          list = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.data) ? parsed.data : []);
+        } catch(_) {}
+      }
+      list = list.filter(o => o.id !== orderId);
+      list.unshift({ id: orderId, ...payload });
+      localStorage.setItem(key, JSON.stringify({ time: Date.now(), data: list.slice(0, 250) }));
+      if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+        window.dispatchEvent(new CustomEvent('tbc_orders_updated', { detail: { count: list.length, companyId: targetCompanyId } }));
+      }
+    }
+  } catch (e) {}
+
   return {
     success: true,
     orderId: orderId,
