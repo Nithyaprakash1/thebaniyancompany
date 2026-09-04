@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -65,6 +65,18 @@
     .sidebar-nav-btn:hover .nav-chevron {
       opacity: 0.9;
       transform: translateX(1px);
+    }
+
+    /* Skeleton Shimmer Loading Animation */
+    @keyframes shimmerAnim {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton-shimmer {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmerAnim 1.5s infinite;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -257,17 +269,7 @@
               <span>View Store</span>
             </a>
 
-            <button
-              type="button"
-              class="relative w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition"
-            >
-              <i data-lucide="bell" class="w-4 h-4"></i>
-              <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
-                3
-              </span>
-            </button>
-
-            <a href="admin.html" class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:opacity-90 transition">
+            <a href="admin.html" class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:opacity-90 transition shadow-xs">
               TB
             </a>
           </div>
@@ -311,7 +313,13 @@
       </div>
 
       <div id="hero-banners-list" class="space-y-3">
-        <!-- Rendered dynamically -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-xs">
+          <div class="w-36 h-18 skeleton-shimmer rounded-xl shrink-0"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-4 w-40 skeleton-shimmer rounded"></div>
+            <div class="h-3 w-64 skeleton-shimmer rounded"></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -328,7 +336,13 @@
       </div>
 
       <div id="promo-banners-list" class="space-y-3">
-        <!-- Rendered dynamically -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-xs">
+          <div class="w-36 h-18 skeleton-shimmer rounded-xl shrink-0"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-4 w-40 skeleton-shimmer rounded"></div>
+            <div class="h-3 w-64 skeleton-shimmer rounded"></div>
+          </div>
+        </div>
       </div>
     </section>
   </main>

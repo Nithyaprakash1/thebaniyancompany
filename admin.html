@@ -106,6 +106,18 @@
       opacity: 0.9;
       transform: translateX(1px);
     }
+
+    /* Skeleton Shimmer Loading Animation */
+    @keyframes shimmerAnim {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton-shimmer {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmerAnim 1.5s infinite;
+      border-radius: 8px;
+    }
   </style>
   <script>
     // Instant Admin Session Persistence (prevents flicker / unexpected logouts)
@@ -308,16 +320,59 @@
     <!-- RIGHT CONTENT AREA -->
     <div class="flex-1 min-w-0 flex flex-col min-h-screen">
       
-      <!-- Top Mobile Navigation Bar -->
-      <header class="md:hidden sticky top-0 z-30 bg-white border-b border-[#e1e3e5] px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <button onclick="toggleMobileSidebar()" class="p-1.5 rounded-lg bg-slate-100 text-slate-800">
-            <span class="material-symbols-outlined text-xl">menu</span>
-          </button>
-          <img src="assets/onespace-commerce-logo.png" alt="Logo" class="h-7 object-contain" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
-          <span class="font-semibold text-xs text-slate-900">OneSpace Commerce</span>
+      <!-- Top Header Bar with TB Avatar (No notification button) -->
+      <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div class="flex items-center gap-2.5">
+            <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 rounded-lg bg-slate-100 text-slate-800">
+              <span class="material-symbols-outlined text-xl">menu</span>
+            </button>
+            <div>
+              <span class="font-bold text-base tracking-tight text-slate-900 block leading-tight">OneSpace Commerce</span>
+              <span class="text-[11px] text-slate-400 font-medium hidden sm:block">The Baniyan Company</span>
+            </div>
+          </div>
+
+          <!-- Center Search Bar -->
+          <div class="flex-1 max-w-lg mx-2 sm:mx-6 hidden md:block">
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+              <input
+                type="text"
+                id="global-admin-top-search"
+                oninput="handleGlobalSearch(this.value)"
+                placeholder="Search orders, products, customers..."
+                class="w-full bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:border-black focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2 outline-none transition"
+              >
+            </div>
+          </div>
+
+          <!-- Right Header Actions -->
+          <div class="flex items-center gap-2.5 sm:gap-3">
+            <button
+              type="button"
+              onclick="openAddProductModal()"
+              class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+            >
+              <span class="material-symbols-outlined text-sm">add</span>
+              <span>Add Product</span>
+            </button>
+
+            <a
+              href="home.html"
+              target="_blank"
+              class="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium px-3 py-2 rounded-xl hidden sm:flex items-center gap-1.5 transition"
+            >
+              <span class="material-symbols-outlined text-sm text-slate-500">open_in_new</span>
+              <span>View Store</span>
+            </a>
+
+            <!-- TB Avatar Button (Consistent across all pages) -->
+            <a href="admin.html" class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:opacity-90 transition shadow-xs">
+              TB
+            </a>
+          </div>
         </div>
-        <a href="home.html" class="text-xs font-medium text-slate-700 hover:text-slate-900">Store →</a>
       </header>
 
       <main class="p-4 md:p-8 flex-1 space-y-6 max-w-7xl">
@@ -350,7 +405,7 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Today's Sales</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-sales">₹0</h3>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-sales"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5" id="kpi-today-growth">Live Store Sales</span>
               </div>
             </div>
@@ -362,7 +417,7 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Today's Orders</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-orders">0</h3>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-orders"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-[11px] font-medium text-slate-500 block mt-0.5" id="kpi-orders-breakdown">0 online · 0 COD</span>
               </div>
             </div>
@@ -375,7 +430,7 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Pending Orders</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-pending-orders">0</h3>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-pending-orders"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-[11px] font-bold text-amber-700 block mt-0.5">Action Needed</span>
               </div>
             </div>
@@ -387,7 +442,7 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Customers</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-total-customers">0</h3>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-total-customers"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5" id="kpi-new-customers">0 in database</span>
               </div>
             </div>
@@ -399,7 +454,7 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Avg Order Value</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-aov">₹0</h3>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-aov"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5">Based on orders</span>
               </div>
             </div>
@@ -411,7 +466,7 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Est. Profit</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-est-profit">₹0</h3>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-est-profit"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-[11px] font-medium text-slate-500 block mt-0.5" id="kpi-profit-margin">Margin: 47%</span>
               </div>
             </div>
@@ -420,90 +475,88 @@
           <!-- Split Section: Action Required Cards (Left 1/3) vs Sales Overview Chart (Right 2/3) -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- Left Column: Action Required Cards Stack -->
+            <!-- Left Column: Action Required Cards Stack (Kept only genuinely needed once) -->
             <div class="space-y-3">
-              <h2 class="font-bold text-sm text-slate-900 flex items-center gap-2">
-                <span class="material-symbols-outlined text-amber-600 text-lg">warning</span> Action Required
-              </h2>
+              <div class="flex items-center justify-between">
+                <h2 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-amber-500 text-lg">error</span> Action Required
+                </h2>
+                <span class="text-[11px] font-medium text-slate-400">Live Priorities</span>
+              </div>
 
               <div class="space-y-3">
-                <!-- Item 1: Pending Acceptance -->
-                <div class="shopify-card p-4 flex items-center justify-between gap-3">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
-                      <span class="material-symbols-outlined text-base">schedule</span>
+                <!-- Action 1: Pending Orders to Fulfill -->
+                <div class="shopify-card p-4 flex items-center justify-between gap-3 hover:border-slate-300 transition-all shadow-xs">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200">
+                      <span class="material-symbols-outlined text-lg">local_shipping</span>
                     </div>
-                    <span class="text-xs font-medium text-slate-800" id="act-pending-count-text">0 Orders waiting for acceptance</span>
+                    <div class="min-w-0">
+                      <span class="text-xs font-bold text-slate-900 block truncate" id="act-pending-count-text">0 Orders to Fulfill</span>
+                      <span class="text-[11px] text-slate-500 block truncate">Awaiting acceptance &amp; packing</span>
+                    </div>
                   </div>
-                  <button onclick="switchAdminTab('orders'); setOrderFilter('pending');"
-                    class="px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap">View Orders</button>
+                  <a href="orders.html" class="px-3 py-1.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-semibold transition-all whitespace-nowrap shadow-xs">Fulfill →</a>
                 </div>
 
-                <!-- Item 2: Low Stock -->
-                <div class="shopify-card p-4 flex items-center justify-between gap-3">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center flex-shrink-0">
-                      <span class="material-symbols-outlined text-base">inventory_2</span>
+                <!-- Action 2: Low Stock Products -->
+                <div class="shopify-card p-4 flex items-center justify-between gap-3 hover:border-slate-300 transition-all shadow-xs">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center shrink-0 border border-rose-200">
+                      <span class="material-symbols-outlined text-lg">inventory_2</span>
                     </div>
-                    <span class="text-xs font-medium text-slate-800" id="act-low-stock-text">0 Products running low on stock</span>
+                    <div class="min-w-0">
+                      <span class="text-xs font-bold text-slate-900 block truncate" id="act-low-stock-text">0 Low Stock Products</span>
+                      <span class="text-[11px] text-slate-500 block truncate">≤ 5 units remaining in branch</span>
+                    </div>
                   </div>
-                  <button onclick="switchAdminTab('products'); setStockFilter('low_stock');"
-                    class="px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap">Check Stock</button>
+                  <a href="stock-availabilities.html" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold transition-all whitespace-nowrap">Restock →</a>
                 </div>
 
-                <!-- Item 3: Failed Payments -->
-                <div class="shopify-card p-4 flex items-center justify-between gap-3">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
-                      <span class="material-symbols-outlined text-base">credit_card</span>
-                    </div>
-                    <span class="text-xs font-medium text-slate-800" id="act-failed-payments-text">0 Failed payments need attention</span>
-                  </div>
-                  <button onclick="switchAdminTab('orders'); setPaymentFilter('failed');"
-                    class="px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap">View Payments</button>
-                </div>
-
-                <!-- Item 4: Abandoned Carts -->
-                <div class="shopify-card p-4 flex items-center justify-between gap-3">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
-                      <span class="material-symbols-outlined text-base">shopping_cart</span>
-                    </div>
-                    <span class="text-xs font-medium text-slate-800" id="act-abandoned-carts-text">0 Pending payment checkouts</span>
-                  </div>
-                  <button onclick="switchAdminTab('orders'); setOrderFilter('pending');"
-                    class="px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap">Recover Sales</button>
+                <!-- Operational Status Card -->
+                <div class="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl flex items-center gap-2.5 text-xs text-emerald-800 font-medium">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
+                  <span class="truncate">Live Store Connected · Data synchronized</span>
                 </div>
               </div>
             </div>
 
-            <!-- Right Column: Sales Overview Chart Panel -->
-            <div class="lg:col-span-2 shopify-card p-6 space-y-4 flex flex-col justify-between">
-              <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
-                <h2 class="font-bold text-sm text-slate-900">Sales Overview</h2>
-                <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
-                  <button onclick="setChartPeriod('today')" id="chart-tab-today" class="px-3 py-1 text-xs font-medium rounded-md text-slate-600 hover:bg-white transition-all">Today</button>
-                  <button onclick="setChartPeriod('7days')" id="chart-tab-7days" class="px-3 py-1 text-xs font-semibold rounded-md bg-slate-900 text-white shadow-xs transition-all">7 Days</button>
-                  <button onclick="setChartPeriod('30days')" id="chart-tab-30days" class="px-3 py-1 text-xs font-medium rounded-md text-slate-600 hover:bg-white transition-all">30 Days</button>
-                  <button onclick="setChartPeriod('month')" id="chart-tab-month" class="px-3 py-1 text-xs font-medium rounded-md text-slate-600 hover:bg-white transition-all">This Month</button>
+            <!-- Right Column: Clean Revenue Performance Chart Panel -->
+            <div class="lg:col-span-2 shopify-card p-5 sm:p-6 space-y-4 flex flex-col justify-between">
+              <!-- Header Strip: Title, Live Pill, Period Toggle -->
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3.5 flex-wrap gap-2">
+                <div class="flex items-center gap-2.5">
+                  <h2 class="font-bold text-sm text-slate-900 tracking-tight">Revenue Analytics</h2>
+                  <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live Feed
+                  </span>
+                </div>
+                <!-- Only needed period toggles: 7 Days & 30 Days -->
+                <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                  <button onclick="setChartPeriod('7days')" id="chart-tab-7days" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white shadow-xs transition-all cursor-pointer">7 Days</button>
+                  <button onclick="setChartPeriod('30days')" id="chart-tab-30days" class="px-3 py-1 text-xs font-medium rounded-lg text-slate-600 hover:bg-white transition-all cursor-pointer">30 Days</button>
                 </div>
               </div>
 
-              <!-- Canvas Chart Area -->
-              <div class="relative h-64 w-full">
+              <!-- Revenue Snapshot Value -->
+              <div class="flex items-baseline justify-between gap-4">
+                <div>
+                  <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Total Period Revenue</span>
+                  <div class="flex items-baseline gap-2.5 mt-0.5">
+                    <h3 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900" id="chart-period-revenue"><span class="inline-block w-24 h-7 skeleton-shimmer rounded"></span></h3>
+                    <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200" id="chart-period-orders">0 Orders</span>
+                  </div>
+                </div>
+                <div class="text-right hidden sm:block">
+                  <span class="text-[11px] text-slate-400 block font-medium">Avg Order Value</span>
+                  <span class="text-sm font-bold text-slate-800" id="chart-period-aov">₹0</span>
+                </div>
+              </div>
+
+              <!-- Canvas Chart Area with Shimmer Loading Placeholder -->
+              <div class="relative h-56 w-full">
+                <div id="chart-shimmer-loader" class="absolute inset-0 skeleton-shimmer rounded-xl z-10"></div>
                 <canvas id="salesOverviewChart"></canvas>
-              </div>
-
-              <!-- Chart Legend Footer -->
-              <div class="flex items-center gap-6 pt-3 border-t border-slate-100 text-xs font-medium">
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-0.5 bg-slate-900 rounded-full inline-block"></span>
-                  <span class="text-slate-700">Revenue</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-0.5 bg-emerald-500 rounded-full inline-block"></span>
-                  <span class="text-slate-700">Profit</span>
-                </div>
               </div>
             </div>
           </div>
@@ -719,16 +772,7 @@
                 <span class="material-symbols-outlined text-sm">open_in_new</span> View Store
               </a>
 
-              <!-- Notification Bell & Profile -->
-              <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
-                <button type="button" class="relative w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition cursor-pointer">
-                  <span class="material-symbols-outlined text-lg">notifications</span>
-                  <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">3</span>
-                </button>
-                <div class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shadow-xs">
-                  TB
-                </div>
-              </div>
+
             </div>
           </div>
 
@@ -2229,14 +2273,14 @@
     window.currentChartPeriod = '7days';
 
     window.setChartPeriod = function(period) {
-      window.currentChartPeriod = period;
-      ['today', '7days', '30days', 'month'].forEach(p => {
+      window.currentChartPeriod = (period === '30days') ? '30days' : '7days';
+      ['7days', '30days'].forEach(p => {
         const tab = document.getElementById(`chart-tab-${p}`);
         if (!tab) return;
-        if (p === period) {
-          tab.className = 'px-3 py-1 text-xs font-semibold rounded-md bg-slate-900 text-white shadow-xs transition-all';
+        if (p === window.currentChartPeriod) {
+          tab.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white shadow-xs transition-all cursor-pointer';
         } else {
-          tab.className = 'px-3 py-1 text-xs font-medium rounded-md text-slate-600 hover:bg-white transition-all';
+          tab.className = 'px-3 py-1 text-xs font-medium rounded-lg text-slate-600 hover:bg-white transition-all cursor-pointer';
         }
       });
       renderSalesChart();
@@ -2256,51 +2300,23 @@
 
       let labels = [];
       let revenueData = [];
-      let profitData = [];
+      let periodRevenue = 0;
+      let periodOrderCount = 0;
 
-      if (window.currentChartPeriod === 'today') {
-        labels = ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM', '11 PM'];
-        revenueData = [0, 0, 0, 0, 0, 0, 0];
-        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-
-        orders.forEach(o => {
-          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
-          if (ts >= startOfToday) {
-            const hr = new Date(ts).getHours();
-            const slotIdx = Math.min(6, Math.floor(hr / 3.5));
-            revenueData[slotIdx] += Number(o.pricing?.total ?? o.totalAmount ?? 0);
-          }
-        });
-      } else if (window.currentChartPeriod === '30days') {
-        labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-        revenueData = [0, 0, 0, 0];
+      if (window.currentChartPeriod === '30days') {
+        labels = ['Day 1-6', 'Day 7-12', 'Day 13-18', 'Day 19-24', 'Day 25-30'];
+        revenueData = [0, 0, 0, 0, 0];
         const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
 
         orders.forEach(o => {
           const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
           if (ts >= thirtyDaysAgo) {
+            const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+            periodRevenue += amt;
+            periodOrderCount++;
             const dayDiff = Math.floor((Date.now() - ts) / (24 * 60 * 60 * 1000));
-            const weekIdx = 3 - Math.min(3, Math.floor(dayDiff / 7.5));
-            revenueData[weekIdx] += Number(o.pricing?.total ?? o.totalAmount ?? 0);
-          }
-        });
-      } else if (window.currentChartPeriod === 'month') {
-        labels = ['1-7th', '8-14th', '15-21st', '22-28th', '29-31st'];
-        revenueData = [0, 0, 0, 0, 0];
-        const curMonth = now.getMonth();
-        const curYear = now.getFullYear();
-
-        orders.forEach(o => {
-          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
-          const od = new Date(ts);
-          if (od.getMonth() === curMonth && od.getFullYear() === curYear) {
-            const dt = od.getDate();
-            const orderAmt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
-            if (dt <= 7) revenueData[0] += orderAmt;
-            else if (dt <= 14) revenueData[1] += orderAmt;
-            else if (dt <= 21) revenueData[2] += orderAmt;
-            else if (dt <= 28) revenueData[3] += orderAmt;
-            else revenueData[4] += orderAmt;
+            const slotIdx = 4 - Math.min(4, Math.max(0, Math.floor(dayDiff / 6)));
+            revenueData[slotIdx] += amt;
           }
         });
       } else { // '7days' default
@@ -2315,14 +2331,30 @@
         orders.forEach(o => {
           const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
           if (ts >= sevenDaysAgo) {
+            const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+            periodRevenue += amt;
+            periodOrderCount++;
             const dayDiff = Math.floor((Date.now() - ts) / (24 * 60 * 60 * 1000));
             const slotIdx = 6 - Math.min(6, Math.max(0, dayDiff));
-            revenueData[slotIdx] += Number(o.pricing?.total ?? o.totalAmount ?? 0);
+            revenueData[slotIdx] += amt;
           }
         });
       }
 
-      profitData = revenueData.map(r => Math.round(r * 0.47));
+      // Update Top Period Revenue & Order badges
+      const periodAov = periodOrderCount > 0 ? Math.round(periodRevenue / periodOrderCount) : 0;
+      if (document.getElementById('chart-period-revenue')) {
+        document.getElementById('chart-period-revenue').textContent = `₹${periodRevenue.toLocaleString('en-IN')}`;
+      }
+      if (document.getElementById('chart-period-orders')) {
+        document.getElementById('chart-period-orders').textContent = `${periodOrderCount} Orders`;
+      }
+      if (document.getElementById('chart-period-aov')) {
+        document.getElementById('chart-period-aov').textContent = `₹${periodAov.toLocaleString('en-IN')}`;
+      }
+
+      const chartLoader = document.getElementById('chart-shimmer-loader');
+      if (chartLoader) chartLoader.classList.add('hidden');
 
       // Aggregate Real-time Dashboard KPIs from real orders
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -2353,13 +2385,9 @@
         salesChartInstance.destroy();
       }
 
-      const gradRev = ctx.createLinearGradient(0, 0, 0, 250);
-      gradRev.addColorStop(0, 'rgba(15, 23, 42, 0.15)');
+      const gradRev = ctx.createLinearGradient(0, 0, 0, 240);
+      gradRev.addColorStop(0, 'rgba(15, 23, 42, 0.12)');
       gradRev.addColorStop(1, 'rgba(15, 23, 42, 0.0)');
-
-      const gradProf = ctx.createLinearGradient(0, 0, 0, 250);
-      gradProf.addColorStop(0, 'rgba(16, 185, 129, 0.18)');
-      gradProf.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
       salesChartInstance = new Chart(ctx, {
         type: 'line',
@@ -2371,49 +2399,50 @@
               data: revenueData,
               borderColor: '#0f172a',
               borderWidth: 2.5,
-              tension: 0.4,
+              tension: 0.38,
               fill: true,
               backgroundColor: gradRev,
               pointRadius: 0,
-              pointHoverRadius: 5
-            },
-            {
-              label: 'Profit',
-              data: profitData,
-              borderColor: '#10b981',
-              borderWidth: 2.5,
-              tension: 0.4,
-              fill: true,
-              backgroundColor: gradProf,
-              pointRadius: 0,
-              pointHoverRadius: 5
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: '#0f172a',
+              pointHoverBorderColor: '#ffffff',
+              pointHoverBorderWidth: 2
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
           plugins: {
             legend: { display: false },
             tooltip: {
-              mode: 'index',
-              intersect: false,
+              backgroundColor: '#0f172a',
+              titleColor: '#f8fafc',
+              bodyColor: '#f8fafc',
+              padding: 10,
+              cornerRadius: 8,
+              displayColors: false,
               callbacks: {
-                label: (ctx) => `${ctx.dataset.label}: ₹${Number(ctx.raw).toLocaleString('en-IN')}`
+                label: (ctx) => ` Revenue: ₹${Number(ctx.raw).toLocaleString('en-IN')}`
               }
             }
           },
           scales: {
             x: {
               grid: { display: false },
-              ticks: { font: { size: 11, family: 'Inter' }, color: '#94a3b8' }
+              ticks: { font: { size: 11, family: 'Inter, sans-serif' }, color: '#94a3b8' }
             },
             y: {
+              beginAtZero: true,
               grid: { color: '#f1f5f9' },
               ticks: {
-                font: { size: 11, family: 'Inter' },
+                font: { size: 11, family: 'Inter, sans-serif' },
                 color: '#94a3b8',
-                callback: (val) => `₹${val / 1000}k`
+                callback: (val) => val >= 1000 ? `₹${(val / 1000).toFixed(val % 1000 === 0 ? 0 : 1)}k` : `₹${val}`
               }
             }
           }
