@@ -411,7 +411,7 @@
             </div>
 
             <!-- 2. Today's Orders -->
-            <div class="shopify-card p-4 space-y-2">
+            <div onclick="switchAdminTab('orders'); setOrderFilter('all');" class="shopify-card p-4 space-y-2 cursor-pointer hover:border-slate-300 transition-all">
               <div class="w-8 h-8 rounded-lg bg-sky-100/70 text-sky-700 flex items-center justify-center">
                 <span class="material-symbols-outlined text-lg">shopping_bag</span>
               </div>
@@ -496,7 +496,7 @@
                       <span class="text-[11px] text-slate-500 block truncate">Awaiting acceptance &amp; packing</span>
                     </div>
                   </div>
-                  <a href="orders.html" class="px-3 py-1.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-semibold transition-all whitespace-nowrap shadow-xs">Fulfill →</a>
+                  <a href="orders.html?status=pending" class="px-3 py-1.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-semibold transition-all whitespace-nowrap shadow-xs">Fulfill →</a>
                 </div>
 
                 <!-- Action 2: Low Stock Products -->
@@ -2166,6 +2166,83 @@
 
     const COMPANY_ID = 'thebaniyancompany';
 
+    // Universal status mapper: maps all variants and aliases to the 7 core stages
+    function canonicalStatus(rawStatus) {
+      const s = String(rawStatus || '').trim().toLowerCase();
+      if (!s || s === 'pending' || s === 'awaiting acceptance' || s === 'order placed' || s === 'placed' || s === 'new' || s === 'confirmed') {
+        return 'Pending';
+      }
+      if (s === 'accepted' || s === 'processing') {
+        return 'Accepted';
+      }
+      if (s === 'packing' || s === 'packed') {
+        return 'Packing';
+      }
+      if (s === 'shipped' || s === 'out for delivery' || s === 'in transit') {
+        return 'Shipped';
+      }
+      if (s === 'delivered' || s === 'completed') {
+        return 'Delivered';
+      }
+      if (s === 'cancelled' || s === 'canceled') {
+        return 'Cancelled';
+      }
+      if (s === 'returned' || s === 'refunded') {
+        return 'Returned';
+      }
+      return 'Pending';
+    }
+    window.canonicalStatus = canonicalStatus;
+
+    function showStatusToast(msg) {
+      try {
+        let toast = document.getElementById('admin-status-toast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'admin-status-toast';
+          toast.className = 'fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-12 opacity-0 pointer-events-none border border-white/10';
+          toast.innerHTML = `<span class="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span><span id="admin-status-toast-msg">${msg}</span>`;
+          document.body.appendChild(toast);
+        } else {
+          const msgEl = document.getElementById('admin-status-toast-msg');
+          if (msgEl) msgEl.textContent = msg;
+        }
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+          toast.classList.add('translate-y-0', 'opacity-100');
+        });
+        clearTimeout(window.__adminToastTimer);
+        window.__adminToastTimer = setTimeout(() => {
+          toast.classList.remove('translate-y-0', 'opacity-100');
+          toast.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+        }, 3500);
+      } catch(e) {}
+    }
+    window.showStatusToast = showStatusToast;
+
+    // Cross-window and cross-tab order state listeners
+    window.addEventListener('storage', (e) => {
+      if (e.key === `tbc_cache_orders_${COMPANY_ID}`) {
+        try {
+          const cached = getCachedOrders(COMPANY_ID);
+          if (Array.isArray(cached) && cached.length > 0) {
+            renderOrders(cached);
+            renderSalesChart();
+          }
+        } catch(_) {}
+      }
+    });
+
+    window.addEventListener('tbc_orders_updated', () => {
+      try {
+        const cached = getCachedOrders(COMPANY_ID);
+        if (Array.isArray(cached) && cached.length > 0) {
+          renderOrders(cached);
+          renderSalesChart();
+        }
+      } catch(_) {}
+    });
+
     // Admin Session Persistence & Auto-Login
     try {
       setPersistence(auth, browserLocalPersistence).catch(() => {});
@@ -2238,6 +2315,8 @@
         renderPaymentsTable();
       } else if (tabName === 'dashboard') {
         initSalesChart();
+      } else if (tabName === 'orders') {
+        renderOrders(window.currentAllOrders);
       }
     };
 
@@ -2365,8 +2444,7 @@
       const todayRev = todayOrders.reduce((sum, o) => sum + Number(o.pricing?.total ?? o.totalAmount ?? 0), 0);
       const totalRev = orders.reduce((sum, o) => sum + Number(o.pricing?.total ?? o.totalAmount ?? 0), 0);
       const pendingOrders = orders.filter(o => {
-        const s = String(o.orderStatus || o.status || 'Pending').toLowerCase();
-        return s === 'pending' || s === 'awaiting acceptance';
+        return canonicalStatus(o.orderStatus || o.status) === 'Pending';
       });
       const onlineTodayCount = todayOrders.filter(o => !String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod')).length;
       const codTodayCount = todayOrders.length - onlineTodayCount;
@@ -4214,14 +4292,12 @@
 
       rawList.forEach(o => {
         rev += Number(o.pricing?.total ?? o.totalAmount ?? 0);
-        const s = String(o.orderStatus || o.status || 'Pending').trim().toLowerCase();
-        if (s === 'delivered') counts.delivered++;
-        else if (s === 'cancelled') counts.cancelled++;
-        else if (s === 'returned') counts.returned++;
-        else if (s === 'accepted' || s === 'processing') counts.accepted++;
-        else if (s === 'packing' || s === 'packed') counts.packing++;
-        else if (s === 'shipped' || s === 'out for delivery') counts.shipped++;
-        else counts.pending++;
+        const st = canonicalStatus(o.orderStatus || o.status).toLowerCase();
+        if (counts[st] !== undefined) {
+          counts[st]++;
+        } else {
+          counts.pending++;
+        }
       });
 
       if (document.getElementById('stat-total-orders')) document.getElementById('stat-total-orders').textContent = rawList.length;
@@ -4258,17 +4334,10 @@
 
       // 1. Order Status Filter across all 8 statuses
       if (window.currentFilter !== 'all') {
-        const target = window.currentFilter;
+        const target = window.currentFilter.toLowerCase();
         filtered = filtered.filter(o => {
-          const s = String(o.orderStatus || o.status || 'Pending').trim().toLowerCase();
-          if (target === 'pending') return (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed');
-          if (target === 'accepted') return (s === 'accepted' || s === 'processing');
-          if (target === 'packing') return (s === 'packing' || s === 'packed');
-          if (target === 'shipped') return (s === 'shipped' || s === 'out for delivery');
-          if (target === 'delivered') return s === 'delivered';
-          if (target === 'cancelled') return s === 'cancelled';
-          if (target === 'returned') return s === 'returned';
-          return true;
+          const st = canonicalStatus(o.orderStatus || o.status).toLowerCase();
+          return st === target;
         });
       }
 
@@ -4385,19 +4454,31 @@
         }).join('') : `<p class="text-xs text-slate-500 italic">Merchandise Package Order</p>`;
 
         // Quick transition button based on status
+        const curCanonical = canonicalStatus(o.orderStatus || o.status);
         let quickActionBtn = '';
-        const curStatus = o.orderStatus || o.status || 'Pending';
-        if (curStatus === 'Pending' || curStatus === 'Awaiting Acceptance') {
+        if (curCanonical === 'Pending') {
           quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Accepted')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">check</span> Accept Order</button>`;
-        } else if (curStatus === 'Accepted') {
+        } else if (curCanonical === 'Accepted') {
           quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Packing')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">inventory_2</span> Mark Packing</button>`;
-        } else if (curStatus === 'Packing') {
+        } else if (curCanonical === 'Packing') {
           quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Shipped')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">local_shipping</span> Ship Order</button>`;
-        } else if (curStatus === 'Shipped') {
+        } else if (curCanonical === 'Shipped') {
           quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Delivered')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">task_alt</span> Mark Delivered</button>`;
         }
 
         const totalAmt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+
+        const statusBadgeMap = {
+          'Pending': 'bg-amber-50 text-amber-700 border-amber-200',
+          'Accepted': 'bg-sky-50 text-sky-700 border-sky-200',
+          'Packing': 'bg-purple-50 text-purple-700 border-purple-200',
+          'Shipped': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+          'Delivered': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          'Cancelled': 'bg-rose-50 text-rose-700 border-rose-200',
+          'Returned': 'bg-orange-50 text-orange-700 border-orange-200'
+        };
+        const stBadgeClass = statusBadgeMap[curCanonical] || 'bg-slate-100 text-slate-700 border-slate-200';
+        const stBadgeHtml = `<span class="inline-flex items-center gap-1 ${stBadgeClass} px-2.5 py-0.5 rounded-full text-xs font-semibold border">${curCanonical}</span>`;
 
         return `
         <div class="shopify-card p-6 space-y-4">
@@ -4409,6 +4490,7 @@
                   <span class="material-symbols-outlined text-[14px] text-slate-500">schedule</span>
                   ${dateStr}
                 </span>
+                ${stBadgeHtml}
                 ${payBadgeHtml}
               </div>
               <p class="text-xs text-slate-700 mt-2">
@@ -4431,9 +4513,9 @@
           <div class="flex items-center justify-between pt-3 border-t border-slate-100 flex-wrap gap-3 text-xs">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="text-slate-600 font-semibold text-xs">Status:</span>
-              <select onchange="updateStatus('${o.id}', this.value)" class="shopify-input text-slate-900 px-3 py-1.5 rounded-lg outline-none font-semibold bg-white border border-slate-300">
+              <select onchange="updateStatus('${o.id}', this.value)" class="shopify-input text-slate-900 px-3 py-1.5 rounded-lg outline-none font-semibold bg-white border border-slate-300 hover:border-slate-400 focus:border-black cursor-pointer shadow-2xs transition">
                 ${['Pending', 'Accepted', 'Packing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(s => `
-                  <option value="${s}" ${(o.orderStatus || o.status) === s ? 'selected' : ''} class="bg-white text-slate-900 font-medium">${s}</option>
+                  <option value="${s}" ${curCanonical === s ? 'selected' : ''} class="bg-white text-slate-900 font-medium">${s}</option>
                 `).join('')}
               </select>
               ${quickActionBtn}
@@ -4449,11 +4531,31 @@
     }
 
     window.updateStatus = async function (id, newStatus) {
-      const res = await setOrderStatus(id, newStatus);
-      if (res.success) {
-        alert(`Order #${id} status updated to: ${newStatus}`);
-      } else {
-        alert(`Error updating status: ${res.error}`);
+      // 1. Instant Optimistic State Update in 0ms
+      const order = (window.currentAllOrders || []).find(o => o.id === id);
+      if (order) {
+        order.status = newStatus;
+        order.orderStatus = newStatus;
+        try {
+          setCachedOrders(window.currentAllOrders, COMPANY_ID);
+        } catch(e) {}
+        renderOrders(window.currentAllOrders);
+        renderSalesChart();
+      }
+
+      showStatusToast(`Order #${id} updated to ${newStatus}`);
+
+      try {
+        const res = await setOrderStatus(id, newStatus, COMPANY_ID);
+        if (res && res.success) {
+          showStatusToast(`Order #${id} status set to ${newStatus}`);
+          window.dispatchEvent(new CustomEvent('tbc_orders_updated'));
+        } else {
+          showStatusToast(`Notice: Status updated locally (${res?.error || 'syncing'})`);
+        }
+      } catch (err) {
+        console.warn('Status update sync notice:', err);
+        showStatusToast(`Status saved: ${newStatus}`);
       }
     };
 

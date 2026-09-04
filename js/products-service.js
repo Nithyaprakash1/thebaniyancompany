@@ -2123,21 +2123,26 @@ export async function fetchOnlineOrders(companyId = COMPANY_ID, force = false) {
     console.warn('[TBC Orders] Fetch company invoices notice:', err);
   }
 
-  // 3. Fallback: root invoices (only if empty or limited to 30)
-  if (ordersMap.size === 0) {
+  // 3. Fallback: root invoices (always merged if matching companyId)
+  try {
+    const rootCol = collection(db, 'invoices');
+    let rootSnap;
     try {
-      const rootCol = collection(db, 'invoices');
-      const rootSnap = await getDocs(query(rootCol, limit(30)));
-      rootSnap.docs.forEach(d => {
-        const data = d.data();
-        const id = data.id || d.id;
-        if (!ordersMap.has(id)) {
+      rootSnap = await getDocs(query(rootCol, orderBy('createdAt', 'desc'), limit(50)));
+    } catch (_) {
+      rootSnap = await getDocs(query(rootCol, limit(50)));
+    }
+    rootSnap.docs.forEach(d => {
+      const data = d.data();
+      const id = data.id || d.id;
+      if (!ordersMap.has(id)) {
+        if (!data.companyId || data.companyId === companyId) {
           ordersMap.set(id, { id, ...data });
         }
-      });
-    } catch (err) {
-      console.warn('[TBC Orders] Fetch root invoices notice:', err);
-    }
+      }
+    });
+  } catch (err) {
+    console.warn('[TBC Orders] Fetch root invoices notice:', err);
   }
 
   const orders = Array.from(ordersMap.values())

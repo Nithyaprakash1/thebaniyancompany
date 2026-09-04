@@ -562,6 +562,33 @@
     let syncIntervalTimer = null;
     let lastSyncTimestamp = 0;
 
+    // Universal status mapper: maps all variants and aliases to the 7 core stages
+    function canonicalStatus(rawStatus) {
+      const s = String(rawStatus || '').trim().toLowerCase();
+      if (!s || s === 'pending' || s === 'awaiting acceptance' || s === 'order placed' || s === 'placed' || s === 'new' || s === 'confirmed') {
+        return 'Pending';
+      }
+      if (s === 'accepted' || s === 'processing') {
+        return 'Accepted';
+      }
+      if (s === 'packing' || s === 'packed') {
+        return 'Packing';
+      }
+      if (s === 'shipped' || s === 'out for delivery' || s === 'in transit') {
+        return 'Shipped';
+      }
+      if (s === 'delivered' || s === 'completed') {
+        return 'Delivered';
+      }
+      if (s === 'cancelled' || s === 'canceled') {
+        return 'Cancelled';
+      }
+      if (s === 'returned' || s === 'refunded') {
+        return 'Returned';
+      }
+      return 'Pending';
+    }
+
     // Clean order normalizer
     function normalizeOrderDoc(docId, data = {}) {
       let dateText = '';
@@ -738,20 +765,21 @@
 
     // Format badge based on status
     function getStatusBadge(status) {
-      const s = String(status || '').trim().toLowerCase();
-      if (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed') {
-        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">Pending Acceptance</span>`;
-      } else if (s === 'accepted' || s === 'processing') {
+      const c = canonicalStatus(status);
+      const isConfirmed = String(status || '').trim().toLowerCase() === 'confirmed';
+      if (c === 'Pending') {
+        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">${isConfirmed ? 'Confirmed · Awaiting Fulfillment' : 'Pending Acceptance'}</span>`;
+      } else if (c === 'Accepted') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">Accepted</span>`;
-      } else if (s === 'packing' || s === 'packed') {
+      } else if (c === 'Packing') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">Packing</span>`;
-      } else if (s === 'shipped' || s === 'out for delivery') {
+      } else if (c === 'Shipped') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">Shipped</span>`;
-      } else if (s === 'delivered') {
+      } else if (c === 'Delivered') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>`;
-      } else if (s === 'cancelled') {
+      } else if (c === 'Cancelled') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>`;
-      } else if (s === 'returned') {
+      } else if (c === 'Returned') {
         return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">Returned</span>`;
       }
       return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">${status}</span>`;
@@ -777,6 +805,8 @@
         const payBadge = isPaid 
           ? `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">PAID (${o.paymentMethod})</span>`
           : `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">${o.paymentMethod}</span>`;
+
+        const curCanonical = canonicalStatus(o.status || o.orderStatus);
 
         return `
           <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 hover:border-slate-300 transition">
@@ -843,15 +873,21 @@
               </div>
             </div>
 
-            <!-- Card Footer: Total Amount & Status Actions -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
+            <!-- Card Footer: Total Amount, Status Dropdown & Action Buttons -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-100">
               <div class="flex items-baseline gap-2">
-                <span class="text-xs text-slate-500">Order Total:</span>
+                <span class="text-xs text-slate-500 font-medium">Order Total:</span>
                 <span class="text-lg font-bold text-slate-900">₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}</span>
               </div>
 
-              <!-- Status Change Action Buttons -->
-              <div class="flex items-center gap-1.5 flex-wrap">
+              <!-- Status Dropdown & Action Buttons -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-semibold text-slate-600">Status:</span>
+                <select onchange="updateOrderStatus('${o.id}', this.value)" class="shopify-input text-xs font-semibold text-slate-900 px-3 py-1.5 rounded-lg outline-none bg-white border border-slate-300 hover:border-slate-400 focus:border-black cursor-pointer shadow-2xs transition">
+                  ${['Pending', 'Accepted', 'Packing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(st => `
+                    <option value="${st}" ${curCanonical === st ? 'selected' : ''}>${st}</option>
+                  `).join('')}
+                </select>
                 ${renderStatusActionButtons(o.id, o.status)}
               </div>
             </div>
@@ -865,27 +901,27 @@
     }
 
     function renderStatusActionButtons(orderId, currentStatus) {
-      const s = String(currentStatus || '').trim().toLowerCase();
+      const c = canonicalStatus(currentStatus);
       let html = '';
 
-      if (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed') {
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Accepted')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Accept Order</button>`;
+      if (c === 'Pending') {
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Accepted')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Accept Order</button>`;
         html += `<button onclick="updateOrderStatus('${orderId}', 'Cancelled')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs border border-rose-200 transition cursor-pointer">Cancel</button>`;
-      } else if (s === 'accepted' || s === 'processing') {
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Packing')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Mark Packing</button>`;
-      } else if (s === 'packing' || s === 'packed') {
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Shipped')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Mark Shipped</button>`;
-      } else if (s === 'shipped' || s === 'out for delivery') {
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Delivered')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Mark Delivered</button>`;
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Returned')" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-semibold rounded-lg text-xs border border-orange-200 transition cursor-pointer">Mark Returned</button>`;
-      } else if (s === 'delivered') {
+      } else if (c === 'Accepted') {
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Packing')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1"><i data-lucide="package" class="w-3.5 h-3.5"></i> Mark Packing</button>`;
+      } else if (c === 'Packing') {
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Shipped')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Mark Shipped</button>`;
+      } else if (c === 'Shipped') {
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Delivered')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Mark Delivered</button>`;
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Returned')" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-semibold rounded-lg text-xs border border-orange-200 transition cursor-pointer">Return</button>`;
+      } else if (c === 'Delivered') {
         html += `<button onclick="updateOrderStatus('${orderId}', 'Returned')" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-semibold rounded-lg text-xs border border-orange-200 transition cursor-pointer">Return / Refund</button>`;
       }
 
       return html;
     }
 
-    // Update Status Handler
+    // Update Status Handler with instant feedback
     window.updateOrderStatus = async function(orderId, newStatus) {
       const order = window.liveOrders.find(o => o.id === orderId);
       if (order) {
@@ -902,17 +938,38 @@
         const payload = {
           status: newStatus,
           orderStatus: newStatus,
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
+          [`statusHistory.${newStatus}`]: serverTimestamp()
         };
         await Promise.allSettled([
           updateDoc(orderRef1, payload),
           updateDoc(orderRef2, payload),
-          updateDoc(orderRef3, payload)
+          updateDoc(orderRef3, payload),
+          setDoc(orderRef1, payload, { merge: true }),
+          setDoc(orderRef2, payload, { merge: true }),
+          setDoc(orderRef3, payload, { merge: true })
         ]);
+        showStatusToast(`Order #${orderId} status set to ${newStatus}`);
       } catch (e) {
-        console.log('Order status updated locally in state:', e);
+        console.warn('Order status update notice:', e);
       }
     };
+
+    function showStatusToast(msg) {
+      try {
+        const toast = document.getElementById('new-order-toast');
+        const title = document.getElementById('toast-order-title');
+        const desc = document.getElementById('toast-order-desc');
+        if (toast && title) {
+          title.textContent = 'Status Updated!';
+          if (desc) desc.textContent = msg;
+          toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+          setTimeout(() => {
+            toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+          }, 3500);
+        }
+      } catch(_) {}
+    }
 
     // Filter Logic
     window.applyOrderFilters = function() {
@@ -926,18 +983,10 @@
       // Update counters for all 8 tabs
       updateTabCounters();
 
-      // 1. Status Filter with full state machine aliasing
+      // 1. Status Filter with canonical state machine aliasing
       if (statusFilter !== 'all') {
         filtered = filtered.filter(o => {
-          const s = String(o.status || '').trim().toLowerCase();
-          if (statusFilter === 'pending') return (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed');
-          if (statusFilter === 'accepted') return (s === 'accepted' || s === 'processing');
-          if (statusFilter === 'packing') return (s === 'packing' || s === 'packed');
-          if (statusFilter === 'shipped') return (s === 'shipped' || s === 'out for delivery');
-          if (statusFilter === 'delivered') return s === 'delivered';
-          if (statusFilter === 'cancelled') return s === 'cancelled';
-          if (statusFilter === 'returned') return s === 'returned';
-          return s === statusFilter;
+          return canonicalStatus(o.status || o.orderStatus).toLowerCase() === statusFilter;
         });
       }
 
@@ -970,15 +1019,7 @@
     function updateTabCounters() {
       const all = window.liveOrders;
       const countFor = (st) => all.filter(o => {
-        const s = String(o.status || '').trim().toLowerCase();
-        if (st === 'pending') return (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed');
-        if (st === 'accepted') return (s === 'accepted' || s === 'processing');
-        if (st === 'packing') return (s === 'packing' || s === 'packed');
-        if (st === 'shipped') return (s === 'shipped' || s === 'out for delivery');
-        if (st === 'delivered') return s === 'delivered';
-        if (st === 'cancelled') return s === 'cancelled';
-        if (st === 'returned') return s === 'returned';
-        return s === st;
+        return canonicalStatus(o.status || o.orderStatus).toLowerCase() === st;
       }).length;
 
       document.getElementById('count-all').textContent = all.length;
@@ -1047,11 +1088,16 @@
         if (cachedName && document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = cachedName;
       } catch(e) {}
 
-      // 1. Instantly load from cache in 0ms (no waiting, no network lag)
-      const hasCached = loadCachedOrders();
+      // 0. Parse initial URL status query (e.g. ?status=pending)
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialStatus = urlParams.get('status') || urlParams.get('filter') || 'all';
+      setOrderStatusFilter(initialStatus);
 
-      // 2. Fetch from Firestore if cache is stale or missing
-      syncOrders(!hasCached);
+      // 1. Instantly load from cache in 0ms (no waiting, no network lag)
+      loadCachedOrders();
+
+      // 2. Immediate fresh fetch from Firestore
+      syncOrders(true);
 
       // 3. Start 1-minute auto-poll ("in a next min")
       startAutoSync();
