@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders &amp; Shipping | OneSpace Commerce</title>
+  <link rel="icon" type="image/png" href="assets/onespace-commerce-logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+
+<body class="bg-[#fafafa] text-slate-900 antialiased min-h-screen flex flex-col">
+
+  <!-- ==========================================
+       TOP NAVIGATION BAR
+  ========================================== -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand & Page Title -->
+      <div class="flex items-center gap-3">
+        <a href="admin.html" class="flex items-center gap-2 group">
+          <div class="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center font-bold text-sm shadow-xs group-hover:bg-slate-800 transition">
+            TB
+          </div>
+          <div>
+            <span class="font-bold text-base tracking-tight text-slate-900 block leading-tight">Orders &amp; Logistics</span>
+            <span class="text-[11px] text-slate-400 font-medium hidden sm:block">The Baniyan Company</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Center Search Bar -->
+      <div class="flex-1 max-w-lg mx-2 sm:mx-6 hidden md:block">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input
+            type="text"
+            id="global-order-search"
+            oninput="handleSearchOrders(this.value)"
+            placeholder="Search by Order ID, Customer Name, Phone, or City..."
+            class="w-full bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:border-black focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2 outline-none transition"
+          >
+        </div>
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <a
+          href="admin.html"
+          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs"
+        >
+          <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+          <span>Admin Console</span>
+        </a>
+
+        <a
+          href="home.html"
+          target="_blank"
+          class="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium px-3 py-2 rounded-xl hidden sm:flex items-center gap-1.5 transition"
+        >
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-500"></i>
+          <span>View Store</span>
+        </a>
+
+        <button
+          type="button"
+          class="relative w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition"
+        >
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
+            3
+          </span>
+        </button>
+
+        <a href="admin.html" class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:opacity-90 transition">
+          TB
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN CONTENT CONTAINER
+  ========================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-6">
+
+    <!-- PAGE HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Orders &amp; Shipping</h1>
+        <p class="text-xs text-slate-500 mt-1">Full pipeline fulfillment: from new pending orders to packing, delivery, and returns.</p>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <a
+          href="stock-availabilities.html"
+          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition shadow-2xs flex items-center gap-1.5"
+        >
+          <i data-lucide="boxes" class="w-3.5 h-3.5"></i>
+          <span>Stock Availabilities</span>
+        </a>
+        <button
+          type="button"
+          onclick="refreshOrdersFeed()"
+          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+        >
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span>Refresh Feed</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         8 ORDER STATUS FILTER TABS (Requested by User)
+         All Orders, Pending, Accepted, Packing, Shipped, Delivered, Cancelled, Returned
+    ========================================== -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3.5">
+      
+      <!-- Top Filters: Search + Payment Filter + Sort -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="relative flex-1 max-w-md">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input
+            type="text"
+            id="table-order-search"
+            oninput="handleSearchOrders(this.value)"
+            placeholder="Search customer, phone, city, or order #..."
+            class="w-full bg-slate-50 border border-slate-200 focus:border-black focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2 outline-none transition"
+          >
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Payment Filter -->
+          <select
+            id="order-payment-filter"
+            onchange="applyOrderFilters()"
+            class="bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
+          >
+            <option value="all">All Payments</option>
+            <option value="paid">Paid (Razorpay / Online)</option>
+            <option value="cod">COD (Pending)</option>
+            <option value="whatsapp">WhatsApp Orders</option>
+          </select>
+
+          <!-- Sorter -->
+          <select
+            id="order-sort-filter"
+            onchange="applyOrderFilters()"
+            class="bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
+          >
+            <option value="newest">Sort: Newest First</option>
+            <option value="oldest">Sort: Oldest First</option>
+            <option value="amount_high">Sort: Amount (High to Low)</option>
+            <option value="amount_low">Sort: Amount (Low to High)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 8 STATUS PILLS ROW -->
+      <div class="flex items-center gap-2 pt-2 border-t border-slate-100 overflow-x-auto custom-scrollbar pb-1">
+        <button
+          type="button"
+          onclick="setOrderStatusFilter('all')"
+          id="btn-status-all"
+          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-black text-white shrink-0 transition"
+        >
+          All Orders (<span id="count-all">0</span>)
+        </button>
+
+        <button
+          type="button"
+          onclick="setOrderStatusFilter('pending')"
+          id="btn-status-pending"
+          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
+        >
+          Pending (<span id="count-pending">0</span>)
+        </button>
+
+        <button
+          type="button"
+          onclick="setOrderStatusFilter('accepted')"
+          id="btn-status-accepted"
+          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
+        >
+          Accepted (<span id="count-accepted">0</span>)
+        </button>
+
+        <button
+          type="button"
+          onclick="setOrderStatusFilter('packing')"
+          id="btn-status-packing"
+          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
+        >
+          Packing (<span id="count-packing">0</span>)
+        </button>
+
+        <button
+          type="button"
+          onclick="setOrderStatusFilter('shipped')"
+          id="btn-status-shipped"
+          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
+        >
+          Shipped (<span id="count-shipped">0</span>)
+        </button>
+
+        <button
+          type="button"
+          onclick="setOrderStatusFilter('delivered')"
+          id="btn-status-delivered"
+          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
+        >
+          Delivered (<span id="count-delivered">0</span>)
+        </button>
+
+        <button
+          type="button"
+          onclick="setOrderStatusFilter('cancelled')"
+          id="btn-status-cancelled"
+          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
+        >
+          Cancelled (<span id="count-cancelled">0</span>)
+        </button>
+
+        <button
+          type="button"
+          onclick="setOrderStatusFilter('returned')"
+          id="btn-status-returned"
+          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
+        >
+          Returned (<span id="count-returned">0</span>)
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         ORDERS LIST CONTAINER
+    ========================================== -->
+    <div id="orders-cards-container" class="space-y-4">
+      <!-- Dynamic Order Cards will render here -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="orders-empty-state" class="hidden bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-400 shadow-xs">
+      <i data-lucide="package-x" class="w-12 h-12 mx-auto mb-2 text-slate-300 stroke-1"></i>
+      <h3 class="font-bold text-sm text-slate-700">No orders found</h3>
+      <p class="text-xs text-slate-400 mt-1">There are no orders matching your selected status or filter.</p>
+    </div>
+  </main>
+
+  <!-- ==========================================
+       APPLICATION & FIRESTORE SCRIPT
+  ========================================== -->
+  <script type="module">
+    import { db } from './js/firebase-config.js';
+    import { 
+      collection, 
+      getDocs, 
+      doc, 
+      setDoc, 
+      updateDoc, 
+      serverTimestamp,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const COMPANY_ID = 'thebaniyancompany';
+
+    // Baseline sample orders to demonstrate all 8 statuses with prominent date & time
+    const DEMO_ORDERS = [
+      {
+        id: 'TBC-ORD-8941',
+        customerName: 'Priya Sundaram',
+        phone: '9840123456',
+        email: 'priya.sundaram@gmail.com',
+        address: '14, 2nd Main Road, Gandhi Nagar, Adyar',
+        city: 'Chennai',
+        state: 'Tamil Nadu',
+        pincode: '600020',
+        totalAmount: 1899,
+        paymentMethod: 'Razorpay Online Payment',
+        paymentStatus: 'Paid',
+        status: 'Pending',
+        createdAtFormatted: '04 Sep 2026, 05:24 PM',
+        createdAtTimestamp: Date.now() - 600000,
+        items: [
+          { name: 'White Linen Kurti', size: 'M', color: 'White', qty: 1, price: 999, imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300' },
+          { name: 'Cotton Palazzo Set', size: 'M', color: 'Peach', qty: 1, price: 900, imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300' }
+        ]
+      },
+      {
+        id: 'TBC-ORD-8940',
+        customerName: 'Karthik Raja',
+        phone: '9790987654',
+        email: 'karthik.r@yahoo.com',
+        address: '88, Cross Cut Road, Gandhipuram',
+        city: 'Coimbatore',
+        state: 'Tamil Nadu',
+        pincode: '641012',
+        totalAmount: 699,
+        paymentMethod: 'Cash on Delivery (COD)',
+        paymentStatus: 'Pending',
+        status: 'Accepted',
+        createdAtFormatted: '04 Sep 2026, 04:12 PM',
+        createdAtTimestamp: Date.now() - 4800000,
+        items: [
+          { name: 'Oversized Heavyweight Cotton T-Shirt', size: 'L', color: 'Black', qty: 1, price: 699, imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300' }
+        ]
+      },
+      {
+        id: 'TBC-ORD-8939',
+        customerName: 'Ananya Sharma',
+        phone: '9811223344',
+        email: 'ananya.sharma@outlook.com',
+        address: 'Plot 45, Jubilee Hills, Road No 10',
+        city: 'Hyderabad',
+        state: 'Telangana',
+        pincode: '500033',
+        totalAmount: 1499,
+        paymentMethod: 'Razorpay Online Payment',
+        paymentStatus: 'Paid',
+        status: 'Packing',
+        createdAtFormatted: '04 Sep 2026, 02:45 PM',
+        createdAtTimestamp: Date.now() - 10000000,
+        items: [
+          { name: 'Denim Joggers', size: '32', color: 'Blue', qty: 1, price: 1499, imageUrl: 'https://images.unsplash.com/photo-1542272604-780c96856592?w=300' }
+        ]
+      },
+      {
+        id: 'TBC-ORD-8938',
+        customerName: 'Rahul Verma',
+        phone: '9820011223',
+        email: 'rahul.v@gmail.com',
+        address: 'Flat 402, Sea Green Apts, Worli',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        pincode: '400018',
+        totalAmount: 1299,
+        paymentMethod: 'Razorpay Online Payment',
+        paymentStatus: 'Paid',
+        status: 'Shipped',
+        createdAtFormatted: '04 Sep 2026, 11:30 AM',
+        createdAtTimestamp: Date.now() - 21600000,
+        trackingNo: 'DTDC-99201948',
+        items: [
+          { name: 'Embroidered Kurta', size: 'XL', color: 'Maroon', qty: 1, price: 1299, imageUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=300' }
+        ]
+      },
+      {
+        id: 'TBC-ORD-8937',
+        customerName: 'Meenakshi Iyer',
+        phone: '9841098765',
+        email: 'meena.iyer@gmail.com',
+        address: '22, North Mada Street, Mylapore',
+        city: 'Chennai',
+        state: 'Tamil Nadu',
+        pincode: '600004',
+        totalAmount: 2499,
+        paymentMethod: 'Razorpay Online Payment',
+        paymentStatus: 'Paid',
+        status: 'Delivered',
+        createdAtFormatted: '03 Sep 2026, 06:15 PM',
+        createdAtTimestamp: Date.now() - 86400000,
+        items: [
+          { name: 'White Linen Kurti', size: 'L', color: 'White', qty: 1, price: 999, imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300' },
+          { name: 'Denim Joggers', size: '30', color: 'Black', qty: 1, price: 1500, imageUrl: 'https://images.unsplash.com/photo-1542272604-780c96856592?w=300' }
+        ]
+      },
+      {
+        id: 'TBC-ORD-8936',
+        customerName: 'Venkatesh Babu',
+        phone: '9940122334',
+        email: 'venkat.babu@gmail.com',
+        address: '15, Anna Salai, Guindy',
+        city: 'Chennai',
+        state: 'Tamil Nadu',
+        pincode: '600032',
+        totalAmount: 699,
+        paymentMethod: 'Cash on Delivery (COD)',
+        paymentStatus: 'Pending',
+        status: 'Cancelled',
+        createdAtFormatted: '03 Sep 2026, 02:20 PM',
+        createdAtTimestamp: Date.now() - 100000000,
+        cancelReason: 'Customer requested cancellation before dispatch',
+        items: [
+          { name: 'Classic Crewneck T-Shirt', size: 'M', color: 'Navy', qty: 1, price: 699, imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300' }
+        ]
+      },
+      {
+        id: 'TBC-ORD-8935',
+        customerName: 'Divya Nair',
+        phone: '9845012345',
+        email: 'divya.nair@gmail.com',
+        address: '5th Block, Koramangala',
+        city: 'Bengaluru',
+        state: 'Karnataka',
+        pincode: '560095',
+        totalAmount: 999,
+        paymentMethod: 'Razorpay Online Payment',
+        paymentStatus: 'Refunded',
+        status: 'Returned',
+        createdAtFormatted: '02 Sep 2026, 04:50 PM',
+        createdAtTimestamp: Date.now() - 180000000,
+        returnReason: 'Size exchange requested -> Store Credit Issued',
+        items: [
+          { name: 'White Linen Kurti', size: 'XL', color: 'White', qty: 1, price: 999, imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300' }
+        ]
+      }
+    ];
+
+    window.liveOrders = [...DEMO_ORDERS];
+    window.activeOrderStatusFilter = 'all';
+    window.activeOrderSearch = '';
+
+    // Load from Firestore
+    async function loadOrdersFromFirestore() {
+      try {
+        const snap = await getDocs(collection(db, 'companies', COMPANY_ID, 'invoices'));
+        if (!snap.empty) {
+          const list = snap.docs.map(d => {
+            const data = d.data();
+            let dateText = '';
+            if (data.createdAt?.seconds) {
+              const dt = new Date(data.createdAt.seconds * 1000);
+              dateText = dt.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+            } else if (data.orderDateStr) {
+              dateText = data.orderDateStr;
+            } else {
+              dateText = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+            }
+
+            return {
+              id: d.id,
+              customerName: data.customerName || data.customerDetails?.name || 'Customer',
+              phone: data.customerPhoneNumber || data.customerPhone || 'Not provided',
+              email: data.customerEmail || '',
+              address: data.customerAddress || data.customerDetails?.address || '',
+              city: data.city || data.customerDetails?.city || '',
+              state: data.state || data.customerDetails?.state || '',
+              pincode: data.pincode || data.customerDetails?.pincode || '',
+              totalAmount: Number(data.totalAmount || 0),
+              paymentMethod: data.paymentMethod || 'Online',
+              paymentStatus: data.paymentStatus || 'Paid',
+              status: data.status || 'Pending',
+              createdAtFormatted: dateText,
+              createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : Date.now(),
+              items: data.items || []
+            };
+          });
+
+          if (list.length > 0) {
+            window.liveOrders = list;
+          }
+        }
+      } catch (err) {
+        console.warn('Using baseline demo orders:', err);
+      }
+
+      applyOrderFilters();
+    }
+
+    // Format badge based on status
+    function getStatusBadge(status) {
+      const s = String(status || '').toLowerCase();
+      if (s === 'pending') {
+        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">Pending Acceptance</span>`;
+      } else if (s === 'accepted') {
+        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">Accepted</span>`;
+      } else if (s === 'packing') {
+        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">Packing</span>`;
+      } else if (s === 'shipped') {
+        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">Shipped</span>`;
+      } else if (s === 'delivered') {
+        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>`;
+      } else if (s === 'cancelled') {
+        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>`;
+      } else if (s === 'returned') {
+        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">Returned</span>`;
+      }
+      return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">${status}</span>`;
+    }
+
+    // Render Orders Cards
+    function renderOrdersView(orders) {
+      const container = document.getElementById('orders-cards-container');
+      const emptyState = document.getElementById('orders-empty-state');
+      if (!container) return;
+
+      if (!orders || orders.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      container.innerHTML = orders.map(o => {
+        const isPaid = (o.paymentStatus === 'Paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
+        const payBadge = isPaid 
+          ? `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">PAID (${o.paymentMethod})</span>`
+          : `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">${o.paymentMethod}</span>`;
+
+        return `
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 hover:border-slate-300 transition">
+            
+            <!-- Card Header: ID, Date & Time, Status Badge -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-3 flex-wrap">
+                <span class="font-mono text-xs font-bold bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg">
+                  ${o.id}
+                </span>
+                
+                <!-- PROMINENT DATE WITH TIME -->
+                <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                  <span>${o.createdAtFormatted}</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                ${payBadge}
+                ${getStatusBadge(o.status)}
+              </div>
+            </div>
+
+            <!-- Customer & Delivery Address Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              
+              <!-- Customer Info -->
+              <div class="space-y-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Customer</span>
+                <h4 class="font-bold text-slate-900 text-sm">${o.customerName}</h4>
+                <p class="text-slate-600 flex items-center gap-1">
+                  <i data-lucide="phone" class="w-3 h-3 text-slate-400"></i>
+                  <span>${o.phone}</span>
+                </p>
+                ${o.email ? `<p class="text-slate-400">${o.email}</p>` : ''}
+              </div>
+
+              <!-- Shipping Address -->
+              <div class="space-y-1 md:col-span-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Delivery Address</span>
+                <p class="text-slate-700 font-medium leading-relaxed">
+                  ${o.address}, ${o.city ? o.city + ', ' : ''}${o.state ? o.state + ' - ' : ''}<strong>${o.pincode}</strong>
+                </p>
+              </div>
+            </div>
+
+            <!-- Ordered Items List -->
+            <div class="p-3 bg-slate-50/70 border border-slate-100 rounded-xl space-y-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Items in Order (${(o.items || []).length})</span>
+              <div class="divide-y divide-slate-100">
+                ${(o.items || []).map(i => `
+                  <div class="flex items-center justify-between py-2 text-xs">
+                    <div class="flex items-center gap-2.5">
+                      <img src="${i.imageUrl || 'https://placehold.co/80x100?text=Product'}" class="w-9 h-11 object-cover rounded-lg bg-white border border-slate-200">
+                      <div>
+                        <span class="font-bold text-slate-800">${i.name}</span>
+                        <span class="text-[11px] text-slate-500 block">Size: ${i.size || 'M'} · Color: ${i.color || 'Standard'} · Qty: ${i.qty || 1}</span>
+                      </div>
+                    </div>
+                    <span class="font-bold text-slate-900">₹${Number(i.price || 0).toLocaleString('en-IN')}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Card Footer: Total Amount & Status Actions -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
+              <div class="flex items-baseline gap-2">
+                <span class="text-xs text-slate-500">Order Total:</span>
+                <span class="text-lg font-bold text-slate-900">₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+              </div>
+
+              <!-- Status Change Action Buttons -->
+              <div class="flex items-center gap-1.5 flex-wrap">
+                ${renderStatusActionButtons(o.id, o.status)}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function renderStatusActionButtons(orderId, currentStatus) {
+      const s = String(currentStatus || '').toLowerCase();
+      let html = '';
+
+      if (s === 'pending') {
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Accepted')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Accept Order</button>`;
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Cancelled')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs border border-rose-200 transition cursor-pointer">Cancel</button>`;
+      } else if (s === 'accepted') {
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Packing')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Mark Packing</button>`;
+      } else if (s === 'packing') {
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Shipped')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Mark Shipped</button>`;
+      } else if (s === 'shipped') {
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Delivered')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">Mark Delivered</button>`;
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Returned')" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-semibold rounded-lg text-xs border border-orange-200 transition cursor-pointer">Mark Returned</button>`;
+      } else if (s === 'delivered') {
+        html += `<button onclick="updateOrderStatus('${orderId}', 'Returned')" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-semibold rounded-lg text-xs border border-orange-200 transition cursor-pointer">Return / Refund</button>`;
+      }
+
+      return html;
+    }
+
+    // Update Status Handler
+    window.updateOrderStatus = async function(orderId, newStatus) {
+      const order = window.liveOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      order.status = newStatus;
+      applyOrderFilters();
+
+      try {
+        const orderRef = doc(db, 'companies', COMPANY_ID, 'invoices', orderId);
+        await updateDoc(orderRef, {
+          status: newStatus,
+          updatedAt: serverTimestamp()
+        });
+      } catch (e) {
+        console.log('Order status updated locally in state:', e);
+      }
+    };
+
+    // Filter Logic
+    window.applyOrderFilters = function() {
+      const statusFilter = window.activeOrderStatusFilter || 'all';
+      const search = (window.activeOrderSearch || '').trim().toLowerCase();
+      const paymentFilter = document.getElementById('order-payment-filter')?.value || 'all';
+      const sortFilter = document.getElementById('order-sort-filter')?.value || 'newest';
+
+      let filtered = [...window.liveOrders];
+
+      // Update counters for all 8 tabs
+      updateTabCounters();
+
+      // 1. Status Filter
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(o => String(o.status || '').toLowerCase() === statusFilter.toLowerCase());
+      }
+
+      // 2. Search
+      if (search) {
+        filtered = filtered.filter(o => 
+          String(o.id || '').toLowerCase().includes(search) ||
+          String(o.customerName || '').toLowerCase().includes(search) ||
+          String(o.phone || '').includes(search) ||
+          String(o.city || '').toLowerCase().includes(search)
+        );
+      }
+
+      // 3. Payment
+      if (paymentFilter !== 'all') {
+        if (paymentFilter === 'paid') filtered = filtered.filter(o => o.paymentStatus === 'Paid' || String(o.paymentMethod || '').toLowerCase().includes('razorpay'));
+        else if (paymentFilter === 'cod') filtered = filtered.filter(o => String(o.paymentMethod || '').toLowerCase().includes('cod') || o.paymentStatus !== 'Paid');
+        else if (paymentFilter === 'whatsapp') filtered = filtered.filter(o => String(o.paymentMethod || '').toLowerCase().includes('whatsapp'));
+      }
+
+      // 4. Sort
+      if (sortFilter === 'newest') filtered.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
+      else if (sortFilter === 'oldest') filtered.sort((a, b) => (a.createdAtTimestamp || 0) - (b.createdAtTimestamp || 0));
+      else if (sortFilter === 'amount_high') filtered.sort((a, b) => (b.totalAmount || 0) - (a.totalAmount || 0));
+      else if (sortFilter === 'amount_low') filtered.sort((a, b) => (a.totalAmount || 0) - (b.totalAmount || 0));
+
+      renderOrdersView(filtered);
+    };
+
+    function updateTabCounters() {
+      const all = window.liveOrders;
+      const countFor = (st) => all.filter(o => String(o.status || '').toLowerCase() === st.toLowerCase()).length;
+
+      document.getElementById('count-all').textContent = all.length;
+      document.getElementById('count-pending').textContent = countFor('pending');
+      document.getElementById('count-accepted').textContent = countFor('accepted');
+      document.getElementById('count-packing').textContent = countFor('packing');
+      document.getElementById('count-shipped').textContent = countFor('shipped');
+      document.getElementById('count-delivered').textContent = countFor('delivered');
+      document.getElementById('count-cancelled').textContent = countFor('cancelled');
+      document.getElementById('count-returned').textContent = countFor('returned');
+    }
+
+    window.setOrderStatusFilter = function(status) {
+      window.activeOrderStatusFilter = status;
+      document.querySelectorAll('.order-tab-btn').forEach(btn => {
+        btn.classList.remove('bg-black', 'text-white', 'font-semibold');
+        btn.classList.add('bg-slate-100', 'text-slate-600', 'font-medium');
+      });
+
+      const active = document.getElementById(`btn-status-${status}`);
+      if (active) {
+        active.classList.remove('bg-slate-100', 'text-slate-600', 'font-medium');
+        active.classList.add('bg-black', 'text-white', 'font-semibold');
+      }
+
+      applyOrderFilters();
+    };
+
+    window.handleSearchOrders = function(val) {
+      window.activeOrderSearch = val;
+      const g = document.getElementById('global-order-search');
+      const t = document.getElementById('table-order-search');
+      if (g && g.value !== val) g.value = val;
+      if (t && t.value !== val) t.value = val;
+      applyOrderFilters();
+    };
+
+    window.refreshOrdersFeed = function() {
+      loadOrdersFromFirestore();
+    };
+
+    window.addEventListener('DOMContentLoaded', loadOrdersFromFirestore);
+  </script>
+</body>
+</html>

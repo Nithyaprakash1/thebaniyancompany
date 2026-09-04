@@ -198,6 +198,15 @@
             <span>Reels &amp; Media</span>
           </button>
 
+          <a href="banners.html"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center justify-between group hover:bg-slate-100 text-slate-700">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-lg text-indigo-600">view_carousel</span>
+              <span class="font-semibold text-slate-900">Hero Banners</span>
+            </div>
+            <span class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full font-bold">New</span>
+          </a>
+
           <button id="side-tab-settings" onclick="switchAdminTab('settings')"
             class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
             <span class="material-symbols-outlined text-lg">settings</span>
@@ -505,26 +514,45 @@
             <div class="space-y-3 pt-2 border-t border-slate-100">
               <!-- Order Filters Header Row -->
               <div class="flex items-center justify-between flex-wrap gap-3">
-                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1">
                   <button id="tab-filter-all" onclick="setOrderFilter('all')"
-                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-900 text-white shadow-xs">
-                    All <span id="badge-count-all" class="ml-1 opacity-80">(0)</span>
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-900 text-white shadow-xs shrink-0 cursor-pointer">
+                    All Orders <span id="badge-count-all" class="ml-0.5 opacity-80">(0)</span>
                   </button>
                   <button id="tab-filter-pending" onclick="setOrderFilter('pending')"
-                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200">
-                    Pending <span id="badge-count-pending" class="ml-1 opacity-80">(0)</span>
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">
+                    Pending <span id="badge-count-pending" class="ml-0.5 opacity-80">(0)</span>
+                  </button>
+                  <button id="tab-filter-accepted" onclick="setOrderFilter('accepted')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">
+                    Accepted <span id="badge-count-accepted" class="ml-0.5 opacity-80">(0)</span>
+                  </button>
+                  <button id="tab-filter-packing" onclick="setOrderFilter('packing')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">
+                    Packing <span id="badge-count-packing" class="ml-0.5 opacity-80">(0)</span>
+                  </button>
+                  <button id="tab-filter-shipped" onclick="setOrderFilter('shipped')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">
+                    Shipped <span id="badge-count-shipped" class="ml-0.5 opacity-80">(0)</span>
                   </button>
                   <button id="tab-filter-delivered" onclick="setOrderFilter('delivered')"
-                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200">
-                    Delivered <span id="badge-count-delivered" class="ml-1 opacity-80">(0)</span>
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">
+                    Delivered <span id="badge-count-delivered" class="ml-0.5 opacity-80">(0)</span>
                   </button>
                   <button id="tab-filter-cancelled" onclick="setOrderFilter('cancelled')"
-                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200">
-                    Cancelled <span id="badge-count-cancelled" class="ml-1 opacity-80">(0)</span>
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">
+                    Cancelled <span id="badge-count-cancelled" class="ml-0.5 opacity-80">(0)</span>
+                  </button>
+                  <button id="tab-filter-returned" onclick="setOrderFilter('returned')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">
+                    Returned <span id="badge-count-returned" class="ml-0.5 opacity-80">(0)</span>
                   </button>
                 </div>
 
                 <div class="flex items-center gap-2 flex-wrap">
+                  <a href="orders.html" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 transition">
+                    <span class="material-symbols-outlined text-sm">fullscreen</span> Fullscreen Orders View →
+                  </a>
                   <select id="order-payment-filter" onchange="handleOrderPaymentFilter(this.value)" class="shopify-input text-slate-700 px-2.5 py-1.5 rounded-lg text-xs outline-none font-medium bg-white cursor-pointer">
                     <option value="all">All Payment Methods</option>
                     <option value="paid">Paid (Online / Razorpay)</option>
@@ -592,172 +620,471 @@
 
         <!-- ==================== VIEW 5: STORE SETTINGS ==================== -->
         <div id="view-settings" class="hidden space-y-6">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            <div class="shopify-card p-6 space-y-5">
-              <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span class="material-symbols-outlined text-slate-900 text-lg">branding_watermark</span>
-                <h2 class="font-semibold text-sm text-slate-900">Branding &amp; Checkout Toggles</h2>
-              </div>
-
-              <form id="branding-update-form" class="space-y-4">
-                <div>
-                  <label class="block text-xs font-medium text-slate-700 mb-1">Store Name</label>
-                  <input type="text" id="ctrl-store-name" placeholder="OneSpace Commerce"
-                    class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none font-normal">
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-slate-700 mb-1">Company Logo Image (URL or Gallery Upload)</label>
-                  <div class="space-y-2">
-                    <input type="url" id="ctrl-store-logo" placeholder="https://... or upload below"
-                      class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none">
-                    <div class="flex items-center gap-2">
-                      <input type="file" id="logo-file-picker" accept="image/*"
-                        onchange="window.handleGalleryUpload(this, '#ctrl-store-logo')" class="hidden">
-                      <label for="logo-file-picker"
-                        class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all shadow-xs">
-                        <span class="material-symbols-outlined text-[15px]">photo_library</span> Upload Logo (1MB Max)
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-slate-700 mb-1">WhatsApp Support Number</label>
-                  <input type="text" id="ctrl-whatsapp-num" placeholder="+91 9876543210"
-                    class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-slate-700 mb-1">Instagram Link / Handle</label>
-                  <input type="text" id="ctrl-instagram-link" placeholder="https://instagram.com/onespacecommerce"
-                    class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none">
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-100">
-                  <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Delivery (Tamil Nadu)</label>
-                    <input type="number" id="ctrl-delivery-tn" placeholder="0 (Free)" value="0"
-                      class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none font-medium">
-                  </div>
-                  <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Delivery (Outside TN)</label>
-                    <input type="number" id="ctrl-delivery-non-tn" placeholder="60" value="60"
-                      class="w-full shopify-input rounded-lg px-3 py-2 text-xs outline-none font-medium">
-                  </div>
-                </div>
-
-                <!-- TOGGLE: WhatsApp Direct Order -->
-                <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-[#25D366]/10 text-[#25D366] flex items-center justify-center flex-shrink-0">
-                      <span class="material-symbols-outlined text-[18px]">chat</span>
-                    </div>
-                    <div>
-                      <div class="flex items-center">
-                        <span class="font-medium text-xs text-slate-900 block">WhatsApp Direct Order</span>
-                        <span id="ctrl-whatsapp-status-pill"
-                          class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
-                      </div>
-                      <span class="text-[11px] text-slate-500">Allow customers to complete purchases via WhatsApp</span>
-                    </div>
-                  </div>
-                  <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="ctrl-whatsapp-toggle" class="sr-only peer" checked
-                      onchange="window.updateToggleLabel(this, 'ctrl-whatsapp-status-pill')">
-                    <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                  </label>
-                </div>
-
-                <!-- TOGGLE: Cash on Delivery (COD) -->
-                <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center flex-shrink-0">
-                      <span class="material-symbols-outlined text-[18px]">payments</span>
-                    </div>
-                    <div>
-                      <div class="flex items-center">
-                        <span class="font-medium text-xs text-slate-900 block">Cash on Delivery (COD)</span>
-                        <span id="ctrl-cod-status-pill"
-                          class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
-                      </div>
-                      <span class="text-[11px] text-slate-500">Accept pay-on-delivery orders across India</span>
-                    </div>
-                  </div>
-                  <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="ctrl-cod-toggle" class="sr-only peer" checked
-                      onchange="window.updateToggleLabel(this, 'ctrl-cod-status-pill')">
-                    <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                  </label>
-                </div>
-
-                <!-- TOGGLE: Promo Discount Coupon -->
-                <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between transition-all">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 flex items-center justify-center flex-shrink-0">
-                      <span class="material-symbols-outlined text-[18px]">loyalty</span>
-                    </div>
-                    <div>
-                      <div class="flex items-center">
-                        <span class="font-medium text-xs text-slate-900 block">Promo Discount Coupon Box</span>
-                        <span id="ctrl-coupon-status-pill"
-                          class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60">ENABLED</span>
-                      </div>
-                      <span class="text-[11px] text-slate-500">Display promo code input on Checkout</span>
-                    </div>
-                  </div>
-                  <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="ctrl-coupon-toggle" class="sr-only peer" checked
-                      onchange="window.updateToggleLabel(this, 'ctrl-coupon-status-pill')">
-                    <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                  </label>
-                </div>
-
-                <button type="submit"
-                  class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg text-xs transition-all shadow-xs cursor-pointer">Save Store Controls</button>
-              </form>
+          <!-- Top Navigation Header Bar (Matching screenshot media_1788523312896.png) -->
+          <div class="flex items-center justify-between flex-wrap gap-4 pb-2 border-b border-slate-100">
+            <div>
+              <span class="text-xs font-semibold text-slate-600">Store Settings</span>
             </div>
 
-            <!-- Multi-Banner Manager -->
-            <div class="shopify-card p-6 space-y-5">
-              <div class="border-b border-slate-100 pb-3 space-y-4">
-                <div class="flex justify-between items-center">
-                  <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-slate-900 text-lg">view_carousel</span>
-                    <h2 class="font-semibold text-sm text-slate-900">Hero Banner Slides</h2>
-                  </div>
-                  <button onclick="addBannerSlide()"
-                    class="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg text-[11px] transition-all shadow-xs cursor-pointer">+ Add Slide</button>
-                </div>
+            <div class="flex items-center gap-3 flex-wrap">
+              <!-- Global Search Input -->
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+                <input type="text" id="global-search-input-settings" oninput="handleGlobalSearch(this.value)" placeholder="Search orders, products, customers..."
+                  class="shopify-input rounded-lg pl-9 pr-4 py-2 text-xs outline-none font-normal w-64 sm:w-80">
               </div>
 
-              <form id="banner-update-form" class="space-y-4">
-                <div id="banners-container" class="space-y-4">
-                  <div class="banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-lg space-y-3">
-                    <span class="text-xs font-medium text-slate-500 block">Slide 1</span>
-                    <div>
-                      <label class="block text-xs font-medium text-slate-600 mb-1">Image / Video URL</label>
-                      <input type="text" class="ctrl-banner-url w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="https://...">
-                    </div>
-                    <div>
-                      <label class="block text-xs font-medium text-slate-600 mb-1">Headline</label>
-                      <input type="text" class="ctrl-banner-heading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="Summer Collection 2026">
-                    </div>
-                    <div>
-                      <label class="block text-xs font-medium text-slate-600 mb-1">Subheading / Tagline</label>
-                      <input type="text" class="ctrl-banner-subheading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="Explore new essentials">
-                    </div>
-                    <div>
-                      <label class="block text-xs font-medium text-slate-600 mb-1">Click Action Target URL</label>
-                      <input type="text" class="ctrl-banner-target w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" placeholder="shop.html">
-                    </div>
-                  </div>
+              <button onclick="openAddProductModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
+                <span class="material-symbols-outlined text-sm">add</span> Add Product
+              </button>
+
+              <a href="home.html" target="_blank" class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-xs font-medium rounded-lg shadow-2xs transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">open_in_new</span> View Store
+              </a>
+
+              <!-- Notification Bell & Profile -->
+              <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
+                <button type="button" class="relative w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition cursor-pointer">
+                  <span class="material-symbols-outlined text-lg">notifications</span>
+                  <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">3</span>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+                  TB
                 </div>
-
-                <button type="submit"
-                  class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg text-xs transition-all shadow-xs cursor-pointer">Save Banner Slides</button>
-              </form>
+              </div>
             </div>
-
           </div>
+
+          <!-- Page Heading -->
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Store Settings</h1>
+          </div>
+
+          <!-- Horizontal Sub-Tabs Row (Matching screenshot media_1788523312896.png) -->
+          <div class="flex items-center gap-6 border-b border-slate-200 overflow-x-auto custom-scrollbar">
+            <button type="button" id="tab-settings-general" onclick="switchSettingsSubTab('general')"
+              class="settings-subtab-btn pb-3 text-sm font-semibold text-slate-900 border-b-2 border-black transition cursor-pointer shrink-0">
+              General
+            </button>
+            <button type="button" id="tab-settings-payments" onclick="switchSettingsSubTab('payments')"
+              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
+              Payments
+            </button>
+            <button type="button" id="tab-settings-shipping" onclick="switchSettingsSubTab('shipping')"
+              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
+              Shipping
+            </button>
+            <button type="button" id="tab-settings-notifications" onclick="switchSettingsSubTab('notifications')"
+              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
+              Notifications
+            </button>
+            <button type="button" id="tab-settings-controls" onclick="switchSettingsSubTab('controls')"
+              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
+              Controls
+            </button>
+            <button type="button" id="tab-settings-seo" onclick="switchSettingsSubTab('seo')"
+              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
+              SEO
+            </button>
+            <button type="button" id="tab-settings-legal" onclick="switchSettingsSubTab('legal')"
+              class="settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0">
+              Legal
+            </button>
+          </div>
+
+          <!-- TAB 1: GENERAL (Matching screenshot media_1788523312896.png, with Instagram Link/Handle completely removed) -->
+          <div id="panel-settings-general" class="settings-panel space-y-6">
+            <form id="general-settings-form" class="space-y-6 max-w-4xl">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store Name</label>
+                  <input type="text" id="ctrl-store-name" placeholder="The Baniyan Company"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-medium">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store URL</label>
+                  <input type="text" id="ctrl-store-url" placeholder="thebaniyancompany.onespace.in"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition font-medium">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Support Email</label>
+                  <input type="email" id="ctrl-support-email" placeholder="support@yourbrand.com"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Support Phone</label>
+                  <input type="text" id="ctrl-support-phone" placeholder="+91 98765 43210"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">WhatsApp Number</label>
+                  <input type="text" id="ctrl-whatsapp-num" placeholder="+91 98765 43210"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store Logo Image (URL or Gallery Upload)</label>
+                  <div class="flex items-center gap-2">
+                    <input type="url" id="ctrl-store-logo" placeholder="https://... or upload"
+                      class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                    <input type="file" id="logo-file-picker" accept="image/*"
+                      onchange="window.handleGalleryUpload(this, '#ctrl-store-logo')" class="hidden">
+                    <label for="logo-file-picker"
+                      class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-xs shrink-0">
+                      <span class="material-symbols-outlined text-[16px]">upload</span> Upload
+                    </label>
+                  </div>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store Address</label>
+                  <input type="text" id="ctrl-store-address" placeholder="14, Anna Nagar, Chennai - 600040"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black transition">
+                </div>
+              </div>
+
+              <div>
+                <button type="submit"
+                  class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 2: CONTROLS (WhatsApp Direct Order ENABLED, Cash on Delivery ENABLED, Promo Discount Coupon Box ENABLED, Hero Banners page link) -->
+          <div id="panel-settings-controls" class="settings-panel hidden space-y-6 max-w-4xl">
+            
+            <!-- Hero Banner Slides Notice / Redirection Card -->
+            <div class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between flex-wrap gap-4 shadow-sm">
+              <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-2xl text-amber-300">view_carousel</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-bold tracking-tight">Hero Banners &amp; Carousel Slides</h3>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900">Separate Page</span>
+                  </div>
+                  <p class="text-xs text-slate-300 mt-0.5">Hero slides (16:6) and promo banners (4:1) have moved to a dedicated management dashboard.</p>
+                </div>
+              </div>
+              <a href="banners.html" class="px-4 py-2 bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 shrink-0">
+                <span>Manage Banners</span>
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+              </a>
+            </div>
+
+            <form id="branding-update-form" class="space-y-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Platform Controls &amp; Checkout Toggles</h3>
+
+              <!-- TOGGLE: WhatsApp Direct Order -->
+              <div class="p-4 rounded-xl bg-white border border-slate-200 flex items-center justify-between transition shadow-2xs">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-[#25D366]/10 text-[#25D366] flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">chat</span>
+                  </div>
+                  <div>
+                    <div class="flex items-center">
+                      <span class="font-semibold text-xs text-slate-900 block">WhatsApp Direct Order</span>
+                      <span id="ctrl-whatsapp-status-pill"
+                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500">Allow customers to complete checkout and order placement via WhatsApp</span>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="ctrl-whatsapp-toggle" class="sr-only peer" checked
+                    onchange="window.updateToggleLabel(this, 'ctrl-whatsapp-status-pill')">
+                  <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+              </div>
+
+              <!-- TOGGLE: Cash on Delivery (COD) -->
+              <div class="p-4 rounded-xl bg-white border border-slate-200 flex items-center justify-between transition shadow-2xs">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">payments</span>
+                  </div>
+                  <div>
+                    <div class="flex items-center">
+                      <span class="font-semibold text-xs text-slate-900 block">Cash on Delivery (COD)</span>
+                      <span id="ctrl-cod-status-pill"
+                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500">Accept pay-on-delivery orders across India</span>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="ctrl-cod-toggle" class="sr-only peer" checked
+                    onchange="window.updateToggleLabel(this, 'ctrl-cod-status-pill')">
+                  <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+              </div>
+
+              <!-- TOGGLE: Promo Discount Coupon Box -->
+              <div class="p-4 rounded-xl bg-white border border-slate-200 flex items-center justify-between transition shadow-2xs">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">loyalty</span>
+                  </div>
+                  <div>
+                    <div class="flex items-center">
+                      <span class="font-semibold text-xs text-slate-900 block">Promo Discount Coupon Box</span>
+                      <span id="ctrl-coupon-status-pill"
+                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500">Display promo code input box during Cart and Checkout flows</span>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="ctrl-coupon-toggle" class="sr-only peer" checked
+                    onchange="window.updateToggleLabel(this, 'ctrl-coupon-status-pill')">
+                  <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+              </div>
+
+              <!-- TOGGLE: Online Payments (Razorpay) -->
+              <div class="p-4 rounded-xl bg-white border border-slate-200 flex items-center justify-between transition shadow-2xs">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">credit_card</span>
+                  </div>
+                  <div>
+                    <div class="flex items-center">
+                      <span class="font-semibold text-xs text-slate-900 block">Online Payment (Razorpay &amp; UPI)</span>
+                      <span id="ctrl-razorpay-status-pill"
+                        class="ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500">Accept Credit/Debit Cards, UPI, Netbanking, and Wallets</span>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="ctrl-razorpay-toggle" class="sr-only peer" checked
+                    onchange="window.updateToggleLabel(this, 'ctrl-razorpay-status-pill')">
+                  <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+              </div>
+
+              <!-- Shipping Charges Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Delivery Fee (Tamil Nadu)</label>
+                  <div class="relative">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">₹</span>
+                    <input type="number" id="ctrl-delivery-tn" placeholder="0 (Free)" value="0"
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-black font-semibold">
+                  </div>
+                </div>
+
+                <div class="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Delivery Fee (Outside Tamil Nadu)</label>
+                  <div class="relative">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">₹</span>
+                    <input type="number" id="ctrl-delivery-non-tn" placeholder="60" value="60"
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-black font-semibold">
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-2">
+                <button type="submit"
+                  class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
+                  Save Controls
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 3: PAYMENTS -->
+          <div id="panel-settings-payments" class="settings-panel hidden space-y-6 max-w-4xl">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
+              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <span class="material-symbols-outlined text-emerald-600 text-xl">account_balance</span>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Payment Gateway Integrations</h3>
+                  <p class="text-xs text-slate-500">Configure Razorpay credentials and instant settlement settings.</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Razorpay Key ID</label>
+                  <input type="text" id="ctrl-razorpay-key-id" placeholder="rzp_live_xxxxxxxxxxxx" value="rzp_live_tbc_store"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Razorpay Key Secret</label>
+                  <input type="password" id="ctrl-razorpay-key-secret" placeholder="••••••••••••••••••••" value="encrypted_key_secret"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Store UPI VPA / ID</label>
+                  <input type="text" id="ctrl-upi-id" placeholder="thebaniyancompany@okhdfcbank" value="thebaniyancompany@okhdfcbank"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Default Currency</label>
+                  <input type="text" readonly value="INR (₹) - Indian Rupee"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-600 outline-none font-medium">
+                </div>
+              </div>
+              <button type="button" onclick="alert('Payment gateway configurations saved successfully!')"
+                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
+                Save Payment Settings
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 4: SHIPPING -->
+          <div id="panel-settings-shipping" class="settings-panel hidden space-y-6 max-w-4xl">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
+              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <span class="material-symbols-outlined text-indigo-600 text-xl">local_shipping</span>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Shipping &amp; Fulfillment Rules</h3>
+                  <p class="text-xs text-slate-500">Configure logistics partners and free shipping thresholds.</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Free Shipping Minimum Amount (₹)</label>
+                  <input type="number" id="ctrl-free-shipping-min" value="999"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-semibold outline-none focus:border-black">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Primary Courier Partner</label>
+                  <select class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-medium outline-none focus:border-black cursor-pointer">
+                    <option value="shiprocket" selected>Shiprocket (Aggregator)</option>
+                    <option value="dtdc">DTDC Express</option>
+                    <option value="delhivery">Delhivery Surface</option>
+                    <option value="bluedart">Blue Dart</option>
+                  </select>
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Tracking Link URL Pattern</label>
+                  <input type="text" value="https://track.shiprocket.in/{AWB}"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black">
+                </div>
+              </div>
+              <button type="button" onclick="alert('Shipping rules updated successfully!')"
+                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
+                Save Shipping Rules
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 5: NOTIFICATIONS -->
+          <div id="panel-settings-notifications" class="settings-panel hidden space-y-6 max-w-4xl">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
+              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <span class="material-symbols-outlined text-purple-600 text-xl">notifications_active</span>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Automated Customer Notifications</h3>
+                  <p class="text-xs text-slate-500">Configure order updates sent to customers via WhatsApp and SMS.</p>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div>
+                    <span class="text-xs font-bold text-slate-900 block">WhatsApp Order Placed Confirmation</span>
+                    <span class="text-[11px] text-slate-500">Send an instant receipt and tracking link via WhatsApp when order is created</span>
+                  </div>
+                  <input type="checkbox" checked class="w-4 h-4 rounded text-black accent-black">
+                </label>
+                <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div>
+                    <span class="text-xs font-bold text-slate-900 block">Dispatch &amp; AWB Tracking SMS</span>
+                    <span class="text-[11px] text-slate-500">Send dispatch notification with courier tracking number when order is shipped</span>
+                  </div>
+                  <input type="checkbox" checked class="w-4 h-4 rounded text-black accent-black">
+                </label>
+                <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div>
+                    <span class="text-xs font-bold text-slate-900 block">Admin New Order Alert</span>
+                    <span class="text-[11px] text-slate-500">Send admin notification to +91 98765 43210 upon every new customer order</span>
+                  </div>
+                  <input type="checkbox" checked class="w-4 h-4 rounded text-black accent-black">
+                </label>
+              </div>
+              <button type="button" onclick="alert('Notification triggers updated!')"
+                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
+                Save Notification Settings
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 6: SEO -->
+          <div id="panel-settings-seo" class="settings-panel hidden space-y-6 max-w-4xl">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
+              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <span class="material-symbols-outlined text-teal-600 text-xl">travel_explore</span>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">SEO &amp; Analytics</h3>
+                  <p class="text-xs text-slate-500">Search engine meta tags and Google Analytics integration.</p>
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Meta Title</label>
+                  <input type="text" value="The Baniyan Company | Premium 100% Combed Cotton Apparel"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Meta Description</label>
+                  <textarea rows="3" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">Shop highest quality combed cotton t-shirts, oversized tees, polos, and loungewear crafted in Tiruppur with pan-India fast shipping.</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Google Analytics Measurement ID</label>
+                  <input type="text" placeholder="G-XXXXXXXXXX" value="G-TBCSTORE99"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none focus:border-black">
+                </div>
+              </div>
+              <button type="button" onclick="alert('SEO metadata saved successfully!')"
+                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
+                Save SEO Settings
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 7: LEGAL -->
+          <div id="panel-settings-legal" class="settings-panel hidden space-y-6 max-w-4xl">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xs">
+              <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <span class="material-symbols-outlined text-rose-600 text-xl">gavel</span>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Legal &amp; Store Policies</h3>
+                  <p class="text-xs text-slate-500">Manage terms, privacy policy, and return &amp; refund clauses displayed on checkout.</p>
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Terms &amp; Conditions Page URL</label>
+                  <input type="text" value="terms.html"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Privacy Policy URL</label>
+                  <input type="text" value="privacy.html"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">Return &amp; Refund Policy URL</label>
+                  <input type="text" value="returns-policy.html"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-black">
+                </div>
+              </div>
+              <button type="button" onclick="alert('Store policies updated successfully!')"
+                class="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer">
+                Save Policies
+              </button>
+            </div>
+          </div>
+
         </div>
 
         <!-- ==================== VIEW: PAYMENTS ==================== -->
@@ -3474,22 +3801,48 @@
       container.appendChild(div);
     };
 
+    window.switchSettingsSubTab = function (tabName) {
+      const allTabs = ['general', 'payments', 'shipping', 'notifications', 'controls', 'seo', 'legal'];
+      allTabs.forEach(t => {
+        const btn = document.getElementById(`tab-settings-${t}`);
+        const panel = document.getElementById(`panel-settings-${t}`);
+        if (btn) {
+          if (t === tabName) {
+            btn.className = 'settings-subtab-btn pb-3 text-sm font-semibold text-slate-900 border-b-2 border-black transition cursor-pointer shrink-0';
+          } else {
+            btn.className = 'settings-subtab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition cursor-pointer shrink-0';
+          }
+        }
+        if (panel) {
+          if (t === tabName) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        }
+      });
+    };
+
     async function initDashboard() {
       const comp = await revalidateCompany(COMPANY_ID);
       if (comp) {
         if (document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = comp.name || 'OneSpace Commerce';
-        if (document.getElementById('ctrl-store-name')) document.getElementById('ctrl-store-name').value = comp.name || 'OneSpace Commerce';
+        if (document.getElementById('ctrl-store-name')) document.getElementById('ctrl-store-name').value = comp.name || 'The Baniyan Company';
+        if (document.getElementById('ctrl-store-url')) document.getElementById('ctrl-store-url').value = comp.storeUrl || 'thebaniyancompany.onespace.in';
+        if (document.getElementById('ctrl-support-email')) document.getElementById('ctrl-support-email').value = comp.supportEmail || 'support@yourbrand.com';
+        if (document.getElementById('ctrl-support-phone')) document.getElementById('ctrl-support-phone').value = comp.supportPhone || '+91 98765 43210';
+        if (document.getElementById('ctrl-whatsapp-num')) document.getElementById('ctrl-whatsapp-num').value = comp.whatsappNumber || '+91 98765 43210';
+        if (document.getElementById('ctrl-store-address')) document.getElementById('ctrl-store-address').value = comp.storeAddress || '14, Anna Nagar, Chennai - 600040';
         if (document.getElementById('ctrl-store-logo')) document.getElementById('ctrl-store-logo').value = comp.logo || '';
         if (document.getElementById('sidebar-logo-img') && comp.logo) document.getElementById('sidebar-logo-img').src = comp.logo;
         if (document.getElementById('login-logo-img') && comp.logo) document.getElementById('login-logo-img').src = comp.logo;
-        if (document.getElementById('ctrl-whatsapp-num')) document.getElementById('ctrl-whatsapp-num').value = comp.whatsappNumber || '';
-        if (document.getElementById('ctrl-instagram-link')) document.getElementById('ctrl-instagram-link').value = comp.instagramLink || '';
         if (document.getElementById('ctrl-delivery-tn')) document.getElementById('ctrl-delivery-tn').value = comp.deliveryTnPrice !== undefined ? comp.deliveryTnPrice : (comp.deliveryTnFee !== undefined ? comp.deliveryTnFee : 0);
         if (document.getElementById('ctrl-delivery-non-tn')) document.getElementById('ctrl-delivery-non-tn').value = comp.deliveryNonTnPrice !== undefined ? comp.deliveryNonTnPrice : (comp.deliveryFee !== undefined ? comp.deliveryFee : 60);
 
         const waToggle = document.getElementById('ctrl-whatsapp-toggle');
         const codToggle = document.getElementById('ctrl-cod-toggle');
         const couponToggle = document.getElementById('ctrl-coupon-toggle');
+        const razorpayToggle = document.getElementById('ctrl-razorpay-toggle');
         if (waToggle) {
           waToggle.checked = comp.isWhatsappEnabled !== false;
           window.updateToggleLabel(waToggle, 'ctrl-whatsapp-status-pill');
@@ -3502,37 +3855,9 @@
           couponToggle.checked = comp.isCouponEnabled !== false;
           window.updateToggleLabel(couponToggle, 'ctrl-coupon-status-pill');
         }
-
-        if (comp.banners && Array.isArray(comp.banners) && comp.banners.length > 0) {
-          const container = document.getElementById('banners-container');
-          container.innerHTML = comp.banners.map((b, i) => `
-          <div class="banner-slide-box bg-slate-50 border border-slate-200/80 p-4 rounded-lg space-y-3 relative">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-medium text-slate-500 block">Slide ${i + 1}</span>
-              ${i > 0 ? `<button type="button" onclick="this.closest('.banner-slide-box').remove()" class="text-rose-600 text-xs font-medium cursor-pointer">Remove</button>` : ''}
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">Image / Video URL</label>
-              <input type="url" class="ctrl-banner-url w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" value="${b.heroMediaUrl || ''}" placeholder="https://...">
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">Headline</label>
-              <input type="text" class="ctrl-banner-heading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" value="${b.heroHeading || ''}" placeholder="Summer Luxe 2026">
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">Subheading / Tagline</label>
-              <input type="text" class="ctrl-banner-subheading w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" value="${b.heroSubheading || ''}" placeholder="New Collection">
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">Click Action Target URL</label>
-              <input type="text" class="ctrl-banner-target w-full shopify-input rounded-lg px-3 py-1.5 text-xs outline-none" value="${b.targetUrl || 'shop.html'}" placeholder="shop.html">
-            </div>
-          </div>
-        `).join('');
-        } else if (comp.heroMediaUrl) {
-          document.querySelector('.ctrl-banner-url').value = comp.heroMediaUrl;
-          document.querySelector('.ctrl-banner-heading').value = comp.heroHeading || '';
-          document.querySelector('.ctrl-banner-subheading').value = comp.heroSubheading || '';
+        if (razorpayToggle) {
+          razorpayToggle.checked = comp.isRazorpayEnabled !== false;
+          window.updateToggleLabel(razorpayToggle, 'ctrl-razorpay-status-pill');
         }
 
         if (comp.youtubeLinks && Array.isArray(comp.youtubeLinks)) {
@@ -3606,50 +3931,75 @@
       if (!listEl) return;
 
       let rev = 0;
-      let pendingCount = 0;
-      let deliveredCount = 0;
-      let cancelledCount = 0;
+      const counts = {
+        all: rawList.length,
+        pending: 0,
+        accepted: 0,
+        packing: 0,
+        shipped: 0,
+        delivered: 0,
+        cancelled: 0,
+        returned: 0
+      };
 
       rawList.forEach(o => {
         rev += Number(o.totalAmount || 0);
-        if (o.status === 'Delivered') deliveredCount++;
-        else if (o.status === 'Cancelled') cancelledCount++;
-        else pendingCount++;
+        const s = String(o.status || 'Pending').trim().toLowerCase();
+        if (s === 'delivered') counts.delivered++;
+        else if (s === 'cancelled') counts.cancelled++;
+        else if (s === 'returned') counts.returned++;
+        else if (s === 'accepted' || s === 'processing') counts.accepted++;
+        else if (s === 'packing' || s === 'packed') counts.packing++;
+        else if (s === 'shipped' || s === 'out for delivery') counts.shipped++;
+        else counts.pending++;
       });
 
-      document.getElementById('stat-total-orders').textContent = rawList.length;
-      document.getElementById('stat-total-revenue').textContent = `₹${rev.toLocaleString('en-IN')}`;
-      document.getElementById('stat-pending-orders').textContent = pendingCount;
+      if (document.getElementById('stat-total-orders')) document.getElementById('stat-total-orders').textContent = rawList.length;
+      if (document.getElementById('stat-total-revenue')) document.getElementById('stat-total-revenue').textContent = `₹${rev.toLocaleString('en-IN')}`;
+      if (document.getElementById('stat-pending-orders')) document.getElementById('stat-pending-orders').textContent = counts.pending;
 
-      const badgeAll = document.getElementById('badge-count-all');
-      const badgePending = document.getElementById('badge-count-pending');
-      const badgeDelivered = document.getElementById('badge-count-delivered');
-      const badgeCancelled = document.getElementById('badge-count-cancelled');
+      const badgeIds = {
+        all: 'badge-count-all',
+        pending: 'badge-count-pending',
+        accepted: 'badge-count-accepted',
+        packing: 'badge-count-packing',
+        shipped: 'badge-count-shipped',
+        delivered: 'badge-count-delivered',
+        cancelled: 'badge-count-cancelled',
+        returned: 'badge-count-returned'
+      };
 
-      if (badgeAll) badgeAll.textContent = `(${rawList.length})`;
-      if (badgePending) badgePending.textContent = `(${pendingCount})`;
-      if (badgeDelivered) badgeDelivered.textContent = `(${deliveredCount})`;
-      if (badgeCancelled) badgeCancelled.textContent = `(${cancelledCount})`;
+      Object.entries(badgeIds).forEach(([k, id]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = `(${counts[k] || 0})`;
+      });
 
-      ['all', 'pending', 'delivered', 'cancelled'].forEach(f => {
+      ['all', 'pending', 'accepted', 'packing', 'shipped', 'delivered', 'cancelled', 'returned'].forEach(f => {
         const tab = document.getElementById(`tab-filter-${f}`);
         if (!tab) return;
         if (f === window.currentFilter) {
-          tab.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-900 text-white shadow-xs cursor-pointer';
+          tab.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-slate-900 text-white shadow-xs shrink-0 cursor-pointer';
         } else {
-          tab.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer';
+          tab.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer';
         }
       });
 
       let filtered = [...rawList];
 
-      // 1. Order Status Filter
-      if (window.currentFilter === 'pending') {
-        filtered = filtered.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
-      } else if (window.currentFilter === 'delivered') {
-        filtered = filtered.filter(o => o.status === 'Delivered');
-      } else if (window.currentFilter === 'cancelled') {
-        filtered = filtered.filter(o => o.status === 'Cancelled');
+      // 1. Order Status Filter across all 8 statuses
+      if (window.currentFilter !== 'all') {
+        const target = window.currentFilter;
+        filtered = filtered.filter(o => {
+          const s = String(o.status || 'Pending').trim().toLowerCase();
+          if (target === 'pending') return (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed');
+          if (target === 'accepted') return (s === 'accepted' || s === 'processing');
+          if (target === 'packing') return (s === 'packing' || s === 'packed');
+          if (target === 'shipped') return (s === 'shipped' || s === 'out for delivery');
+          if (target === 'delivered') return s === 'delivered';
+          if (target === 'cancelled') return s === 'cancelled';
+          if (target === 'returned') return s === 'returned';
+          return true;
+        });
       }
 
       // 2. Payment Method Filter
@@ -3729,18 +4079,23 @@
         const city = o.city || o.customerDetails?.city || '';
         const state = o.state || o.customerDetails?.state || '';
         const pin = o.pincode || o.customerDetails?.pincode || '';
-        const dateStr = o.orderDateStr || (o.createdAt?.seconds ? new Date(o.createdAt.seconds * 1000).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : (o.createdAt ? new Date(o.createdAt).toLocaleString('en-IN') : 'Recent'));
+        
+        // Date with Time prominently displayed
+        const dateObj = o.createdAt?.seconds ? new Date(o.createdAt.seconds * 1000) : (o.createdAt ? new Date(o.createdAt) : null);
+        const dateStr = (dateObj && !isNaN(dateObj.getTime()))
+          ? dateObj.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+          : (o.orderDateStr || 'Recent');
 
         const isPaid = (o.paymentStatus === 'Paid') || (String(o.paymentMethod || '').toLowerCase().includes('razorpay') && o.razorpayPaymentId);
         const payMethod = o.paymentMethod || 'Razorpay Online Payment';
 
         let payBadgeHtml = '';
         if (isPaid) {
-          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-medium border border-emerald-200"><span class="material-symbols-outlined text-[13px]">verified</span> PAID (${payMethod})</span>`;
+          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-emerald-200"><span class="material-symbols-outlined text-[13px]">verified</span> PAID (${payMethod})</span>`;
         } else if (String(payMethod).toLowerCase().includes('whatsapp')) {
-          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-medium border border-emerald-200"><span class="material-symbols-outlined text-[13px]">chat</span> WHATSAPP ORDER</span>`;
+          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-emerald-200"><span class="material-symbols-outlined text-[13px]">chat</span> WHATSAPP ORDER</span>`;
         } else {
-          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-medium border border-amber-200"><span class="material-symbols-outlined text-[13px]">pending</span> COD (PENDING)</span>`;
+          payBadgeHtml = `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-amber-200"><span class="material-symbols-outlined text-[13px]">pending</span> COD (PENDING)</span>`;
         }
 
         const itemsDetailHtml = items.length > 0 ? items.map(i => {
@@ -3759,13 +4114,29 @@
           `;
         }).join('') : `<p class="text-xs text-slate-500 italic">Merchandise Package Order</p>`;
 
+        // Quick transition button based on status
+        let quickActionBtn = '';
+        const curStatus = o.status || 'Pending';
+        if (curStatus === 'Pending' || curStatus === 'Awaiting Acceptance') {
+          quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Accepted')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">check</span> Accept Order</button>`;
+        } else if (curStatus === 'Accepted') {
+          quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Packing')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">inventory_2</span> Mark Packing</button>`;
+        } else if (curStatus === 'Packing') {
+          quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Shipped')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">local_shipping</span> Ship Order</button>`;
+        } else if (curStatus === 'Shipped') {
+          quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Delivered')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">task_alt</span> Mark Delivered</button>`;
+        }
+
         return `
         <div class="shopify-card p-6 space-y-4">
           <div class="flex justify-between items-start flex-wrap gap-2">
             <div>
               <div class="flex items-center gap-2 mb-1 flex-wrap">
-                <span class="text-xs font-semibold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">ORDER #${o.id}</span>
-                <span class="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">${dateStr}</span>
+                <span class="text-xs font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">ORDER #${o.id}</span>
+                <span class="text-xs font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[14px] text-slate-500">schedule</span>
+                  ${dateStr}
+                </span>
                 ${payBadgeHtml}
               </div>
               <p class="text-xs text-slate-700 mt-2">
@@ -3776,7 +4147,7 @@
               </p>
             </div>
             <div class="text-right flex-shrink-0">
-              <span class="text-xl font-semibold text-slate-900 block">₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+              <span class="text-xl font-bold text-slate-900 block">₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
               <span class="text-xs font-medium text-slate-500">${items.length} Item${items.length !== 1 ? 's' : ''}</span>
             </div>
           </div>
@@ -3786,17 +4157,18 @@
           </div>
 
           <div class="flex items-center justify-between pt-3 border-t border-slate-100 flex-wrap gap-3 text-xs">
-            <div class="flex items-center gap-2">
-              <span class="text-slate-600 font-medium text-xs">Order Status:</span>
-              <select onchange="updateStatus('${o.id}', this.value)" class="shopify-input text-slate-900 px-3 py-1.5 rounded-lg outline-none font-medium bg-white border border-slate-300">
-                ${['Awaiting Acceptance', 'Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].map(s => `
-                  <option value="${s}" ${o.status === s ? 'selected' : ''} class="bg-white text-slate-900">${s}</option>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-slate-600 font-semibold text-xs">Status:</span>
+              <select onchange="updateStatus('${o.id}', this.value)" class="shopify-input text-slate-900 px-3 py-1.5 rounded-lg outline-none font-semibold bg-white border border-slate-300">
+                ${['Pending', 'Accepted', 'Packing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(s => `
+                  <option value="${s}" ${o.status === s ? 'selected' : ''} class="bg-white text-slate-900 font-medium">${s}</option>
                 `).join('')}
               </select>
+              ${quickActionBtn}
             </div>
             ${phone !== 'Not Provided' ? `
-            <a href="https://wa.me/91${phone}?text=Hi%20${encodeURIComponent(name)}%2C%20regarding%20your%20Order%20%23${o.id}%20from%20OneSpace%20Commerce" target="_blank" class="px-3.5 py-2 bg-[#25D366] hover:opacity-95 text-white font-medium rounded-lg flex items-center gap-1.5 transition-all shadow-xs">
-              <span class="material-symbols-outlined text-sm">chat</span> Contact Customer via WhatsApp
+            <a href="https://wa.me/91${phone}?text=Hi%20${encodeURIComponent(name)}%2C%20regarding%20your%20Order%20%23${o.id}%20from%20OneSpace%20Commerce" target="_blank" class="px-3.5 py-2 bg-[#25D366] hover:opacity-95 text-white font-semibold rounded-lg flex items-center gap-1.5 transition-all shadow-xs">
+              <span class="material-symbols-outlined text-sm">chat</span> WhatsApp Customer
             </a>` : ''}
           </div>
         </div>
@@ -3813,7 +4185,53 @@
       }
     };
 
-    document.getElementById('banner-update-form').addEventListener('submit', async (e) => {
+    document.getElementById('general-settings-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('ctrl-store-name')?.value?.trim() || '';
+      const storeUrl = document.getElementById('ctrl-store-url')?.value?.trim() || '';
+      const supportEmail = document.getElementById('ctrl-support-email')?.value?.trim() || '';
+      const supportPhone = document.getElementById('ctrl-support-phone')?.value?.trim() || '';
+      const whatsappNumber = document.getElementById('ctrl-whatsapp-num')?.value?.trim() || '';
+      const storeAddress = document.getElementById('ctrl-store-address')?.value?.trim() || '';
+      const logo = document.getElementById('ctrl-store-logo')?.value?.trim() || '';
+
+      const res = await updateCompanySettings({ name, storeUrl, supportEmail, supportPhone, whatsappNumber, storeAddress, logo }, COMPANY_ID);
+      if (res.success) {
+        alert('General store settings saved successfully!');
+        if (document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = name;
+        if (document.getElementById('sidebar-logo-img') && logo) document.getElementById('sidebar-logo-img').src = logo;
+      } else {
+        alert('Error updating settings: ' + res.error);
+      }
+    });
+
+    document.getElementById('branding-update-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const deliveryTnPrice = Number(document.getElementById('ctrl-delivery-tn')?.value || 0);
+      const deliveryNonTnPrice = Number(document.getElementById('ctrl-delivery-non-tn')?.value || 60);
+
+      const isWhatsappEnabled = document.getElementById('ctrl-whatsapp-toggle')?.checked ?? true;
+      const isCodEnabled = document.getElementById('ctrl-cod-toggle')?.checked ?? true;
+      const isCouponEnabled = document.getElementById('ctrl-coupon-toggle')?.checked ?? true;
+      const isRazorpayEnabled = document.getElementById('ctrl-razorpay-toggle')?.checked ?? true;
+
+      const res = await updateCompanySettings({
+        deliveryTnPrice,
+        deliveryNonTnPrice,
+        isWhatsappEnabled,
+        isCodEnabled,
+        isCouponEnabled,
+        isRazorpayEnabled
+      }, COMPANY_ID);
+
+      if (res.success) {
+        alert('Platform controls, COD, WhatsApp & Promo Coupon settings updated successfully!');
+      } else {
+        alert('Error updating controls: ' + res.error);
+      }
+    });
+
+    document.getElementById('banner-update-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const slides = Array.from(document.querySelectorAll('.banner-slide-box')).map(box => ({
         heroMediaUrl: box.querySelector('.ctrl-banner-url').value.trim(),
@@ -3834,29 +4252,6 @@
         alert('Homepage Banner Slides updated successfully!');
       } else {
         alert('Error updating banners: ' + res.error);
-      }
-    });
-
-    document.getElementById('branding-update-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('ctrl-store-name').value.trim();
-      const logo = document.getElementById('ctrl-store-logo').value.trim();
-      const whatsappNumber = document.getElementById('ctrl-whatsapp-num').value.trim();
-      const instagramLink = document.getElementById('ctrl-instagram-link').value.trim();
-      const deliveryTnPrice = Number(document.getElementById('ctrl-delivery-tn').value || 0);
-      const deliveryNonTnPrice = Number(document.getElementById('ctrl-delivery-non-tn').value || 60);
-
-      const isWhatsappEnabled = document.getElementById('ctrl-whatsapp-toggle').checked;
-      const isCodEnabled = document.getElementById('ctrl-cod-toggle').checked;
-      const isCouponEnabled = document.getElementById('ctrl-coupon-toggle').checked;
-
-      const res = await updateCompanySettings({ name, logo, whatsappNumber, instagramLink, deliveryTnPrice, deliveryNonTnPrice, isWhatsappEnabled, isCodEnabled, isCouponEnabled }, COMPANY_ID);
-      if (res.success) {
-        alert('Branding, Contact, WhatsApp, COD & Promo Coupon settings updated successfully!');
-        document.getElementById('header-brand-name').textContent = name;
-        if (document.getElementById('sidebar-logo-img') && logo) document.getElementById('sidebar-logo-img').src = logo;
-      } else {
-        alert('Error updating branding: ' + res.error);
       }
     });
 

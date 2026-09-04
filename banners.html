@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banners &amp; Sliders | OneSpace Commerce</title>
+  <link rel="icon" type="image/png" href="assets/onespace-commerce-logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+
+<body class="bg-[#fafafa] text-slate-900 antialiased min-h-screen flex flex-col">
+
+  <!-- ==========================================
+       TOP NAVIGATION BAR (Matching System UI)
+  ========================================== -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand & Page Title -->
+      <div class="flex items-center gap-3">
+        <a href="admin.html" class="flex items-center gap-2 group">
+          <div class="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center font-bold text-sm shadow-xs group-hover:bg-slate-800 transition">
+            TB
+          </div>
+          <div>
+            <span class="font-bold text-base tracking-tight text-slate-900 block leading-tight">Banners</span>
+            <span class="text-[11px] text-slate-400 font-medium hidden sm:block">The Baniyan Company</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Center Search Bar -->
+      <div class="flex-1 max-w-lg mx-2 sm:mx-6 hidden md:block">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input
+            type="text"
+            placeholder="Search orders, products, customers..."
+            class="w-full bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:border-black focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2 outline-none transition"
+          >
+        </div>
+      </div>
+
+      <!-- Right Header Controls -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <a
+          href="admin.html"
+          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs"
+        >
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>Add Product</span>
+        </a>
+
+        <a
+          href="home.html"
+          target="_blank"
+          class="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium px-3 py-2 rounded-xl hidden sm:flex items-center gap-1.5 transition"
+        >
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-500"></i>
+          <span>View Store</span>
+        </a>
+
+        <button
+          type="button"
+          class="relative w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition"
+        >
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
+            3
+          </span>
+        </button>
+
+        <a href="admin.html" class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:opacity-90 transition">
+          TB
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN CONTENT CONTAINER
+  ========================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-8">
+
+    <!-- PAGE HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Banners</h1>
+        <p class="text-xs text-slate-500 mt-1">Manage storefront carousel slides, marketing promotions, and click-through banners.</p>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <button
+          type="button"
+          onclick="openBannerModal()"
+          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+        >
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>Add Banner</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         SECTION 1: HERO BANNERS (16:6 recommended)
+    ========================================== -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900">Hero Banners</h2>
+          <span class="text-[11px] text-slate-400 font-medium">16:6 recommended</span>
+        </div>
+        <span class="text-xs text-slate-500 font-medium" id="hero-count-text">2 Banners</span>
+      </div>
+
+      <div id="hero-banners-list" class="space-y-3">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 2: PROMOTIONAL BANNERS (4:1 recommended)
+    ========================================== -->
+    <section class="space-y-3 pt-4 border-t border-slate-200/80">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900">Promotional Banners</h2>
+          <span class="text-[11px] text-slate-400 font-medium">4:1 recommended</span>
+        </div>
+        <span class="text-xs text-slate-500 font-medium" id="promo-count-text">1 Banner</span>
+      </div>
+
+      <div id="promo-banners-list" class="space-y-3">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================
+       NEAT & CLEAN ADD / EDIT BANNER DIALOG MODAL
+  ========================================== -->
+  <div id="modal-banner" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Top Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center">
+            <i data-lucide="image" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900" id="banner-modal-title">Add New Banner</h3>
+            <p class="text-[11px] text-slate-400">Configure banner type, image, and call-to-action</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onclick="closeBannerModal()"
+          class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Form Body -->
+      <form id="banner-form" onsubmit="handleSaveBanner(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="banner-edit-id" value="">
+
+        <!-- Banner Type Selector -->
+        <div class="space-y-1">
+          <label class="font-semibold text-slate-700">Banner Section</label>
+          <div class="grid grid-cols-2 gap-2 pt-0.5">
+            <label class="flex items-center gap-2 p-2.5 border rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 border-slate-200 has-[:checked]:border-black has-[:checked]:bg-black has-[:checked]:text-white transition">
+              <input type="radio" name="bannerType" value="hero" checked class="hidden">
+              <span class="font-semibold text-xs">Hero Banner (16:6)</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 border rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 border-slate-200 has-[:checked]:border-black has-[:checked]:bg-black has-[:checked]:text-white transition">
+              <input type="radio" name="bannerType" value="promo" class="hidden">
+              <span class="font-semibold text-xs">Promo Banner (4:1)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Headline / Title -->
+        <div class="space-y-1">
+          <label class="font-semibold text-slate-700">Headline / Title <span class="text-rose-500">*</span></label>
+          <input
+            type="text"
+            id="banner-title"
+            required
+            placeholder="e.g. Summer Sale - Up to 40% Off"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black outline-none font-medium"
+          >
+        </div>
+
+        <!-- Subheading / Tagline -->
+        <div class="space-y-1">
+          <label class="font-semibold text-slate-700">Subheading / Description</label>
+          <input
+            type="text"
+            id="banner-subtitle"
+            placeholder="e.g. Shop our latest collection"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black outline-none"
+          >
+        </div>
+
+        <!-- Button Text & Action URL -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="font-semibold text-slate-700">Button Label</label>
+            <input
+              type="text"
+              id="banner-button-text"
+              placeholder="e.g. Shop Now"
+              value="Shop Now"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black outline-none font-medium"
+            >
+          </div>
+          <div class="space-y-1">
+            <label class="font-semibold text-slate-700">Target Link URL</label>
+            <input
+              type="text"
+              id="banner-target-url"
+              placeholder="e.g. shop.html"
+              value="shop.html"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black outline-none font-mono"
+            >
+          </div>
+        </div>
+
+        <!-- Image URL & File Upload -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="font-semibold text-slate-700">Banner Image</label>
+            <span class="text-[10px] text-slate-400">High-resolution JPG / WebP</span>
+          </div>
+          <input
+            type="url"
+            id="banner-image-url"
+            required
+            placeholder="https://images.unsplash.com/..."
+            oninput="previewBannerImage(this.value)"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black outline-none font-mono text-[11px]"
+          >
+          
+          <!-- Image Preview Thumbnail -->
+          <div id="banner-image-preview-box" class="h-24 w-full rounded-xl border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center relative">
+            <img id="banner-preview-img" src="" alt="Banner Preview" class="w-full h-full object-cover hidden">
+            <span id="banner-preview-placeholder" class="text-[11px] text-slate-400 italic">No image URL specified</span>
+          </div>
+        </div>
+
+        <!-- Status Toggle -->
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+          <div>
+            <span class="font-bold text-slate-900 block text-xs">Active Status</span>
+            <span class="text-[10px] text-slate-400">Show this banner live on web store</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="banner-status-toggle" checked class="sr-only peer">
+            <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+          </label>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button
+            type="button"
+            onclick="closeBannerModal()"
+            class="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-xl border border-slate-200 transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="btn-save-banner"
+            class="px-5 py-2 text-xs font-semibold text-white bg-black hover:bg-neutral-800 rounded-xl shadow-xs transition"
+          >
+            Save Banner
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       APPLICATION LOGIC & FIRESTORE SCRIPT
+  ========================================== -->
+  <script type="module">
+    import { db } from './js/firebase-config.js';
+    import { 
+      collection, 
+      getDocs, 
+      doc, 
+      setDoc, 
+      deleteDoc, 
+      writeBatch, 
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const COMPANY_ID = 'thebaniyancompany';
+
+    // Baseline Banners matching screenshot exactly
+    window.allBanners = [
+      {
+        id: 'banner-hero-1',
+        type: 'hero',
+        title: 'Summer Sale – Up to 40% Off',
+        subtitle: 'Shop our latest collection',
+        buttonText: 'Shop Now',
+        targetUrl: 'shop.html',
+        imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&q=80',
+        status: 'Active'
+      },
+      {
+        id: 'banner-hero-2',
+        type: 'hero',
+        title: 'New Arrivals – Cotton Kurtis',
+        subtitle: 'Fresh styles for every occasion',
+        buttonText: 'Explore',
+        targetUrl: 'shop.html?category=Kurtas',
+        imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1200&q=80',
+        status: 'Hidden'
+      },
+      {
+        id: 'banner-promo-1',
+        type: 'promo',
+        title: 'Free Delivery on ₹999+',
+        subtitle: 'Pan-India lightning fast dispatch',
+        buttonText: 'Shop Now',
+        targetUrl: 'shop.html',
+        imageUrl: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200&q=80',
+        status: 'Active'
+      }
+    ];
+
+    async function loadBanners() {
+      try {
+        const snap = await getDocs(collection(db, 'companies', COMPANY_ID, 'banners'));
+        if (!snap.empty) {
+          window.allBanners = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+      } catch (e) {
+        console.warn('Using baseline banners:', e);
+      }
+      renderBannersList();
+    }
+
+    function renderBannersList() {
+      const heroList = document.getElementById('hero-banners-list');
+      const promoList = document.getElementById('promo-banners-list');
+
+      const heroes = window.allBanners.filter(b => b.type === 'hero');
+      const promos = window.allBanners.filter(b => b.type === 'promo');
+
+      document.getElementById('hero-count-text').textContent = `${heroes.length} Banners`;
+      document.getElementById('promo-count-text').textContent = `${promos.length} Banner`;
+
+      // Render Hero Banners
+      heroList.innerHTML = heroes.map(b => renderBannerRow(b)).join('');
+      promoList.innerHTML = promos.map(b => renderBannerRow(b)).join('');
+
+      lucide.createIcons();
+    }
+
+    function renderBannerRow(b) {
+      const isActive = b.status === 'Active';
+      const statusBadge = isActive 
+        ? `<span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#f0fdf4] text-[#16a34a] border border-[#dcfce7]">Active</span>`
+        : `<span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#f1f5f9] text-[#64748b] border border-[#e2e8f0]">Hidden</span>`;
+
+      return `
+        <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-xs flex items-center justify-between gap-4 hover:border-slate-300 transition">
+          <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+            <!-- Drag Handle Dots -->
+            <div class="text-slate-300 hover:text-slate-500 cursor-grab px-1 select-none">
+              <i data-lucide="grip-vertical" class="w-4 h-4"></i>
+            </div>
+
+            <!-- Thumbnail Image -->
+            <div class="w-20 sm:w-28 h-12 sm:h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+              <img src="${b.imageUrl}" alt="${b.title}" class="w-full h-full object-cover">
+            </div>
+
+            <!-- Content Details -->
+            <div class="min-w-0">
+              <h3 class="font-bold text-xs sm:text-sm text-slate-900 truncate">${b.title}</h3>
+              <p class="text-[11px] text-slate-500 truncate mt-0.5">${b.subtitle || ''}</p>
+              <span class="text-[10px] text-indigo-600 font-semibold block mt-0.5">Button: "${b.buttonText || 'Shop Now'}"</span>
+            </div>
+          </div>
+
+          <!-- Right Status & Actions -->
+          <div class="flex items-center gap-3 shrink-0">
+            ${statusBadge}
+            <button
+              type="button"
+              onclick="editBanner('${b.id}')"
+              title="Edit Banner"
+              class="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
+            >
+              <i data-lucide="pencil" class="w-4 h-4"></i>
+            </button>
+            <button
+              type="button"
+              onclick="deleteBanner('${b.id}')"
+              title="Delete Banner"
+              class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+            >
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Modal Handlers
+    window.openBannerModal = function(isEdit = false) {
+      const modal = document.getElementById('modal-banner');
+      if (!isEdit) {
+        document.getElementById('banner-modal-title').textContent = 'Add New Banner';
+        document.getElementById('banner-edit-id').value = '';
+        document.getElementById('banner-title').value = '';
+        document.getElementById('banner-subtitle').value = '';
+        document.getElementById('banner-button-text').value = 'Shop Now';
+        document.getElementById('banner-target-url').value = 'shop.html';
+        document.getElementById('banner-image-url').value = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&q=80';
+        document.getElementById('banner-status-toggle').checked = true;
+        previewBannerImage('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&q=80');
+      }
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    window.closeBannerModal = function() {
+      document.getElementById('modal-banner')?.classList.add('hidden');
+    };
+
+    window.previewBannerImage = function(url) {
+      const img = document.getElementById('banner-preview-img');
+      const placeholder = document.getElementById('banner-preview-placeholder');
+      if (url && url.trim()) {
+        img.src = url.trim();
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+    };
+
+    window.editBanner = function(id) {
+      const b = window.allBanners.find(x => x.id === id);
+      if (!b) return;
+
+      document.getElementById('banner-modal-title').textContent = 'Edit Banner';
+      document.getElementById('banner-edit-id').value = b.id;
+      document.getElementById('banner-title').value = b.title || '';
+      document.getElementById('banner-subtitle').value = b.subtitle || '';
+      document.getElementById('banner-button-text').value = b.buttonText || 'Shop Now';
+      document.getElementById('banner-target-url').value = b.targetUrl || 'shop.html';
+      document.getElementById('banner-image-url').value = b.imageUrl || '';
+      document.getElementById('banner-status-toggle').checked = (b.status === 'Active');
+
+      const radios = document.getElementsByName('bannerType');
+      radios.forEach(r => {
+        r.checked = (r.value === b.type);
+      });
+
+      previewBannerImage(b.imageUrl);
+      openBannerModal(true);
+    };
+
+    window.deleteBanner = async function(id) {
+      if (!confirm('Are you sure you want to remove this banner?')) return;
+      window.allBanners = window.allBanners.filter(b => b.id !== id);
+      renderBannersList();
+
+      try {
+        await deleteDoc(doc(db, 'companies', COMPANY_ID, 'banners', id));
+      } catch (e) {
+        console.log('Deleted locally:', e);
+      }
+    };
+
+    window.handleSaveBanner = async function(e) {
+      e.preventDefault();
+      const editId = document.getElementById('banner-edit-id').value;
+      const type = document.querySelector('input[name="bannerType"]:checked')?.value || 'hero';
+      const title = document.getElementById('banner-title').value.trim();
+      const subtitle = document.getElementById('banner-subtitle').value.trim();
+      const buttonText = document.getElementById('banner-button-text').value.trim();
+      const targetUrl = document.getElementById('banner-target-url').value.trim();
+      const imageUrl = document.getElementById('banner-image-url').value.trim();
+      const isActive = document.getElementById('banner-status-toggle').checked;
+
+      const bannerId = editId || `BANNER-${Date.now().toString().slice(-6)}`;
+      const payload = {
+        id: bannerId,
+        type,
+        title,
+        subtitle,
+        buttonText,
+        targetUrl,
+        imageUrl,
+        status: isActive ? 'Active' : 'Hidden',
+        updatedAt: serverTimestamp()
+      };
+
+      if (editId) {
+        const idx = window.allBanners.findIndex(b => b.id === editId);
+        if (idx !== -1) window.allBanners[idx] = { ...window.allBanners[idx], ...payload };
+      } else {
+        window.allBanners.push(payload);
+      }
+
+      closeBannerModal();
+      renderBannersList();
+
+      try {
+        await setDoc(doc(db, 'companies', COMPANY_ID, 'banners', bannerId), payload, { merge: true });
+      } catch (err) {
+        console.log('Banner persisted to state:', err);
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', loadBanners);
+  </script>
+</body>
+</html>
