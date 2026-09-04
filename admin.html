@@ -350,8 +350,8 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Today's Sales</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-sales">₹12,450</h3>
-                <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5">+18% from yesterday</span>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-sales">₹0</h3>
+                <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5" id="kpi-today-growth">Live Store Sales</span>
               </div>
             </div>
 
@@ -362,8 +362,8 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Today's Orders</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-orders">28</h3>
-                <span class="text-[11px] font-medium text-slate-500 block mt-0.5" id="kpi-orders-breakdown">17 online · 11 COD</span>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-orders">0</h3>
+                <span class="text-[11px] font-medium text-slate-500 block mt-0.5" id="kpi-orders-breakdown">0 online · 0 COD</span>
               </div>
             </div>
 
@@ -375,7 +375,7 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Pending Orders</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-pending-orders">16</h3>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-pending-orders">0</h3>
                 <span class="text-[11px] font-bold text-amber-700 block mt-0.5">Action Needed</span>
               </div>
             </div>
@@ -387,8 +387,8 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Customers</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-total-customers">356</h3>
-                <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5" id="kpi-new-customers">+12 new today</span>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-total-customers">0</h3>
+                <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5" id="kpi-new-customers">0 in database</span>
               </div>
             </div>
 
@@ -399,8 +399,8 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Avg Order Value</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-aov">₹445</h3>
-                <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5">+₹22 from last week</span>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-aov">₹0</h3>
+                <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5">Based on orders</span>
               </div>
             </div>
 
@@ -411,7 +411,7 @@
               </div>
               <div>
                 <span class="text-xs font-medium text-slate-500">Est. Profit</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-est-profit">₹5,870</h3>
+                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-est-profit">₹0</h3>
                 <span class="text-[11px] font-medium text-slate-500 block mt-0.5" id="kpi-profit-margin">Margin: 47%</span>
               </div>
             </div>
@@ -433,7 +433,7 @@
                     <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
                       <span class="material-symbols-outlined text-base">schedule</span>
                     </div>
-                    <span class="text-xs font-medium text-slate-800" id="act-pending-count-text">16 Orders waiting for acceptance</span>
+                    <span class="text-xs font-medium text-slate-800" id="act-pending-count-text">0 Orders waiting for acceptance</span>
                   </div>
                   <button onclick="switchAdminTab('orders'); setOrderFilter('pending');"
                     class="px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap">View Orders</button>
@@ -445,7 +445,7 @@
                     <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center flex-shrink-0">
                       <span class="material-symbols-outlined text-base">inventory_2</span>
                     </div>
-                    <span class="text-xs font-medium text-slate-800" id="act-low-stock-text">8 Products running low on stock</span>
+                    <span class="text-xs font-medium text-slate-800" id="act-low-stock-text">0 Products running low on stock</span>
                   </div>
                   <button onclick="switchAdminTab('products'); setStockFilter('low_stock');"
                     class="px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap">Check Stock</button>
@@ -457,7 +457,7 @@
                     <div class="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
                       <span class="material-symbols-outlined text-base">credit_card</span>
                     </div>
-                    <span class="text-xs font-medium text-slate-800">3 Failed payments need attention</span>
+                    <span class="text-xs font-medium text-slate-800" id="act-failed-payments-text">0 Failed payments need attention</span>
                   </div>
                   <button onclick="switchAdminTab('orders'); setPaymentFilter('failed');"
                     class="px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap">View Payments</button>
@@ -469,7 +469,7 @@
                     <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
                       <span class="material-symbols-outlined text-base">shopping_cart</span>
                     </div>
-                    <span class="text-xs font-medium text-slate-800">6 Abandoned carts need recovery</span>
+                    <span class="text-xs font-medium text-slate-800" id="act-abandoned-carts-text">0 Pending payment checkouts</span>
                   </div>
                   <button onclick="switchAdminTab('orders'); setOrderFilter('pending');"
                     class="px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap">Recover Sales</button>
@@ -892,41 +892,71 @@
                   </div>
                 </div>
 
-                <!-- Regional Delivery Fees (Moved from Controls) -->
-                <div>
-                  <h4 class="text-xs font-medium uppercase tracking-wider text-slate-500 mb-3">Regional Delivery Charges</h4>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="p-4 rounded-xl bg-slate-50/70 border border-slate-200 shadow-2xs">
-                      <label class="block text-xs font-medium text-slate-700 mb-1.5">Delivery Fee (Inside Tamil Nadu)</label>
-                      <div class="relative">
-                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400">₹</span>
-                        <input type="number" id="ctrl-delivery-tn" placeholder="0" value="0"
-                          class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-black font-medium">
+                <!-- Regional Delivery Fees Stacked 1 by 1 -->
+                <div class="space-y-3.5">
+                  <h4 class="text-xs font-medium uppercase tracking-wider text-slate-500 mb-1">Shipping &amp; Delivery Options (1 by 1)</h4>
+                  
+                  <!-- 1. Tamil Nadu -->
+                  <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 shadow-2xs transition-all">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div class="space-y-1 max-w-lg">
+                        <div class="flex items-center gap-2">
+                          <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">1</span>
+                          <h4 class="text-sm font-semibold text-slate-900">Tamil Nadu</h4>
+                          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Inside TN Delivery Fee</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Shipping rate applied to orders within Tamil Nadu state. Set to ₹0 for free local delivery.</p>
                       </div>
-                      <span class="text-[11px] text-slate-400 mt-1 block">Set 0 for free delivery within Tamil Nadu</span>
-                    </div>
-
-                    <div class="p-4 rounded-xl bg-slate-50/70 border border-slate-200 shadow-2xs">
-                      <label class="block text-xs font-medium text-slate-700 mb-1.5">Delivery Fee (Outside Tamil Nadu)</label>
-                      <div class="relative">
-                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400">₹</span>
-                        <input type="number" id="ctrl-delivery-non-tn" placeholder="60" value="60"
-                          class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-black font-medium">
+                      <div class="w-full sm:w-48 shrink-0">
+                        <div class="relative">
+                          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">₹</span>
+                          <input type="number" id="ctrl-delivery-tn" placeholder="0" value="0"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 font-semibold outline-none focus:border-black focus:bg-white transition">
+                        </div>
                       </div>
-                      <span class="text-[11px] text-slate-400 mt-1 block">Standard shipping for all other Indian states</span>
                     </div>
                   </div>
-                </div>
 
-                <div class="pt-2 border-t border-slate-100">
-                  <div class="max-w-md">
-                    <label class="block text-xs font-medium text-slate-700 mb-1.5">Free Shipping Minimum Order (₹)</label>
-                    <div class="relative">
-                      <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400">₹</span>
-                      <input type="number" id="ctrl-free-shipping-min" value="999"
-                        class="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 font-medium outline-none focus:border-black">
+                  <!-- 2. Outside Tamil Nadu -->
+                  <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 shadow-2xs transition-all">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div class="space-y-1 max-w-lg">
+                        <div class="flex items-center gap-2">
+                          <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-800 font-bold text-xs flex items-center justify-center shrink-0">2</span>
+                          <h4 class="text-sm font-semibold text-slate-900">Outside Tamil Nadu</h4>
+                          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-50 text-sky-700 border border-sky-200/60">Rest of India</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Standard shipping charge for all deliveries to other Indian states and union territories.</p>
+                      </div>
+                      <div class="w-full sm:w-48 shrink-0">
+                        <div class="relative">
+                          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">₹</span>
+                          <input type="number" id="ctrl-delivery-non-tn" placeholder="60" value="60"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 font-semibold outline-none focus:border-black focus:bg-white transition">
+                        </div>
+                      </div>
                     </div>
-                    <span class="text-[11px] text-slate-400 mt-1 block">Orders above this subtotal qualify for 100% free delivery across India</span>
+                  </div>
+
+                  <!-- 3. Free Delivery Above -->
+                  <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 shadow-2xs transition-all">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div class="space-y-1 max-w-lg">
+                        <div class="flex items-center gap-2">
+                          <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 font-bold text-xs flex items-center justify-center shrink-0">3</span>
+                          <h4 class="text-sm font-semibold text-slate-900">Free Delivery Above</h4>
+                          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/60">Free Shipping Minimum</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Cart subtotal threshold in ₹ where shipping charges become automatically waived for 100% free delivery.</p>
+                      </div>
+                      <div class="w-full sm:w-48 shrink-0">
+                        <div class="relative">
+                          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">₹</span>
+                          <input type="number" id="ctrl-free-shipping-min" placeholder="999" value="999"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 font-semibold outline-none focus:border-black focus:bg-white transition">
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -1828,149 +1858,77 @@
           </div>
         </div>
 
-        <!-- ==================== SECTION 2: INTERACTIVE ATTRIBUTE SELECTORS ==================== -->
-        <div class="space-y-3.5 p-4 bg-slate-50/80 border border-slate-200/90 rounded-2xl">
-          <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-              <i data-lucide="sliders" class="w-4 h-4 text-slate-700"></i> Section 2: Interactive Attribute Selectors (Multi-Select Chips)
-            </span>
-            <span class="text-[11px] font-semibold text-slate-500">Auto-Generates Matrix Below</span>
+        <!-- ==================== SECTION 3: PRICING (MATCHING EXACT IMAGE SPEC) ==================== -->
+        <div class="space-y-4 p-5 bg-white border border-slate-200 rounded-2xl shadow-2xs">
+          <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center shrink-0">3</span>
+            <h3 class="text-base font-bold text-slate-900">Pricing</h3>
           </div>
 
-          <!-- SIZES SELECTOR -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="font-bold text-slate-800 flex items-center gap-1.5">
-                <i data-lucide="maximize" class="w-3.5 h-3.5 text-slate-600"></i> Sizes Selector
-              </label>
-              <span id="selected-sizes-count" class="text-[11px] font-semibold text-slate-500">Selected: 0</span>
-            </div>
-            <p class="text-[11px] text-slate-500 leading-tight">Click chips to toggle. Click "+ Add Size" to type custom numerical/alpha sizes.</p>
-
-            <div id="size-chips-container" class="flex flex-wrap items-center gap-2 pt-1">
-              <!-- Dynamically populated size chips -->
+          <!-- 3 Pricing Inputs Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="space-y-1.5">
+              <label class="block font-semibold text-slate-700 text-xs">MRP (₹)</label>
+              <input type="number" id="quick-prod-mrp" placeholder="999" value="999" min="0" oninput="calculatePricingMetrics()"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium outline-none focus:border-black transition">
             </div>
 
-            <!-- Inline Custom Size Box -->
-            <div id="custom-size-input-box" class="hidden items-center gap-2 pt-2 border-t border-slate-200/80 mt-2">
-              <input type="text" id="custom-size-text" placeholder="Type custom size (e.g. 28, 30, 32, Free Size)..." class="shopify-input rounded-xl px-3 py-1.5 text-xs outline-none w-64 uppercase font-bold text-slate-900 border border-slate-300" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomSize();}">
-              <button type="button" onclick="addCustomSize()" class="px-3.5 py-1.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 transition-colors cursor-pointer">Add</button>
-              <button type="button" onclick="toggleCustomSizeBox(false)" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">Cancel</button>
+            <div class="space-y-1.5">
+              <label class="block font-semibold text-slate-700 text-xs">Selling Price (₹)</label>
+              <input type="number" id="quick-prod-price" placeholder="799" value="799" min="0" oninput="calculatePricingMetrics()"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold outline-none focus:border-black transition">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block font-semibold text-slate-700 text-xs">Cost Price (₹)</label>
+              <input type="number" id="quick-prod-cost" placeholder="400" value="400" min="0" oninput="calculatePricingMetrics()"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium outline-none focus:border-black transition">
             </div>
           </div>
 
-          <!-- COLORS SELECTOR -->
-          <div class="space-y-2 pt-2 border-t border-slate-200/60">
-            <div class="flex items-center justify-between">
-              <label class="font-bold text-slate-800 flex items-center gap-1.5">
-                <i data-lucide="palette" class="w-3.5 h-3.5 text-slate-600"></i> Colors Selector
-              </label>
-              <span id="selected-colors-count" class="text-[11px] font-semibold text-slate-500">Selected: 0</span>
+          <!-- Green Profit & Margin KPI Banner -->
+          <div class="p-4 rounded-xl bg-[#f0fdf4] border border-[#dcfce7] flex items-center gap-12 sm:gap-16">
+            <div>
+              <span class="text-xl font-extrabold text-[#166534] block tracking-tight" id="pricing-profit-unit">₹399</span>
+              <span class="text-xs font-semibold text-[#15803d] block mt-0.5">Profit per unit</span>
             </div>
-            <p class="text-[11px] text-slate-500 leading-tight">Click chips to toggle colorways. Click "+ Add Color" to type custom shade name and pick hex swatch.</p>
-
-            <div id="color-chips-container" class="flex flex-wrap items-center gap-2 pt-1">
-              <!-- Dynamically populated color chips -->
-            </div>
-
-            <!-- Inline Custom Color Box -->
-            <div id="custom-color-input-box" class="hidden items-center gap-2 pt-2 border-t border-slate-200/80 mt-2 flex-wrap">
-              <input type="text" id="custom-color-name" placeholder="Color name (e.g. Sage Green, Terracotta)..." class="shopify-input rounded-xl px-3 py-1.5 text-xs outline-none w-56 font-medium text-slate-900 border border-slate-300" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomColor();}">
-              <div class="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-2.5 py-1">
-                <span class="text-[10px] text-slate-400 font-medium">Hex Swatch:</span>
-                <input type="color" id="custom-color-hex" value="#059669" class="w-6 h-6 rounded cursor-pointer border-0 bg-transparent">
-              </div>
-              <button type="button" onclick="addCustomColor()" class="px-3.5 py-1.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 transition-colors cursor-pointer">Add</button>
-              <button type="button" onclick="toggleCustomColorBox(false)" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">Cancel</button>
+            <div>
+              <span class="text-xl font-extrabold text-[#166534] block tracking-tight" id="pricing-profit-margin">50%</span>
+              <span class="text-xs font-semibold text-[#15803d] block mt-0.5">Profit Margin</span>
             </div>
           </div>
         </div>
 
-        <!-- ==================== SECTION 3: VARIANT MATRIX TABLE (PRICING & BRANCH-WISE STOCK) ==================== -->
-        <div class="space-y-3.5 p-4 bg-white border border-slate-200 rounded-2xl shadow-xs">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 flex-wrap gap-2">
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                <i data-lucide="table-2" class="w-4 h-4 text-slate-900"></i> Section 3: Variant Matrix Table (Pricing &amp; Branch-wise Stock)
-              </span>
-              <p class="text-[11px] text-slate-500 mt-0.5">Enter individual variant prices and physical stock counts one-by-one per store branch location.</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <span id="matrix-badge-count" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200/80">4 Variants</span>
-              <button type="button" onclick="showAddBranchPrompt()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 inline-flex items-center gap-1 cursor-pointer">
-                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Branch
-              </button>
+        <!-- ==================== SECTION 4: VARIANTS (MATCHING EXACT IMAGE SPEC) ==================== -->
+        <div class="space-y-4 p-5 bg-white border border-slate-200 rounded-2xl shadow-2xs">
+          <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center shrink-0">4</span>
+            <h3 class="text-base font-bold text-slate-900">Variants</h3>
+          </div>
+
+          <!-- SIZES CHIPS -->
+          <div class="space-y-2">
+            <label class="block font-semibold text-slate-700 text-xs">Sizes</label>
+            <div id="size-chips-container" class="flex flex-wrap items-center gap-2">
+              <!-- Rendered size chips -->
             </div>
           </div>
 
-          <!-- Bulk Apply Row -->
-          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1">
-                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i> Quick Fill to All Variants
-              </span>
-              <span class="text-[10px] text-slate-400">Fills all matrix rows instantly</span>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 items-center">
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">MRP (₹)</label>
-                <input type="number" id="bulk-mrp" placeholder="999" value="999" class="w-full shopify-input rounded-lg px-2 py-1 text-xs outline-none">
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Selling Price (₹)</label>
-                <input type="number" id="bulk-price" placeholder="699" value="699" class="w-full shopify-input rounded-lg px-2 py-1 text-xs outline-none font-bold text-slate-900">
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Cost Price (₹)</label>
-                <input type="number" id="bulk-cost" placeholder="350" value="350" class="w-full shopify-input rounded-lg px-2 py-1 text-xs outline-none">
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Main Store Stock</label>
-                <input type="number" id="bulk-stock-main" placeholder="15" value="15" class="w-full shopify-input rounded-lg px-2 py-1 text-xs outline-none">
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Branch 2 Stock</label>
-                <input type="number" id="bulk-stock-branch2" placeholder="8" value="8" class="w-full shopify-input rounded-lg px-2 py-1 text-xs outline-none">
-              </div>
-              <div class="flex items-end">
-                <button type="button" onclick="applyBulkToAllVariants()" class="w-full py-1.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs transition-colors flex items-center justify-center gap-1">
-                  <span>Apply All</span>
-                </button>
-              </div>
+          <!-- COLORS CHIPS -->
+          <div class="space-y-2 pt-2">
+            <label class="block font-semibold text-slate-700 text-xs">Colors</label>
+            <div id="color-chips-container" class="flex flex-wrap items-center gap-2">
+              <!-- Rendered color chips -->
             </div>
           </div>
 
-          <!-- Variant Matrix Table Container -->
-          <div class="overflow-x-auto rounded-xl border border-slate-200">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="bg-slate-50/90 text-[10px] font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200">
-                  <th class="p-3 w-40">Variant</th>
-                  <th class="p-3 w-24">MRP (₹)</th>
-                  <th class="p-3 w-28">Selling Price (₹)</th>
-                  <th class="p-3 w-24">Cost (₹)</th>
-                  <th class="p-3" id="th-branch-headers">Branch Physical Stocks</th>
-                  <th class="p-3 text-right w-20">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="variant-matrix-tbody" class="divide-y divide-slate-100 text-xs">
-                <!-- Dynamically populated variant rows -->
-              </tbody>
-            </table>
-          </div>
+          <!-- STOCK PER VARIANT LIST -->
+          <div class="pt-3 border-t border-slate-100 space-y-3">
+            <label class="block font-semibold text-slate-800 text-xs">Stock per Variant</label>
 
-          <!-- Matrix Summary Bar -->
-          <div class="p-3 bg-slate-900 text-white rounded-xl flex items-center justify-between flex-wrap gap-2 text-xs shadow-xs">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="boxes" class="w-5 h-5 text-amber-400"></i>
-              <div>
-                <span id="matrix-summary-text" class="font-bold block">4 Variants Ready</span>
-                <span id="matrix-branches-text" class="text-slate-300 block text-[11px]">Across 2 registered branches</span>
-              </div>
-            </div>
-            <div class="text-right">
-              <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-semibold">Total Physical Units</span>
-              <span id="matrix-total-units" class="text-sm font-extrabold text-amber-300">0 Units</span>
+            <!-- Dynamic Variant Rows matching image: [Color / Size] [SKU: XXX] [Stock Input] -->
+            <div id="variant-matrix-tbody" class="divide-y divide-slate-100 border-t border-slate-100">
+              <!-- Rendered variant rows -->
             </div>
           </div>
         </div>
@@ -2274,39 +2232,102 @@
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
 
-      let labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      let revenueData = [8000, 7000, 11000, 9500, 15000, 20000, 12500];
-      let profitData = [3500, 3000, 5000, 4200, 6800, 8500, 5870];
+      const orders = Array.isArray(window.currentAllOrders) ? window.currentAllOrders : [];
+      const now = new Date();
+
+      let labels = [];
+      let revenueData = [];
+      let profitData = [];
 
       if (window.currentChartPeriod === 'today') {
-        labels = ['8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM'];
-        revenueData = [1200, 2500, 4100, 3200, 5600, 7800, 12450];
-        profitData = [600, 1100, 1900, 1500, 2600, 3600, 5870];
+        labels = ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM', '11 PM'];
+        revenueData = [0, 0, 0, 0, 0, 0, 0];
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+        orders.forEach(o => {
+          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          if (ts >= startOfToday) {
+            const hr = new Date(ts).getHours();
+            const slotIdx = Math.min(6, Math.floor(hr / 3.5));
+            revenueData[slotIdx] += Number(o.totalAmount || 0);
+          }
+        });
       } else if (window.currentChartPeriod === '30days') {
         labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-        revenueData = [45000, 62000, 58000, 89000];
-        profitData = [21000, 28000, 26000, 41000];
+        revenueData = [0, 0, 0, 0];
+        const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+
+        orders.forEach(o => {
+          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          if (ts >= thirtyDaysAgo) {
+            const dayDiff = Math.floor((Date.now() - ts) / (24 * 60 * 60 * 1000));
+            const weekIdx = 3 - Math.min(3, Math.floor(dayDiff / 7.5));
+            revenueData[weekIdx] += Number(o.totalAmount || 0);
+          }
+        });
       } else if (window.currentChartPeriod === 'month') {
-        labels = ['1-7 Sep', '8-14 Sep', '15-21 Sep', '22-28 Sep'];
-        revenueData = [52000, 68000, 74000, 91000];
-        profitData = [24000, 31000, 34000, 42500];
-      }
+        labels = ['1-7th', '8-14th', '15-21st', '22-28th', '29-31st'];
+        revenueData = [0, 0, 0, 0, 0];
+        const curMonth = now.getMonth();
+        const curYear = now.getFullYear();
 
-      if (Array.isArray(window.currentAllOrders) && window.currentAllOrders.length > 0) {
-        const orders = window.currentAllOrders;
-        const totalRev = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
-        if (totalRev > 0) {
-          const kpiSales = document.getElementById('kpi-today-sales');
-          const kpiOrders = document.getElementById('kpi-today-orders');
-          const kpiAov = document.getElementById('kpi-aov');
-          const kpiProfit = document.getElementById('kpi-est-profit');
-
-          if (kpiSales) kpiSales.textContent = `₹${totalRev.toLocaleString('en-IN')}`;
-          if (kpiOrders) kpiOrders.textContent = orders.length;
-          if (kpiAov) kpiAov.textContent = `₹${Math.round(totalRev / orders.length).toLocaleString('en-IN')}`;
-          if (kpiProfit) kpiProfit.textContent = `₹${Math.round(totalRev * 0.47).toLocaleString('en-IN')}`;
+        orders.forEach(o => {
+          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          const od = new Date(ts);
+          if (od.getMonth() === curMonth && od.getFullYear() === curYear) {
+            const dt = od.getDate();
+            if (dt <= 7) revenueData[0] += Number(o.totalAmount || 0);
+            else if (dt <= 14) revenueData[1] += Number(o.totalAmount || 0);
+            else if (dt <= 21) revenueData[2] += Number(o.totalAmount || 0);
+            else if (dt <= 28) revenueData[3] += Number(o.totalAmount || 0);
+            else revenueData[4] += Number(o.totalAmount || 0);
+          }
+        });
+      } else { // '7days' default
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        labels = [];
+        revenueData = [0, 0, 0, 0, 0, 0, 0];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(Date.now() - (i * 24 * 60 * 60 * 1000));
+          labels.push(dayNames[d.getDay()]);
         }
+        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+        orders.forEach(o => {
+          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          if (ts >= sevenDaysAgo) {
+            const dayDiff = Math.floor((Date.now() - ts) / (24 * 60 * 60 * 1000));
+            const slotIdx = 6 - Math.min(6, Math.max(0, dayDiff));
+            revenueData[slotIdx] += Number(o.totalAmount || 0);
+          }
+        });
       }
+
+      profitData = revenueData.map(r => Math.round(r * 0.47));
+
+      // Aggregate Real-time Dashboard KPIs from real orders
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const todayOrders = orders.filter(o => {
+        const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+        return ts >= startOfToday;
+      });
+      const todayRev = todayOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+      const totalRev = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+      const pendingOrders = orders.filter(o => {
+        const s = String(o.status || 'Pending').toLowerCase();
+        return s === 'pending' || s === 'awaiting acceptance';
+      });
+      const onlineTodayCount = todayOrders.filter(o => !String(o.paymentMethod || '').toLowerCase().includes('cod')).length;
+      const codTodayCount = todayOrders.length - onlineTodayCount;
+      const aovVal = orders.length > 0 ? Math.round(totalRev / orders.length) : 0;
+      const estProfitVal = Math.round(todayRev * 0.47);
+
+      if (document.getElementById('kpi-today-sales')) document.getElementById('kpi-today-sales').textContent = `₹${todayRev.toLocaleString('en-IN')}`;
+      if (document.getElementById('kpi-today-orders')) document.getElementById('kpi-today-orders').textContent = todayOrders.length;
+      if (document.getElementById('kpi-orders-breakdown')) document.getElementById('kpi-orders-breakdown').textContent = `${onlineTodayCount} online · ${codTodayCount} COD`;
+      if (document.getElementById('kpi-pending-orders')) document.getElementById('kpi-pending-orders').textContent = pendingOrders.length;
+      if (document.getElementById('kpi-aov')) document.getElementById('kpi-aov').textContent = `₹${aovVal.toLocaleString('en-IN')}`;
+      if (document.getElementById('kpi-est-profit')) document.getElementById('kpi-est-profit').textContent = `₹${estProfitVal.toLocaleString('en-IN')}`;
+      if (document.getElementById('act-pending-count-text')) document.getElementById('act-pending-count-text').textContent = `${pendingOrders.length} Orders waiting for acceptance`;
 
       if (salesChartInstance) {
         salesChartInstance.destroy();
@@ -2492,17 +2513,31 @@
       const startDate = document.getElementById('cust-start-date')?.value;
       const endDate = document.getElementById('cust-end-date')?.value;
 
-      let customersList = [
-        { name: 'Priya Nair', email: 'priya@gmail.com', phone: '9876543210', ordersCount: 7, totalSpent: 12450, lastOrder: '2 min ago', type: 'VIP', initials: 'PN', lastOrderMins: 2 },
-        { name: 'Rahul Kumar', email: 'rahul@gmail.com', phone: '9123456780', ordersCount: 3, totalSpent: 3200, lastOrder: '18 min ago', type: 'Repeat', initials: 'RK', lastOrderMins: 18 },
-        { name: 'Meera Devi', email: 'meera@gmail.com', phone: '8765432109', ordersCount: 1, totalSpent: 2250, lastOrder: '45 min ago', type: 'New', initials: 'MD', lastOrderMins: 45 },
-        { name: 'Suresh Raj', email: 'suresh@gmail.com', phone: '9988776655', ordersCount: 5, totalSpent: 8900, lastOrder: '2 hrs ago', type: 'VIP', initials: 'SR', lastOrderMins: 120 },
-        { name: 'Kavitha S', email: 'kavitha@gmail.com', phone: '9444123456', ordersCount: 2, totalSpent: 4100, lastOrder: '5 hrs ago', type: 'Repeat', initials: 'KS', lastOrderMins: 300 },
-        { name: 'Arjun Pillai', email: 'arjun@gmail.com', phone: '9567891234', ordersCount: 1, totalSpent: 1598, lastOrder: '1 day ago', type: 'New', initials: 'AP', lastOrderMins: 1440 }
-      ];
+      let customersList = [];
 
+      const map = new Map();
+
+      // 1. Incorporate any Firestore customers if fetched
+      if (Array.isArray(window.firestoreCustomers) && window.firestoreCustomers.length > 0) {
+        window.firestoreCustomers.forEach(fc => {
+          const phone = String(fc.phone || fc.phoneNumber || fc.customerPhone || '').replace(/\D/g, '');
+          const key = phone || String(fc.name || fc.id);
+          const parts = (fc.name || 'Customer').trim().split(' ');
+          const initials = (parts[0]?.[0] || 'C') + (parts[1]?.[0] || '');
+          map.set(key, {
+            name: fc.name || 'Valued Customer',
+            email: fc.email || '—',
+            phone: phone || 'Not Provided',
+            ordersCount: Number(fc.ordersCount || fc.totalOrders || 0),
+            totalSpent: Number(fc.totalSpent || 0),
+            lastOrderTs: Number(fc.lastOrderTs || (fc.updatedAt?.seconds ? fc.updatedAt.seconds * 1000 : Date.now())),
+            initials: initials.toUpperCase()
+          });
+        });
+      }
+
+      // 2. Incorporate real orders from dual collection streams
       if (Array.isArray(window.currentAllOrders) && window.currentAllOrders.length > 0) {
-        const map = new Map();
         window.currentAllOrders.forEach(o => {
           const phone = String(o.customerPhoneNumber || o.customerPhone || o.phone || '').replace(/\D/g, '');
           const key = phone || String(o.customerName || o.name || 'Customer');
@@ -2513,7 +2548,7 @@
             const initials = (parts[0]?.[0] || 'C') + (parts[1]?.[0] || '');
             map.set(key, {
               name: name,
-              email: o.customerEmail || o.email || `${name.toLowerCase().replace(/\s+/g, '')}@gmail.com`,
+              email: o.customerEmail || o.email || '—',
               phone: phone || 'Not Provided',
               ordersCount: 0,
               totalSpent: 0,
@@ -2526,23 +2561,23 @@
           c.totalSpent += Number(o.totalAmount || 0);
           c.lastOrderTs = Math.max(Number(c.lastOrderTs) || 0, ts);
         });
+      }
 
-        if (map.size > 0) {
-          customersList = Array.from(map.values()).map(c => {
-            const validTs = Number(c.lastOrderTs) || Date.now();
-            const diffMins = Math.max(0, Math.floor((Date.now() - validTs) / 60000));
-            let lastOrderStr = 'Recent';
-            if (diffMins < 60) lastOrderStr = `${Math.max(1, diffMins)} min ago`;
-            else if (diffMins < 1440) lastOrderStr = `${Math.floor(diffMins / 60)} hrs ago`;
-            else lastOrderStr = `${Math.floor(diffMins / 1440)} day ago`;
+      if (map.size > 0) {
+        customersList = Array.from(map.values()).map(c => {
+          const validTs = Number(c.lastOrderTs) || Date.now();
+          const diffMins = Math.max(0, Math.floor((Date.now() - validTs) / 60000));
+          let lastOrderStr = 'Recent';
+          if (diffMins < 60) lastOrderStr = `${Math.max(1, diffMins)} min ago`;
+          else if (diffMins < 1440) lastOrderStr = `${Math.floor(diffMins / 60)} hrs ago`;
+          else lastOrderStr = `${Math.floor(diffMins / 1440)} day ago`;
 
-            let type = 'New';
-            if (c.totalSpent >= 8000 || c.ordersCount >= 5) type = 'VIP';
-            else if (c.ordersCount >= 2) type = 'Repeat';
+          let type = 'New';
+          if (c.totalSpent >= 8000 || c.ordersCount >= 5) type = 'VIP';
+          else if (c.ordersCount >= 2) type = 'Repeat';
 
-            return { ...c, lastOrder: lastOrderStr, lastOrderMins: diffMins, type };
-          });
-        }
+          return { ...c, lastOrder: lastOrderStr, lastOrderMins: diffMins, type };
+        });
       }
 
       // Filter by Date
@@ -2612,13 +2647,16 @@
       const repeatCount = customersList.filter(c => c.type === 'Repeat').length;
       const newCount = customersList.filter(c => c.type === 'New').length;
 
-      if (document.getElementById('cust-kpi-total')) document.getElementById('cust-kpi-total').textContent = customersList.length || 356;
-      if (document.getElementById('cust-kpi-new')) document.getElementById('cust-kpi-new').textContent = newCount || 42;
-      if (document.getElementById('cust-kpi-repeat')) document.getElementById('cust-kpi-repeat').textContent = repeatCount || 198;
-      if (document.getElementById('cust-kpi-vip')) document.getElementById('cust-kpi-vip').textContent = vipCount || 24;
+      if (document.getElementById('cust-kpi-total')) document.getElementById('cust-kpi-total').textContent = customersList.length;
+      if (document.getElementById('cust-kpi-new')) document.getElementById('cust-kpi-new').textContent = newCount;
+      if (document.getElementById('cust-kpi-repeat')) document.getElementById('cust-kpi-repeat').textContent = repeatCount;
+      if (document.getElementById('cust-kpi-vip')) document.getElementById('cust-kpi-vip').textContent = vipCount;
+
+      if (document.getElementById('kpi-total-customers')) document.getElementById('kpi-total-customers').textContent = customersList.length;
+      if (document.getElementById('kpi-new-customers')) document.getElementById('kpi-new-customers').textContent = `${newCount} in database`;
 
       if (customersList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-medium">No customers found matching search/filter.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-medium">No customer records in database yet.</td></tr>`;
         return;
       }
 
@@ -2665,15 +2703,7 @@
     window.currentPaySortCol = 'date';
     window.currentPaySortDir = 'desc';
 
-    window.allPaymentsData = [
-      { orderId: '#OSC10289', customerName: 'Priya Nair', amount: 1490, method: 'Razorpay', status: 'Success', date: '29 Aug 2026', dateTs: 1787961600000 },
-      { orderId: '#OSC10288', customerName: 'Rahul Kumar', amount: 799, method: 'Razorpay', status: 'Success', date: '29 Aug 2026', dateTs: 1787961600000 },
-      { orderId: '#OSC10287', customerName: 'Meera Devi', amount: 2250, method: 'COD', status: 'Pending', date: '29 Aug 2026', dateTs: 1787961600000 },
-      { orderId: '#OSC10286', customerName: 'Suresh Raj', amount: 650, method: 'Razorpay', status: 'Success', date: '28 Aug 2026', dateTs: 1787875200000 },
-      { orderId: '#OSC10284', customerName: 'Arjun Pillai', amount: 1598, method: 'Razorpay', status: 'Failed', date: '28 Aug 2026', dateTs: 1787875200000 },
-      { orderId: '#OSC10281', customerName: 'Kavitha S', amount: 3400, method: 'COD', status: 'Success', date: '27 Aug 2026', dateTs: 1787788800000 },
-      { orderId: '#OSC10278', customerName: 'Anitha R', amount: 1290, method: 'WhatsApp', status: 'Pending', date: '26 Aug 2026', dateTs: 1787702400000 }
-    ];
+    window.allPaymentsData = [];
 
     window.togglePaySort = function(col) {
       if (window.currentPaySortCol === col) {
@@ -2721,10 +2751,6 @@
             dateTs: ts
           };
         });
-      }
-
-      if (list.length === 0) {
-        list = [...window.allPaymentsData];
       }
 
       // Filter by Date
@@ -2828,13 +2854,7 @@
     window.currentReturnSortCol = 'date';
     window.currentReturnSortDir = 'desc';
 
-    window.allReturnsData = [
-      { id: '#OSC10282', customerName: 'Deepak M', customerPhone: '8098765432', product: 'Denim Joggers × 1', reason: 'Wrong size received', amount: 899, status: 'Requested', date: '28 Aug 2026', dateTs: 1787875200000 },
-      { id: '#OSC10271', customerName: 'Anitha R', customerPhone: '9876501234', product: 'White Kurti × 1', reason: 'Quality not as expected', amount: 745, status: 'Approved', date: '25 Aug 2026', dateTs: 1787616000000 },
-      { id: '#OSC10258', customerName: 'Vijay K', customerPhone: '9988001122', product: 'Cotton Palazzo Set × 2', reason: 'Color mismatch', amount: 1500, status: 'Pickup Scheduled', date: '22 Aug 2026', dateTs: 1787356800000 },
-      { id: '#OSC10240', customerName: 'Meera D', customerPhone: '8765432109', product: 'Embroidered Kurta × 1', reason: 'Size too large', amount: 1290, status: 'Refunded', date: '18 Aug 2026', dateTs: 1787011200000 },
-      { id: '#OSC10229', customerName: 'Priya N', customerPhone: '9876543210', product: 'Black T-Shirt × 2', reason: 'Defective item', amount: 1598, status: 'Completed', date: '14 Aug 2026', dateTs: 1786665600000 }
-    ];
+    window.allReturnsData = [];
 
     window.setReturnFilter = function(filter) {
       window.currentReturnFilter = filter;
@@ -2871,7 +2891,36 @@
       const startDate = document.getElementById('ret-start-date')?.value;
       const endDate = document.getElementById('ret-end-date')?.value;
 
-      let list = [...window.allReturnsData];
+      // Collect real return records
+      let list = Array.isArray(window.allReturnsData) ? [...window.allReturnsData] : [];
+
+      // Also derive any returned orders from real orders stream
+      if (Array.isArray(window.currentAllOrders) && window.currentAllOrders.length > 0) {
+        window.currentAllOrders.forEach(o => {
+          const s = String(o.status || '').toLowerCase();
+          if (s === 'returned' || o.returnRequested) {
+            const exists = list.some(r => r.id === `#OSC${o.id}` || r.id === o.id);
+            if (!exists) {
+              const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || Date.now())) || Date.now();
+              const dateStr = o.orderDateStr || new Date(ts).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+              const prodName = Array.isArray(o.items) && o.items.length > 0 ? `${o.items[0].name || 'Product'} × ${o.items[0].quantity || o.items[0].qty || 1}` : 'Product × 1';
+              list.push({
+                id: `#OSC${o.id}`,
+                customerName: o.customerName || o.customerDetails?.name || 'Customer',
+                customerPhone: o.customerPhoneNumber || o.customerPhone || '—',
+                product: prodName,
+                reason: o.returnReason || 'Exchange / Return',
+                amount: Number(o.totalAmount || 0),
+                status: 'Refunded',
+                date: dateStr,
+                dateTs: ts
+              });
+            }
+          }
+        });
+      }
+
+      window.allReturnsData = list;
 
       // Filter by Date
       if (dateFilter !== 'all') {
@@ -3025,29 +3074,12 @@
     // =========================================================================
     const addProductState = {
       availableSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-      selectedSizes: new Set(['M', 'L']),
-      availableColors: [
-        { name: 'Black', hex: '#000000' },
-        { name: 'White', hex: '#ffffff' },
-        { name: 'Red', hex: '#ef4444' },
-        { name: 'Blue', hex: '#3b82f6' },
-        { name: 'Navy', hex: '#1e3a8a' },
-        { name: 'Green', hex: '#22c55e' },
-        { name: 'Beige', hex: '#d4b996' },
-        { name: 'Grey', hex: '#94a3b8' },
-        { name: 'Maroon', hex: '#800000' },
-        { name: 'Brown', hex: '#854d0e' },
-        { name: 'Charcoal', hex: '#374151' },
-        { name: 'Lavender', hex: '#c084fc' }
-      ],
-      selectedColors: new Set(['Black', 'Blue']),
+      selectedSizes: new Set(['M', 'L', 'XL']),
+      availableColors: ['Black', 'White', 'Blue', 'Red', 'Green', 'Yellow', 'Pink', 'Grey'],
+      selectedColors: new Set(['Black', 'White']),
+      variantStockMap: {},
       tags: ['Best Seller', 'Hot', 'New', 'Trending', 'Exclusive', 'Custom', 'None'],
       selectedTag: 'Best Seller',
-      branches: [
-        { id: 'main', name: 'Main Store', stock: 15 },
-        { id: 'branch_02', name: 'Branch 2', stock: 8 },
-        { id: 'warehouse', name: 'Warehouse', stock: 20 }
-      ],
       images: [
         'assets/mockups/tshirt_black_mockup.jpg'
       ],
@@ -3322,38 +3354,55 @@
       }).join('');
     }
 
-    // Sizes Selector Chips
+    // ==========================================
+    // SECTION 3: PRICING & PROFIT MARGIN LOGIC
+    // ==========================================
+    window.calculatePricingMetrics = function() {
+      const mrp = Number(document.getElementById('quick-prod-mrp')?.value || 0);
+      const selling = Number(document.getElementById('quick-prod-price')?.value || 0);
+      const cost = Number(document.getElementById('quick-prod-cost')?.value || 0);
+      const profit = Math.max(0, selling - cost);
+      const margin = selling > 0 ? Math.round((profit / selling) * 100) : 0;
+
+      if (document.getElementById('pricing-profit-unit')) {
+        document.getElementById('pricing-profit-unit').textContent = `₹${profit.toLocaleString('en-IN')}`;
+      }
+      if (document.getElementById('pricing-profit-margin')) {
+        document.getElementById('pricing-profit-margin').textContent = `${margin}%`;
+      }
+
+      // Sync prices into active variants
+      if (Array.isArray(addProductState.variants)) {
+        addProductState.variants.forEach(v => {
+          v.mrp = mrp || selling;
+          v.price = selling;
+          v.cost = cost;
+        });
+      }
+    };
+
+    // ==========================================
+    // SECTION 4: SIZES CHIPS (Multi-Select)
+    // ==========================================
     function renderSizeChips() {
       const container = document.getElementById('size-chips-container');
-      const countEl = document.getElementById('selected-sizes-count');
       if (!container) return;
 
-      if (countEl) countEl.textContent = `Selected: ${addProductState.selectedSizes.size}`;
-
-      let html = addProductState.availableSizes.map(sz => {
+      container.innerHTML = addProductState.availableSizes.map(sz => {
         const isSelected = addProductState.selectedSizes.has(sz);
         return `
           <button type="button" onclick="toggleProductSize('${sz}')"
-            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            class="px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               isSelected 
-                ? 'bg-slate-900 text-white shadow-xs border border-slate-900' 
-                : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-black text-white shadow-xs' 
+                : 'bg-white text-slate-700 hover:border-slate-400 border border-slate-200'
             }">
             <span>${sz}</span>
-            ${isSelected ? '<span class="text-[10px]">✓</span>' : ''}
           </button>
         `;
       }).join('');
 
-      html += `
-        <button type="button" onclick="toggleCustomSizeBox(true)"
-          class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-dashed border-indigo-300 inline-flex items-center gap-1 cursor-pointer">
-          <span>+ Add Size</span>
-        </button>
-      `;
-
-      container.innerHTML = html;
-      generateVariantMatrix();
+      renderStockPerVariant();
     }
 
     window.toggleProductSize = function(size) {
@@ -3365,68 +3414,29 @@
       renderSizeChips();
     };
 
-    window.toggleCustomSizeBox = function(show) {
-      const box = document.getElementById('custom-size-input-box');
-      if (!box) return;
-      if (show) {
-        box.classList.remove('hidden');
-        box.classList.add('flex');
-        document.getElementById('custom-size-text')?.focus();
-      } else {
-        box.classList.add('hidden');
-        box.classList.remove('flex');
-        const input = document.getElementById('custom-size-text');
-        if (input) input.value = '';
-      }
-    };
-
-    window.addCustomSize = function() {
-      const input = document.getElementById('custom-size-text');
-      if (!input) return;
-      const val = input.value.trim().toUpperCase();
-      if (!val) return;
-      if (!addProductState.availableSizes.includes(val)) {
-        addProductState.availableSizes.push(val);
-      }
-      addProductState.selectedSizes.add(val);
-      input.value = '';
-      toggleCustomSizeBox(false);
-      renderSizeChips();
-    };
-
-    // Colors Selector Chips
+    // ==========================================
+    // SECTION 4: COLORS CHIPS (Multi-Select)
+    // ==========================================
     function renderColorChips() {
       const container = document.getElementById('color-chips-container');
-      const countEl = document.getElementById('selected-colors-count');
       if (!container) return;
 
-      if (countEl) countEl.textContent = `Selected: ${addProductState.selectedColors.size}`;
-
-      let html = addProductState.availableColors.map(col => {
-        const isSelected = addProductState.selectedColors.has(col.name);
+      container.innerHTML = addProductState.availableColors.map(col => {
+        const colName = typeof col === 'string' ? col : col.name;
+        const isSelected = addProductState.selectedColors.has(colName);
         return `
-          <button type="button" onclick="toggleProductColor('${col.name}')"
-            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+          <button type="button" onclick="toggleProductColor('${colName}')"
+            class="px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               isSelected 
-                ? 'bg-slate-900 text-white shadow-xs border border-slate-900' 
-                : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-black text-white shadow-xs' 
+                : 'bg-white text-slate-700 hover:border-slate-400 border border-slate-200'
             }">
-            <span class="w-3.5 h-3.5 rounded-full border border-white/50 flex-shrink-0" style="background-color: ${col.hex}"></span>
-            <span>${col.name}</span>
-            ${isSelected ? '<span class="text-[10px]">✓</span>' : ''}
+            <span>${colName}</span>
           </button>
         `;
       }).join('');
 
-      html += `
-        <button type="button" onclick="toggleCustomColorBox(true)"
-          class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-dashed border-indigo-300 inline-flex items-center gap-1 cursor-pointer">
-          <span>+ Add Color</span>
-        </button>
-      `;
-
-      container.innerHTML = html;
-      generateVariantMatrix();
+      renderStockPerVariant();
     }
 
     window.toggleProductColor = function(colorName) {
@@ -3438,274 +3448,85 @@
       renderColorChips();
     };
 
-    window.toggleCustomColorBox = function(show) {
-      const box = document.getElementById('custom-color-input-box');
-      if (!box) return;
-      if (show) {
-        box.classList.remove('hidden');
-        box.classList.add('flex');
-        document.getElementById('custom-color-name')?.focus();
-      } else {
-        box.classList.add('hidden');
-        box.classList.remove('flex');
-        const input = document.getElementById('custom-color-name');
-        if (input) input.value = '';
+    // ==========================================
+    // SECTION 4: STOCK PER VARIANT LIST (Matching Image 2)
+    // ==========================================
+    function renderStockPerVariant() {
+      const container = document.getElementById('variant-matrix-tbody');
+      if (!container) return;
+
+      const selectedColors = Array.from(addProductState.selectedColors);
+      const selectedSizes = Array.from(addProductState.selectedSizes);
+
+      if (selectedColors.length === 0 || selectedSizes.length === 0) {
+        container.innerHTML = `<div class="py-6 text-center text-slate-400 text-xs font-medium">Select sizes and colors above to generate variants.</div>`;
+        addProductState.variants = [];
+        return;
       }
-    };
 
-    window.addCustomColor = function() {
-      const nameInput = document.getElementById('custom-color-name');
-      const hexInput = document.getElementById('custom-color-hex');
-      if (!nameInput) return;
-      const name = nameInput.value.trim();
-      if (!name) return;
-      const hex = hexInput ? hexInput.value : '#059669';
+      let rawSkuPrefix = String(document.getElementById('quick-prod-sku')?.value || 'BOT').trim();
+      let cleanPrefix = rawSkuPrefix.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase() || 'BOT';
 
-      const existing = addProductState.availableColors.find(c => c.name.toLowerCase() === name.toLowerCase());
-      if (!existing) {
-        addProductState.availableColors.push({ name, hex });
-      }
-      addProductState.selectedColors.add(existing ? existing.name : name);
-      nameInput.value = '';
-      toggleCustomColorBox(false);
-      renderColorChips();
-    };
-
-    // Auto-Matrix Generator
-    function generateVariantMatrix() {
-      const sizes = addProductState.selectedSizes.size > 0 ? Array.from(addProductState.selectedSizes) : ['Free Size'];
-      const colors = addProductState.selectedColors.size > 0 ? Array.from(addProductState.selectedColors) : ['Default'];
-
-      // Read bulk default values if present
-      const defMrp = Number(document.getElementById('bulk-mrp')?.value) || 999;
-      const defPrice = Number(document.getElementById('bulk-price')?.value) || 699;
-      const defCost = Number(document.getElementById('bulk-cost')?.value) || 350;
-
-      const existingMap = new Map();
-      addProductState.variants.forEach(v => {
-        existingMap.set(`${v.size}:::${v.color}`, v);
-      });
+      const mrp = Number(document.getElementById('quick-prod-mrp')?.value || 999);
+      const price = Number(document.getElementById('quick-prod-price')?.value || 799);
+      const cost = Number(document.getElementById('quick-prod-cost')?.value || 400);
 
       const newVariants = [];
-      sizes.forEach(sz => {
-        colors.forEach(col => {
-          const key = `${sz}:::${col}`;
-          const prev = existingMap.get(key);
-          if (prev) {
-            newVariants.push(prev);
-          } else {
-            const stockMap = {};
-            addProductState.branches.forEach(b => {
-              stockMap[b.id] = Number(b.stock) || 0;
-            });
+      let rowsHtml = '';
 
-            newVariants.push({
-              key: `${sz}::${col}::${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-              size: sz,
-              color: col,
-              mrp: defMrp,
-              price: defPrice,
-              cost: defCost,
-              stock: stockMap
-            });
-          }
+      selectedColors.forEach(col => {
+        selectedSizes.forEach(sz => {
+          const key = `${col}:::${sz}`;
+          const currentStock = (addProductState.variantStockMap && addProductState.variantStockMap[key] !== undefined)
+            ? addProductState.variantStockMap[key]
+            : 20; // default 20 matching user screenshot exactly
+
+          const colorShort = col.slice(0, 3).toUpperCase();
+          const skuTag = `${cleanPrefix}-${sz}-${colorShort}`;
+
+          newVariants.push({
+            size: sz,
+            color: col,
+            sku: skuTag,
+            mrp: mrp,
+            price: price,
+            cost: cost,
+            stock: { main: currentStock },
+            availableStock: currentStock
+          });
+
+          rowsHtml += `
+            <div class="flex items-center justify-between py-3.5 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 px-2 rounded-xl transition">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-xs sm:text-sm">${col} / ${sz}</span>
+              </div>
+              <div class="flex items-center gap-4 sm:gap-6">
+                <span class="text-[11px] sm:text-xs font-mono text-slate-400 uppercase tracking-wider">SKU: ${skuTag}</span>
+                <input type="number" min="0" value="${currentStock}"
+                  oninput="updateVariantStockValue('${key}', this.value)"
+                  class="w-16 sm:w-20 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-center text-xs font-bold text-slate-900 outline-none focus:border-black focus:ring-1 focus:ring-black shadow-2xs">
+              </div>
+            </div>
+          `;
         });
       });
 
       addProductState.variants = newVariants;
-      renderVariantMatrixTable();
+      container.innerHTML = rowsHtml;
     }
 
-    // Variant Matrix Table Rendering
-    function renderVariantMatrixTable() {
-      const tbody = document.getElementById('variant-matrix-tbody');
-      const thBranchHeaders = document.getElementById('th-branch-headers');
-      const countBadge = document.getElementById('matrix-badge-count');
-      if (!tbody) return;
+    window.updateVariantStockValue = function(key, val) {
+      if (!addProductState.variantStockMap) addProductState.variantStockMap = {};
+      const num = Math.max(0, parseInt(val, 10) || 0);
+      addProductState.variantStockMap[key] = num;
 
-      if (countBadge) {
-        countBadge.textContent = `${addProductState.variants.length} Variant${addProductState.variants.length === 1 ? '' : 's'}`;
-      }
-
-      if (thBranchHeaders) {
-        thBranchHeaders.innerHTML = `
-          <div class="flex items-center gap-3">
-            ${addProductState.branches.map(b => `<span class="font-bold text-slate-700">${b.name}</span>`).join('<span class="text-slate-300">|</span>')}
-          </div>
-        `;
-      }
-
-      if (!addProductState.variants.length) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">Select at least one Size and Color above to generate the variant matrix.</td></tr>`;
-        updateMatrixSummary();
-        return;
-      }
-
-      tbody.innerHTML = addProductState.variants.map((v, idx) => {
-        const colorObj = addProductState.availableColors.find(c => c.name.toLowerCase() === v.color.toLowerCase()) || { hex: '#475569' };
-        
-        // Render branch stock inputs for this variant
-        const branchInputsHtml = addProductState.branches.map(b => {
-          const currentVal = (v.stock && v.stock[b.id] !== undefined) ? v.stock[b.id] : (b.stock || 0);
-          return `
-            <div class="flex items-center gap-1">
-              <span class="text-[9px] font-mono font-bold text-slate-400 uppercase">${b.id}:</span>
-              <input type="number" min="0" value="${currentVal}"
-                oninput="updateMatrixVariantStock(${idx}, '${b.id}', this.value)"
-                class="w-16 shopify-input rounded-lg px-2 py-1 text-xs font-bold outline-none text-slate-900 border border-slate-200">
-            </div>
-          `;
-        }).join('');
-
-        return `
-          <tr class="hover:bg-slate-50/80 transition-colors">
-            <!-- Variant Attributes Badge -->
-            <td class="p-3">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="px-2 py-0.5 rounded-md bg-slate-900 text-white font-extrabold text-[11px]">${v.size}</span>
-                <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 font-semibold text-[11px] border border-slate-200 flex items-center gap-1.5">
-                  <span class="w-2.5 h-2.5 rounded-full border border-slate-400" style="background-color: ${colorObj.hex}"></span>
-                  ${v.color}
-                </span>
-              </div>
-            </td>
-
-            <!-- MRP -->
-            <td class="p-3">
-              <input type="number" min="0" value="${v.mrp}"
-                oninput="updateMatrixVariantField(${idx}, 'mrp', this.value)"
-                class="w-20 shopify-input rounded-lg px-2 py-1 text-xs outline-none border border-slate-200">
-            </td>
-
-            <!-- Selling Price -->
-            <td class="p-3">
-              <input type="number" min="0" value="${v.price}"
-                oninput="updateMatrixVariantField(${idx}, 'price', this.value)"
-                class="w-22 shopify-input rounded-lg px-2 py-1 text-xs font-bold outline-none text-slate-900 border border-slate-200">
-            </td>
-
-            <!-- Cost Price -->
-            <td class="p-3">
-              <input type="number" min="0" value="${v.cost}"
-                oninput="updateMatrixVariantField(${idx}, 'cost', this.value)"
-                class="w-20 shopify-input rounded-lg px-2 py-1 text-xs outline-none border border-slate-200">
-            </td>
-
-            <!-- Branch Stock Grid -->
-            <td class="p-3">
-              <div class="flex items-center gap-3 flex-wrap">
-                ${branchInputsHtml}
-              </div>
-            </td>
-
-            <!-- Duplicate / Delete Actions -->
-            <td class="p-3 text-right">
-              <div class="flex items-center justify-end gap-1">
-                <button type="button" onclick="duplicateVariant(${idx})" title="Duplicate variant" class="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-200/80 transition-colors cursor-pointer">
-                  <span class="text-xs">⎘</span>
-                </button>
-                <button type="button" onclick="deleteVariant(${idx})" title="Delete variant" class="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer">
-                  <span class="text-xs">✕</span>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      updateMatrixSummary();
-    }
-
-    window.updateMatrixVariantField = function(idx, field, val) {
-      if (addProductState.variants[idx]) {
-        addProductState.variants[idx][field] = Number(val) || 0;
-        updateMatrixSummary();
+      const [col, sz] = key.split(':::');
+      const v = addProductState.variants.find(item => item.color === col && item.size === sz);
+      if (v) {
+        v.stock = { main: num };
+        v.availableStock = num;
       }
     };
-
-    window.updateMatrixVariantStock = function(idx, branchId, val) {
-      if (addProductState.variants[idx]) {
-        if (!addProductState.variants[idx].stock) addProductState.variants[idx].stock = {};
-        addProductState.variants[idx].stock[branchId] = Math.max(0, parseInt(val, 10) || 0);
-        updateMatrixSummary();
-      }
-    };
-
-    window.duplicateVariant = function(idx) {
-      const src = addProductState.variants[idx];
-      if (src) {
-        const clone = {
-          ...src,
-          key: `${src.size}::${src.color}::copy_${Date.now().toString(36)}`,
-          stock: { ...src.stock }
-        };
-        addProductState.variants.splice(idx + 1, 0, clone);
-        renderVariantMatrixTable();
-      }
-    };
-
-    window.deleteVariant = function(idx) {
-      addProductState.variants.splice(idx, 1);
-      renderVariantMatrixTable();
-    };
-
-    window.applyBulkToAllVariants = function() {
-      const mrp = Number(document.getElementById('bulk-mrp')?.value) || 999;
-      const price = Number(document.getElementById('bulk-price')?.value) || 699;
-      const cost = Number(document.getElementById('bulk-cost')?.value) || 350;
-      const mainStock = Number(document.getElementById('bulk-stock-main')?.value) || 0;
-      const b2Stock = Number(document.getElementById('bulk-stock-branch2')?.value) || 0;
-
-      addProductState.variants.forEach(v => {
-        v.mrp = mrp;
-        v.price = price;
-        v.cost = cost;
-        if (!v.stock) v.stock = {};
-        v.stock['main'] = mainStock;
-        v.stock['branch_02'] = b2Stock;
-      });
-
-      renderVariantMatrixTable();
-      alert(`Applied bulk pricing (₹${price}) & stocks to all ${addProductState.variants.length} variants!`);
-    };
-
-    window.showAddBranchPrompt = function() {
-      const name = prompt('Enter store branch name (e.g. Warehouse 2, Airport Kiosk):');
-      if (!name || !name.trim()) return;
-      const clean = name.trim();
-      const id = clean.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 16) || `br_${Date.now()}`;
-
-      if (addProductState.branches.some(b => b.id === id)) {
-        alert('A branch with this ID already exists.');
-        return;
-      }
-
-      addProductState.branches.push({ id, name: clean, stock: 10 });
-      addProductState.variants.forEach(v => {
-        if (!v.stock) v.stock = {};
-        v.stock[id] = 10;
-      });
-      renderVariantMatrixTable();
-    };
-
-    function updateMatrixSummary() {
-      let totalUnits = 0;
-      addProductState.variants.forEach(v => {
-        if (v.stock) {
-          Object.values(v.stock).forEach(val => {
-            totalUnits += Number(val) || 0;
-          });
-        }
-      });
-
-      const summaryText = document.getElementById('matrix-summary-text');
-      const branchesText = document.getElementById('matrix-branches-text');
-      const totalUnitsEl = document.getElementById('matrix-total-units');
-
-      if (summaryText) summaryText.textContent = `${addProductState.variants.length} Variants Ready`;
-      if (branchesText) branchesText.textContent = `Across ${addProductState.branches.length} registered store branches`;
-      if (totalUnitsEl) totalUnitsEl.textContent = `${totalUnits} Units`;
-    }
 
     // Modal Visibility
     window.openAddProductModal = function() {
@@ -3715,6 +3536,7 @@
 
       renderTagChips();
       renderImagePreviews();
+      calculatePricingMetrics();
       renderSizeChips();
       renderColorChips();
 
@@ -4196,14 +4018,43 @@
       initSalesChart();
 
       try {
-        const snap = await getDocs(collection(db, 'products'));
-        if (document.getElementById('stat-total-products')) document.getElementById('stat-total-products').textContent = snap.size;
+        const compProdsSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'products'));
+        const rootProdsSnap = await getDocs(collection(db, 'products'));
+        const allProdsMap = new Map();
+        rootProdsSnap.forEach(d => allProdsMap.set(d.id, d.data()));
+        compProdsSnap.forEach(d => allProdsMap.set(d.id, d.data()));
+        
+        const totalProds = allProdsMap.size;
+        if (document.getElementById('stat-total-products')) document.getElementById('stat-total-products').textContent = totalProds;
+        
+        let lowStockCount = 0;
+        allProdsMap.forEach(p => {
+          const stk = Number(p.availableStock || p.stock || 0);
+          if (stk <= 5) lowStockCount++;
+        });
+        if (document.getElementById('act-low-stock-text')) document.getElementById('act-low-stock-text').textContent = `${lowStockCount} Products running low on stock`;
       } catch (e) { }
+
+      try {
+        const custSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'customers'));
+        if (!custSnap.empty) {
+          window.firestoreCustomers = custSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+      } catch(e) {}
+
+      try {
+        const retSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'returns'));
+        if (!retSnap.empty) {
+          window.allReturnsData = retSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+      } catch(e) {}
 
       subscribeToOnlineOrders(orders => {
         renderOrders(orders);
         renderSalesChart();
         renderCustomersTable();
+        renderPaymentsTable();
+        renderReturnsTable();
       });
     }
 

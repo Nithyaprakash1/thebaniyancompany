@@ -314,17 +314,17 @@
         <button
           type="button"
           onclick="openStockHistoryModal()"
-          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition shadow-2xs"
+          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition shadow-2xs cursor-pointer"
         >
           Stock History
         </button>
         <button
           type="button"
-          onclick="openAddStockModal()"
-          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs"
+          onclick="openAddProductModal()"
+          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
         >
           <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-          <span>Add Stock</span>
+          <span>Add Product</span>
         </button>
       </div>
     </div>
@@ -340,7 +340,7 @@
           📦
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-slate-900 tracking-tight" id="kpi-total-count">6</h2>
+          <h2 class="text-2xl font-bold text-slate-900 tracking-tight" id="kpi-total-count">0</h2>
           <span class="text-xs text-slate-500 font-medium">Total Products</span>
         </div>
       </div>
@@ -351,7 +351,7 @@
           <i data-lucide="check" class="w-6 h-6 stroke-[2.5]"></i>
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-emerald-600 tracking-tight" id="kpi-instock-count">3</h2>
+          <h2 class="text-2xl font-bold text-emerald-600 tracking-tight" id="kpi-instock-count">0</h2>
           <span class="text-xs text-slate-500 font-medium">In Stock</span>
         </div>
       </div>
@@ -362,7 +362,7 @@
           <i data-lucide="alert-triangle" class="w-6 h-6 stroke-[2]"></i>
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-amber-500 tracking-tight" id="kpi-lowstock-count">2</h2>
+          <h2 class="text-2xl font-bold text-amber-500 tracking-tight" id="kpi-lowstock-count">0</h2>
           <span class="text-xs text-slate-500 font-medium">Low Stock</span>
         </div>
       </div>
@@ -373,7 +373,7 @@
           <i data-lucide="x" class="w-6 h-6 stroke-[2.5]"></i>
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-rose-500 tracking-tight" id="kpi-outofstock-count">2</h2>
+          <h2 class="text-2xl font-bold text-rose-500 tracking-tight" id="kpi-outofstock-count">0</h2>
           <span class="text-xs text-slate-500 font-medium">Out of Stock</span>
         </div>
       </div>
@@ -779,173 +779,80 @@
           </div>
         </section>
 
-        <!-- SECTION 2: ATTRIBUTE SELECTORS (SIZES & COLORS) -->
-        <section class="space-y-4 p-4 bg-slate-50/70 border border-slate-200/80 rounded-2xl">
-          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-            <div class="flex items-center gap-2">
-              <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center">2</span>
-              <h3 class="font-bold uppercase tracking-wider text-slate-800 text-xs">Attribute Selectors &amp; Multi-Select Chips</h3>
-            </div>
-            <span class="text-[11px] text-slate-500 font-medium">Auto-Generates Matrix</span>
+        <!-- ==================== SECTION 2: PRICING (MATCHING EXACT IMAGE SPEC) ==================== -->
+        <div class="space-y-4 p-5 bg-white border border-slate-200 rounded-2xl shadow-2xs">
+          <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center shrink-0">2</span>
+            <h3 class="text-base font-bold text-slate-900">Pricing</h3>
           </div>
 
-          <!-- SIZES -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="font-semibold text-slate-700">1. Select Available Sizes</label>
-              <span id="modal-size-selected-count" class="text-[11px] text-slate-400">2 selected</span>
+          <!-- 3 Pricing Inputs Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="space-y-1.5">
+              <label class="block font-semibold text-slate-700 text-xs">MRP (₹)</label>
+              <input type="number" id="inp-prod-mrp" placeholder="999" value="999" min="0" oninput="calculatePricingMetrics()"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium outline-none focus:border-black transition">
             </div>
-            <div id="modal-size-chips-box" class="flex flex-wrap items-center gap-2">
+
+            <div class="space-y-1.5">
+              <label class="block font-semibold text-slate-700 text-xs">Selling Price (₹)</label>
+              <input type="number" id="inp-prod-price" placeholder="799" value="799" min="0" oninput="calculatePricingMetrics()"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold outline-none focus:border-black transition">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block font-semibold text-slate-700 text-xs">Cost Price (₹)</label>
+              <input type="number" id="inp-prod-cost" placeholder="400" value="400" min="0" oninput="calculatePricingMetrics()"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium outline-none focus:border-black transition">
+            </div>
+          </div>
+
+          <!-- Green Profit & Margin KPI Banner -->
+          <div class="p-4 rounded-xl bg-[#f0fdf4] border border-[#dcfce7] flex items-center gap-12 sm:gap-16">
+            <div>
+              <span class="text-xl font-extrabold text-[#166534] block tracking-tight" id="pricing-profit-unit">₹399</span>
+              <span class="text-xs font-semibold text-[#15803d] block mt-0.5">Profit per unit</span>
+            </div>
+            <div>
+              <span class="text-xl font-extrabold text-[#166534] block tracking-tight" id="pricing-profit-margin">50%</span>
+              <span class="text-xs font-semibold text-[#15803d] block mt-0.5">Profit Margin</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== SECTION 3: VARIANTS (MATCHING EXACT IMAGE SPEC) ==================== -->
+        <div class="space-y-4 p-5 bg-white border border-slate-200 rounded-2xl shadow-2xs">
+          <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center shrink-0">3</span>
+            <h3 class="text-base font-bold text-slate-900">Variants</h3>
+          </div>
+
+          <!-- SIZES CHIPS -->
+          <div class="space-y-2">
+            <label class="block font-semibold text-slate-700 text-xs">Sizes</label>
+            <div id="size-chips-container" class="flex flex-wrap items-center gap-2">
               <!-- Rendered size chips -->
             </div>
-            <!-- Custom size input -->
-            <div class="flex items-center gap-1.5 pt-1">
-              <input
-                type="text"
-                id="inp-custom-size"
-                placeholder="+ Add custom size (e.g. 28, 30, Free Size)..."
-                class="w-64 px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-black uppercase font-bold"
-                onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomSizeChip();}"
-              >
-              <button
-                type="button"
-                onclick="addCustomSizeChip()"
-                class="px-3 py-1.5 bg-black text-white text-xs font-semibold rounded-xl hover:bg-neutral-800 transition cursor-pointer"
-              >
-                Add Size
-              </button>
+          </div>
+
+          <!-- COLORS CHIPS -->
+          <div class="space-y-2 pt-2">
+            <label class="block font-semibold text-slate-700 text-xs">Colors</label>
+            <div id="color-chips-container" class="flex flex-wrap items-center gap-2">
+              <!-- Rendered color chips -->
             </div>
           </div>
 
-          <!-- COLORS -->
-          <div class="space-y-2 pt-2 border-t border-slate-200/60">
-            <div class="flex items-center justify-between">
-              <label class="font-semibold text-slate-700">2. Select Color Variations</label>
-              <span id="modal-color-selected-count" class="text-[11px] text-slate-400">1 selected</span>
-            </div>
-            <div id="modal-color-chips-box" class="flex flex-wrap items-center gap-2">
-              <!-- Rendered color chips with swatches -->
-            </div>
-            <!-- Custom color adder -->
-            <div class="flex items-center gap-2 pt-1 flex-wrap">
-              <input
-                type="text"
-                id="inp-custom-color-name"
-                placeholder="+ Custom color name..."
-                class="w-44 px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-black"
-                onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomColorChip();}"
-              >
-              <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2 py-1">
-                <span class="text-[10px] text-slate-400 font-medium">Hex:</span>
-                <input type="color" id="inp-custom-color-hex" value="#000000" class="w-5 h-5 rounded cursor-pointer border-0 bg-transparent">
-              </div>
-              <button
-                type="button"
-                onclick="addCustomColorChip()"
-                class="px-3 py-1.5 bg-black text-white text-xs font-semibold rounded-xl hover:bg-neutral-800 transition cursor-pointer"
-              >
-                Add Color
-              </button>
+          <!-- STOCK PER VARIANT LIST -->
+          <div class="pt-3 border-t border-slate-100 space-y-3">
+            <label class="block font-semibold text-slate-800 text-xs">Stock per Variant</label>
+
+            <!-- Dynamic Variant Rows matching image: [Color / Size] [SKU: XXX] [Stock Input] -->
+            <div id="variant-matrix-tbody" class="divide-y divide-slate-100 border-t border-slate-100">
+              <!-- Rendered variant rows -->
             </div>
           </div>
-        </section>
-
-        <!-- SECTION 3: VARIANT MATRIX TABLE (PRICES & BRANCH-WISE STOCK) -->
-        <section class="space-y-3 p-4 bg-white border border-slate-200 rounded-2xl shadow-xs">
-          <div class="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
-            <div class="flex items-center gap-2">
-              <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center">3</span>
-              <h3 class="font-bold uppercase tracking-wider text-slate-800 text-xs">Variant Matrix &amp; Branch Stocks</h3>
-            </div>
-            <div class="flex items-center gap-2">
-              <span id="matrix-total-badge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-800 border border-slate-200">
-                2 Combinations
-              </span>
-            </div>
-          </div>
-
-          <!-- Quick Bulk Apply Bar -->
-          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1">
-                <i data-lucide="sliders" class="w-3.5 h-3.5 text-black"></i> Quick Fill to All Variants
-              </span>
-              <button
-                type="button"
-                onclick="copyFirstMatrixRowToAll()"
-                class="text-[11px] font-semibold text-slate-800 hover:text-black flex items-center gap-1"
-              >
-                <i data-lucide="copy" class="w-3 h-3"></i> Copy Row 1 to All
-              </button>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div class="flex items-center gap-1 bg-white px-2 py-1.5 rounded-lg border border-slate-200">
-                <span class="text-[10px] text-slate-400 font-medium">MRP: ₹</span>
-                <input type="number" id="bulk-inp-mrp" value="999" class="w-full text-xs font-semibold focus:outline-none">
-              </div>
-              <div class="flex items-center gap-1 bg-white px-2 py-1.5 rounded-lg border border-slate-200">
-                <span class="text-[10px] text-slate-400 font-medium">Price: ₹</span>
-                <input type="number" id="bulk-inp-price" value="699" class="w-full text-xs font-semibold focus:outline-none">
-              </div>
-              <div class="flex items-center gap-1 bg-white px-2 py-1.5 rounded-lg border border-slate-200">
-                <span class="text-[10px] text-slate-400 font-medium">Cost: ₹</span>
-                <input type="number" id="bulk-inp-cost" value="320" class="w-full text-xs font-semibold focus:outline-none">
-              </div>
-              <button
-                type="button"
-                onclick="applyBulkPricesToMatrix()"
-                class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs transition cursor-pointer"
-              >
-                Apply Prices to All
-              </button>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200/60">
-              <span class="text-[11px] font-semibold text-slate-600 mr-1">Bulk Stock:</span>
-              <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
-                <span class="text-[10px] text-slate-400">Main:</span>
-                <input type="number" id="bulk-inp-stock-main" value="30" class="w-12 text-xs font-semibold focus:outline-none">
-              </div>
-              <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
-                <span class="text-[10px] text-slate-400">Branch 02:</span>
-                <input type="number" id="bulk-inp-stock-b2" value="15" class="w-12 text-xs font-semibold focus:outline-none">
-              </div>
-              <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
-                <span class="text-[10px] text-slate-400">Warehouse:</span>
-                <input type="number" id="bulk-inp-stock-wh" value="50" class="w-12 text-xs font-semibold focus:outline-none">
-              </div>
-              <button
-                type="button"
-                onclick="applyBulkStockToMatrix()"
-                class="ml-auto px-3 py-1 bg-slate-800 hover:bg-black text-white text-xs font-semibold rounded-lg transition cursor-pointer"
-              >
-                Apply Stock to All
-              </button>
-            </div>
-          </div>
-
-          <!-- Matrix Table -->
-          <div class="border border-slate-200 rounded-xl overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
-                  <th class="p-3">Variant</th>
-                  <th class="p-3">MRP (₹)</th>
-                  <th class="p-3">Selling Price (₹)</th>
-                  <th class="p-3">Cost Price (₹)</th>
-                  <th class="p-3">Main Store</th>
-                  <th class="p-3">Branch 02</th>
-                  <th class="p-3">Warehouse</th>
-                  <th class="p-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="modal-matrix-table-body" class="divide-y divide-slate-100">
-                <!-- Dynamically rendered variant rows -->
-              </tbody>
-            </table>
-          </div>
-        </section>
+        </div>
 
         <!-- Sticky Bottom Footer inside Form -->
         <div class="sticky -bottom-6 -mx-6 px-6 py-4 border-t border-slate-200 bg-white/95 backdrop-blur-sm flex items-center justify-between shrink-0 shadow-lg">
@@ -981,65 +888,7 @@
     </div>
   </div>
 
-  <!-- =========================================================
-       MODAL 2: ADD STOCK MODAL (Quick Restock)
-  ========================================================= -->
-  <div id="modal-add-stock" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center font-bold text-xs">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-sm text-slate-900">Add Stock</h3>
-            <p class="text-[11px] text-slate-400">Select product &amp; branch to adjust physical stock</p>
-          </div>
-        </div>
-        <button type="button" onclick="closeAddStockModal()" class="text-slate-400 hover:text-slate-700">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
 
-      <form id="form-quick-add-stock" onsubmit="handleQuickAddStockSubmit(event)" class="space-y-3.5 text-xs">
-        <div class="space-y-1">
-          <label class="font-semibold text-slate-700">Select Product / Variant</label>
-          <select id="quick-stock-product-select" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-black font-medium">
-            <!-- Populated dynamically -->
-          </select>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div class="space-y-1">
-            <label class="font-semibold text-slate-700">Target Branch</label>
-            <select id="quick-stock-branch-select" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-black font-medium">
-              <option value="main">Main Store</option>
-              <option value="branch_02">Branch 02</option>
-              <option value="warehouse">Warehouse</option>
-            </select>
-          </div>
-          <div class="space-y-1">
-            <label class="font-semibold text-slate-700">Quantity to Add</label>
-            <input type="number" id="quick-stock-qty-input" required min="1" value="10" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-black font-bold text-slate-900">
-          </div>
-        </div>
-
-        <div class="space-y-1">
-          <label class="font-semibold text-slate-700">Reason / Notes</label>
-          <input type="text" id="quick-stock-reason" placeholder="e.g. Purchase order PO-448 received" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-black">
-        </div>
-
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-          <button type="button" onclick="closeAddStockModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">
-            Cancel
-          </button>
-          <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-black hover:bg-neutral-800 rounded-xl shadow-xs">
-            Confirm &amp; Update Stock
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 
   <!-- =========================================================
        MODAL 3: STOCK HISTORY DRAWER
@@ -1090,151 +939,80 @@
     // Global application state
     const COMPANY_ID = 'thebaniyancompany';
 
-    // Baseline demo dataset matching user screenshot exactly
-    const DEFAULT_INVENTORY_ITEMS = [
-      {
-        id: 'item-1',
-        productId: 'WLK-001',
-        productName: 'White Linen Kurti',
-        variantName: 'Size M',
-        sku: 'WLK-M-WHT',
-        category: 'Kurtas',
-        currentStock: 2,
-        status: 'Critical', // 'Critical' | 'Low' | 'In Stock' | 'Out of Stock'
-        stockByBranch: { main: 2, branch_02: 0, warehouse: 0 }
-      },
-      {
-        id: 'item-2',
-        productId: 'WLK-001',
-        productName: 'White Linen Kurti',
-        variantName: 'Size L',
-        sku: 'WLK-L-WHT',
-        category: 'Kurtas',
-        currentStock: 4,
-        status: 'Low',
-        stockByBranch: { main: 4, branch_02: 0, warehouse: 0 }
-      },
-      {
-        id: 'item-3',
-        productId: 'DJ6-032',
-        productName: 'Denim Joggers',
-        variantName: 'Size 32',
-        sku: 'DJ6-32-BLU',
-        category: 'Joggers',
-        currentStock: 3,
-        status: 'Low',
-        stockByBranch: { main: 2, branch_02: 1, warehouse: 0 }
-      },
-      {
-        id: 'item-4',
-        productId: 'BOT-99',
-        productName: 'Black Oversized T-Shirt',
-        variantName: 'Size XXL',
-        sku: 'BOT-XXL-BLK',
-        category: 'T-Shirts',
-        currentStock: 1,
-        status: 'Critical',
-        stockByBranch: { main: 1, branch_02: 0, warehouse: 0 }
-      },
-      {
-        id: 'item-5',
-        productId: 'EMK-501',
-        productName: 'Embroidered Kurta',
-        variantName: 'Size XL',
-        sku: 'EMK-XL-RED',
-        category: 'Kurtas',
-        currentStock: 0,
-        status: 'Out of Stock',
-        stockByBranch: { main: 0, branch_02: 0, warehouse: 0 }
-      },
-      {
-        id: 'item-6',
-        productId: 'CPS-108',
-        productName: 'Cotton Palazzo Set',
-        variantName: 'Size S',
-        sku: 'CPS-S-PNK',
-        category: 'Sets',
-        currentStock: 0,
-        status: 'Out of Stock',
-        stockByBranch: { main: 0, branch_02: 0, warehouse: 0 }
-      }
-    ];
-
-    window.inventoryItems = [...DEFAULT_INVENTORY_ITEMS];
+    // Real inventory state (strictly zero mock data)
+    window.inventoryItems = [];
     window.activeStatusFilter = 'all';
     window.activeSearchTerm = '';
-    window.stockHistoryLogs = [
-      { time: 'Today, 15:40', item: 'White Linen Kurti (Size M)', change: '-1 (Online order INV-892)', prev: 3, curr: 2 },
-      { time: 'Today, 14:15', item: 'Denim Joggers (Size 32)', change: '+5 (Store replenishment)', prev: 0, curr: 3 },
-      { time: 'Today, 11:30', item: 'Cotton Palazzo Set (Size S)', change: '-2 (Retail sale)', prev: 2, curr: 0 }
-    ];
+    window.stockHistoryLogs = [];
 
     // ==========================================
-    // INITIALIZATION & FIRESTORE FETCH
+    // INITIALIZATION & FIRESTORE FETCH (REAL DATA ONLY)
     // ==========================================
     async function initInventoryPage() {
       try {
-        // Attempt to load live products from Firestore
-        const snap = await getDocs(collection(db, 'products'));
-        if (!snap.empty) {
-          const liveItems = [];
-          snap.docs.forEach(docSnap => {
-            const p = docSnap.data();
-            const pName = p.name || 'Untitled Product';
-            const cat = p.category || 'General';
+        const compSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'products'));
+        const rootSnap = await getDocs(collection(db, 'products'));
+        const allDocsMap = new Map();
+        rootSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        compSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
 
-            if (Array.isArray(p.variants) && p.variants.length > 0) {
-              p.variants.forEach(v => {
-                const totalStock = Object.values(v.stock || {}).reduce((acc, num) => acc + (Number(num) || 0), 0);
-                let st = 'In Stock';
-                if (totalStock === 0) st = 'Out of Stock';
-                else if (totalStock <= 2) st = 'Critical';
-                else if (totalStock <= 5) st = 'Low';
+        const liveItems = [];
+        allDocsMap.forEach((p, docId) => {
+          const pName = p.name || 'Untitled Product';
+          const cat = p.category || 'General';
 
-                liveItems.push({
-                  id: `${docSnap.id}-${v.size}-${v.color}`,
-                  productId: docSnap.id,
-                  productName: pName,
-                  variantName: `Size ${v.size} / ${v.color}`,
-                  sku: `${p.productId || docSnap.id}-${v.size}`,
-                  category: cat,
-                  currentStock: totalStock,
-                  status: st,
-                  stockByBranch: v.stock || { main: totalStock }
-                });
-              });
-            } else {
-              const stock = Number(p.availableStock || p.stock || 0);
+          if (Array.isArray(p.variants) && p.variants.length > 0) {
+            p.variants.forEach(v => {
+              const totalStock = Object.values(v.stock || {}).reduce((acc, num) => acc + (Number(num) || 0), 0);
               let st = 'In Stock';
-              if (stock === 0) st = 'Out of Stock';
-              else if (stock <= 2) st = 'Critical';
-              else if (stock <= 5) st = 'Low';
+              if (totalStock === 0) st = 'Out of Stock';
+              else if (totalStock <= 2) st = 'Critical';
+              else if (totalStock <= 5) st = 'Low';
 
               liveItems.push({
-                id: docSnap.id,
-                productId: docSnap.id,
+                id: `${docId}-${v.size}-${v.color}`,
+                productId: docId,
                 productName: pName,
-                variantName: 'Standard',
-                sku: p.productId || docSnap.id,
+                variantName: `Size ${v.size} / ${v.color}`,
+                sku: v.sku || `${p.productId || docId}-${v.size}`,
                 category: cat,
-                currentStock: stock,
+                currentStock: totalStock,
                 status: st,
-                stockByBranch: { main: stock }
+                stockByBranch: v.stock || { main: totalStock }
               });
-            }
-          });
+            });
+          } else {
+            const stock = Number(p.availableStock || p.stock || 0);
+            let st = 'In Stock';
+            if (stock === 0) st = 'Out of Stock';
+            else if (stock <= 2) st = 'Critical';
+            else if (stock <= 5) st = 'Low';
 
-          if (liveItems.length > 0) {
-            window.inventoryItems = liveItems;
+            liveItems.push({
+              id: docId,
+              productId: docId,
+              productName: pName,
+              variantName: 'Standard',
+              sku: p.productId || docId,
+              category: cat,
+              currentStock: stock,
+              status: st,
+              stockByBranch: { main: stock }
+            });
           }
-        }
+        });
+
+        window.inventoryItems = liveItems;
       } catch (err) {
-        console.warn('Firestore load fallback to baseline catalog:', err);
+        console.warn('Firestore load products error:', err);
+        window.inventoryItems = [];
       }
 
       applyAllFilters();
       initAddProductModalData();
-      lucide.createIcons();
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
     }
 
     // ==========================================
@@ -1546,7 +1324,6 @@
           btn.disabled = false;
           applyAllFilters();
         }, 1200);
-
       } catch (err) {
         console.error('Error saving row stock:', err);
         btn.textContent = 'Error';
@@ -1555,28 +1332,34 @@
     };
 
     // ==========================================
-    // STOCK HISTORY MODAL
+    // STOCK HISTORY MODAL (REAL LOGS ONLY)
     // ==========================================
     window.openStockHistoryModal = function() {
       const modal = document.getElementById('modal-stock-history');
       const list = document.getElementById('stock-history-list');
       if (!modal || !list) return;
 
-      list.innerHTML = window.stockHistoryLogs.map(log => `
-        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-          <div>
-            <span class="font-bold text-slate-900 block">${log.item}</span>
-            <span class="text-[10px] text-slate-400 font-medium">${log.time} · ${log.change}</span>
+      if (!window.stockHistoryLogs || window.stockHistoryLogs.length === 0) {
+        list.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs">No stock adjustment logs recorded yet.</div>`;
+      } else {
+        list.innerHTML = window.stockHistoryLogs.map(log => `
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="font-bold text-slate-900 block">${log.item}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${log.time} · ${log.change}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-bold text-slate-800">${log.curr} units</span>
+              <span class="text-[10px] text-slate-400 block">(was ${log.prev})</span>
+            </div>
           </div>
-          <div class="text-right">
-            <span class="text-xs font-bold text-slate-800">${log.curr} units</span>
-            <span class="text-[10px] text-slate-400 block">(was ${log.prev})</span>
-          </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
 
       modal.classList.remove('hidden');
-      lucide.createIcons();
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
     };
 
     window.closeStockHistoryModal = function() {
@@ -1584,93 +1367,27 @@
     };
 
     // ==========================================
-    // ADD STOCK (QUICK RESTOCK) MODAL
-    // ==========================================
-    window.openAddStockModal = function() {
-      const modal = document.getElementById('modal-add-stock');
-      const sel = document.getElementById('quick-stock-product-select');
-      if (!modal || !sel) return;
-
-      sel.innerHTML = window.inventoryItems.map(i => `
-        <option value="${i.id}">${i.productName} — ${i.variantName} (Current: ${i.currentStock})</option>
-      `).join('');
-
-      modal.classList.remove('hidden');
-      lucide.createIcons();
-    };
-
-    window.closeAddStockModal = function() {
-      document.getElementById('modal-add-stock')?.classList.add('hidden');
-    };
-
-    window.handleQuickAddStockSubmit = async function(e) {
-      e.preventDefault();
-      const selId = document.getElementById('quick-stock-product-select')?.value;
-      const branch = document.getElementById('quick-stock-branch-select')?.value;
-      const addQty = parseInt(document.getElementById('quick-stock-qty-input')?.value, 10) || 0;
-      const reason = document.getElementById('quick-stock-reason')?.value.trim() || 'Manual restock';
-
-      const target = window.inventoryItems.find(i => i.id === selId);
-      if (!target) return;
-
-      const prev = target.currentStock;
-      const curr = prev + addQty;
-      target.currentStock = curr;
-      if (curr > 5) target.status = 'In Stock';
-      else if (curr > 2) target.status = 'Low';
-      else if (curr > 0) target.status = 'Critical';
-      else target.status = 'Out of Stock';
-
-      if (target.stockByBranch) {
-        target.stockByBranch[branch] = (target.stockByBranch[branch] || 0) + addQty;
-      }
-
-      window.stockHistoryLogs.unshift({
-        time: 'Just now',
-        item: `${target.productName} (${target.variantName})`,
-        change: `+${addQty} (${reason} -> ${branch})`,
-        prev,
-        curr
-      });
-
-      closeAddStockModal();
-      applyAllFilters();
-    };
-
-    // ==========================================
-    // REDESIGNED ADD PRODUCT MODAL LOGIC
-    // (Preserves ALL fields from specifications)
+    // ADD PRODUCT STATE & CONTROLS (MATCHING IMAGE SPEC)
     // ==========================================
     const MODAL_TAGS = ['Trending', 'Hot', 'New', 'Best Seller', 'Exclusive', 'Clearance'];
-    const MODAL_PRESET_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
-    const MODAL_PRESET_COLORS = [
-      { name: 'Black', hex: '#000000' },
-      { name: 'White', hex: '#ffffff' },
-      { name: 'Navy Blue', hex: '#1e3a8a' },
-      { name: 'Royal Blue', hex: '#2563eb' },
-      { name: 'Crimson Red', hex: '#dc2626' },
-      { name: 'Olive Green', hex: '#4d7c0f' },
-      { name: 'Charcoal', hex: '#374151' },
-      { name: 'Beige', hex: '#d4b996' },
-      { name: 'Pastel Pink', hex: '#f472b6' }
-    ];
+    const IMAGE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+    const IMAGE_COLORS = ['Black', 'White', 'Blue', 'Red', 'Green', 'Yellow', 'Pink', 'Grey'];
 
     let addProductState = {
       selectedTag: 'Trending',
-      selectedSizes: ['M', 'L'],
-      allSizes: [...MODAL_PRESET_SIZES],
-      selectedColors: [{ name: 'Black', hex: '#000000' }],
-      allColors: [...MODAL_PRESET_COLORS],
-      imageUrls: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'],
-      matrix: []
+      selectedSizes: new Set(['M', 'L', 'XL']), // Pre-selected matching image
+      selectedColors: new Set(['Black', 'White']), // Pre-selected matching image
+      variantStockMap: {}, // key: 'Color:::Size' -> stock
+      variants: [],
+      imageUrls: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800']
     };
 
     function initAddProductModalData() {
       renderModalTags();
+      renderModalImagePreviews();
+      calculatePricingMetrics();
       renderModalSizes();
       renderModalColors();
-      renderModalImagePreviews();
-      generateModalMatrix();
     }
 
     function renderModalTags() {
@@ -1682,7 +1399,7 @@
           <button
             type="button"
             onclick="setModalTag('${t}')"
-            class="px-3 py-1 text-xs rounded-xl border transition ${
+            class="px-3 py-1 text-xs rounded-xl border transition cursor-pointer ${
               active 
                 ? 'bg-black text-white border-black font-semibold shadow-xs' 
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -1696,289 +1413,192 @@
 
     window.setModalTag = function(t) {
       addProductState.selectedTag = t;
-      document.getElementById('inp-prod-tag').value = t;
+      const inp = document.getElementById('inp-prod-tag');
+      if (inp) inp.value = t;
       renderModalTags();
     };
 
+    // Pricing calculation
+    window.calculatePricingMetrics = function() {
+      const mrp = parseFloat(document.getElementById('inp-prod-mrp')?.value || '999') || 0;
+      const selling = parseFloat(document.getElementById('inp-prod-price')?.value || '799') || 0;
+      const cost = parseFloat(document.getElementById('inp-prod-cost')?.value || '400') || 0;
+
+      const profit = Math.max(0, selling - cost);
+      const margin = selling > 0 ? Math.round((profit / selling) * 100) : 0;
+
+      const pUnitEl = document.getElementById('pricing-profit-unit');
+      const pMarginEl = document.getElementById('pricing-profit-margin');
+
+      if (pUnitEl) pUnitEl.textContent = `₹${profit}`;
+      if (pMarginEl) pMarginEl.textContent = `${margin}%`;
+
+      renderStockPerVariant();
+    };
+
+    // Sizes Chips
     function renderModalSizes() {
-      const container = document.getElementById('modal-size-chips-box');
+      const container = document.getElementById('size-chips-container');
       if (!container) return;
-      container.innerHTML = addProductState.allSizes.map(s => {
-        const isChecked = addProductState.selectedSizes.includes(s);
+
+      container.innerHTML = IMAGE_SIZES.map(sz => {
+        const isSelected = addProductState.selectedSizes.has(sz);
         return `
-          <button
-            type="button"
-            onclick="toggleModalSize('${s}')"
-            class="min-w-9 px-3 py-1.5 rounded-xl border text-xs font-semibold transition ${
-              isChecked
-                ? 'bg-black text-white border-black shadow-xs'
-                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-            }"
-          >
-            ${s}
+          <button type="button" onclick="toggleModalSize('${sz}')"
+            class="px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+              isSelected 
+                ? 'bg-black text-white shadow-xs' 
+                : 'bg-white text-slate-700 hover:border-slate-400 border border-slate-200'
+            }">
+            <span>${sz}</span>
           </button>
         `;
       }).join('');
-      document.getElementById('modal-size-selected-count').textContent = `${addProductState.selectedSizes.length} selected`;
+
+      renderStockPerVariant();
     }
 
-    window.toggleModalSize = function(s) {
-      if (addProductState.selectedSizes.includes(s)) {
-        addProductState.selectedSizes = addProductState.selectedSizes.filter(x => x !== s);
+    window.toggleModalSize = function(sz) {
+      if (addProductState.selectedSizes.has(sz)) {
+        addProductState.selectedSizes.delete(sz);
       } else {
-        addProductState.selectedSizes.push(s);
+        addProductState.selectedSizes.add(sz);
       }
       renderModalSizes();
-      generateModalMatrix();
     };
 
-    window.addCustomSizeChip = function() {
-      const inp = document.getElementById('inp-custom-size');
-      const val = inp?.value.trim().toUpperCase();
-      if (!val) return;
-      if (!addProductState.allSizes.includes(val)) addProductState.allSizes.push(val);
-      if (!addProductState.selectedSizes.includes(val)) addProductState.selectedSizes.push(val);
-      inp.value = '';
-      renderModalSizes();
-      generateModalMatrix();
-    };
-
+    // Colors Chips
     function renderModalColors() {
-      const container = document.getElementById('modal-color-chips-box');
+      const container = document.getElementById('color-chips-container');
       if (!container) return;
-      container.innerHTML = addProductState.allColors.map(c => {
-        const isChecked = addProductState.selectedColors.some(sc => sc.name.toLowerCase() === c.name.toLowerCase());
+
+      container.innerHTML = IMAGE_COLORS.map(colName => {
+        const isSelected = addProductState.selectedColors.has(colName);
         return `
-          <button
-            type="button"
-            onclick="toggleModalColor('${c.name}', '${c.hex}')"
-            class="flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium transition ${
-              isChecked
-                ? 'bg-slate-900 text-white border-slate-900 shadow-xs ring-1 ring-slate-900'
-                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-            }"
-          >
-            <span class="w-3.5 h-3.5 rounded-full border border-black/15 shrink-0" style="background-color: ${c.hex};"></span>
-            <span>${c.name}</span>
+          <button type="button" onclick="toggleModalColor('${colName}')"
+            class="px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-2 ${
+              isSelected 
+                ? 'bg-black text-white shadow-xs' 
+                : 'bg-white text-slate-700 hover:border-slate-400 border border-slate-200'
+            }">
+            <span>${colName}</span>
           </button>
         `;
       }).join('');
-      document.getElementById('modal-color-selected-count').textContent = `${addProductState.selectedColors.length} selected`;
+
+      renderStockPerVariant();
     }
 
-    window.toggleModalColor = function(name, hex) {
-      const exists = addProductState.selectedColors.some(c => c.name.toLowerCase() === name.toLowerCase());
-      if (exists) {
-        addProductState.selectedColors = addProductState.selectedColors.filter(c => c.name.toLowerCase() !== name.toLowerCase());
+    window.toggleModalColor = function(colName) {
+      if (addProductState.selectedColors.has(colName)) {
+        addProductState.selectedColors.delete(colName);
       } else {
-        addProductState.selectedColors.push({ name, hex });
+        addProductState.selectedColors.add(colName);
       }
       renderModalColors();
-      generateModalMatrix();
     };
 
-    window.addCustomColorChip = function() {
-      const nameInp = document.getElementById('inp-custom-color-name');
-      const hexInp = document.getElementById('inp-custom-color-hex');
-      const name = nameInp?.value.trim();
-      const hex = hexInp?.value || '#000000';
-      if (!name) return;
+    // Stock per variant list
+    function renderStockPerVariant() {
+      const container = document.getElementById('variant-matrix-tbody');
+      if (!container) return;
 
-      const newCol = { name, hex };
-      if (!addProductState.allColors.some(c => c.name.toLowerCase() === name.toLowerCase())) {
-        addProductState.allColors.push(newCol);
-      }
-      if (!addProductState.selectedColors.some(c => c.name.toLowerCase() === name.toLowerCase())) {
-        addProductState.selectedColors.push(newCol);
-      }
-      nameInp.value = '';
-      renderModalColors();
-      generateModalMatrix();
-    };
+      const selectedColors = Array.from(addProductState.selectedColors);
+      const selectedSizes = Array.from(addProductState.selectedSizes);
 
-    function generateModalMatrix() {
-      const newMatrix = [];
-      const defaultMrp = parseFloat(document.getElementById('bulk-inp-mrp')?.value || '999') || 999;
-      const defaultPrice = parseFloat(document.getElementById('bulk-inp-price')?.value || '699') || 699;
-      const defaultCost = parseFloat(document.getElementById('bulk-inp-cost')?.value || '320') || 320;
-      const defMain = parseInt(document.getElementById('bulk-inp-stock-main')?.value || '30', 10) || 0;
-      const defB2 = parseInt(document.getElementById('bulk-inp-stock-b2')?.value || '15', 10) || 0;
-      const defWh = parseInt(document.getElementById('bulk-inp-stock-wh')?.value || '50', 10) || 0;
-
-      addProductState.selectedSizes.forEach(size => {
-        addProductState.selectedColors.forEach(colorObj => {
-          const existing = addProductState.matrix.find(v => v.size === size && v.color.toLowerCase() === colorObj.name.toLowerCase());
-          if (existing) {
-            newMatrix.push({ ...existing, colorHex: colorObj.hex });
-          } else {
-            newMatrix.push({
-              size,
-              color: colorObj.name,
-              colorHex: colorObj.hex,
-              mrp: defaultMrp,
-              price: defaultPrice,
-              cost: defaultCost,
-              stock: {
-                main: defMain,
-                branch_02: defB2,
-                warehouse: defWh
-              }
-            });
-          }
-        });
-      });
-
-      addProductState.matrix = newMatrix;
-      renderModalMatrixTable();
-    }
-
-    function renderModalMatrixTable() {
-      const tbody = document.getElementById('modal-matrix-table-body');
-      if (!tbody) return;
-
-      if (addProductState.matrix.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">Please select at least one size and color to generate the matrix.</td></tr>`;
-        document.getElementById('matrix-total-badge').textContent = '0 Combinations';
-        document.getElementById('footer-variant-count').textContent = '0';
-        document.getElementById('footer-total-units').textContent = '0 units';
+      if (selectedColors.length === 0 || selectedSizes.length === 0) {
+        container.innerHTML = `<div class="py-6 text-center text-slate-400 text-xs font-medium">Select sizes and colors above to generate variants.</div>`;
+        addProductState.variants = [];
+        const fvCount = document.getElementById('footer-variant-count');
+        const ftUnits = document.getElementById('footer-total-units');
+        if (fvCount) fvCount.textContent = '0';
+        if (ftUnits) ftUnits.textContent = '0 units';
         return;
       }
 
-      let grandTotalUnits = 0;
-      tbody.innerHTML = addProductState.matrix.map((row, idx) => {
-        const rowStock = Object.values(row.stock || {}).reduce((a, b) => a + (Number(b) || 0), 0);
-        grandTotalUnits += rowStock;
+      let rawSkuPrefix = String(document.getElementById('inp-prod-sku')?.value || 'BOT').trim();
+      let cleanPrefix = rawSkuPrefix.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase() || 'BOT';
 
-        return `
-          <tr class="hover:bg-slate-50/60 transition">
-            <!-- Variant Badge -->
-            <td class="p-3">
+      const mrp = Number(document.getElementById('inp-prod-mrp')?.value || 999);
+      const price = Number(document.getElementById('inp-prod-price')?.value || 799);
+      const cost = Number(document.getElementById('inp-prod-cost')?.value || 400);
+
+      const newVariants = [];
+      let rowsHtml = '';
+      let totalUnits = 0;
+
+      selectedColors.forEach(col => {
+        selectedSizes.forEach(sz => {
+          const key = `${col}:::${sz}`;
+          const currentStock = (addProductState.variantStockMap && addProductState.variantStockMap[key] !== undefined)
+            ? addProductState.variantStockMap[key]
+            : 20; // default 20 matching user screenshot exactly
+
+          totalUnits += currentStock;
+          const colorShort = col.slice(0, 3).toUpperCase();
+          const skuTag = `${cleanPrefix}-${sz}-${colorShort}`;
+
+          newVariants.push({
+            size: sz,
+            color: col,
+            sku: skuTag,
+            mrp: mrp,
+            price: price,
+            cost: cost,
+            stock: { main: currentStock },
+            availableStock: currentStock
+          });
+
+          rowsHtml += `
+            <div class="flex items-center justify-between py-3.5 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 px-2 rounded-xl transition">
               <div class="flex items-center gap-2">
-                <span class="w-3.5 h-3.5 rounded-full border border-black/15 shrink-0" style="background-color: ${row.colorHex || '#000000'};"></span>
-                <span class="font-bold text-slate-900">${row.size}</span>
-                <span class="text-slate-400">/ ${row.color}</span>
+                <span class="font-bold text-slate-900 text-xs sm:text-sm">${col} / ${sz}</span>
               </div>
-            </td>
-
-            <!-- MRP -->
-            <td class="p-3">
-              <input type="number" value="${row.mrp}" onchange="updateMatrixField(${idx}, 'mrp', this.value)" class="w-20 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:bg-white focus:border-black outline-none">
-            </td>
-
-            <!-- Selling Price -->
-            <td class="p-3">
-              <input type="number" value="${row.price}" onchange="updateMatrixField(${idx}, 'price', this.value)" class="w-20 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-emerald-600 focus:bg-white focus:border-black outline-none">
-            </td>
-
-            <!-- Cost Price -->
-            <td class="p-3">
-              <input type="number" value="${row.cost}" onchange="updateMatrixField(${idx}, 'cost', this.value)" class="w-20 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-500 focus:bg-white focus:border-black outline-none">
-            </td>
-
-            <!-- Main Branch -->
-            <td class="p-3">
-              <input type="number" value="${row.stock.main || 0}" onchange="updateMatrixStock(${idx}, 'main', this.value)" class="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:bg-white focus:border-black outline-none">
-            </td>
-
-            <!-- Branch 02 -->
-            <td class="p-3">
-              <input type="number" value="${row.stock.branch_02 || 0}" onchange="updateMatrixStock(${idx}, 'branch_02', this.value)" class="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:bg-white focus:border-black outline-none">
-            </td>
-
-            <!-- Warehouse -->
-            <td class="p-3">
-              <input type="number" value="${row.stock.warehouse || 0}" onchange="updateMatrixStock(${idx}, 'warehouse', this.value)" class="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:bg-white focus:border-black outline-none">
-            </td>
-
-            <!-- Row Actions -->
-            <td class="p-3 text-right">
-              <div class="flex items-center justify-end gap-1">
-                <button type="button" onclick="duplicateMatrixRow(${idx})" title="Duplicate Variant" class="p-1 rounded text-slate-400 hover:text-black transition">
-                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                </button>
-                <button type="button" onclick="deleteMatrixRow(${idx})" title="Delete Variant" class="p-1 rounded text-slate-400 hover:text-rose-600 transition">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
+              <div class="flex items-center gap-4 sm:gap-6">
+                <span class="text-[11px] sm:text-xs font-mono text-slate-400 uppercase tracking-wider">SKU: ${skuTag}</span>
+                <input type="number" min="0" value="${currentStock}"
+                  oninput="updateVariantStockValue('${key}', this.value)"
+                  class="w-16 sm:w-20 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-center text-xs font-bold text-slate-900 outline-none focus:border-black focus:ring-1 focus:ring-black shadow-2xs">
               </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
+            </div>
+          `;
+        });
+      });
 
-      document.getElementById('matrix-total-badge').textContent = `${addProductState.matrix.length} Combinations`;
-      document.getElementById('footer-variant-count').textContent = addProductState.matrix.length;
-      document.getElementById('footer-total-units').textContent = `${grandTotalUnits} units`;
-      lucide.createIcons();
+      addProductState.variants = newVariants;
+      container.innerHTML = rowsHtml;
+
+      const fvCount = document.getElementById('footer-variant-count');
+      const ftUnits = document.getElementById('footer-total-units');
+      if (fvCount) fvCount.textContent = String(newVariants.length);
+      if (ftUnits) ftUnits.textContent = `${totalUnits} units`;
     }
 
-    window.updateMatrixField = function(idx, field, val) {
-      if (addProductState.matrix[idx]) {
-        addProductState.matrix[idx][field] = parseFloat(val) || 0;
+    window.updateVariantStockValue = function(key, val) {
+      if (!addProductState.variantStockMap) addProductState.variantStockMap = {};
+      const num = Math.max(0, parseInt(val, 10) || 0);
+      addProductState.variantStockMap[key] = num;
+
+      const [col, sz] = key.split(':::');
+      const v = addProductState.variants.find(item => item.color === col && item.size === sz);
+      if (v) {
+        v.stock = { main: num };
+        v.availableStock = num;
       }
-    };
 
-    window.updateMatrixStock = function(idx, branch, val) {
-      if (addProductState.matrix[idx]) {
-        addProductState.matrix[idx].stock[branch] = parseInt(val, 10) || 0;
-        renderModalMatrixTable();
-      }
-    };
-
-    window.duplicateMatrixRow = function(idx) {
-      const original = addProductState.matrix[idx];
-      if (!original) return;
-      const clone = JSON.parse(JSON.stringify(original));
-      clone.size = `${clone.size}-Copy`;
-      addProductState.matrix.splice(idx + 1, 0, clone);
-      renderModalMatrixTable();
-    };
-
-    window.deleteMatrixRow = function(idx) {
-      addProductState.matrix.splice(idx, 1);
-      renderModalMatrixTable();
-    };
-
-    window.applyBulkPricesToMatrix = function() {
-      const m = parseFloat(document.getElementById('bulk-inp-mrp')?.value || '0') || 0;
-      const p = parseFloat(document.getElementById('bulk-inp-price')?.value || '0') || 0;
-      const c = parseFloat(document.getElementById('bulk-inp-cost')?.value || '0') || 0;
-      addProductState.matrix.forEach(v => {
-        v.mrp = m;
-        v.price = p;
-        v.cost = c;
+      let totalUnits = 0;
+      addProductState.variants.forEach(item => {
+        totalUnits += Number(item.availableStock || 0);
       });
-      renderModalMatrixTable();
-    };
-
-    window.applyBulkStockToMatrix = function() {
-      const main = parseInt(document.getElementById('bulk-inp-stock-main')?.value || '0', 10) || 0;
-      const b2 = parseInt(document.getElementById('bulk-inp-stock-b2')?.value || '0', 10) || 0;
-      const wh = parseInt(document.getElementById('bulk-inp-stock-wh')?.value || '0', 10) || 0;
-      addProductState.matrix.forEach(v => {
-        v.stock = { main, branch_02: b2, warehouse: wh };
-      });
-      renderModalMatrixTable();
-    };
-
-    window.copyFirstMatrixRowToAll = function() {
-      if (addProductState.matrix.length <= 1) return;
-      const first = addProductState.matrix[0];
-      addProductState.matrix.forEach((v, i) => {
-        if (i > 0) {
-          v.mrp = first.mrp;
-          v.price = first.price;
-          v.cost = first.cost;
-          v.stock = { ...first.stock };
-        }
-      });
-      renderModalMatrixTable();
+      const ftUnits = document.getElementById('footer-total-units');
+      if (ftUnits) ftUnits.textContent = `${totalUnits} units`;
     };
 
     // Images
     function renderModalImagePreviews() {
       const box = document.getElementById('modal-image-previews');
       if (!box) return;
-      if (addProductState.imageUrls.length === 0) {
+      if (!addProductState.imageUrls || addProductState.imageUrls.length === 0) {
         box.innerHTML = `<span class="text-[11px] text-slate-400 italic m-auto">No images added</span>`;
         document.getElementById('img-count-badge').textContent = '0 images added';
         return;
@@ -1987,19 +1607,22 @@
         <div class="relative group w-14 h-14 rounded-lg overflow-hidden border border-slate-200 shrink-0 bg-slate-100">
           <img src="${url}" class="w-full h-full object-cover">
           ${i === 0 ? `<span class="absolute bottom-0.5 left-0.5 bg-black/80 text-white text-[8px] px-1 rounded">Cover</span>` : ''}
-          <button type="button" onclick="removeModalImage(${i})" class="absolute top-0.5 right-0.5 p-0.5 bg-rose-600 text-white rounded opacity-0 group-hover:opacity-100 transition">
+          <button type="button" onclick="removeModalImage(${i})" class="absolute top-0.5 right-0.5 p-0.5 bg-rose-600 text-white rounded opacity-0 group-hover:opacity-100 transition cursor-pointer">
             <i data-lucide="x" class="w-3 h-3"></i>
           </button>
         </div>
       `).join('');
       document.getElementById('img-count-badge').textContent = `${addProductState.imageUrls.length} images added`;
-      lucide.createIcons();
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
     }
 
     window.addImageUrlAction = function() {
       const inp = document.getElementById('inp-image-direct-url');
       const val = inp?.value.trim();
       if (!val) return;
+      if (!addProductState.imageUrls) addProductState.imageUrls = [];
       addProductState.imageUrls.push(val);
       inp.value = '';
       renderModalImagePreviews();
@@ -2008,6 +1631,7 @@
     window.handleModalImageUpload = function(el) {
       const files = el.files;
       if (!files) return;
+      if (!addProductState.imageUrls) addProductState.imageUrls = [];
       Array.from(files).forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -2031,6 +1655,7 @@
       const prefix = name.replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase() || 'TBC';
       const rand = Math.floor(100 + Math.random() * 900);
       document.getElementById('inp-prod-sku').value = `${prefix}-${cat.slice(0, 3).toUpperCase()}-${rand}`;
+      renderStockPerVariant();
     };
 
     window.openCustomCategoryModal = function() {
@@ -2041,7 +1666,7 @@
         opt.value = val.trim();
         opt.textContent = val.trim();
         opt.selected = true;
-        catSelect.appendChild(opt);
+        catSelect?.appendChild(opt);
       }
     };
 
@@ -2054,7 +1679,7 @@
         opt.value = supId;
         opt.textContent = `${val.trim()} (${supId})`;
         opt.selected = true;
-        supSelect.appendChild(opt);
+        supSelect?.appendChild(opt);
       }
     };
 
@@ -2073,26 +1698,40 @@
       const btn = document.getElementById('btn-save-product-submit');
       if (!btn) return;
 
-      const name = document.getElementById('inp-prod-name').value.trim();
-      const sku = document.getElementById('inp-prod-sku').value.trim() || `TBC-${Date.now().toString().slice(-4)}`;
-      const category = document.getElementById('inp-prod-category').value;
-      const supplierId = document.getElementById('inp-prod-supplier').value;
-      const gender = document.getElementById('inp-prod-gender').value;
-      const material = document.getElementById('inp-prod-material').value;
-      const tag = document.getElementById('inp-prod-tag').value;
-      const showInEcom = document.getElementById('inp-prod-show-ecom').checked;
+      const name = document.getElementById('inp-prod-name')?.value.trim();
+      const sku = document.getElementById('inp-prod-sku')?.value.trim() || `TBC-${Date.now().toString().slice(-4)}`;
+      const category = document.getElementById('inp-prod-category')?.value || 'General';
+      const supplierId = document.getElementById('inp-prod-supplier')?.value || 'supp_99';
+      const gender = document.getElementById('inp-prod-gender')?.value || 'Unisex';
+      const material = document.getElementById('inp-prod-material')?.value || '100% Cotton';
+      const tag = document.getElementById('inp-prod-tag')?.value || 'Trending';
+      const showInEcom = document.getElementById('inp-prod-show-ecom')?.checked ?? true;
 
-      if (addProductState.matrix.length === 0) {
+      if (!addProductState.variants || addProductState.variants.length === 0) {
         alert('Please select at least one size and color combination.');
         return;
       }
 
       btn.disabled = true;
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving to Firestore...`;
-      lucide.createIcons();
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+
+      const formattedVariants = addProductState.variants.map(v => ({
+        size: v.size,
+        color: v.color,
+        sku: v.sku,
+        mrp: Number(v.mrp) || 0,
+        price: Number(v.price) || 0,
+        cost: Number(v.cost) || 0,
+        stock: { ...v.stock }
+      }));
+
+      const newDocId = `PROD-${Date.now().toString().slice(-5)}${Math.floor(10 + Math.random() * 90)}`;
 
       const productPayload = {
-        id: sku,
+        id: newDocId,
         companyId: COMPANY_ID,
         name,
         productId: sku,
@@ -2101,17 +1740,17 @@
         gender,
         material,
         tag,
-        showInEcom,
-        imageUrls: addProductState.imageUrls.length > 0 ? addProductState.imageUrls : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'],
-        variants: addProductState.matrix,
+        showInEcom: Boolean(showInEcom),
+        imageUrls: (addProductState.imageUrls && addProductState.imageUrls.length > 0) ? addProductState.imageUrls : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'],
+        variants: formattedVariants,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
 
       try {
         const batch = writeBatch(db);
-        const globalRef = doc(db, 'products', sku);
-        const tenantRef = doc(db, 'companies', COMPANY_ID, 'products', sku);
+        const globalRef = doc(db, 'products', newDocId);
+        const tenantRef = doc(db, 'companies', COMPANY_ID, 'products', newDocId);
 
         batch.set(globalRef, productPayload, { merge: true });
         batch.set(tenantRef, productPayload, { merge: true });
@@ -2119,7 +1758,7 @@
         await batch.commit();
 
         // Also append to local memory table so user sees it instantly
-        addProductState.matrix.forEach(v => {
+        formattedVariants.forEach(v => {
           const tot = Object.values(v.stock || {}).reduce((a, b) => a + (Number(b) || 0), 0);
           let st = 'In Stock';
           if (tot === 0) st = 'Out of Stock';
@@ -2127,11 +1766,11 @@
           else if (tot <= 5) st = 'Low';
 
           window.inventoryItems.unshift({
-            id: `${sku}-${v.size}-${v.color}`,
-            productId: sku,
+            id: `${newDocId}-${v.size}-${v.color}`,
+            productId: newDocId,
             productName: name,
             variantName: `Size ${v.size} / ${v.color}`,
-            sku: `${sku}-${v.size}`,
+            sku: v.sku || `${sku}-${v.size}`,
             category,
             currentStock: tot,
             status: st,
@@ -2141,18 +1780,18 @@
 
         closeAddProductModal();
         applyAllFilters();
-        alert('Product and variants created successfully!');
+        alert('Product and variants created successfully in POS & Storefront catalog!');
       } catch (err) {
         console.error('Save product error:', err);
         // Fallback memory save
-        addProductState.matrix.forEach(v => {
+        formattedVariants.forEach(v => {
           const tot = Object.values(v.stock || {}).reduce((a, b) => a + (Number(b) || 0), 0);
           window.inventoryItems.unshift({
-            id: `${sku}-${v.size}-${v.color}`,
-            productId: sku,
+            id: `${newDocId}-${v.size}-${v.color}`,
+            productId: newDocId,
             productName: name,
             variantName: `Size ${v.size} / ${v.color}`,
-            sku: `${sku}-${v.size}`,
+            sku: v.sku || `${sku}-${v.size}`,
             category,
             currentStock: tot,
             status: tot === 0 ? 'Out of Stock' : (tot <= 2 ? 'Critical' : (tot <= 5 ? 'Low' : 'In Stock')),
@@ -2165,12 +1804,14 @@
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Save Product &amp; Variants`;
-        lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
       }
     };
 
     window.toggleNotifications = function() {
-      alert('Recent Stock Alerts:\n• White Linen Kurti (M) is Critical (2 left)\n• Black Oversized T-Shirt (XXL) has only 1 unit\n• Cotton Palazzo Set (S) is Out of Stock');
+      alert('Recent Stock Alerts:\n• Check stock levels for real products in inventory table');
     };
 
     window.toggleMobileSidebar = function() {

@@ -462,194 +462,64 @@
 
     const COMPANY_ID = 'thebaniyancompany';
 
-    // Baseline sample orders to demonstrate all 8 statuses with prominent date & time
-    const DEMO_ORDERS = [
-      {
-        id: 'TBC-ORD-8941',
-        customerName: 'Priya Sundaram',
-        phone: '9840123456',
-        email: 'priya.sundaram@gmail.com',
-        address: '14, 2nd Main Road, Gandhi Nagar, Adyar',
-        city: 'Chennai',
-        state: 'Tamil Nadu',
-        pincode: '600020',
-        totalAmount: 1899,
-        paymentMethod: 'Razorpay Online Payment',
-        paymentStatus: 'Paid',
-        status: 'Pending',
-        createdAtFormatted: '04 Sep 2026, 05:24 PM',
-        createdAtTimestamp: Date.now() - 600000,
-        items: [
-          { name: 'White Linen Kurti', size: 'M', color: 'White', qty: 1, price: 999, imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300' },
-          { name: 'Cotton Palazzo Set', size: 'M', color: 'Peach', qty: 1, price: 900, imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300' }
-        ]
-      },
-      {
-        id: 'TBC-ORD-8940',
-        customerName: 'Karthik Raja',
-        phone: '9790987654',
-        email: 'karthik.r@yahoo.com',
-        address: '88, Cross Cut Road, Gandhipuram',
-        city: 'Coimbatore',
-        state: 'Tamil Nadu',
-        pincode: '641012',
-        totalAmount: 699,
-        paymentMethod: 'Cash on Delivery (COD)',
-        paymentStatus: 'Pending',
-        status: 'Accepted',
-        createdAtFormatted: '04 Sep 2026, 04:12 PM',
-        createdAtTimestamp: Date.now() - 4800000,
-        items: [
-          { name: 'Oversized Heavyweight Cotton T-Shirt', size: 'L', color: 'Black', qty: 1, price: 699, imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300' }
-        ]
-      },
-      {
-        id: 'TBC-ORD-8939',
-        customerName: 'Ananya Sharma',
-        phone: '9811223344',
-        email: 'ananya.sharma@outlook.com',
-        address: 'Plot 45, Jubilee Hills, Road No 10',
-        city: 'Hyderabad',
-        state: 'Telangana',
-        pincode: '500033',
-        totalAmount: 1499,
-        paymentMethod: 'Razorpay Online Payment',
-        paymentStatus: 'Paid',
-        status: 'Packing',
-        createdAtFormatted: '04 Sep 2026, 02:45 PM',
-        createdAtTimestamp: Date.now() - 10000000,
-        items: [
-          { name: 'Denim Joggers', size: '32', color: 'Blue', qty: 1, price: 1499, imageUrl: 'https://images.unsplash.com/photo-1542272604-780c96856592?w=300' }
-        ]
-      },
-      {
-        id: 'TBC-ORD-8938',
-        customerName: 'Rahul Verma',
-        phone: '9820011223',
-        email: 'rahul.v@gmail.com',
-        address: 'Flat 402, Sea Green Apts, Worli',
-        city: 'Mumbai',
-        state: 'Maharashtra',
-        pincode: '400018',
-        totalAmount: 1299,
-        paymentMethod: 'Razorpay Online Payment',
-        paymentStatus: 'Paid',
-        status: 'Shipped',
-        createdAtFormatted: '04 Sep 2026, 11:30 AM',
-        createdAtTimestamp: Date.now() - 21600000,
-        trackingNo: 'DTDC-99201948',
-        items: [
-          { name: 'Embroidered Kurta', size: 'XL', color: 'Maroon', qty: 1, price: 1299, imageUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=300' }
-        ]
-      },
-      {
-        id: 'TBC-ORD-8937',
-        customerName: 'Meenakshi Iyer',
-        phone: '9841098765',
-        email: 'meena.iyer@gmail.com',
-        address: '22, North Mada Street, Mylapore',
-        city: 'Chennai',
-        state: 'Tamil Nadu',
-        pincode: '600004',
-        totalAmount: 2499,
-        paymentMethod: 'Razorpay Online Payment',
-        paymentStatus: 'Paid',
-        status: 'Delivered',
-        createdAtFormatted: '03 Sep 2026, 06:15 PM',
-        createdAtTimestamp: Date.now() - 86400000,
-        items: [
-          { name: 'White Linen Kurti', size: 'L', color: 'White', qty: 1, price: 999, imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300' },
-          { name: 'Denim Joggers', size: '30', color: 'Black', qty: 1, price: 1500, imageUrl: 'https://images.unsplash.com/photo-1542272604-780c96856592?w=300' }
-        ]
-      },
-      {
-        id: 'TBC-ORD-8936',
-        customerName: 'Venkatesh Babu',
-        phone: '9940122334',
-        email: 'venkat.babu@gmail.com',
-        address: '15, Anna Salai, Guindy',
-        city: 'Chennai',
-        state: 'Tamil Nadu',
-        pincode: '600032',
-        totalAmount: 699,
-        paymentMethod: 'Cash on Delivery (COD)',
-        paymentStatus: 'Pending',
-        status: 'Cancelled',
-        createdAtFormatted: '03 Sep 2026, 02:20 PM',
-        createdAtTimestamp: Date.now() - 100000000,
-        cancelReason: 'Customer requested cancellation before dispatch',
-        items: [
-          { name: 'Classic Crewneck T-Shirt', size: 'M', color: 'Navy', qty: 1, price: 699, imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300' }
-        ]
-      },
-      {
-        id: 'TBC-ORD-8935',
-        customerName: 'Divya Nair',
-        phone: '9845012345',
-        email: 'divya.nair@gmail.com',
-        address: '5th Block, Koramangala',
-        city: 'Bengaluru',
-        state: 'Karnataka',
-        pincode: '560095',
-        totalAmount: 999,
-        paymentMethod: 'Razorpay Online Payment',
-        paymentStatus: 'Refunded',
-        status: 'Returned',
-        createdAtFormatted: '02 Sep 2026, 04:50 PM',
-        createdAtTimestamp: Date.now() - 180000000,
-        returnReason: 'Size exchange requested -> Store Credit Issued',
-        items: [
-          { name: 'White Linen Kurti', size: 'XL', color: 'White', qty: 1, price: 999, imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300' }
-        ]
-      }
-    ];
-
-    window.liveOrders = [...DEMO_ORDERS];
+    // Real orders list (strictly zero mock data)
+    window.liveOrders = [];
     window.activeOrderStatusFilter = 'all';
     window.activeOrderSearch = '';
 
-    // Load from Firestore
+    // Load from Firestore (Multi-tenant dual collections)
     async function loadOrdersFromFirestore() {
       try {
-        const snap = await getDocs(collection(db, 'companies', COMPANY_ID, 'invoices'));
-        if (!snap.empty) {
-          const list = snap.docs.map(d => {
-            const data = d.data();
-            let dateText = '';
-            if (data.createdAt?.seconds) {
-              const dt = new Date(data.createdAt.seconds * 1000);
-              dateText = dt.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-            } else if (data.orderDateStr) {
-              dateText = data.orderDateStr;
-            } else {
-              dateText = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+        const compSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'invoices'));
+        const rootSnap = await getDocs(collection(db, 'invoices'));
+        const allDocsMap = new Map();
+
+        rootSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        compSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+
+        const list = [];
+        allDocsMap.forEach((data, docId) => {
+          let dateText = '';
+          if (data.createdAt?.seconds) {
+            const dt = new Date(data.createdAt.seconds * 1000);
+            dateText = dt.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+          } else if (data.orderDateStr) {
+            dateText = data.orderDateStr;
+          } else if (data.createdAt) {
+            try {
+              dateText = new Date(data.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+            } catch(e) {
+              dateText = 'Recently';
             }
-
-            return {
-              id: d.id,
-              customerName: data.customerName || data.customerDetails?.name || 'Customer',
-              phone: data.customerPhoneNumber || data.customerPhone || 'Not provided',
-              email: data.customerEmail || '',
-              address: data.customerAddress || data.customerDetails?.address || '',
-              city: data.city || data.customerDetails?.city || '',
-              state: data.state || data.customerDetails?.state || '',
-              pincode: data.pincode || data.customerDetails?.pincode || '',
-              totalAmount: Number(data.totalAmount || 0),
-              paymentMethod: data.paymentMethod || 'Online',
-              paymentStatus: data.paymentStatus || 'Paid',
-              status: data.status || 'Pending',
-              createdAtFormatted: dateText,
-              createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : Date.now(),
-              items: data.items || []
-            };
-          });
-
-          if (list.length > 0) {
-            window.liveOrders = list;
+          } else {
+            dateText = 'Recently';
           }
-        }
+
+          list.push({
+            id: docId,
+            customerName: data.customerName || data.customerDetails?.name || 'Customer',
+            phone: data.customerPhoneNumber || data.customerPhone || 'Not provided',
+            email: data.customerEmail || '',
+            address: data.customerAddress || data.customerDetails?.address || '',
+            city: data.city || data.customerDetails?.city || '',
+            state: data.state || data.customerDetails?.state || '',
+            pincode: data.pincode || data.customerDetails?.pincode || '',
+            totalAmount: Number(data.totalAmount || data.finalAmount || data.grandTotal || 0),
+            paymentMethod: data.paymentMethod || 'Online',
+            paymentStatus: data.paymentStatus || 'Paid',
+            status: data.status || 'Pending',
+            createdAtFormatted: dateText,
+            createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : (data.createdAt ? new Date(data.createdAt).getTime() : 0),
+            items: data.items || data.orderItems || []
+          });
+        });
+
+        // Sort newest first
+        list.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
+        window.liveOrders = list;
       } catch (err) {
-        console.warn('Using baseline demo orders:', err);
+        console.warn('Firestore orders fetch error:', err);
+        window.liveOrders = [];
       }
 
       applyOrderFilters();

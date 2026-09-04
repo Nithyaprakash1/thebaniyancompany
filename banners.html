@@ -499,48 +499,22 @@
 
     const COMPANY_ID = 'thebaniyancompany';
 
-    // Baseline Banners matching screenshot exactly
-    window.allBanners = [
-      {
-        id: 'banner-hero-1',
-        type: 'hero',
-        title: 'Summer Sale – Up to 40% Off',
-        subtitle: 'Shop our latest collection',
-        buttonText: 'Shop Now',
-        targetUrl: 'shop.html',
-        imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&q=80',
-        status: 'Active'
-      },
-      {
-        id: 'banner-hero-2',
-        type: 'hero',
-        title: 'New Arrivals – Cotton Kurtis',
-        subtitle: 'Fresh styles for every occasion',
-        buttonText: 'Explore',
-        targetUrl: 'shop.html?category=Kurtas',
-        imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1200&q=80',
-        status: 'Hidden'
-      },
-      {
-        id: 'banner-promo-1',
-        type: 'promo',
-        title: 'Free Delivery on ₹999+',
-        subtitle: 'Pan-India lightning fast dispatch',
-        buttonText: 'Shop Now',
-        targetUrl: 'shop.html',
-        imageUrl: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200&q=80',
-        status: 'Active'
-      }
-    ];
+    // Real Banners state (strictly zero mock data)
+    window.allBanners = [];
 
     async function loadBanners() {
       try {
-        const snap = await getDocs(collection(db, 'companies', COMPANY_ID, 'banners'));
-        if (!snap.empty) {
-          window.allBanners = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        }
+        const compSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'banners'));
+        const rootSnap = await getDocs(collection(db, 'banners'));
+        const map = new Map();
+
+        rootSnap.forEach(d => map.set(d.id, { id: d.id, ...d.data() }));
+        compSnap.forEach(d => map.set(d.id, { id: d.id, ...d.data() }));
+
+        window.allBanners = Array.from(map.values());
       } catch (e) {
-        console.warn('Using baseline banners:', e);
+        console.warn('Firestore banners fetch error:', e);
+        window.allBanners = [];
       }
       renderBannersList();
     }
@@ -552,14 +526,30 @@
       const heroes = window.allBanners.filter(b => b.type === 'hero');
       const promos = window.allBanners.filter(b => b.type === 'promo');
 
-      document.getElementById('hero-count-text').textContent = `${heroes.length} Banners`;
-      document.getElementById('promo-count-text').textContent = `${promos.length} Banner`;
+      if (document.getElementById('hero-count-text')) document.getElementById('hero-count-text').textContent = `${heroes.length} Banners`;
+      if (document.getElementById('promo-count-text')) document.getElementById('promo-count-text').textContent = `${promos.length} Banners`;
 
       // Render Hero Banners
-      heroList.innerHTML = heroes.map(b => renderBannerRow(b)).join('');
-      promoList.innerHTML = promos.map(b => renderBannerRow(b)).join('');
+      if (heroList) {
+        if (heroes.length === 0) {
+          heroList.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs font-medium border border-dashed border-slate-200 rounded-2xl">No Hero banners created yet. Click "+ Add Banner" above.</div>`;
+        } else {
+          heroList.innerHTML = heroes.map(b => renderBannerRow(b)).join('');
+        }
+      }
 
-      lucide.createIcons();
+      // Render Promo Banners
+      if (promoList) {
+        if (promos.length === 0) {
+          promoList.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs font-medium border border-dashed border-slate-200 rounded-2xl">No Promotional banners created yet. Click "+ Add Banner" above.</div>`;
+        } else {
+          promoList.innerHTML = promos.map(b => renderBannerRow(b)).join('');
+        }
+      }
+
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
     }
 
     function renderBannerRow(b) {
