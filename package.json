@@ -1,0 +1,9 @@
+﻿{
+  "name": "the-baniyan-company",
+  "version": "1.0.0",
+  "description": "The Baniyan Company Web Store",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js"
+  }
+}
