@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -489,11 +489,12 @@
 
   <script type="module">
     import tbcCart from './js/cart-store.js';
-    import { saveOrderToFirestore } from './js/products-service.js';
+    import { saveOrderToFirestore, validateCartForOrder } from './js/products-service.js';
 
     // Expose to window so non-module functions can call it
     window.tbcCart = tbcCart;
     window.saveOrderToFirestore = saveOrderToFirestore;
+    window.validateCartForOrder = validateCartForOrder;
 
     const BACKEND_URL = window.TBC_BACKEND_URL || 'http://localhost:5000';
     const WHATSAPP_NUMBER = '918110061911';
@@ -1228,6 +1229,11 @@
     async function processCODOrder() {
       const customer = getCustomerDetails();
       const items = tbcCart.getCart();
+      if (!items || items.length === 0) {
+        alert('Your cart is empty. Please add items before placing an order.');
+        return;
+      }
+
       const totals = tbcCart.getCartTotals();
       const state = (document.getElementById('cust-state')?.value || customer.state || 'Tamil Nadu').trim();
       const deliveryInfo = getOrderDeliveryInfo(state, totals.subtotal);
@@ -1238,12 +1244,19 @@
       const btn = document.getElementById('pay-submit-btn');
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Placing COD Order...`;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Validating & Placing Order...`;
       }
 
       try {
-        let orderId = `TBC-${Math.floor(100000 + Math.random() * 900000)}`;
+        // 1. Live Validation against Firestore (Zero stale cache purchase)
+        if (typeof window.validateCartForOrder === 'function') {
+          await window.validateCartForOrder(items, 'thebaniyancompany');
+        }
+
+        let orderId = `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
         const orderPayload = {
+          orderId: orderId,
+          companyId: 'thebaniyancompany',
           customerDetails: customer,
           customerName: customer.name,
           customerPhoneNumber: cleanPhone,
@@ -1267,25 +1280,27 @@
           paymentMethod: 'Cash on Delivery (COD)',
           paymentStatus: 'Pending',
           status: 'Awaiting Acceptance',
+          orderStatus: 'pending',
           orderType: 'online',
           customerSource: 'website',
           source: 'website'
         };
 
-        if (typeof window.saveOrderToFirestore === 'function') {
-          try {
-            const directRes = await window.saveOrderToFirestore(orderPayload);
-            if (directRes && (directRes.invoiceId || directRes.orderId)) {
-              orderId = directRes.invoiceId || directRes.orderId;
-            }
-          } catch (err) {
-            console.error("[TBC] saveOrderToFirestore COD error:", err);
-          }
+        if (typeof window.saveOrderToFirestore !== 'function') {
+          throw new Error('Database service is currently initializing. Please try again.');
         }
 
+        const directRes = await window.saveOrderToFirestore(orderPayload);
+        if (!directRes || directRes.success === false) {
+          throw new Error(directRes?.error || 'Failed to save order to database.');
+        }
+
+        const confirmedOrderId = directRes.orderId || directRes.invoiceId || (typeof directRes === 'string' ? directRes : orderId);
+
         saveOrderToLocalStorage({
-          id: orderId,
+          id: confirmedOrderId,
           ...orderPayload,
+          orderId: confirmedOrderId,
           timestamp: Date.now(),
           orderDateStr: new Date().toLocaleString('en-IN', {
             day: '2-digit', month: 'short', year: 'numeric',
@@ -1295,9 +1310,10 @@
 
         localStorage.setItem('tbc_customer_phone', cleanPhone);
         tbcCart.clearCart();
-        window.location.href = `order-success.html?orderId=${encodeURIComponent(orderId)}&method=COD`;
+        window.location.href = `order-success.html?orderId=${encodeURIComponent(confirmedOrderId)}&method=COD`;
       } catch (error) {
-        alert(error.message || 'Unable to place COD order.');
+        console.error('[TBC] COD Order placement error:', error);
+        alert(error.message || 'Unable to place COD order. Please check your details and try again.');
         if (btn) {
           btn.disabled = false;
           window.renderOrderSummary();
@@ -1308,6 +1324,11 @@
     window.executeWhatsAppOrder = async function() {
       const customer = getCustomerDetails();
       const items = tbcCart.getCart();
+      if (!items || items.length === 0) {
+        alert('Your cart is empty. Please add items before placing an order.');
+        return;
+      }
+
       const totals = tbcCart.getCartTotals();
       const state = (document.getElementById('cust-state')?.value || customer.state || 'Tamil Nadu').trim();
       const deliveryInfo = getOrderDeliveryInfo(state, totals.subtotal);
@@ -1315,73 +1336,100 @@
       const finalTotal = totals.grandTotal + deliveryFee;
       const cleanPhone = (customer.phone || '').replace(/\D/g, '').slice(-10);
 
-      let orderId = `TBC-${Math.floor(100000 + Math.random() * 900000)}`;
-
-      const orderPayload = {
-        customerDetails: customer,
-        customerName: customer.name,
-        customerPhoneNumber: cleanPhone,
-        customerPhone: cleanPhone,
-        phone: cleanPhone,
-        customerEmail: customer.email,
-        customerAddress: customer.address,
-        doorNo: customer.doorNo,
-        streetName: customer.streetName,
-        landmark: customer.landmark,
-        city: customer.city,
-        state: customer.state,
-        pincode: customer.pincode,
-        items: items,
-        subtotal: totals.subtotal,
-        deliveryFee: deliveryFee,
-        shippingCharge: deliveryFee,
-        cgstAmount: totals.isGstEnabled ? Math.round(totals.subtotal * (totals.gstPct / 200)) : 0,
-        sgstAmount: totals.isGstEnabled ? Math.round(totals.subtotal * (totals.gstPct / 200)) : 0,
-        totalAmount: finalTotal,
-        paymentMethod: 'WhatsApp Order',
-        paymentStatus: 'Pending',
-        status: 'Awaiting Acceptance',
-        orderType: 'online',
-        customerSource: 'website',
-        source: 'website',
-        whatsappOrder: true
-      };
-
-      if (typeof window.saveOrderToFirestore === 'function') {
-        try {
-          const directRes = await window.saveOrderToFirestore(orderPayload);
-          if (directRes && (directRes.invoiceId || directRes.orderId)) {
-            orderId = directRes.invoiceId || directRes.orderId;
-          }
-        } catch (err) {
-          console.error("[TBC] saveOrderToFirestore WhatsApp error:", err);
-        }
+      const btn = document.getElementById('pay-submit-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Validating & Placing Order...`;
       }
 
-      saveOrderToLocalStorage({
-        id: orderId,
-        ...orderPayload,
-        timestamp: Date.now(),
-        orderDateStr: new Date().toLocaleString('en-IN', {
-          day: '2-digit', month: 'short', year: 'numeric',
-          hour: '2-digit', minute: '2-digit', hour12: true
-        })
-      });
+      try {
+        if (typeof window.validateCartForOrder === 'function') {
+          await window.validateCartForOrder(items, 'thebaniyancompany');
+        }
 
-      localStorage.setItem('tbc_customer_phone', cleanPhone);
-      tbcCart.clearCart();
+        let orderId = `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+        const orderPayload = {
+          orderId: orderId,
+          companyId: 'thebaniyancompany',
+          customerDetails: customer,
+          customerName: customer.name,
+          customerPhoneNumber: cleanPhone,
+          customerPhone: cleanPhone,
+          phone: cleanPhone,
+          customerEmail: customer.email,
+          customerAddress: customer.address,
+          doorNo: customer.doorNo,
+          streetName: customer.streetName,
+          landmark: customer.landmark,
+          city: customer.city,
+          state: customer.state,
+          pincode: customer.pincode,
+          items: items,
+          subtotal: totals.subtotal,
+          deliveryFee: deliveryFee,
+          shippingCharge: deliveryFee,
+          cgstAmount: totals.isGstEnabled ? Math.round(totals.subtotal * (totals.gstPct / 200)) : 0,
+          sgstAmount: totals.isGstEnabled ? Math.round(totals.subtotal * (totals.gstPct / 200)) : 0,
+          totalAmount: finalTotal,
+          paymentMethod: 'WhatsApp Order',
+          paymentStatus: 'Pending',
+          status: 'Awaiting Acceptance',
+          orderStatus: 'pending',
+          orderType: 'online',
+          customerSource: 'website',
+          source: 'website',
+          whatsappOrder: true
+        };
 
-      // Format WhatsApp message
-      const itemsListText = items.map(i => `• ${i.name} (Size: ${i.size || 'M'}, Qty: ${i.quantity}) - ₹${(i.price * i.quantity).toLocaleString('en-IN')}`).join('\n');
-      const waMsg = `🛍️ *NEW ORDER — THE BANIYAN COMPANY*\n\n*Order ID:* #${orderId}\n*Customer:* ${customer.name}\n*Phone:* +91 ${cleanPhone}\n*Address:* ${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}\n${customer.landmark ? `*Landmark:* ${customer.landmark}\n` : ''}\n*Items:*\n${itemsListText}\n\n*Subtotal:* ₹${totals.subtotal.toLocaleString('en-IN')}\n*Shipping:* ${deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}\n*Total Amount:* ₹${finalTotal.toLocaleString('en-IN')}\n*Payment Method:* WhatsApp Direct Order`;
+        if (typeof window.saveOrderToFirestore !== 'function') {
+          throw new Error('Database service is currently initializing. Please try again.');
+        }
 
-      window.open(`https://wa.me/918110061911?text=${encodeURIComponent(waMsg)}`, '_blank');
-      window.location.href = `order-success.html?orderId=${encodeURIComponent(orderId)}&method=WhatsApp`;
+        const directRes = await window.saveOrderToFirestore(orderPayload);
+        if (!directRes || directRes.success === false) {
+          throw new Error(directRes?.error || 'Failed to save order to database.');
+        }
+
+        const confirmedOrderId = directRes.orderId || directRes.invoiceId || (typeof directRes === 'string' ? directRes : orderId);
+
+        saveOrderToLocalStorage({
+          id: confirmedOrderId,
+          ...orderPayload,
+          orderId: confirmedOrderId,
+          timestamp: Date.now(),
+          orderDateStr: new Date().toLocaleString('en-IN', {
+            day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', hour12: true
+          })
+        });
+
+        localStorage.setItem('tbc_customer_phone', cleanPhone);
+        tbcCart.clearCart();
+
+        // Format WhatsApp message
+        const itemsListText = items.map(i => `• ${i.name} (Size: ${i.size || 'M'}, Qty: ${i.quantity}) - ₹${(i.price * i.quantity).toLocaleString('en-IN')}`).join('\n');
+        const waMsg = `🛍️ *NEW ORDER — THE BANIYAN COMPANY*\n\n*Order ID:* #${confirmedOrderId}\n*Customer:* ${customer.name}\n*Phone:* +91 ${cleanPhone}\n*Address:* ${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}\n${customer.landmark ? `*Landmark:* ${customer.landmark}\n` : ''}\n*Items:*\n${itemsListText}\n\n*Subtotal:* ₹${totals.subtotal.toLocaleString('en-IN')}\n*Shipping:* ${deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}\n*Total Amount:* ₹${finalTotal.toLocaleString('en-IN')}\n*Payment Method:* WhatsApp Direct Order`;
+
+        window.open(`https://wa.me/918110061911?text=${encodeURIComponent(waMsg)}`, '_blank');
+        window.location.href = `order-success.html?orderId=${encodeURIComponent(confirmedOrderId)}&method=WhatsApp`;
+      } catch (error) {
+        console.error('[TBC] WhatsApp Order placement error:', error);
+        alert(error.message || 'Unable to place WhatsApp order. Please try again.');
+        if (btn) {
+          btn.disabled = false;
+          window.renderOrderSummary();
+        }
+      }
     };
 
     async function processRazorpayOrder() {
       const customer = getCustomerDetails();
       const items = tbcCart.getCart();
+      if (!items || items.length === 0) {
+        alert('Your cart is empty. Please add items before checking out.');
+        return;
+      }
+
       const totals = tbcCart.getCartTotals();
       const btn = document.getElementById('pay-submit-btn');
 
@@ -1392,7 +1440,21 @@
 
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Opening Razorpay...`;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Validating & Opening Gateway...`;
+      }
+
+      // Live Cart Validation before opening Razorpay
+      try {
+        if (typeof window.validateCartForOrder === 'function') {
+          await window.validateCartForOrder(items, 'thebaniyancompany');
+        }
+      } catch (valErr) {
+        alert(valErr.message || 'Validation error.');
+        if (btn) {
+          btn.disabled = false;
+          window.renderOrderSummary();
+        }
+        return;
       }
 
       const liveKey = 'rzp_live_TM8qhpQTojuGA9';
@@ -1411,12 +1473,17 @@
         description: "Standard Checkout",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBvNJO0SoAyvQ0YA3RnuDwKetM4akXXnq_OHVOYgJ74pQx3sXBJ77NvkVioPDaflDhcejU1S7uu8Vw64QHyTXlVsc9_LXrikVAjYi64rrRLxYu7Tf_PMVOQn9AJHzlkH0x9GXrUmVo2cwrNBBnQIsY_0M7N5y0jurvdrdpERMuUW-ZXc9vlr1qNDHBwj-xj7ARRE1Swrqju9ub9QMoVnkRHwvaO0daOgURvmSkwio-qvsCvIo2A-7mJ6EnHZ8tlpE7I0L4tB1VBhzLM",
         handler: async function (response) {
-          if (btn) btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Finalizing Order...`;
+          if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Finalizing Order in Database...`;
+          }
           try {
             const paymentId = response.razorpay_payment_id || `PAY_${Date.now()}`;
-            let invoiceId = `TBC-${Math.floor(100000 + Math.random() * 900000)}`;
+            let orderId = `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
             const orderPayload = {
+              orderId: orderId,
+              companyId: 'thebaniyancompany',
               customerDetails: customer,
               customerName: customer.name,
               customerPhoneNumber: cleanPhone,
@@ -1440,6 +1507,7 @@
               paymentMethod: 'Razorpay Online Payment',
               paymentStatus: 'Paid',
               status: 'Awaiting Acceptance',
+              orderStatus: 'confirmed',
               orderType: 'online',
               customerSource: 'website',
               source: 'website',
@@ -1448,20 +1516,21 @@
               razorpaySignature: response.razorpay_signature || null
             };
 
-            if (typeof window.saveOrderToFirestore === 'function') {
-              try {
-                const res = await window.saveOrderToFirestore(orderPayload);
-                if (res && (res.invoiceId || res.orderId)) {
-                  invoiceId = res.invoiceId || res.orderId;
-                }
-              } catch (e) {
-                console.error("[TBC] saveOrderToFirestore error:", e);
-              }
+            if (typeof window.saveOrderToFirestore !== 'function') {
+              throw new Error('Database service is currently unavailable.');
             }
 
+            const res = await window.saveOrderToFirestore(orderPayload);
+            if (!res || res.success === false) {
+              throw new Error(res?.error || 'Database write error while saving order.');
+            }
+
+            const confirmedOrderId = res.orderId || res.invoiceId || (typeof res === 'string' ? res : orderId);
+
             saveOrderToLocalStorage({
-              id: invoiceId,
+              id: confirmedOrderId,
               ...orderPayload,
+              orderId: confirmedOrderId,
               timestamp: Date.now(),
               orderDateStr: new Date().toLocaleString('en-IN', {
                 day: '2-digit', month: 'short', year: 'numeric',
@@ -1471,11 +1540,14 @@
 
             localStorage.setItem('tbc_customer_phone', cleanPhone);
             tbcCart.clearCart();
-            window.location.href = `order-success.html?orderId=${encodeURIComponent(invoiceId)}&method=Razorpay`;
+            window.location.href = `order-success.html?orderId=${encodeURIComponent(confirmedOrderId)}&method=Razorpay`;
           } catch (error) {
             console.error("Order completion catch:", error);
-            tbcCart.clearCart();
-            window.location.href = 'order-success.html?method=Razorpay';
+            alert("Payment was successful, but database order recording encountered an issue: " + error.message + "\nPlease contact support with payment ID: " + (response.razorpay_payment_id || ''));
+            if (btn) {
+              btn.disabled = false;
+              window.renderOrderSummary();
+            }
           }
         },
         prefill: {

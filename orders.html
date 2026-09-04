@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -467,15 +467,25 @@
     window.activeOrderStatusFilter = 'all';
     window.activeOrderSearch = '';
 
-    // Load from Firestore (Multi-tenant dual collections)
+    // Load from Firestore (Multi-tenant subcollections & root)
     async function loadOrdersFromFirestore() {
       try {
-        const compSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'invoices'));
-        const rootSnap = await getDocs(collection(db, 'invoices'));
+        const [compSnap, ordersSnap, rootSnap] = await Promise.allSettled([
+          getDocs(collection(db, 'companies', COMPANY_ID, 'invoices')),
+          getDocs(collection(db, 'companies', COMPANY_ID, 'orders')),
+          getDocs(collection(db, 'invoices'))
+        ]);
         const allDocsMap = new Map();
 
-        rootSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
-        compSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        if (rootSnap.status === 'fulfilled' && rootSnap.value) {
+          rootSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        }
+        if (compSnap.status === 'fulfilled' && compSnap.value) {
+          compSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        }
+        if (ordersSnap.status === 'fulfilled' && ordersSnap.value) {
+          ordersSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        }
 
         const list = [];
         allDocsMap.forEach((data, docId) => {
@@ -497,17 +507,17 @@
 
           list.push({
             id: docId,
-            customerName: data.customerName || data.customerDetails?.name || 'Customer',
-            phone: data.customerPhoneNumber || data.customerPhone || 'Not provided',
-            email: data.customerEmail || '',
-            address: data.customerAddress || data.customerDetails?.address || '',
-            city: data.city || data.customerDetails?.city || '',
-            state: data.state || data.customerDetails?.state || '',
-            pincode: data.pincode || data.customerDetails?.pincode || '',
-            totalAmount: Number(data.totalAmount || data.finalAmount || data.grandTotal || 0),
-            paymentMethod: data.paymentMethod || 'Online',
-            paymentStatus: data.paymentStatus || 'Paid',
-            status: data.status || 'Pending',
+            customerName: data.customer?.name || data.customerName || data.customerDetails?.name || 'Customer',
+            phone: data.customer?.phone || data.customerPhoneNumber || data.customerPhone || 'Not provided',
+            email: data.customer?.email || data.customerEmail || '',
+            address: data.shippingAddress?.addressLine1 || data.customerAddress || data.customerDetails?.address || '',
+            city: data.shippingAddress?.city || data.city || data.customerDetails?.city || '',
+            state: data.shippingAddress?.state || data.state || data.customerDetails?.state || '',
+            pincode: data.shippingAddress?.pincode || data.pincode || data.customerDetails?.pincode || '',
+            totalAmount: Number(data.pricing?.total ?? data.totalAmount ?? data.finalAmount ?? data.grandTotal ?? 0),
+            paymentMethod: data.payment?.method || data.paymentMethod || 'Online',
+            paymentStatus: data.payment?.status || data.paymentStatus || 'Paid',
+            status: data.orderStatus || data.status || 'Pending',
             createdAtFormatted: dateText,
             createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : (data.createdAt ? new Date(data.createdAt).getTime() : 0),
             items: data.items || data.orderItems || []
@@ -679,11 +689,19 @@
       applyOrderFilters();
 
       try {
-        const orderRef = doc(db, 'companies', COMPANY_ID, 'invoices', orderId);
-        await updateDoc(orderRef, {
+        const orderRef1 = doc(db, 'companies', COMPANY_ID, 'orders', orderId);
+        const orderRef2 = doc(db, 'companies', COMPANY_ID, 'invoices', orderId);
+        const orderRef3 = doc(db, 'invoices', orderId);
+        const payload = {
           status: newStatus,
+          orderStatus: newStatus,
           updatedAt: serverTimestamp()
-        });
+        };
+        await Promise.allSettled([
+          updateDoc(orderRef1, payload),
+          updateDoc(orderRef2, payload),
+          updateDoc(orderRef3, payload)
+        ]);
       } catch (e) {
         console.log('Order status updated locally in state:', e);
       }

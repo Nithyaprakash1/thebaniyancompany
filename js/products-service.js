@@ -323,6 +323,39 @@ try {
 let _cachedProducts = null;
 let _cachedCategories = null;
 
+// Session-level browser caching (survives tab navigation, cleared on close or refresh)
+export function getSessionData(key) {
+  try {
+    if (typeof sessionStorage === 'undefined') return null;
+    const raw = sessionStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+export function setSessionData(key, data) {
+  try {
+    if (typeof sessionStorage === 'undefined') return;
+    sessionStorage.setItem(key, JSON.stringify(data));
+  } catch (_) {}
+}
+
+export function removeSessionData(key) {
+  try {
+    if (typeof sessionStorage === 'undefined') return;
+    sessionStorage.removeItem(key);
+  } catch (_) {}
+}
+
+export function clearProductSessionCache(companyId = COMPANY_ID) {
+  _cachedProducts = null;
+  _cachedCategories = null;
+  removeSessionData(`tbc_session_products_${companyId}`);
+  removeSessionData(`tbc_session_categories_${companyId}`);
+  removeSessionData(`tbc_session_company_${companyId}`);
+}
+
 // Exported live accessors
 export function getCachedProducts() {
   return _cachedProducts;
@@ -342,6 +375,9 @@ export function setCachedCategories(categories) {
 
 export function getCachedCompany() {
   try {
+    const sessionCompany = getSessionData(`tbc_session_company_${COMPANY_ID}`);
+    if (sessionCompany) return sessionCompany;
+
     const raw = localStorage.getItem('tbc_cache_company');
     if (!raw) return null;
     const parsed = JSON.parse(raw);
@@ -353,12 +389,14 @@ export function getCachedCompany() {
 
 export function setCachedCompany(company) {
   try {
+    setSessionData(`tbc_session_company_${COMPANY_ID}`, company);
     localStorage.setItem('tbc_cache_company', JSON.stringify({ time: Date.now(), data: company }));
   } catch (e) {}
 }
 
 export function clearTbcCache() {
   try {
+    clearProductSessionCache(COMPANY_ID);
     localStorage.removeItem('tbc_cache_products');
     localStorage.removeItem('tbc_cache_categories');
     localStorage.removeItem('tbc_cache_company');
@@ -519,20 +557,39 @@ export async function getEcomCategories(companyId = COMPANY_ID) {
  * @param {Function} [onError]
  * @returns {Function} Unsubscribe function
  */
-export function subscribeToProducts(onUpdate, onError, companyId = COMPANY_ID) {
+/**
+ * Product listener & fetcher.
+ * Uses session-level caching for public storefront (zero unnecessary onSnapshot/reads).
+ * Admin can specify options.realtime = true for live order/inventory synchronization.
+ *
+ * @param {Function} onUpdate
+ * @param {Function} [onError]
+ * @param {string}   [companyId]
+ * @param {object}   [options]
+ * @returns {Function} Unsubscribe function
+ */
+export function subscribeToProducts(onUpdate, onError, companyId = COMPANY_ID, options = {}) {
   if (typeof onUpdate !== 'function') return () => {};
 
-  // Instant render from memory if available
-  if (_cachedProducts && Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
-    onUpdate(_cachedProducts);
+  // For public storefront: use session-level cache & one-time getDocs (no continuous real-time read quota usage)
+  if (!options.realtime) {
+    getProducts(companyId).then(products => {
+      onUpdate(products);
+    }).catch(err => {
+      console.warn('[TBC] subscribeToProducts session fetch warning:', err);
+      if (typeof onError === 'function') onError(err);
+    });
+    return () => {};
   }
 
+  // Real-time listener for Admin Dashboard when options.realtime = true
   const productsMap = new Map();
 
   function notifySubscribers() {
     const list = Array.from(productsMap.values())
       .filter(p => p.id && p.showInEcom !== false);
     _cachedProducts = list;
+    setSessionData(`tbc_session_products_${companyId}`, list);
     onUpdate(list);
   }
 
@@ -582,17 +639,45 @@ export function subscribeToProducts(onUpdate, onError, companyId = COMPANY_ID) {
 }
 
 /**
- * Fetch all products for a given company live from Firestore.
+ * Fetch all products for a given company with session-level caching.
+ * First visit: fetches from Firestore and stores in sessionStorage.
+ * While browsing: uses cached data (ZERO Firestore reads).
+ * On reload or fresh window: fetches fresh data.
+ *
  * @param {string} [companyId]
  * @param {number} [limitCount]
+ * @param {boolean} [forceRefresh]
  * @returns {Promise<object[]>}
  */
-export async function getProducts(companyId = COMPANY_ID, limitCount = null) {
-  if (_cachedProducts && Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
-    return limitCount ? _cachedProducts.slice(0, limitCount) : _cachedProducts;
+export async function getProducts(companyId = COMPANY_ID, limitCount = null, forceRefresh = false) {
+  const targetCompanyId = companyId || COMPANY_ID;
+
+  // Detect page reload: clear session cache to fetch fresh on reload
+  if (!forceRefresh && typeof window !== 'undefined' && window.performance?.getEntriesByType) {
+    const navEntries = window.performance.getEntriesByType('navigation');
+    if (navEntries.length > 0 && navEntries[0].type === 'reload') {
+      if (!window.__tbcReloadCacheBusted) {
+        window.__tbcReloadCacheBusted = true;
+        forceRefresh = true;
+        clearProductSessionCache(targetCompanyId);
+      }
+    }
   }
 
-  const products = await revalidateProducts(companyId);
+  if (!forceRefresh) {
+    if (_cachedProducts && Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
+      return limitCount ? _cachedProducts.slice(0, limitCount) : _cachedProducts;
+    }
+
+    const sessionCached = getSessionData(`tbc_session_products_${targetCompanyId}`);
+    if (Array.isArray(sessionCached) && sessionCached.length > 0) {
+      _cachedProducts = sessionCached;
+      console.info(`[TBC Cache] Loaded ${sessionCached.length} products from browser session cache (0 Firestore reads).`);
+      return limitCount ? sessionCached.slice(0, limitCount) : sessionCached;
+    }
+  }
+
+  const products = await revalidateProducts(targetCompanyId);
   return limitCount ? products.slice(0, limitCount) : products;
 }
 
@@ -601,7 +686,7 @@ export async function revalidateProducts(companyId = COMPANY_ID) {
     const targetCompanyId = companyId || COMPANY_ID;
     const productsMap = new Map();
 
-    // 1. Fetch from company products collection (Primary)
+    // 1. Fetch from company products collection: companies/{companyId}/products (Primary)
     try {
       const compRef = collection(db, 'companies', targetCompanyId, 'products');
       const compSnap = await getDocs(compRef);
@@ -629,9 +714,10 @@ export async function revalidateProducts(companyId = COMPANY_ID) {
       .filter(p => p.id && p.showInEcom !== false);
 
     _cachedProducts = normalized;
+    setSessionData(`tbc_session_products_${targetCompanyId}`, normalized);
     return _cachedProducts || [];
   } catch (err) {
-    console.error('[TBC] getProducts error:', err);
+    console.error('[TBC] revalidateProducts error:', err);
     return _cachedProducts || [];
   }
 }
@@ -643,36 +729,53 @@ export async function revalidateProducts(companyId = COMPANY_ID) {
  * @returns {Promise<object[]>}
  */
 export async function getEcomProducts(companyId = COMPANY_ID) {
-  return revalidateProducts(companyId);
+  return getProducts(companyId);
 }
 
 /**
- * Fetch a single product by its Firestore document ID or productId field live from Firestore.
+ * Fetch a single product by its Firestore document ID or productId field.
+ * Uses session cache when available, or executes direct read if forceLive is true.
  * @param {string} id
+ * @param {string} [companyId]
+ * @param {boolean} [forceLive]
  * @returns {Promise<object|null>}
  */
-export async function getProductById(id) {
+export async function getProductById(id, companyId = COMPANY_ID, forceLive = false) {
   if (!id) return null;
+  const targetCompanyId = companyId || COMPANY_ID;
 
-  // 1. Direct Firestore document lookup in company collection
+  // 1. If not forcing live read, check memory & session cache first (ZERO reads)
+  if (!forceLive) {
+    if (Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
+      const match = _cachedProducts.find(p => (p.id === id || p.productId === id) && p.showInEcom !== false);
+      if (match) return match;
+    }
+    const sessionList = getSessionData(`tbc_session_products_${targetCompanyId}`);
+    if (Array.isArray(sessionList)) {
+      const match = sessionList.find(p => (p.id === id || p.productId === id) && p.showInEcom !== false);
+      if (match) return match;
+    }
+  }
+
+  // 2. Direct Firestore document lookup in company collection
   try {
-    const compSnap = await getDoc(doc(db, 'companies', COMPANY_ID, 'products', id));
+    const compSnap = await getDoc(doc(db, 'companies', targetCompanyId, 'products', id));
     if (compSnap.exists()) {
-      const p = normalizeProduct(compSnap.id, { ...compSnap.data(), companyId: COMPANY_ID });
+      const p = normalizeProduct(compSnap.id, { ...compSnap.data(), companyId: targetCompanyId });
       return p.showInEcom !== false ? p : null;
     }
 
-    const qComp = query(collection(db, 'companies', COMPANY_ID, 'products'), where('productId', '==', id), limit(1));
+    const qComp = query(collection(db, 'companies', targetCompanyId, 'products'), where('productId', '==', id), limit(1));
     const snapComp = await getDocs(qComp);
     if (!snapComp.empty) {
-      const p = normalizeProduct(snapComp.docs[0].id, { ...snapComp.docs[0].data(), companyId: COMPANY_ID });
+      const p = normalizeProduct(snapComp.docs[0].id, { ...snapComp.docs[0].data(), companyId: targetCompanyId });
       return p.showInEcom !== false ? p : null;
     }
   } catch (err) {
     console.warn(`[TBC] getProductById(${id}) company fetch error:`, err);
   }
 
-  // 2. Direct Firestore document lookup in root products collection
+  // 3. Direct Firestore document lookup in root products collection
   try {
     const snap = await getDoc(doc(db, 'products', id));
     if (snap.exists()) {
@@ -690,7 +793,7 @@ export async function getProductById(id) {
     console.error(`[TBC] getProductById(${id}) direct fetch error:`, err);
   }
 
-  // 3. Fallback to active in-memory list if offline or network glitch
+  // 4. Fallback to active in-memory list if offline or network glitch
   if (Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
     const match = _cachedProducts.find(p => (p.id === id || p.productId === id) && p.showInEcom !== false);
     if (match) return match;
@@ -843,14 +946,104 @@ export function getOrderTimestamp(o) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 3.  INVOICES (ORDERS) — CREATE  —  Dual Location (Subcollection & Root)
-//     1. /companies/{companyId}/invoices/{orderId}
-//     2. /invoices/{orderId}
+// 3.  INVENTORY PRE-VALIDATION & MULTI-TENANT ORDER CREATION
+//     Primary path: /companies/{companyId}/orders/{orderId}
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Create a new order document in BOTH company subcollection and root /invoices on checkout.
- * Guaranteed zero-failure schema with atomic stock reduction.
+ * Live validation of cart items against Firestore before order placement.
+ * Validates product availability, active status, and real-time stock.
+ *
+ * @param {Array} items
+ * @param {string} [companyId]
+ * @returns {Promise<{ valid: boolean, liveItems: Array }>}
+ */
+export async function validateCartForOrder(items = [], companyId = COMPANY_ID) {
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new Error('Your cart is empty. Please add items before placing an order.');
+  }
+
+  const targetCompanyId = companyId || COMPANY_ID;
+  const validatedItems = [];
+
+  for (const item of items) {
+    const pId = String(item.productId || item.id || '').trim();
+    if (!pId) throw new Error('One or more items in your cart has an invalid product ID.');
+
+    const requestedQty = Number(item.qty || item.quantity || 1);
+    if (isNaN(requestedQty) || requestedQty <= 0) {
+      throw new Error(`Invalid quantity for item "${item.name || 'Product'}".`);
+    }
+
+    // Direct Live Fetch from Firestore (skipping display cache)
+    let pSnap = null;
+    try {
+      pSnap = await getDoc(doc(db, 'companies', targetCompanyId, 'products', pId));
+    } catch (_) {}
+    if (!pSnap || !pSnap.exists()) {
+      try {
+        pSnap = await getDoc(doc(db, 'products', pId));
+      } catch (_) {}
+    }
+
+    if (!pSnap || !pSnap.exists()) {
+      throw new Error(`"${item.name || 'Selected product'}" is no longer available.`);
+    }
+
+    const pData = pSnap.data();
+    if (pData.isActive === false || pData.showInEcom === false) {
+      throw new Error(`"${pData.name || item.name}" is currently not available for purchase.`);
+    }
+
+    // Live Variant Stock Verification
+    const variants = Array.isArray(pData.variants) ? pData.variants : [];
+    if (variants.length > 0) {
+      const targetSize = String(item.size || 'M').trim().toUpperCase();
+      const targetColor = String(item.color || 'Default').trim().toLowerCase();
+      const targetKey = String(item.variantKey || '').trim().toLowerCase();
+
+      let matchedVariant = variants.find(v => {
+        if (!v) return false;
+        const vKey = String(v.id || v.key || '').trim().toLowerCase();
+        if (targetKey && (vKey === targetKey)) return true;
+        const vSize = String(v.size || '').trim().toUpperCase();
+        const vColor = String(v.color || '').trim().toLowerCase();
+        return (vSize === targetSize && (vColor === targetColor || !targetColor || !vColor));
+      });
+
+      if (!matchedVariant) matchedVariant = variants[0];
+
+      let availableStock = 0;
+      if (typeof matchedVariant.stock === 'number') {
+        availableStock = matchedVariant.stock;
+      } else if (typeof matchedVariant.stock === 'object' && matchedVariant.stock !== null) {
+        availableStock = Number(matchedVariant.stock.main ?? matchedVariant.stock.online ?? matchedVariant.stock.default ?? 0);
+      } else if (typeof pData.stock === 'number') {
+        availableStock = pData.stock;
+      }
+
+      if (availableStock < requestedQty) {
+        throw new Error(`Insufficient stock for "${pData.name || item.name}" (${targetSize}). Only ${availableStock} remaining.`);
+      }
+    } else if (typeof pData.stock === 'number' && pData.stock < requestedQty) {
+      throw new Error(`Insufficient stock for "${pData.name || item.name}". Only ${pData.stock} remaining.`);
+    }
+
+    validatedItems.push({
+      ...item,
+      productId: pId,
+      name: pData.name || item.name,
+      price: Number(item.price || pData.salePrice || pData.price || 0),
+      quantity: requestedQty
+    });
+  }
+
+  return { valid: true, liveItems: validatedItems };
+}
+
+/**
+ * Create a new order document in companies/{companyId}/orders/{orderId}.
+ * Strictly multi-tenant, zero-failure schema with atomic stock reduction.
  *
  * @param {object} orderData
  * @returns {Promise<{ success: boolean, invoiceId: string, orderId: string, error?: string }>}
@@ -869,23 +1062,14 @@ export async function createInvoice(orderData = {}) {
   const isWhatsApp = methodLower.includes('whatsapp') || Boolean(orderData.whatsappOrder);
   const isCOD = methodLower.includes('cod') || methodLower.includes('cash on delivery');
 
-  // Derive explicit paymentStatus
   let paymentStatus = orderData.paymentStatus;
   if (!paymentStatus) {
-    if (isOnlinePayment) {
-      paymentStatus = 'Paid';
-    } else {
-      paymentStatus = 'Pending';
-    }
+    paymentStatus = isOnlinePayment ? 'Paid' : 'Pending';
   }
 
-  // Resolve target companyId
   const companyId = orderData.companyId || COMPANY_ID;
+  const orderId = orderData.orderId || orderData.id || orderData.invoiceId || `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-  // Generate unique order ID if not already generated
-  const orderId = orderData.id || orderData.orderId || orderData.invoiceId || `INV_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-
-  // Sanitize customer contact
   const rawPhone = String(orderData.customerPhoneNumber || orderData.customerPhone || orderData.phone || cd.phone || cd.customerPhone || '').trim();
   const cleanPhone = rawPhone.replace(/\D/g, '').slice(-10);
   const cleanName = String(orderData.customerName || cd.name || orderData.name || 'Valued Customer').trim();
@@ -902,15 +1086,13 @@ export async function createInvoice(orderData = {}) {
     cleanAddress = cleanDoor && cleanStreet ? `${cleanDoor}, ${cleanStreet}` : (cleanDoor || cleanStreet);
   }
 
-  // Financials
   const subtotal = Number(orderData.subtotal || 0);
-  const deliveryFee = Number(orderData.deliveryFee || 0);
+  const deliveryFee = Number(orderData.deliveryFee || orderData.shippingCharge || 0);
   const discountAmount = Number(orderData.discountAmount || 0);
   const cgstAmount = Number(orderData.cgstAmount || 0);
   const sgstAmount = Number(orderData.sgstAmount || 0);
   const totalAmount = Number(orderData.totalAmount || (subtotal + deliveryFee + cgstAmount + sgstAmount - discountAmount));
 
-  // Sanitize Items array
   const rawItems = Array.isArray(orderData.items) ? orderData.items : [];
   const sanitizedItems = rawItems.map(item => {
     const pId = String(item.productId || item.id || '').trim();
@@ -929,44 +1111,84 @@ export async function createInvoice(orderData = {}) {
     return {
       productId: pId,
       name: String(item.name || 'Apparel Item').trim(),
+      image: imgUrl,
+      price: priceNum,
+      quantity: qtyNum,
+      variant: item.variantKey || `${sizeStr}::${colorStr}`,
+      subtotal: priceNum * qtyNum,
+      // Compatibility keys:
       color: colorStr,
       size: sizeStr,
-      price: priceNum,
       qty: qtyNum,
-      quantity: qtyNum,
       originalPrice: origPrice,
       mrp: origPrice,
-      variantKey: String(item.variantKey || `${sizeStr}::${colorStr}`).trim(),
+      variantKey: item.variantKey || `${sizeStr}::${colorStr}`,
       imageUrl: imgUrl
     };
   });
 
   const nowMs = Date.now();
+  const addressLine1 = cleanDoor && cleanStreet ? `${cleanDoor}, ${cleanStreet}` : (cleanDoor || cleanStreet || cleanAddress);
+  const addressLine2 = cleanLandmark || '';
+
   const rawPayload = {
-    // ── Identity ──────────────────────────────────────────
-    id:                  orderId,
+    // ── Scalable Multi-Tenant Order Schema ────────────────
     orderId:             orderId,
-    invoiceId:           orderId,
     companyId:           companyId,
+
+    customer: {
+      customerId:        orderData.customerId || cd.customerId || cleanPhone || 'guest',
+      name:              cleanName,
+      phone:             cleanPhone,
+      email:             cleanEmail
+    },
+
+    items:               sanitizedItems,
+
+    pricing: {
+      subtotal:          subtotal,
+      discount:          discountAmount,
+      deliveryCharge:    deliveryFee,
+      tax:               cgstAmount + sgstAmount,
+      total:             totalAmount
+    },
+
+    payment: {
+      method:            methodRaw,
+      status:            paymentStatus
+    },
+
+    shippingAddress: {
+      name:              cleanName,
+      phone:             cleanPhone,
+      addressLine1:      addressLine1,
+      addressLine2:      addressLine2,
+      city:              cleanCity,
+      state:             cleanState,
+      pincode:           cleanPincode
+    },
+
+    orderStatus:         orderData.orderStatus || orderData.status || (isOnlinePayment ? 'confirmed' : 'pending'),
+
+    // ── Flat Accessors for Full UI/Admin Backwards-Compatibility ──
+    id:                  orderId,
+    invoiceId:           orderId,
     branchId:            orderData.branchId || BRANCH_ID,
     orderType:           orderData.orderType || 'online',
     customerSource:      'website',
     source:              'website',
-
-    // ── Status ────────────────────────────────────────────
-    status:              orderData.status || 'Awaiting Acceptance',
+    status:              orderData.status || orderData.orderStatus || (isOnlinePayment ? 'confirmed' : 'Awaiting Acceptance'),
     paymentStatus:       paymentStatus,
     paymentMethod:       methodRaw,
 
-    // ── Customer ──────────────────────────────────────────
     customerName:        cleanName,
     customerPhoneNumber: cleanPhone,
     customerPhone:       cleanPhone,
     phone:               cleanPhone,
     customerEmail:       cleanEmail,
     email:               cleanEmail,
-    customerAddress:     cleanAddress,
-    address:             cleanAddress,
+    customerAddress:     cleanAddress || addressLine1,
+    address:             cleanAddress || addressLine1,
     doorNo:              cleanDoor,
     streetName:          cleanStreet,
     landmark:            cleanLandmark,
@@ -974,7 +1196,6 @@ export async function createInvoice(orderData = {}) {
     state:               cleanState,
     pincode:             cleanPincode,
 
-    // ── Financials ────────────────────────────────────────
     subtotal:            subtotal,
     deliveryFee:         deliveryFee,
     shippingCharge:      deliveryFee,
@@ -983,16 +1204,11 @@ export async function createInvoice(orderData = {}) {
     discountAmount:      discountAmount,
     totalAmount:         totalAmount,
 
-    // ── Payment References ────────────────────────────────
     razorpayOrderId:     String(orderData.razorpayOrderId || '').trim() || null,
     razorpayPaymentId:   String(orderData.razorpayPaymentId || '').trim() || null,
     razorpaySignature:   String(orderData.razorpaySignature || '').trim() || null,
     whatsappOrder:       Boolean(isWhatsApp),
 
-    // ── Items ─────────────────────────────────────────────
-    items:               sanitizedItems,
-
-    // ── Timestamps ────────────────────────────────────────
     timestamp:           nowMs,
     createdAt:           serverTimestamp(),
     updatedAt:           serverTimestamp(),
@@ -1004,9 +1220,11 @@ export async function createInvoice(orderData = {}) {
 
   const payload = cleanFirestoreDoc(rawPayload);
 
-  // References for Dual-Location Persistence:
-  // 1. Company subcollection: companies/${companyId}/invoices/${orderId}
-  // 2. Root collection: invoices/${orderId}
+  // Exact Database Paths:
+  // Primary: companies/{companyId}/orders/{orderId}
+  // Secondary: companies/{companyId}/invoices/{orderId} (Billing POS sync)
+  // Root: invoices/{orderId} (POS real-time sound pulse)
+  const companyOrderRef = doc(db, `companies/${companyId}/orders`, orderId);
   const companyInvoiceRef = doc(db, `companies/${companyId}/invoices`, orderId);
   const rootInvoiceRef = doc(db, 'invoices', orderId);
 
@@ -1016,10 +1234,11 @@ export async function createInvoice(orderData = {}) {
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const batch = writeBatch(db);
+      batch.set(companyOrderRef, payload);
       batch.set(companyInvoiceRef, payload);
       batch.set(rootInvoiceRef, payload);
       await batch.commit();
-      console.info(`[TBC] Order invoice successfully saved atomically via writeBatch in dual locations (attempt ${attempt}): ${orderId}`);
+      console.info(`[TBC] Order successfully created in companies/${companyId}/orders/${orderId} (attempt ${attempt})`);
       success = true;
       break;
     } catch (err) {
@@ -1034,7 +1253,7 @@ export async function createInvoice(orderData = {}) {
     return { success: false, invoiceId: orderId, orderId: orderId, error: lastError?.message || 'Database write error' };
   }
 
-  // Automatically decrement product & variant stock atomically in Firestore
+  // Atomically decrement stock in Firestore
   try {
     if (Array.isArray(payload.items) && payload.items.length > 0) {
       await decrementStockForOrder(payload.items);
@@ -1048,94 +1267,32 @@ export async function createInvoice(orderData = {}) {
 
 // Function matching user's exact requested signature: saveEcomOrder(db, companyId, orderData)
 export async function saveEcomOrder(dbInstance, companyId, orderData = {}) {
-  const targetDb = dbInstance || db;
-  const targetCompanyId = companyId || COMPANY_ID;
-  
-  const orderId = orderData.orderId || orderData.id || orderData.invoiceId || 
-    `INV_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+  let targetDb = db;
+  let targetCompanyId = COMPANY_ID;
+  let data = {};
 
-  const cd = orderData.customerDetails || {};
-  const rawPhone = String(
-    orderData.customerPhoneNumber || orderData.customerPhone || orderData.phone || cd.phone || ''
-  ).trim();
-  const cleanPhone = rawPhone.replace(/\D/g, '').slice(-10);
+  if (dbInstance && typeof dbInstance === 'object' && !dbInstance.getDocs && !dbInstance.type && (dbInstance.companyId || dbInstance.customerName || dbInstance.items)) {
+    data = dbInstance;
+    targetCompanyId = dbInstance.companyId || COMPANY_ID;
+  } else if (dbInstance && typeof dbInstance === 'object' && (dbInstance.type === 'firestore' || dbInstance._delegate || typeof dbInstance.app === 'object')) {
+    targetDb = dbInstance;
+    targetCompanyId = typeof companyId === 'string' ? companyId : (companyId?.companyId || COMPANY_ID);
+    data = orderData || companyId || {};
+  } else if (typeof dbInstance === 'string') {
+    targetCompanyId = dbInstance;
+    data = companyId || {};
+  } else {
+    data = orderData || {};
+    targetCompanyId = companyId || data.companyId || COMPANY_ID;
+  }
 
-  const subtotal = Number(orderData.subtotal || 0);
-  const deliveryFee = Number(orderData.deliveryFee || orderData.shippingCharge || 0);
-  const discountAmount = Number(orderData.discountAmount || 0);
-  const totalAmount = Number(orderData.totalAmount || (subtotal + deliveryFee - discountAmount));
+  data.companyId = targetCompanyId;
+  const result = await createInvoice(data);
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to save order to database.');
+  }
 
-  const payload = {
-    id: orderId,
-    orderId: orderId,
-    invoiceId: orderId,
-    companyId: targetCompanyId,
-    branchId: orderData.branchId || 'online',
-    orderType: 'online',
-    customerSource: 'website',
-    source: 'website',
-
-    status: orderData.status || 'Awaiting Acceptance',
-    paymentStatus: orderData.paymentStatus || (orderData.razorpayPaymentId ? 'Paid' : 'Pending'),
-    paymentMethod: orderData.paymentMethod || 'Razorpay Online Payment',
-
-    customerName: String(orderData.customerName || cd.name || 'Valued Customer').trim(),
-    customerPhoneNumber: cleanPhone,
-    customerPhone: cleanPhone,
-    phone: cleanPhone,
-    customerEmail: String(orderData.customerEmail || cd.email || '').trim(),
-    email: String(orderData.customerEmail || cd.email || '').trim(),
-    
-    customerAddress: orderData.customerAddress || cd.address || `${orderData.doorNo || cd.doorNo || ''}, ${orderData.streetName || cd.streetName || ''}`.trim(),
-    doorNo: orderData.doorNo || cd.doorNo || '',
-    streetName: orderData.streetName || cd.streetName || '',
-    landmark: orderData.landmark || cd.landmark || '',
-    city: orderData.city || cd.city || 'Coimbatore',
-    state: orderData.state || cd.state || 'Tamil Nadu',
-    pincode: orderData.pincode || cd.pincode || '',
-
-    subtotal: subtotal,
-    deliveryFee: deliveryFee,
-    shippingCharge: deliveryFee,
-    discountAmount: discountAmount,
-    cgstAmount: Number(orderData.cgstAmount || 0),
-    sgstAmount: Number(orderData.sgstAmount || 0),
-    totalAmount: totalAmount,
-
-    razorpayOrderId: orderData.razorpayOrderId || null,
-    razorpayPaymentId: orderData.razorpayPaymentId || null,
-    razorpaySignature: orderData.razorpaySignature || null,
-    whatsappOrder: Boolean(orderData.whatsappOrder),
-
-    items: Array.isArray(orderData.items) ? orderData.items.map(item => ({
-      productId: item.productId || item.id || '',
-      name: item.name || 'Apparel Item',
-      color: item.color || 'Default',
-      size: String(item.size || 'M').toUpperCase(),
-      price: Number(item.price || 0),
-      qty: Number(item.qty || item.quantity || 1),
-      quantity: Number(item.qty || item.quantity || 1),
-      originalPrice: Number(item.originalPrice || item.mrp || item.price || 0),
-      mrp: Number(item.mrp || item.originalPrice || item.price || 0),
-      variantKey: item.variantKey || `${String(item.size || 'M').toUpperCase()}::${item.color || 'Default'}`,
-      imageUrl: item.imageUrl || item.image || ''
-    })) : [],
-
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  };
-
-  const batch = writeBatch(targetDb);
-  
-  const companyInvoiceRef = doc(targetDb, `companies/${targetCompanyId}/invoices`, orderId);
-  const rootInvoiceRef = doc(targetDb, 'invoices', orderId);
-
-  batch.set(companyInvoiceRef, payload);
-  batch.set(rootInvoiceRef, payload);
-
-  await batch.commit();
-
-  // Return string orderId, with attached compatibility properties if checked as an object
+  const orderId = result.orderId;
   const resStr = String(orderId);
   Object.defineProperties(resStr, {
     invoiceId: { value: orderId, enumerable: false },
@@ -1143,10 +1300,10 @@ export async function saveEcomOrder(dbInstance, companyId, orderData = {}) {
     success: { value: true, enumerable: false }
   });
 
-  return orderId;
+  return resStr;
 }
 
-// Alias kept for backwards compatibility with existing checkout.html
+// Backwards compatibility alias
 export const saveOrderToFirestore = saveEcomOrder;
 
 
@@ -1331,9 +1488,11 @@ export async function getCustomerOrders(phoneNumber, companyId = COMPANY_ID) {
     const q2 = query(collection(db, 'invoices'), where('customerPhone', '==', cleanPhone));
     const q3 = query(collection(db, `companies/${companyId}/invoices`), where('customerPhoneNumber', '==', cleanPhone));
     const q4 = query(collection(db, `companies/${companyId}/invoices`), where('customerPhone', '==', cleanPhone));
+    const q5 = query(collection(db, `companies/${companyId}/orders`), where('customerPhoneNumber', '==', cleanPhone));
+    const q6 = query(collection(db, `companies/${companyId}/orders`), where('customerPhone', '==', cleanPhone));
 
     const snaps = await Promise.allSettled([
-      getDocs(q1), getDocs(q2), getDocs(q3), getDocs(q4)
+      getDocs(q1), getDocs(q2), getDocs(q3), getDocs(q4), getDocs(q5), getDocs(q6)
     ]);
 
     const orderMap = new Map();
@@ -1359,7 +1518,7 @@ export async function getCustomerOrders(phoneNumber, companyId = COMPANY_ID) {
 }
 
 /**
- * Real-time live listener for customer order updates across dual collections.
+ * Real-time live listener for customer order updates across collections (orders & invoices).
  * Returns ONLY the specific customer's orders.
  * @param {string} identifier (phone or email)
  * @param {Function} onUpdate
@@ -1372,9 +1531,11 @@ export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMP
   try {
     const ref1 = collection(db, 'invoices');
     const ref2 = collection(db, `companies/${companyId}/invoices`);
+    const ref3 = collection(db, `companies/${companyId}/orders`);
 
     const docsMap1 = new Map();
     const docsMap2 = new Map();
+    const docsMap3 = new Map();
 
     const combineAndNotify = () => {
       if (!identifier) {
@@ -1385,7 +1546,7 @@ export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMP
       const cleanPhone = String(identifier).replace(/\D/g, '').slice(-10);
       const cleanEmail = String(identifier).toLowerCase().trim();
 
-      const combinedMap = new Map([...docsMap1, ...docsMap2]);
+      const combinedMap = new Map([...docsMap1, ...docsMap2, ...docsMap3]);
       const allDocs = Array.from(combinedMap.values());
 
       const matched = allDocs.filter(doc => {
@@ -1431,9 +1592,20 @@ export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMP
       combineAndNotify();
     }, (err) => console.warn('[TBC Real-Time] subscribeToCustomerOrders ref2 warning:', err));
 
+    const unsub3 = onSnapshot(ref3, (snapshot) => {
+      docsMap3.clear();
+      snapshot.docs.forEach(d => {
+        const data = d.data();
+        const id = data.id || d.id;
+        docsMap3.set(id, { id, ...data });
+      });
+      combineAndNotify();
+    }, (err) => console.warn('[TBC Real-Time] subscribeToCustomerOrders ref3 warning:', err));
+
     return () => {
       unsub1();
       unsub2();
+      unsub3();
     };
   } catch (err) {
     console.error('[TBC Real-Time] subscribeToCustomerOrders exception:', err);
@@ -1483,12 +1655,14 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
   try {
     const ref1 = collection(db, 'invoices');
     const ref2 = collection(db, `companies/${companyId}/invoices`);
+    const ref3 = collection(db, `companies/${companyId}/orders`);
 
     const docsMap1 = new Map();
     const docsMap2 = new Map();
+    const docsMap3 = new Map();
 
     const combineAndNotify = () => {
-      const combinedMap = new Map([...docsMap1, ...docsMap2]);
+      const combinedMap = new Map([...docsMap1, ...docsMap2, ...docsMap3]);
       let orders = Array.from(combinedMap.values())
         .filter(d => {
           const orderType = String(d.orderType || '').toLowerCase().trim();
@@ -1512,7 +1686,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
         })
         .sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
 
-      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s) across dual collections.`);
+      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order bill(s) across collections.`);
       onUpdate(orders);
     };
 
@@ -1541,9 +1715,22 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
       console.warn('[TBC Ecom Admin] subscribeToOnlineOrders ref2 warning:', err);
     });
 
+    const unsub3 = onSnapshot(ref3, (snapshot) => {
+      docsMap3.clear();
+      snapshot.docs.forEach(d => {
+        const data = d.data();
+        const id = data.id || d.id;
+        docsMap3.set(id, { id, ...data });
+      });
+      combineAndNotify();
+    }, (err) => {
+      console.warn('[TBC Ecom Admin] subscribeToOnlineOrders ref3 warning:', err);
+    });
+
     return () => {
       unsub1();
       unsub2();
+      unsub3();
     };
   } catch (err) {
     console.error('[TBC Ecom Admin] subscribeToOnlineOrders exception:', err);
@@ -1552,7 +1739,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
 }
 
 /**
- * Subscribe to a SINGLE invoice document in real time across dual locations.
+ * Subscribe to a SINGLE invoice/order document in real time across locations.
  *
  * @param {string}   invoiceId
  * @param {Function} onUpdate  Called with the order object on every change
@@ -1565,12 +1752,14 @@ export function subscribeToInvoice(invoiceId, onUpdate, onError, companyId = COM
 
   const ref1 = doc(db, 'invoices', invoiceId);
   const ref2 = doc(db, `companies/${companyId}/invoices`, invoiceId);
+  const ref3 = doc(db, `companies/${companyId}/orders`, invoiceId);
 
   let doc1 = null;
   let doc2 = null;
+  let doc3 = null;
 
   const notify = () => {
-    const active = doc1 || doc2;
+    const active = doc1 || doc2 || doc3;
     if (active) {
       onUpdate(active);
     }
@@ -1598,9 +1787,21 @@ export function subscribeToInvoice(invoiceId, onUpdate, onError, companyId = COM
     (err) => console.warn(`[TBC] subscribeToInvoice(${invoiceId}) ref2 warning:`, err)
   );
 
+  const unsub3 = onSnapshot(
+    ref3,
+    (snap) => {
+      if (snap.exists()) {
+        doc3 = { id: snap.id, ...snap.data() };
+        notify();
+      }
+    },
+    (err) => console.warn(`[TBC] subscribeToInvoice(${invoiceId}) ref3 warning:`, err)
+  );
+
   return () => {
     unsub1();
     unsub2();
+    unsub3();
   };
 }
 
@@ -1624,13 +1825,17 @@ export async function advanceOrderStatus(invoiceId, companyId = COMPANY_ID) {
 
   const rootRef = doc(db, 'invoices', invoiceId);
   const companyRef = doc(db, `companies/${companyId}/invoices`, invoiceId);
+  const companyOrderRef = doc(db, `companies/${companyId}/orders`, invoiceId);
 
   try {
     let snap = await getDoc(rootRef);
     if (!snap.exists()) {
       snap = await getDoc(companyRef);
     }
-    if (!snap.exists()) throw new Error(`Invoice ${invoiceId} not found.`);
+    if (!snap.exists()) {
+      snap = await getDoc(companyOrderRef);
+    }
+    if (!snap.exists()) throw new Error(`Invoice/Order ${invoiceId} not found.`);
 
     const currentStatus = snap.data().status;
     const currentIndex  = ORDER_STATUS_FLOW.indexOf(currentStatus);
@@ -1656,10 +1861,11 @@ export async function advanceOrderStatus(invoiceId, companyId = COMPANY_ID) {
 
     await Promise.allSettled([
       updateDoc(rootRef, updatePayload),
-      updateDoc(companyRef, updatePayload)
+      updateDoc(companyRef, updatePayload),
+      updateDoc(companyOrderRef, updatePayload)
     ]);
 
-    console.info(`[TBC] Invoice ${invoiceId}: "${currentStatus}" → "${newStatus}" updated across collections`);
+    console.info(`[TBC] Order ${invoiceId}: "${currentStatus}" → "${newStatus}" updated across collections`);
     return { success: true, previousStatus: currentStatus, newStatus };
 
   } catch (err) {
@@ -1669,7 +1875,7 @@ export async function advanceOrderStatus(invoiceId, companyId = COMPANY_ID) {
 }
 
 /**
- * Set an invoice to a specific status directly in dual collections.
+ * Set an invoice/order to a specific status directly across all collections.
  *
  * @param {string} invoiceId
  * @param {string} status   Must be a value from ORDER_STATUS_FLOW or 'Cancelled' / 'Pending' / 'Paid'
@@ -1690,11 +1896,13 @@ export async function setOrderStatus(invoiceId, status, companyId = COMPANY_ID) 
 
   const rootRef = doc(db, 'invoices', invoiceId);
   const companyRef = doc(db, `companies/${companyId}/invoices`, invoiceId);
+  const companyOrderRef = doc(db, `companies/${companyId}/orders`, invoiceId);
 
   try {
     const results = await Promise.allSettled([
       updateDoc(rootRef, updatePayload),
-      updateDoc(companyRef, updatePayload)
+      updateDoc(companyRef, updatePayload),
+      updateDoc(companyOrderRef, updatePayload)
     ]);
 
     const isSuccess = results.some(r => r.status === 'fulfilled');
@@ -1705,7 +1913,8 @@ export async function setOrderStatus(invoiceId, status, companyId = COMPANY_ID) 
     // Fallback: merge if documents need creation/merge
     await Promise.allSettled([
       setDoc(rootRef, updatePayload, { merge: true }),
-      setDoc(companyRef, updatePayload, { merge: true })
+      setDoc(companyRef, updatePayload, { merge: true }),
+      setDoc(companyOrderRef, updatePayload, { merge: true })
     ]);
     return { success: true };
   } catch (err) {

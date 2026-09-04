@@ -76,11 +76,15 @@ export async function saveEcomOrder(input: EcomOrderInput): Promise<string> {
     createdAt: serverTimestamp(),
   };
 
-  // 1. Scoped Company Order Path (OneSpace Billing POS Primary)
+  // 1. Scoped Company Orders Path (Requested collection pattern)
+  const companyOrdersRef = doc(db, `companies/${input.companyId}/orders`, orderId);
+  batch.set(companyOrdersRef, orderData);
+
+  // 2. Scoped Company Invoice Path (OneSpace Billing POS Primary)
   const companyOrderRef = doc(db, `companies/${input.companyId}/invoices`, orderId);
   batch.set(companyOrderRef, orderData);
 
-  // 2. Global Invoices Path (Real-time POS Sound Pulse)
+  // 3. Global Invoices Path (Real-time POS Sound Pulse)
   const rootOrderRef = doc(db, 'invoices', orderId);
   batch.set(rootOrderRef, orderData);
 

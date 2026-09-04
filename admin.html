@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -2268,7 +2268,7 @@
           if (ts >= startOfToday) {
             const hr = new Date(ts).getHours();
             const slotIdx = Math.min(6, Math.floor(hr / 3.5));
-            revenueData[slotIdx] += Number(o.totalAmount || 0);
+            revenueData[slotIdx] += Number(o.pricing?.total ?? o.totalAmount ?? 0);
           }
         });
       } else if (window.currentChartPeriod === '30days') {
@@ -2281,7 +2281,7 @@
           if (ts >= thirtyDaysAgo) {
             const dayDiff = Math.floor((Date.now() - ts) / (24 * 60 * 60 * 1000));
             const weekIdx = 3 - Math.min(3, Math.floor(dayDiff / 7.5));
-            revenueData[weekIdx] += Number(o.totalAmount || 0);
+            revenueData[weekIdx] += Number(o.pricing?.total ?? o.totalAmount ?? 0);
           }
         });
       } else if (window.currentChartPeriod === 'month') {
@@ -2295,11 +2295,12 @@
           const od = new Date(ts);
           if (od.getMonth() === curMonth && od.getFullYear() === curYear) {
             const dt = od.getDate();
-            if (dt <= 7) revenueData[0] += Number(o.totalAmount || 0);
-            else if (dt <= 14) revenueData[1] += Number(o.totalAmount || 0);
-            else if (dt <= 21) revenueData[2] += Number(o.totalAmount || 0);
-            else if (dt <= 28) revenueData[3] += Number(o.totalAmount || 0);
-            else revenueData[4] += Number(o.totalAmount || 0);
+            const orderAmt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+            if (dt <= 7) revenueData[0] += orderAmt;
+            else if (dt <= 14) revenueData[1] += orderAmt;
+            else if (dt <= 21) revenueData[2] += orderAmt;
+            else if (dt <= 28) revenueData[3] += orderAmt;
+            else revenueData[4] += orderAmt;
           }
         });
       } else { // '7days' default
@@ -2316,7 +2317,7 @@
           if (ts >= sevenDaysAgo) {
             const dayDiff = Math.floor((Date.now() - ts) / (24 * 60 * 60 * 1000));
             const slotIdx = 6 - Math.min(6, Math.max(0, dayDiff));
-            revenueData[slotIdx] += Number(o.totalAmount || 0);
+            revenueData[slotIdx] += Number(o.pricing?.total ?? o.totalAmount ?? 0);
           }
         });
       }
@@ -2329,13 +2330,13 @@
         const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
         return ts >= startOfToday;
       });
-      const todayRev = todayOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
-      const totalRev = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+      const todayRev = todayOrders.reduce((sum, o) => sum + Number(o.pricing?.total ?? o.totalAmount ?? 0), 0);
+      const totalRev = orders.reduce((sum, o) => sum + Number(o.pricing?.total ?? o.totalAmount ?? 0), 0);
       const pendingOrders = orders.filter(o => {
-        const s = String(o.status || 'Pending').toLowerCase();
+        const s = String(o.orderStatus || o.status || 'Pending').toLowerCase();
         return s === 'pending' || s === 'awaiting acceptance';
       });
-      const onlineTodayCount = todayOrders.filter(o => !String(o.paymentMethod || '').toLowerCase().includes('cod')).length;
+      const onlineTodayCount = todayOrders.filter(o => !String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod')).length;
       const codTodayCount = todayOrders.length - onlineTodayCount;
       const aovVal = orders.length > 0 ? Math.round(totalRev / orders.length) : 0;
       const estProfitVal = Math.round(todayRev * 0.47);
@@ -2558,16 +2559,16 @@
       // 2. Incorporate real orders from dual collection streams
       if (Array.isArray(window.currentAllOrders) && window.currentAllOrders.length > 0) {
         window.currentAllOrders.forEach(o => {
-          const phone = String(o.customerPhoneNumber || o.customerPhone || o.phone || '').replace(/\D/g, '');
-          const key = phone || String(o.customerName || o.name || 'Customer');
+          const phone = String(o.customer?.phone || o.customerPhoneNumber || o.customerPhone || o.phone || '').replace(/\D/g, '');
+          const name = o.customer?.name || o.customerName || o.name || 'Valued Customer';
+          const key = phone || String(name);
           const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || Date.now())) || Date.now();
           if (!map.has(key)) {
-            const name = o.customerName || o.name || 'Valued Customer';
             const parts = name.trim().split(' ');
             const initials = (parts[0]?.[0] || 'C') + (parts[1]?.[0] || '');
             map.set(key, {
               name: name,
-              email: o.customerEmail || o.email || '—',
+              email: o.customer?.email || o.customerEmail || o.email || '—',
               phone: phone || 'Not Provided',
               ordersCount: 0,
               totalSpent: 0,
@@ -2577,7 +2578,7 @@
           }
           const c = map.get(key);
           c.ordersCount += 1;
-          c.totalSpent += Number(o.totalAmount || 0);
+          c.totalSpent += Number(o.pricing?.total ?? o.totalAmount ?? 0);
           c.lastOrderTs = Math.max(Number(c.lastOrderTs) || 0, ts);
         });
       }
@@ -2748,22 +2749,22 @@
       let list = [];
       if (Array.isArray(window.currentAllOrders) && window.currentAllOrders.length > 0) {
         list = window.currentAllOrders.map(o => {
-          const isPaid = (o.paymentStatus === 'Paid') || (String(o.paymentMethod || '').toLowerCase().includes('razorpay') && o.razorpayPaymentId);
-          const payMethodRaw = String(o.paymentMethod || '');
+          const isPaid = (o.payment?.status === 'PAID' || o.paymentStatus === 'Paid') || (String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('razorpay') && (o.razorpayPaymentId || o.payment?.transactionId));
+          const payMethodRaw = String(o.payment?.method || o.paymentMethod || '');
           let method = 'Razorpay';
           if (payMethodRaw.toLowerCase().includes('cod')) method = 'COD';
           else if (payMethodRaw.toLowerCase().includes('whatsapp')) method = 'WhatsApp';
 
           let status = isPaid ? 'Success' : (method === 'COD' ? 'Pending' : 'Success');
-          if (o.status === 'Cancelled') status = 'Failed';
+          if (o.orderStatus === 'Cancelled' || o.status === 'Cancelled') status = 'Failed';
 
           const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || Date.now())) || Date.now();
           const dateStr = o.orderDateStr || new Date(ts).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
           return {
             orderId: `#OSC${o.id}`,
-            customerName: o.customerName || o.customerDetails?.name || o.name || 'Customer',
-            amount: Number(o.totalAmount || 0),
+            customerName: o.customer?.name || o.customerName || o.customerDetails?.name || o.name || 'Customer',
+            amount: Number(o.pricing?.total ?? o.totalAmount ?? 0),
             method: method,
             status: status,
             date: dateStr,
@@ -4168,8 +4169,8 @@
       };
 
       rawList.forEach(o => {
-        rev += Number(o.totalAmount || 0);
-        const s = String(o.status || 'Pending').trim().toLowerCase();
+        rev += Number(o.pricing?.total ?? o.totalAmount ?? 0);
+        const s = String(o.orderStatus || o.status || 'Pending').trim().toLowerCase();
         if (s === 'delivered') counts.delivered++;
         else if (s === 'cancelled') counts.cancelled++;
         else if (s === 'returned') counts.returned++;
@@ -4215,7 +4216,7 @@
       if (window.currentFilter !== 'all') {
         const target = window.currentFilter;
         filtered = filtered.filter(o => {
-          const s = String(o.status || 'Pending').trim().toLowerCase();
+          const s = String(o.orderStatus || o.status || 'Pending').trim().toLowerCase();
           if (target === 'pending') return (s === 'pending' || s === 'awaiting acceptance' || s === 'order placed');
           if (target === 'accepted') return (s === 'accepted' || s === 'processing');
           if (target === 'packing') return (s === 'packing' || s === 'packed');
@@ -4230,8 +4231,8 @@
       // 2. Payment Method Filter
       if (window.paymentFilter !== 'all') {
         filtered = filtered.filter(o => {
-          const isPaid = (o.paymentStatus === 'Paid') || (String(o.paymentMethod || '').toLowerCase().includes('razorpay') && o.razorpayPaymentId);
-          const payMethod = String(o.paymentMethod || '').toLowerCase();
+          const isPaid = (o.payment?.status === 'PAID' || o.paymentStatus === 'Paid') || (String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('razorpay') && (o.razorpayPaymentId || o.payment?.transactionId));
+          const payMethod = String(o.payment?.method || o.paymentMethod || '').toLowerCase();
           const isWhatsApp = payMethod.includes('whatsapp') || Boolean(o.whatsappOrder);
 
           if (window.paymentFilter === 'paid') return isPaid;
@@ -4246,9 +4247,9 @@
         const q = window.searchQuery;
         filtered = filtered.filter(o => {
           const idStr = String(o.id || '').toLowerCase();
-          const nameStr = String(o.customerName || o.customerDetails?.name || o.name || '').toLowerCase();
-          const phoneStr = String(o.customerPhoneNumber || o.customerPhone || o.customerDetails?.phone || o.phone || '').replace(/\D/g, '');
-          const cityStr = String(o.city || o.customerDetails?.city || '').toLowerCase();
+          const nameStr = String(o.customer?.name || o.customerName || o.customerDetails?.name || o.name || '').toLowerCase();
+          const phoneStr = String(o.customer?.phone || o.customerPhoneNumber || o.customerPhone || o.customerDetails?.phone || o.phone || '').replace(/\D/g, '');
+          const cityStr = String(o.shippingAddress?.city || o.city || o.customerDetails?.city || '').toLowerCase();
           return idStr.includes(q) || nameStr.includes(q) || phoneStr.includes(q) || cityStr.includes(q);
         });
       }
@@ -4257,7 +4258,7 @@
       if (window.sortOrderFilter === 'oldest') {
         filtered.sort((a, b) => getOrderTimestamp(a) - getOrderTimestamp(b));
       } else if (window.sortOrderFilter === 'highest_amount') {
-        filtered.sort((a, b) => Number(b.totalAmount || 0) - Number(a.totalAmount || 0));
+        filtered.sort((a, b) => Number(b.pricing?.total ?? b.totalAmount ?? 0) - Number(a.pricing?.total ?? a.totalAmount ?? 0));
       } else {
         // Default: newest first
         filtered.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
@@ -4294,16 +4295,16 @@
 
       listEl.innerHTML = pageSlice.map(o => {
         const items = o.items || [];
-        const name = o.customerName || o.customerDetails?.name || o.name || 'Valued Customer';
-        const rawPhone = o.customerPhoneNumber || o.customerPhone || o.customerDetails?.phone || o.phone || '';
+        const name = o.customer?.name || o.customerName || o.customerDetails?.name || o.name || 'Valued Customer';
+        const rawPhone = o.customer?.phone || o.customerPhoneNumber || o.customerPhone || o.customerDetails?.phone || o.phone || '';
         const phone = rawPhone ? String(rawPhone).replace(/\D/g, '').slice(-10) : 'Not Provided';
-        const address = o.customerAddress || o.customerDetails?.address || o.address || 'Address on record';
-        const door = o.doorNo || o.customerDetails?.doorNo || '';
-        const street = o.streetName || o.customerDetails?.streetName || '';
-        const landmark = o.landmark || o.customerDetails?.landmark || '';
-        const city = o.city || o.customerDetails?.city || '';
-        const state = o.state || o.customerDetails?.state || '';
-        const pin = o.pincode || o.customerDetails?.pincode || '';
+        const address = o.shippingAddress?.addressLine1 || o.customerAddress || o.customerDetails?.address || o.address || 'Address on record';
+        const door = o.shippingAddress?.doorNo || o.doorNo || o.customerDetails?.doorNo || '';
+        const street = o.shippingAddress?.streetName || o.streetName || o.customerDetails?.streetName || '';
+        const landmark = o.shippingAddress?.landmark || o.landmark || o.customerDetails?.landmark || '';
+        const city = o.shippingAddress?.city || o.city || o.customerDetails?.city || '';
+        const state = o.shippingAddress?.state || o.state || o.customerDetails?.state || '';
+        const pin = o.shippingAddress?.pincode || o.pincode || o.customerDetails?.pincode || '';
         
         // Date with Time prominently displayed
         const dateObj = o.createdAt?.seconds ? new Date(o.createdAt.seconds * 1000) : (o.createdAt ? new Date(o.createdAt) : null);
@@ -4311,8 +4312,8 @@
           ? dateObj.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
           : (o.orderDateStr || 'Recent');
 
-        const isPaid = (o.paymentStatus === 'Paid') || (String(o.paymentMethod || '').toLowerCase().includes('razorpay') && o.razorpayPaymentId);
-        const payMethod = o.paymentMethod || 'Razorpay Online Payment';
+        const isPaid = (o.payment?.status === 'PAID' || o.paymentStatus === 'Paid') || (String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('razorpay') && (o.razorpayPaymentId || o.payment?.transactionId));
+        const payMethod = o.payment?.method || o.paymentMethod || 'Razorpay Online Payment';
 
         let payBadgeHtml = '';
         if (isPaid) {
@@ -4341,7 +4342,7 @@
 
         // Quick transition button based on status
         let quickActionBtn = '';
-        const curStatus = o.status || 'Pending';
+        const curStatus = o.orderStatus || o.status || 'Pending';
         if (curStatus === 'Pending' || curStatus === 'Awaiting Acceptance') {
           quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Accepted')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">check</span> Accept Order</button>`;
         } else if (curStatus === 'Accepted') {
@@ -4351,6 +4352,8 @@
         } else if (curStatus === 'Shipped') {
           quickActionBtn = `<button onclick="updateStatus('${o.id}', 'Delivered')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">task_alt</span> Mark Delivered</button>`;
         }
+
+        const totalAmt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
 
         return `
         <div class="shopify-card p-6 space-y-4">
@@ -4372,7 +4375,7 @@
               </p>
             </div>
             <div class="text-right flex-shrink-0">
-              <span class="text-xl font-bold text-slate-900 block">₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+              <span class="text-xl font-bold text-slate-900 block">₹${totalAmt.toLocaleString('en-IN')}</span>
               <span class="text-xs font-medium text-slate-500">${items.length} Item${items.length !== 1 ? 's' : ''}</span>
             </div>
           </div>
@@ -4386,7 +4389,7 @@
               <span class="text-slate-600 font-semibold text-xs">Status:</span>
               <select onchange="updateStatus('${o.id}', this.value)" class="shopify-input text-slate-900 px-3 py-1.5 rounded-lg outline-none font-semibold bg-white border border-slate-300">
                 ${['Pending', 'Accepted', 'Packing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(s => `
-                  <option value="${s}" ${o.status === s ? 'selected' : ''} class="bg-white text-slate-900 font-medium">${s}</option>
+                  <option value="${s}" ${(o.orderStatus || o.status) === s ? 'selected' : ''} class="bg-white text-slate-900 font-medium">${s}</option>
                 `).join('')}
               </select>
               ${quickActionBtn}

@@ -1,0 +1,128 @@
+﻿rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for Multi-Tenant SaaS isolation
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the authenticated user belongs to the requested company
+    function belongsToCompany(companyId) {
+      return isAuthenticated() && (
+        request.auth.token.companyId == companyId ||
+        request.auth.token.tenantId == companyId ||
+        exists(/databases/$(database)/documents/companies/$(companyId)/users/$(request.auth.uid))
+      );
+    }
+
+    // Check if user has admin role in this company
+    function isCompanyAdmin(companyId) {
+      return isAuthenticated() && (
+        request.auth.token.role == 'admin' ||
+        request.auth.token.companyId == companyId ||
+        (
+          exists(/databases/$(database)/documents/companies/$(companyId)/users/$(request.auth.uid)) &&
+          get(/databases/$(database)/documents/companies/$(companyId)/users/$(request.auth.uid)).data.role in ['admin', 'owner', 'manager']
+        )
+      );
+    }
+
+    // ==========================================
+    // MULTI-TENANT COMPANIES HIERARCHY
+    // Path: /companies/{companyId}
+    // ==========================================
+    match /companies/{companyId} {
+      // Company document (store profile, basic info)
+      allow read: if true; // Public store needs to read company basic info (e.g. name, branding)
+      allow write: if isCompanyAdmin(companyId);
+
+      // 1. Products: Public read for storefront; write restricted to company admins
+      match /products/{productId} {
+        allow read: if true;
+        allow write: if isCompanyAdmin(companyId);
+      }
+
+      // 2. Categories: Public read for storefront; write restricted to company admins
+      match /categories/{categoryId} {
+        allow read: if true;
+        allow write: if isCompanyAdmin(companyId);
+      }
+
+      // 3. Orders: Strict multi-tenant isolation
+      // - Customer checkout can create order with valid companyId matching path
+      // - Admins of this company can read/update/delete
+      // - Authenticated customer can read their own order
+      match /orders/{orderId} {
+        allow create: if request.resource.data.companyId == companyId &&
+                         request.resource.data.items is list &&
+                         request.resource.data.items.size() > 0;
+        allow read: if belongsToCompany(companyId) ||
+                       (isAuthenticated() && resource.data.customer.id == request.auth.uid);
+        allow update, delete: if isCompanyAdmin(companyId);
+      }
+
+      // 4. Invoices / Online Invoices (POS & E-commerce compatibility)
+      match /invoices/{invoiceId} {
+        allow create: if request.resource.data.companyId == companyId;
+        allow read, update, delete: if belongsToCompany(companyId);
+      }
+
+      // 5. Customers: Company staff can access; customers can read/write their own record
+      match /customers/{customerId} {
+        allow read: if belongsToCompany(companyId) || (isAuthenticated() && request.auth.uid == customerId);
+        allow write: if belongsToCompany(companyId) || (isAuthenticated() && request.auth.uid == customerId);
+      }
+
+      // 6. Users / Staff
+      match /users/{userId} {
+        allow read: if belongsToCompany(companyId) || (isAuthenticated() && request.auth.uid == userId);
+        allow write: if isCompanyAdmin(companyId);
+      }
+
+      // 7. Settings (Store general settings, payment keys, branding)
+      match /settings/{settingDoc} {
+        allow read: if true; // Public read for storefront configuration
+        allow write: if isCompanyAdmin(companyId);
+      }
+
+      // 8. Suppliers, Inventory Logs, Analytics
+      match /suppliers/{supplierId} {
+        allow read, write: if belongsToCompany(companyId);
+      }
+      match /returns/{returnId} {
+        allow read, write: if belongsToCompany(companyId);
+      }
+      match /analytics/{analyticsDoc} {
+        allow read, write: if belongsToCompany(companyId);
+      }
+
+      // Fallback for any other nested subcollections under this company
+      match /{allSubcollections=**} {
+        allow read, write: if belongsToCompany(companyId);
+      }
+    }
+
+    // ==========================================
+    // BACKWARD COMPATIBILITY / LEGACY ROOT PATHS
+    // ==========================================
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    match /invoices/{invoiceId} {
+      allow create: if true;
+      allow read, update, delete: if isAuthenticated();
+    }
+
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+  }
+}

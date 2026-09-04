@@ -55,8 +55,12 @@ async function resolveItems(transaction, requestedItems) {
     const productId = String(requested.productId || '');
     const quantity = Number(requested.quantity);
     if (!productId || !Number.isInteger(quantity) || quantity < 1 || quantity > 25) throw new Error('One or more cart quantities are invalid.');
-    const ref = firebaseDb().collection('products').doc(productId);
-    const snapshot = await transaction.get(ref);
+    let ref = firebaseDb().collection('companies').doc('thebaniyancompany').collection('products').doc(productId);
+    let snapshot = await transaction.get(ref);
+    if (!snapshot.exists) {
+      ref = firebaseDb().collection('products').doc(productId);
+      snapshot = await transaction.get(ref);
+    }
     if (!snapshot.exists) throw new Error('A product in your bag is no longer available.');
     const product = snapshot.data();
     const variants = Array.isArray(product.variants) ? product.variants : [];
@@ -86,7 +90,7 @@ async function resolveItems(transaction, requestedItems) {
         productName: String(product.name || ''),
         selectedVariant: { id: variant.id || null, size: variant.size || '', color: variant.color || '' },
         quantity, unitPrice, imageUrl: Array.isArray(product.imageUrls) ? product.imageUrls[0] || '' : ''
-      }, companyId: product.companyId || null
+      }, companyId: product.companyId || 'thebaniyancompany'
     });
     subtotal += unitPrice * quantity;
   }
@@ -101,6 +105,7 @@ async function persistOrder({ customer, requestedItems, paymentMethod, paymentSt
     const { lines, subtotal } = await resolveItems(transaction, requestedItems);
     const tax = Math.round(subtotal * 0.05);
     const totalAmount = subtotal + tax;
+    const targetCompanyId = lines.find(line => line.companyId)?.companyId || 'thebaniyancompany';
     const order = {
       orderId,
       customerName: cleanCustomer.name,
@@ -111,7 +116,7 @@ async function persistOrder({ customer, requestedItems, paymentMethod, paymentSt
       city: cleanCustomer.city,
       state: cleanCustomer.state,
       pincode: cleanCustomer.pincode,
-      companyId: lines.find(line => line.companyId)?.companyId || null,
+      companyId: targetCompanyId,
       branchId: null,
       items: lines.map(line => line.item),
       subtotal, discount: 0, tax, shippingCharge: 0, totalAmount,
@@ -125,6 +130,8 @@ async function persistOrder({ customer, requestedItems, paymentMethod, paymentSt
     };
     lines.forEach(line => transaction.update(line.ref, { variants: line.variants, updatedAt: admin.firestore.FieldValue.serverTimestamp() }));
     transaction.set(db.collection('orders').doc(orderId), order);
+    transaction.set(db.collection('companies').doc(targetCompanyId).collection('orders').doc(orderId), order);
+    transaction.set(db.collection('companies').doc(targetCompanyId).collection('invoices').doc(orderId), order);
   });
   return { orderId };
 }

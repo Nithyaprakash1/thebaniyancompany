@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -823,12 +823,22 @@
 
     async function loadAnalyticsData() {
       try {
-        const compSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'invoices'));
-        const rootSnap = await getDocs(collection(db, 'invoices'));
+        const [compSnap, ordersSnap, rootSnap] = await Promise.allSettled([
+          getDocs(collection(db, 'companies', COMPANY_ID, 'invoices')),
+          getDocs(collection(db, 'companies', COMPANY_ID, 'orders')),
+          getDocs(collection(db, 'invoices'))
+        ]);
         const allDocsMap = new Map();
 
-        rootSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
-        compSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        if (rootSnap.status === 'fulfilled' && rootSnap.value) {
+          rootSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        }
+        if (compSnap.status === 'fulfilled' && compSnap.value) {
+          compSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        }
+        if (ordersSnap.status === 'fulfilled' && ordersSnap.value) {
+          ordersSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        }
 
         const list = [];
         allDocsMap.forEach((data, docId) => {
@@ -838,12 +848,12 @@
 
           list.push({
             id: docId,
-            customerName: data.customerName || data.customerDetails?.name || '',
-            phone: data.customerPhoneNumber || data.customerPhone || '',
-            city: data.city || data.customerDetails?.city || '',
-            totalAmount: Number(data.totalAmount || data.finalAmount || data.grandTotal || 0),
-            paymentMethod: data.paymentMethod || 'Online',
-            paymentStatus: data.paymentStatus || 'Paid',
+            customerName: data.customer?.name || data.customerName || data.customerDetails?.name || '',
+            phone: data.customer?.phone || data.customerPhoneNumber || data.customerPhone || '',
+            city: data.shippingAddress?.city || data.city || data.customerDetails?.city || '',
+            totalAmount: Number(data.pricing?.total ?? data.totalAmount ?? data.finalAmount ?? data.grandTotal ?? 0),
+            paymentMethod: data.payment?.method || data.paymentMethod || 'Online',
+            paymentStatus: data.payment?.status || data.paymentStatus || 'Paid',
             timestamp: ts,
             items: data.items || data.orderItems || []
           });
