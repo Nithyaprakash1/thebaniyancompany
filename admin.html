@@ -333,20 +333,6 @@
             </div>
           </div>
 
-          <!-- Center Search Bar -->
-          <div class="flex-1 max-w-lg mx-2 sm:mx-6 hidden md:block">
-            <div class="relative">
-              <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-              <input
-                type="text"
-                id="global-admin-top-search"
-                oninput="handleGlobalSearch(this.value)"
-                placeholder="Search orders, products, customers..."
-                class="w-full bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:border-black focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2 outline-none transition"
-              >
-            </div>
-          </div>
-
           <!-- Right Header Actions -->
           <div class="flex items-center gap-2.5 sm:gap-3">
             <button
@@ -365,11 +351,6 @@
             >
               <span class="material-symbols-outlined text-sm text-slate-500">open_in_new</span>
               <span>View Store</span>
-            </a>
-
-            <!-- TB Avatar Button (Consistent across all pages) -->
-            <a href="admin.html" class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:opacity-90 transition shadow-xs">
-              TB
             </a>
           </div>
         </div>
@@ -622,10 +603,43 @@
                 </thead>
                 <tbody id="products-table-body" class="divide-y divide-slate-100 text-xs font-normal">
                   <tr>
-                    <td colspan="5" class="p-8 text-center text-slate-400">
-                      <span class="material-symbols-outlined text-3xl animate-spin mb-1">motion_photos_on</span>
-                      <p class="font-medium">Loading product catalog...</p>
+                    <td class="p-3.5 flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-lg bg-slate-200 skeleton-shimmer shrink-0"></div>
+                      <div class="space-y-1.5 flex-1">
+                        <div class="h-4 w-36 bg-slate-200 skeleton-shimmer rounded"></div>
+                        <div class="h-3 w-20 bg-slate-200 skeleton-shimmer rounded"></div>
+                      </div>
                     </td>
+                    <td class="p-3.5"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-3.5"><div class="h-4 w-14 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-3.5"><div class="h-4 w-12 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-3.5 text-right"><div class="h-5 w-16 ml-auto bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                  </tr>
+                  <tr>
+                    <td class="p-3.5 flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-lg bg-slate-200 skeleton-shimmer shrink-0"></div>
+                      <div class="space-y-1.5 flex-1">
+                        <div class="h-4 w-44 bg-slate-200 skeleton-shimmer rounded"></div>
+                        <div class="h-3 w-24 bg-slate-200 skeleton-shimmer rounded"></div>
+                      </div>
+                    </td>
+                    <td class="p-3.5"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-3.5"><div class="h-4 w-14 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-3.5"><div class="h-4 w-12 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-3.5 text-right"><div class="h-5 w-16 ml-auto bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                  </tr>
+                  <tr>
+                    <td class="p-3.5 flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-lg bg-slate-200 skeleton-shimmer shrink-0"></div>
+                      <div class="space-y-1.5 flex-1">
+                        <div class="h-4 w-32 bg-slate-200 skeleton-shimmer rounded"></div>
+                        <div class="h-3 w-20 bg-slate-200 skeleton-shimmer rounded"></div>
+                      </div>
+                    </td>
+                    <td class="p-3.5"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-3.5"><div class="h-4 w-14 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-3.5"><div class="h-4 w-12 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-3.5 text-right"><div class="h-5 w-16 ml-auto bg-slate-200 skeleton-shimmer rounded-full"></div></td>
                   </tr>
                 </tbody>
               </table>
@@ -707,9 +721,39 @@
           </div>
 
           <div id="admin-orders-list" class="space-y-4">
-            <div class="shopify-card p-12 text-center text-slate-400">
-              <span class="material-symbols-outlined text-4xl animate-spin mb-2 text-slate-400">motion_photos_on</span>
-              <p class="text-xs font-medium">Listening to customer orders...</p>
+            <div class="shopify-card p-5 space-y-3">
+              <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="h-5 w-24 bg-slate-200 skeleton-shimmer rounded"></div>
+                  <div class="h-4 w-32 bg-slate-200 skeleton-shimmer rounded"></div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="h-6 w-20 bg-slate-200 skeleton-shimmer rounded-full"></div>
+                  <div class="h-6 w-24 bg-slate-200 skeleton-shimmer rounded-full"></div>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                <div class="space-y-1.5"><div class="h-3 w-16 bg-slate-200 skeleton-shimmer rounded"></div><div class="h-4 w-36 bg-slate-200 skeleton-shimmer rounded"></div></div>
+                <div class="space-y-1.5"><div class="h-3 w-16 bg-slate-200 skeleton-shimmer rounded"></div><div class="h-4 w-48 bg-slate-200 skeleton-shimmer rounded"></div></div>
+                <div class="space-y-1.5"><div class="h-3 w-16 bg-slate-200 skeleton-shimmer rounded"></div><div class="h-5 w-20 bg-slate-200 skeleton-shimmer rounded"></div></div>
+              </div>
+            </div>
+            <div class="shopify-card p-5 space-y-3">
+              <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="h-5 w-24 bg-slate-200 skeleton-shimmer rounded"></div>
+                  <div class="h-4 w-32 bg-slate-200 skeleton-shimmer rounded"></div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="h-6 w-20 bg-slate-200 skeleton-shimmer rounded-full"></div>
+                  <div class="h-6 w-24 bg-slate-200 skeleton-shimmer rounded-full"></div>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                <div class="space-y-1.5"><div class="h-3 w-16 bg-slate-200 skeleton-shimmer rounded"></div><div class="h-4 w-36 bg-slate-200 skeleton-shimmer rounded"></div></div>
+                <div class="space-y-1.5"><div class="h-3 w-16 bg-slate-200 skeleton-shimmer rounded"></div><div class="h-4 w-48 bg-slate-200 skeleton-shimmer rounded"></div></div>
+                <div class="space-y-1.5"><div class="h-3 w-16 bg-slate-200 skeleton-shimmer rounded"></div><div class="h-5 w-20 bg-slate-200 skeleton-shimmer rounded"></div></div>
+              </div>
             </div>
           </div>
 
@@ -749,32 +793,6 @@
 
         <!-- ==================== VIEW 5: STORE SETTINGS ==================== -->
         <div id="view-settings" class="hidden space-y-6">
-
-          <!-- Top Navigation Header Bar (Matching screenshot media_1788523312896.png) -->
-          <div class="flex items-center justify-between flex-wrap gap-4 pb-2 border-b border-slate-100">
-            <div>
-              <span class="text-xs font-semibold text-slate-600">Store Settings</span>
-            </div>
-
-            <div class="flex items-center gap-3 flex-wrap">
-              <!-- Global Search Input -->
-              <div class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-                <input type="text" id="global-search-input-settings" oninput="handleGlobalSearch(this.value)" placeholder="Search orders, products, customers..."
-                  class="shopify-input rounded-lg pl-9 pr-4 py-2 text-xs outline-none font-normal w-64 sm:w-80">
-              </div>
-
-              <button onclick="openAddProductModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
-                <span class="material-symbols-outlined text-sm">add</span> Add Product
-              </button>
-
-              <a href="home.html" target="_blank" class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-xs font-medium rounded-lg shadow-2xs transition-all flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm">open_in_new</span> View Store
-              </a>
-
-
-            </div>
-          </div>
 
           <!-- Page Heading -->
           <div>
@@ -1160,35 +1178,6 @@
 
         <!-- ==================== VIEW: PAYMENTS ==================== -->
         <div id="view-payments" class="hidden space-y-6">
-          
-          <!-- Top Navigation Header Bar -->
-          <div class="flex items-center justify-between flex-wrap gap-4 pb-2 border-b border-slate-100">
-            <div>
-              <span class="text-xs font-semibold text-slate-600">Payments</span>
-            </div>
-
-            <div class="flex items-center gap-3 flex-wrap">
-              <!-- Global Search Input -->
-              <div class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-                <input type="text" id="global-search-input-payments" oninput="handleGlobalSearch(this.value)" placeholder="Search orders, products, customers..."
-                  class="shopify-input rounded-lg pl-9 pr-4 py-2 text-xs outline-none font-normal w-64 sm:w-80">
-              </div>
-
-              <button onclick="openAddProductModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
-                <span class="material-symbols-outlined text-sm">add</span> Add Product
-              </button>
-
-              <a href="home.html" target="_blank" class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-xs font-medium rounded-lg shadow-2xs transition-all flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm">open_in_new</span> View Store
-              </a>
-
-              <!-- Profile Logo -->
-              <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
-                <img src="assets/tbclogo.jpeg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs" onerror="this.src='assets/tbclogo.jpeg';">
-              </div>
-            </div>
-          </div>
 
           <!-- Page Heading -->
           <div>
@@ -1203,7 +1192,7 @@
                 💰
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-slate-900" id="pay-kpi-collected">₹2,34,500</h3>
+                <h3 class="text-2xl font-bold text-slate-900" id="pay-kpi-collected"><span class="inline-block w-20 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">Total Collected</span>
               </div>
             </div>
@@ -1214,7 +1203,7 @@
                 <span class="material-symbols-outlined text-2xl">check_circle</span>
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-emerald-600" id="pay-kpi-balance">₹18,420</h3>
+                <h3 class="text-2xl font-bold text-emerald-600" id="pay-kpi-balance"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">Available Balance</span>
               </div>
             </div>
@@ -1225,7 +1214,7 @@
                 ⌛
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-amber-600" id="pay-kpi-settlement">₹5,200</h3>
+                <h3 class="text-2xl font-bold text-amber-600" id="pay-kpi-settlement"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">Pending Settlement</span>
               </div>
             </div>
@@ -1236,7 +1225,7 @@
                 🏠
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-sky-600" id="pay-kpi-cod">₹8,450</h3>
+                <h3 class="text-2xl font-bold text-sky-600" id="pay-kpi-cod"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">COD Pending</span>
               </div>
             </div>
@@ -1256,7 +1245,7 @@
                     <div>
                       <h4 class="font-bold text-sm text-slate-900">Razorpay</h4>
                       <p class="text-xs text-slate-500">Accept cards, UPI, netbanking, wallets</p>
-                      <span class="text-[11px] text-slate-400 font-medium block mt-0.5">Connected · Last payout 25 Aug</span>
+                      <span class="text-[11px] text-slate-500 font-medium block mt-0.5">Online Gateway · UPI, Cards, Netbanking</span>
                     </div>
                   </div>
                   <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ ACTIVE</span>
@@ -1276,7 +1265,7 @@
                     <div>
                       <h4 class="font-bold text-sm text-slate-900">Cash on Delivery</h4>
                       <p class="text-xs text-slate-500">Collect payment on delivery</p>
-                      <span class="text-[11px] text-slate-500 font-medium block mt-0.5">₹8,450 COD pending</span>
+                      <span class="text-[11px] text-slate-500 font-medium block mt-0.5">Pay with cash upon delivery</span>
                     </div>
                   </div>
                   <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ ACTIVE</span>
@@ -1296,13 +1285,13 @@
                     <div>
                       <h4 class="font-bold text-sm text-slate-900">WhatsApp Order</h4>
                       <p class="text-xs text-slate-500">Let customers order via WhatsApp</p>
-                      <span class="text-[11px] text-slate-400 font-medium block mt-0.5">Configure WhatsApp Business API</span>
+                      <span class="text-[11px] text-slate-500 font-medium block mt-0.5">Direct checkout via WhatsApp chat</span>
                     </div>
                   </div>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">! SETUP REQUIRED</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ ACTIVE</span>
                 </div>
                 <div class="text-right pt-2 border-t border-slate-100">
-                  <button onclick="switchAdminTab('settings')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-medium rounded-md transition-all cursor-pointer">Setup</button>
+                  <button onclick="switchAdminTab('settings')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-medium rounded-md transition-all cursor-pointer">Manage</button>
                 </div>
               </div>
             </div>
@@ -1363,7 +1352,30 @@
                     </tr>
                   </thead>
                   <tbody id="payments-table-body" class="divide-y divide-slate-100 text-xs font-normal">
-                    <!-- Populated dynamically via JS -->
+                    <tr>
+                      <td class="p-4"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                      <td class="p-4"><div class="h-4 w-32 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                      <td class="p-4"><div class="h-4 w-16 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                      <td class="p-4"><div class="h-5 w-16 bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                      <td class="p-4"><div class="h-5 w-16 bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                      <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    </tr>
+                    <tr>
+                      <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                      <td class="p-4"><div class="h-4 w-28 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                      <td class="p-4"><div class="h-4 w-14 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                      <td class="p-4"><div class="h-5 w-16 bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                      <td class="p-4"><div class="h-5 w-16 bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                      <td class="p-4"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    </tr>
+                    <tr>
+                      <td class="p-4"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                      <td class="p-4"><div class="h-4 w-36 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                      <td class="p-4"><div class="h-4 w-16 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                      <td class="p-4"><div class="h-5 w-16 bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                      <td class="p-4"><div class="h-5 w-16 bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                      <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -1374,35 +1386,6 @@
 
         <!-- ==================== VIEW 6: CUSTOMERS ==================== -->
         <div id="view-customers" class="hidden space-y-6">
-          
-          <!-- Top Navigation Header Bar -->
-          <div class="flex items-center justify-between flex-wrap gap-4 pb-2 border-b border-slate-100">
-            <div>
-              <span class="text-xs font-semibold text-slate-600">Customers</span>
-            </div>
-
-            <div class="flex items-center gap-3 flex-wrap">
-              <!-- Global Search Input -->
-              <div class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-                <input type="text" id="global-search-input" oninput="handleGlobalSearch(this.value)" placeholder="Search orders, products, customers..."
-                  class="shopify-input rounded-lg pl-9 pr-4 py-2 text-xs outline-none font-normal w-64 sm:w-80">
-              </div>
-
-              <button onclick="openAddProductModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
-                <span class="material-symbols-outlined text-sm">add</span> Add Product
-              </button>
-
-              <a href="home.html" target="_blank" class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-xs font-medium rounded-lg shadow-2xs transition-all flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm">open_in_new</span> View Store
-              </a>
-
-              <!-- Profile Logo -->
-              <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
-                <img src="assets/tbclogo.jpeg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs" onerror="this.src='assets/tbclogo.jpeg';">
-              </div>
-            </div>
-          </div>
 
           <!-- Page Heading -->
           <div>
@@ -1417,7 +1400,7 @@
                 <span class="material-symbols-outlined text-xl">group</span>
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-slate-900" id="cust-kpi-total">356</h3>
+                <h3 class="text-2xl font-bold text-slate-900" id="cust-kpi-total"><span class="inline-block w-12 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">Total Customers</span>
               </div>
             </div>
@@ -1428,7 +1411,7 @@
                 <span class="material-symbols-outlined text-xl">fiber_new</span>
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-slate-900" id="cust-kpi-new">42</h3>
+                <h3 class="text-2xl font-bold text-slate-900" id="cust-kpi-new"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">New (This Month)</span>
               </div>
             </div>
@@ -1439,7 +1422,7 @@
                 <span class="material-symbols-outlined text-xl">autorenew</span>
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-slate-900" id="cust-kpi-repeat">198</h3>
+                <h3 class="text-2xl font-bold text-slate-900" id="cust-kpi-repeat"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">Repeat</span>
               </div>
             </div>
@@ -1450,7 +1433,7 @@
                 <span class="material-symbols-outlined text-xl">star</span>
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-slate-900" id="cust-kpi-vip">24</h3>
+                <h3 class="text-2xl font-bold text-slate-900" id="cust-kpi-vip"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">VIP</span>
               </div>
             </div>
@@ -1517,7 +1500,33 @@
                   </tr>
                 </thead>
                 <tbody id="customers-table-body" class="divide-y divide-slate-100 text-xs font-normal">
-                  <!-- Populated dynamically via JS -->
+                  <tr>
+                    <td class="p-4"><div class="h-4 w-32 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-10 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-16 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-5 w-14 bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                    <td class="p-4 text-right"><div class="h-6 w-16 ml-auto bg-slate-200 skeleton-shimmer rounded"></div></td>
+                  </tr>
+                  <tr>
+                    <td class="p-4"><div class="h-4 w-28 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-10 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-16 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-5 w-14 bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                    <td class="p-4 text-right"><div class="h-6 w-16 ml-auto bg-slate-200 skeleton-shimmer rounded"></div></td>
+                  </tr>
+                  <tr>
+                    <td class="p-4"><div class="h-4 w-36 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-10 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-16 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-5 w-14 bg-slate-200 skeleton-shimmer rounded-full"></div></td>
+                    <td class="p-4 text-right"><div class="h-6 w-16 ml-auto bg-slate-200 skeleton-shimmer rounded"></div></td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -1527,50 +1536,21 @@
 
         <!-- ==================== VIEW 7: RETURNS & REFUNDS ==================== -->
         <div id="view-returns" class="hidden space-y-6">
-          
-          <!-- Top Navigation Header Bar -->
-          <div class="flex items-center justify-between flex-wrap gap-4 pb-2 border-b border-slate-100">
-            <div>
-              <span class="text-xs font-semibold text-slate-600">Returns &amp; Refunds</span>
-            </div>
-
-            <div class="flex items-center gap-3 flex-wrap">
-              <!-- Global Search Input -->
-              <div class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-                <input type="text" id="global-search-input-returns" oninput="handleGlobalSearch(this.value)" placeholder="Search orders, products, customers..."
-                  class="shopify-input rounded-lg pl-9 pr-4 py-2 text-xs outline-none font-normal w-64 sm:w-80">
-              </div>
-
-              <button onclick="openAddProductModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
-                <span class="material-symbols-outlined text-sm">add</span> Add Product
-              </button>
-
-              <a href="home.html" target="_blank" class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-xs font-medium rounded-lg shadow-2xs transition-all flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm">open_in_new</span> View Store
-              </a>
-
-              <!-- Profile Logo -->
-              <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
-                <img src="assets/tbclogo.jpeg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs" onerror="this.src='assets/tbclogo.jpeg';">
-              </div>
-            </div>
-          </div>
 
           <!-- Page Heading -->
           <div>
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Returns &amp; Refunds</h1>
           </div>
 
-          <!-- 4 KPI Summary Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- 3 KPI Summary Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <!-- Card 1: Total Requests -->
             <div class="shopify-card p-5 flex items-center gap-4">
               <div class="w-10 h-10 rounded-lg bg-sky-100/70 text-sky-600 font-bold flex items-center justify-center text-lg">
                 <span class="bg-sky-500 text-white w-6 h-6 rounded flex items-center justify-center text-xs font-black">P</span>
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-slate-900" id="ret-kpi-total">5</h3>
+                <h3 class="text-2xl font-bold text-slate-900" id="ret-kpi-total"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">Total Requests</span>
               </div>
             </div>
@@ -1581,7 +1561,7 @@
                 <span class="material-symbols-outlined text-xl">hourglass_empty</span>
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-amber-700" id="ret-kpi-pending">1</h3>
+                <h3 class="text-2xl font-bold text-amber-700" id="ret-kpi-pending"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">Pending Action</span>
               </div>
             </div>
@@ -1592,19 +1572,8 @@
                 <span class="material-symbols-outlined text-xl">payments</span>
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-emerald-600" id="ret-kpi-amount">₹1,290</h3>
+                <h3 class="text-2xl font-bold text-emerald-600" id="ret-kpi-amount"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">Refunded Amount</span>
-              </div>
-            </div>
-
-            <!-- Card 4: Return Rate -->
-            <div class="shopify-card p-5 flex items-center gap-4">
-              <div class="w-10 h-10 rounded-lg bg-indigo-100/70 text-indigo-600 flex items-center justify-center">
-                <span class="material-symbols-outlined text-xl">analytics</span>
-              </div>
-              <div>
-                <h3 class="text-2xl font-bold text-slate-900" id="ret-kpi-rate">2.8%</h3>
-                <span class="text-xs font-medium text-slate-500">Return Rate</span>
               </div>
             </div>
           </div>
@@ -1614,27 +1583,27 @@
             <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
               <button id="ret-tab-all" onclick="setReturnFilter('all')"
                 class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all bg-slate-900 text-white shadow-xs flex items-center gap-1.5 whitespace-nowrap">
-                All Returns <span id="ret-cnt-all" class="bg-white text-slate-900 px-1.5 py-0.2 rounded-full text-[10px] font-bold">5</span>
+                All Returns <span id="ret-cnt-all" class="bg-white text-slate-900 px-1.5 py-0.2 rounded-full text-[10px] font-bold">0</span>
               </button>
               <button id="ret-tab-Requested" onclick="setReturnFilter('Requested')"
                 class="px-3 py-1.5 rounded-full text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-1.5 whitespace-nowrap">
-                Requested <span id="ret-cnt-Requested" class="text-slate-500 font-semibold">1</span>
+                Requested <span id="ret-cnt-Requested" class="text-slate-500 font-semibold">0</span>
               </button>
               <button id="ret-tab-Approved" onclick="setReturnFilter('Approved')"
                 class="px-3 py-1.5 rounded-full text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-1.5 whitespace-nowrap">
-                Approved <span id="ret-cnt-Approved" class="text-slate-500 font-semibold">1</span>
+                Approved <span id="ret-cnt-Approved" class="text-slate-500 font-semibold">0</span>
               </button>
               <button id="ret-tab-Pickup" onclick="setReturnFilter('Pickup Scheduled')"
                 class="px-3 py-1.5 rounded-full text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-1.5 whitespace-nowrap">
-                Pickup <span id="ret-cnt-Pickup" class="text-slate-500 font-semibold">1</span>
+                Pickup <span id="ret-cnt-Pickup" class="text-slate-500 font-semibold">0</span>
               </button>
               <button id="ret-tab-Refunded" onclick="setReturnFilter('Refunded')"
                 class="px-3 py-1.5 rounded-full text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-1.5 whitespace-nowrap">
-                Refunded <span id="ret-cnt-Refunded" class="text-slate-500 font-semibold">1</span>
+                Refunded <span id="ret-cnt-Refunded" class="text-slate-500 font-semibold">0</span>
               </button>
               <button id="ret-tab-Completed" onclick="setReturnFilter('Completed')"
                 class="px-3 py-1.5 rounded-full text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-1.5 whitespace-nowrap">
-                Completed <span id="ret-cnt-Completed" class="text-slate-500 font-semibold">1</span>
+                Completed <span id="ret-cnt-Completed" class="text-slate-500 font-semibold">0</span>
               </button>
             </div>
 
@@ -1682,7 +1651,36 @@
                   </tr>
                 </thead>
                 <tbody id="returns-table-body" class="divide-y divide-slate-100 text-xs font-normal">
-                  <!-- Dynamic returns rows -->
+                  <tr>
+                    <td class="p-4"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-28 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-32 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-16 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-5 w-20 bg-slate-200 skeleton-shimmer rounded-md"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4 text-right"><div class="h-6 w-20 ml-auto bg-slate-200 skeleton-shimmer rounded"></div></td>
+                  </tr>
+                  <tr>
+                    <td class="p-4"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-32 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-28 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-14 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-5 w-20 bg-slate-200 skeleton-shimmer rounded-md"></div></td>
+                    <td class="p-4"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4 text-right"><div class="h-6 w-20 ml-auto bg-slate-200 skeleton-shimmer rounded"></div></td>
+                  </tr>
+                  <tr>
+                    <td class="p-4"><div class="h-4 w-20 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-36 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-16 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-4 w-16 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4"><div class="h-5 w-20 bg-slate-200 skeleton-shimmer rounded-md"></div></td>
+                    <td class="p-4"><div class="h-4 w-24 bg-slate-200 skeleton-shimmer rounded"></div></td>
+                    <td class="p-4 text-right"><div class="h-6 w-20 ml-auto bg-slate-200 skeleton-shimmer rounded"></div></td>
+                  </tr>
                 </tbody>
               </table>
             </div>

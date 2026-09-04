@@ -1636,98 +1636,101 @@ export async function decrementVariantStock(productId, variantKey, qty = 1, bran
       return { success: true, skipped: true };
     }
 
-    await runTransaction(db, async (transaction) => {
-      const liveSnap = await transaction.get(targetRef);
-      if (!liveSnap.exists()) return;
+    const liveSnap = await getDoc(targetRef);
+    if (!liveSnap || !liveSnap.exists()) {
+      return { success: true, skipped: true };
+    }
 
-      const data = liveSnap.data();
-      const updates = { updatedAt: serverTimestamp() };
+    const data = liveSnap.data();
+    const updates = { updatedAt: serverTimestamp() };
 
-      // 1. Decrement Top-Level Product Stock fields if present
-      if (typeof data.stock === 'number') {
-        updates.stock = Math.max(0, data.stock - qty);
+    // 1. Decrement Top-Level Product Stock fields if present
+    if (typeof data.stock === 'number') {
+      updates.stock = Math.max(0, data.stock - qty);
+    }
+    if (typeof data.availableStock === 'number') {
+      updates.availableStock = Math.max(0, data.availableStock - qty);
+    }
+    if (typeof data.quantity === 'number') {
+      updates.quantity = Math.max(0, data.quantity - qty);
+    }
+
+    // 2. Decrement Variant Stock if variants array exists
+    if (Array.isArray(data.variants) && data.variants.length > 0) {
+      const variants = data.variants.map(v => ({ ...v }));
+
+      const targetKey = String(variantKey || '').trim().toLowerCase();
+      let targetSize = String(sizeParam || '').trim().toUpperCase();
+      let targetColor = String(colorParam || '').trim().toLowerCase();
+
+      if (!targetSize && typeof variantKey === 'string' && variantKey.includes('::')) {
+        const parts = variantKey.split('::');
+        targetSize = String(parts[0] || '').trim().toUpperCase();
+        targetColor = String(parts[1] || '').trim().toLowerCase();
       }
-      if (typeof data.availableStock === 'number') {
-        updates.availableStock = Math.max(0, data.availableStock - qty);
-      }
-      if (typeof data.quantity === 'number') {
-        updates.quantity = Math.max(0, data.quantity - qty);
-      }
 
-      // 2. Decrement Variant Stock if variants array exists
-      if (Array.isArray(data.variants) && data.variants.length > 0) {
-        const variants = data.variants.map(v => ({ ...v }));
+      // Exact match by ID or Key or (Size + Color)
+      let idx = variants.findIndex(v => {
+        if (!v) return false;
+        const vId = String(v.id || '').trim().toLowerCase();
+        const vKey = String(v.key || '').trim().toLowerCase();
+        if (targetKey && (vId === targetKey || vKey === targetKey)) return true;
 
-        const targetKey = String(variantKey || '').trim().toLowerCase();
-        let targetSize = String(sizeParam || '').trim().toUpperCase();
-        let targetColor = String(colorParam || '').trim().toLowerCase();
+        const vSize = String(v.size || '').trim().toUpperCase();
+        const vColor = String(v.color || '').trim().toLowerCase();
 
-        if (!targetSize && typeof variantKey === 'string' && variantKey.includes('::')) {
-          const parts = variantKey.split('::');
-          targetSize = String(parts[0] || '').trim().toUpperCase();
-          targetColor = String(parts[1] || '').trim().toLowerCase();
+        if (targetSize && targetColor) {
+          if (vSize === targetSize && (vColor === targetColor || !vColor || !targetColor || targetColor === 'default' || vColor === 'none' || targetColor.includes(vColor) || vColor.includes(targetColor))) return true;
         }
+        if (targetSize && vSize === targetSize) return true;
+        return false;
+      });
 
-        // Exact match by ID or Key or (Size + Color)
-        let idx = variants.findIndex(v => {
-          if (!v) return false;
-          const vId = String(v.id || '').trim().toLowerCase();
-          const vKey = String(v.key || '').trim().toLowerCase();
-          if (targetKey && (vId === targetKey || vKey === targetKey)) return true;
+      if (idx === -1 && targetSize) {
+        idx = variants.findIndex(v => String(v.size || '').trim().toUpperCase() === targetSize);
+      }
+      if (idx === -1) idx = 0;
 
-          const vSize = String(v.size || '').trim().toUpperCase();
-          const vColor = String(v.color || '').trim().toLowerCase();
+      const variant = { ...variants[idx] };
 
-          if (targetSize && targetColor) {
-            if (vSize === targetSize && (vColor === targetColor || !vColor || !targetColor || targetColor === 'default' || vColor === 'none')) return true;
-          }
-          if (targetSize && vSize === targetSize) return true;
-          return false;
-        });
-
-        if (idx === -1 && targetSize) {
-          idx = variants.findIndex(v => String(v.size || '').trim().toUpperCase() === targetSize);
+      if (typeof variant.stock === 'object' && variant.stock !== null) {
+        const stockMap = { ...variant.stock };
+        for (const k of Object.keys(stockMap)) {
+          stockMap[k] = Math.max(0, Number(stockMap[k] || 0) - qty);
         }
-        if (idx === -1) idx = 0;
-
-        const variant = { ...variants[idx] };
-
-        if (typeof variant.stock === 'object' && variant.stock !== null) {
-          const stockMap = { ...variant.stock };
-          const branchKeys = ['main', 'online', branchId, 'default', 'warehouse', 'store'];
-          let decremented = false;
-
-          branchKeys.forEach(k => {
-            if (stockMap[k] !== undefined && stockMap[k] !== null) {
-              stockMap[k] = Math.max(0, Number(stockMap[k] || 0) - qty);
-              decremented = true;
-            }
-          });
-
-          if (!decremented) {
-            const firstVal = Number(Object.values(stockMap)[0] || 0);
-            stockMap.main = Math.max(0, firstVal - qty);
-            stockMap.online = Math.max(0, firstVal - qty);
-          } else {
-            if (stockMap.main !== undefined && stockMap.online === undefined) stockMap.online = stockMap.main;
-            if (stockMap.online !== undefined && stockMap.main === undefined) stockMap.main = stockMap.online;
-          }
-
-          variant.stock = stockMap;
-        } else if (typeof variant.stock === 'number') {
-          variant.stock = Math.max(0, variant.stock - qty);
-        } else if (typeof variant.quantity === 'number') {
-          variant.quantity = Math.max(0, variant.quantity - qty);
-        } else {
-          variant.stock = { main: 0, online: 0 };
+        if (stockMap.main !== undefined) {
+          stockMap.online = stockMap.main;
         }
-
-        variants[idx] = variant;
-        updates.variants = variants;
+        variant.stock = stockMap;
+      } else if (typeof variant.stock === 'number') {
+        variant.stock = Math.max(0, variant.stock - qty);
+      } else if (typeof variant.quantity === 'number') {
+        variant.quantity = Math.max(0, variant.quantity - qty);
+      } else {
+        variant.stock = { main: 0, online: 0 };
       }
 
-      transaction.update(targetRef, updates);
-    });
+      variants[idx] = variant;
+      updates.variants = variants;
+
+      const totalVariantStock = variants.reduce((sum, v) => {
+        if (typeof v.stock === 'object' && v.stock !== null) return sum + (Number(v.stock.main || v.stock.online || 0));
+        return sum + Number(v.stock || 0);
+      }, 0);
+      updates.availableStock = totalVariantStock;
+      updates.stock = totalVariantStock;
+    }
+
+    await Promise.allSettled([
+      updateDoc(targetRef, updates),
+      setDoc(targetRef, updates, { merge: true })
+    ]);
+
+    // Invalidate local product caches to force fresh stock everywhere
+    try {
+      localStorage.removeItem(`tbc_cache_products_${COMPANY_ID}`);
+      sessionStorage.removeItem(`tbc_cache_products_${COMPANY_ID}`);
+    } catch (_) {}
 
     console.info(`[TBC] Stock successfully decremented for product ${productId}, qty ${qty}`);
     return { success: true };

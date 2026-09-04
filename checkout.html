@@ -1250,7 +1250,8 @@
       try {
         // 1. Live Validation against Firestore (Zero stale cache purchase)
         if (typeof window.validateCartForOrder === 'function') {
-          await window.validateCartForOrder(items, 'thebaniyancompany');
+          const validated = await window.validateCartForOrder(items, 'thebaniyancompany');
+          if (Array.isArray(validated) && validated.length > 0) items = validated;
         }
 
         let orderId = `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -1344,7 +1345,8 @@
 
       try {
         if (typeof window.validateCartForOrder === 'function') {
-          await window.validateCartForOrder(items, 'thebaniyancompany');
+          const validated = await window.validateCartForOrder(items, 'thebaniyancompany');
+          if (Array.isArray(validated) && validated.length > 0) items = validated;
         }
 
         let orderId = `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -1446,7 +1448,8 @@
       // Live Cart Validation before opening Razorpay
       try {
         if (typeof window.validateCartForOrder === 'function') {
-          await window.validateCartForOrder(items, 'thebaniyancompany');
+          const validated = await window.validateCartForOrder(items, 'thebaniyancompany');
+          if (Array.isArray(validated) && validated.length > 0) items = validated;
         }
       } catch (valErr) {
         alert(valErr.message || 'Validation error.');

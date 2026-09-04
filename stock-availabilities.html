@@ -252,20 +252,6 @@
             </div>
           </div>
 
-      <!-- Center Search Bar -->
-      <div class="flex-1 max-w-lg mx-2 sm:mx-6 hidden md:block">
-        <div class="relative">
-          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-          <input
-            type="text"
-            id="global-search-input"
-            oninput="handleSearchInput(this.value)"
-            placeholder="Search orders, products, customers..."
-            class="w-full bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:border-black focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2 outline-none transition"
-          >
-        </div>
-      </div>
-
       <!-- Right Header Action Controls -->
       <div class="flex items-center gap-2.5 sm:gap-3">
         <!-- + Add Product Button -->
@@ -286,11 +272,6 @@
         >
           <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-500"></i>
           <span>View Store</span>
-        </a>
-
-        <!-- Profile Avatar -->
-        <a href="admin.html" class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center hover:opacity-90 transition shadow-xs">
-          TB
         </a>
       </div>
     </div>
@@ -338,7 +319,7 @@
           📦
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-slate-900 tracking-tight" id="kpi-total-count">0</h2>
+          <h2 class="text-2xl font-bold text-slate-900 tracking-tight" id="kpi-total-count"><span class="inline-block w-8 h-6 skeleton-shimmer rounded"></span></h2>
           <span class="text-xs text-slate-500 font-medium">Total Products</span>
         </div>
       </div>
@@ -349,7 +330,7 @@
           <i data-lucide="check" class="w-6 h-6 stroke-[2.5]"></i>
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-emerald-600 tracking-tight" id="kpi-instock-count">0</h2>
+          <h2 class="text-2xl font-bold text-emerald-600 tracking-tight" id="kpi-instock-count"><span class="inline-block w-8 h-6 skeleton-shimmer rounded"></span></h2>
           <span class="text-xs text-slate-500 font-medium">In Stock</span>
         </div>
       </div>
@@ -360,7 +341,7 @@
           <i data-lucide="alert-triangle" class="w-6 h-6 stroke-[2]"></i>
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-amber-500 tracking-tight" id="kpi-lowstock-count">0</h2>
+          <h2 class="text-2xl font-bold text-amber-500 tracking-tight" id="kpi-lowstock-count"><span class="inline-block w-8 h-6 skeleton-shimmer rounded"></span></h2>
           <span class="text-xs text-slate-500 font-medium">Low Stock</span>
         </div>
       </div>
@@ -371,7 +352,7 @@
           <i data-lucide="x" class="w-6 h-6 stroke-[2.5]"></i>
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-rose-500 tracking-tight" id="kpi-outofstock-count">0</h2>
+          <h2 class="text-2xl font-bold text-rose-500 tracking-tight" id="kpi-outofstock-count"><span class="inline-block w-8 h-6 skeleton-shimmer rounded"></span></h2>
           <span class="text-xs text-slate-500 font-medium">Out of Stock</span>
         </div>
       </div>
@@ -462,7 +443,7 @@
           id="btn-status-all"
           class="status-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-black text-white transition shadow-2xs"
         >
-          All Items (<span id="pill-count-all">6</span>)
+          All Items (<span id="pill-count-all">-</span>)
         </button>
         <button
           type="button"
@@ -470,7 +451,7 @@
           id="btn-status-in_stock"
           class="status-tab px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
         >
-          In Stock (<span id="pill-count-in_stock">3</span>)
+          In Stock (<span id="pill-count-in_stock">-</span>)
         </button>
         <button
           type="button"
@@ -478,7 +459,7 @@
           id="btn-status-low"
           class="status-tab px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
         >
-          Low Stock (<span id="pill-count-low">2</span>)
+          Low Stock (<span id="pill-count-low">-</span>)
         </button>
         <button
           type="button"
@@ -486,7 +467,7 @@
           id="btn-status-critical"
           class="status-tab px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
         >
-          Critical (<span id="pill-count-critical">2</span>)
+          Critical (<span id="pill-count-critical">-</span>)
         </button>
         <button
           type="button"
@@ -494,7 +475,7 @@
           id="btn-status-out_of_stock"
           class="status-tab px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
         >
-          Out of Stock (<span id="pill-count-out_of_stock">2</span>)
+          Out of Stock (<span id="pill-count-out_of_stock">-</span>)
         </button>
       </div>
     </div>
@@ -944,15 +925,8 @@
        FIREBASE + APPLICATION LOGIC SCRIPT
   ========================================================= -->
   <script type="module">
-    import { db, auth } from './js/firebase-config.js';
-    import { 
-      collection, 
-      getDocs, 
-      doc, 
-      setDoc, 
-      writeBatch, 
-      serverTimestamp 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { db, auth, collection, getDocs, doc, setDoc, updateDoc, writeBatch, serverTimestamp } from './js/firebase-config.js';
+    import { getStoreProducts } from './js/products-service.js';
 
     // Global application state
     const COMPANY_ID = 'thebaniyancompany';
@@ -962,70 +936,124 @@
     window.activeStatusFilter = 'all';
     window.activeSearchTerm = '';
     window.stockHistoryLogs = [];
+    window.cachedRawProducts = [];
 
     // ==========================================
     // INITIALIZATION & FIRESTORE FETCH (REAL DATA ONLY)
     // ==========================================
     async function initInventoryPage() {
+      // 1. Instant 0ms cache hydration
+      try {
+        const cachedStr = localStorage.getItem(`tbc_cache_products_${COMPANY_ID}`);
+        if (cachedStr) {
+          const parsed = JSON.parse(cachedStr);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            populateInventory(parsed);
+          }
+        }
+      } catch (_) {}
+
+      // 2. Fresh fetch from Firestore
       try {
         const compSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'products'));
-        const rootSnap = await getDocs(collection(db, 'products'));
-        const allDocsMap = new Map();
-        rootSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
-        compSnap.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
+        const liveProds = [];
+        compSnap.forEach(d => liveProds.push({ id: d.id, ...d.data() }));
 
-        const liveItems = [];
-        allDocsMap.forEach((p, docId) => {
-          const pName = p.name || 'Untitled Product';
-          const cat = p.category || 'General';
-
-          if (Array.isArray(p.variants) && p.variants.length > 0) {
-            p.variants.forEach(v => {
-              const totalStock = Object.values(v.stock || {}).reduce((acc, num) => acc + (Number(num) || 0), 0);
-              let st = 'In Stock';
-              if (totalStock === 0) st = 'Out of Stock';
-              else if (totalStock <= 2) st = 'Critical';
-              else if (totalStock <= 5) st = 'Low';
-
-              liveItems.push({
-                id: `${docId}-${v.size}-${v.color}`,
-                productId: docId,
-                productName: pName,
-                variantName: `Size ${v.size} / ${v.color}`,
-                sku: v.sku || `${p.productId || docId}-${v.size}`,
-                category: cat,
-                currentStock: totalStock,
-                status: st,
-                stockByBranch: v.stock || { main: totalStock }
-              });
-            });
+        if (liveProds.length > 0) {
+          populateInventory(liveProds);
+          try {
+            localStorage.setItem(`tbc_cache_products_${COMPANY_ID}`, JSON.stringify(liveProds));
+          } catch (_) {}
+        } else {
+          // Check root products fallback
+          const rootSnap = await getDocs(collection(db, 'products'));
+          const rootProds = [];
+          rootSnap.forEach(d => rootProds.push({ id: d.id, ...d.data() }));
+          if (rootProds.length > 0) {
+            populateInventory(rootProds);
+            try {
+              localStorage.setItem(`tbc_cache_products_${COMPANY_ID}`, JSON.stringify(rootProds));
+            } catch (_) {}
           } else {
-            const stock = Number(p.availableStock || p.stock || 0);
+            const sProds = await getStoreProducts(COMPANY_ID, true);
+            if (Array.isArray(sProds) && sProds.length > 0) {
+              populateInventory(sProds);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Firestore load products notice:', err);
+        try {
+          const sProds = await getStoreProducts(COMPANY_ID, false);
+          if (Array.isArray(sProds) && sProds.length > 0) {
+            populateInventory(sProds);
+          }
+        } catch (_) {}
+      }
+    }
+
+    function populateInventory(prods) {
+      window.cachedRawProducts = prods;
+      const liveItems = [];
+      prods.forEach(p => {
+        const docId = p.id || p.productId;
+        const pName = p.name || 'Untitled Product';
+        const cat = p.category || 'General';
+
+        if (Array.isArray(p.variants) && p.variants.length > 0) {
+          p.variants.forEach(v => {
+            let totalStock = 0;
+            if (typeof v.stock === 'object' && v.stock !== null) {
+              totalStock = Object.values(v.stock).reduce((acc, num) => acc + (Number(num) || 0), 0);
+            } else if (typeof v.stock === 'number') {
+              totalStock = Math.max(0, v.stock);
+            } else if (typeof v.quantity === 'number') {
+              totalStock = Math.max(0, v.quantity);
+            }
+
             let st = 'In Stock';
-            if (stock === 0) st = 'Out of Stock';
-            else if (stock <= 2) st = 'Critical';
-            else if (stock <= 5) st = 'Low';
+            if (totalStock === 0) st = 'Out of Stock';
+            else if (totalStock <= 2) st = 'Critical';
+            else if (totalStock <= 5) st = 'Low';
 
             liveItems.push({
-              id: docId,
+              id: `${docId}-${v.size}-${v.color}`,
               productId: docId,
               productName: pName,
-              variantName: 'Standard',
-              sku: p.productId || docId,
+              variantName: `Size ${v.size} / ${v.color}`,
+              sku: v.sku || `${p.productId || docId}-${v.size}`,
+              size: v.size,
+              color: v.color,
               category: cat,
-              currentStock: stock,
+              currentStock: totalStock,
               status: st,
-              stockByBranch: { main: stock }
+              stockByBranch: (typeof v.stock === 'object' && v.stock !== null) ? v.stock : { main: totalStock }
             });
-          }
-        });
+          });
+        } else {
+          const stock = Number(p.availableStock || p.stock || 0);
+          let st = 'In Stock';
+          if (stock === 0) st = 'Out of Stock';
+          else if (stock <= 2) st = 'Critical';
+          else if (stock <= 5) st = 'Low';
 
-        window.inventoryItems = liveItems;
-      } catch (err) {
-        console.warn('Firestore load products error:', err);
-        window.inventoryItems = [];
-      }
+          liveItems.push({
+            id: docId,
+            productId: docId,
+            productName: pName,
+            variantName: 'Standard',
+            sku: p.productId || docId,
+            size: 'M',
+            color: 'Default',
+            category: cat,
+            currentStock: stock,
+            status: st,
+            stockByBranch: { main: stock }
+          });
+        }
+      });
 
+      window.inventoryItems = liveItems;
       applyAllFilters();
       initAddProductModalData();
       if (window.lucide && typeof window.lucide.createIcons === 'function') {
@@ -1311,23 +1339,69 @@
         // Persist to Firestore if product exists
         if (targetItem.productId) {
           try {
-            const productRef = doc(db, 'products', targetItem.productId);
             const tenantRef = doc(db, 'companies', COMPANY_ID, 'products', targetItem.productId);
-            const batch = writeBatch(db);
+            const globalRef = doc(db, 'products', targetItem.productId);
+            
+            let pSnap = await getDoc(tenantRef).catch(() => null);
+            if (!pSnap || !pSnap.exists()) {
+              pSnap = await getDoc(globalRef).catch(() => null);
+            }
 
-            batch.set(productRef, {
-              updatedAt: serverTimestamp(),
-              availableStock: newQty
-            }, { merge: true });
+            if (pSnap && pSnap.exists()) {
+              const pData = pSnap.data();
+              const variants = Array.isArray(pData.variants) ? pData.variants.map(v => ({ ...v })) : [];
+              const targetSize = String(targetItem.size || '').trim().toUpperCase();
+              const targetColor = String(targetItem.color || '').trim().toLowerCase();
 
-            batch.set(tenantRef, {
-              updatedAt: serverTimestamp(),
-              availableStock: newQty
-            }, { merge: true });
+              let vIdx = variants.findIndex(v => {
+                const s = String(v.size || '').trim().toUpperCase();
+                const c = String(v.color || '').trim().toLowerCase();
+                return s === targetSize && (c === targetColor || !c || !targetColor || c === 'none' || targetColor === 'default');
+              });
+              if (vIdx === -1 && targetSize) {
+                vIdx = variants.findIndex(v => String(v.size || '').trim().toUpperCase() === targetSize);
+              }
+              if (vIdx > -1) {
+                const v = variants[vIdx];
+                if (typeof v.stock === 'object' && v.stock !== null) {
+                  v.stock = { ...v.stock, main: newQty, online: newQty };
+                } else {
+                  v.stock = newQty;
+                }
+                variants[vIdx] = v;
+              }
 
-            await batch.commit();
+              let totalAvailable = 0;
+              if (variants.length > 0) {
+                totalAvailable = variants.reduce((sum, v) => {
+                  if (typeof v.stock === 'object' && v.stock !== null) return sum + (Number(v.stock.main || v.stock.online || 0));
+                  return sum + Number(v.stock || 0);
+                }, 0);
+              } else {
+                totalAvailable = newQty;
+              }
+
+              const payload = {
+                variants,
+                availableStock: totalAvailable,
+                stock: totalAvailable,
+                updatedAt: serverTimestamp()
+              };
+
+              await Promise.allSettled([
+                updateDoc(tenantRef, payload),
+                updateDoc(globalRef, payload),
+                setDoc(tenantRef, payload, { merge: true }),
+                setDoc(globalRef, payload, { merge: true })
+              ]);
+            } else {
+              await Promise.allSettled([
+                setDoc(tenantRef, { availableStock: newQty, stock: newQty, updatedAt: serverTimestamp() }, { merge: true }),
+                setDoc(globalRef, { availableStock: newQty, stock: newQty, updatedAt: serverTimestamp() }, { merge: true })
+              ]);
+            }
           } catch (dbErr) {
-            console.log('Local memory save succeeded (Firestore batch optional):', dbErr);
+            console.warn('Firestore stock save notice:', dbErr);
           }
         }
 
@@ -1850,8 +1924,8 @@
       window.location.href = 'admin.html';
     };
 
-    // Run on mount
-    window.addEventListener('DOMContentLoaded', () => {
+    // Robust Application Startup
+    function startStockApp() {
       try {
         const cachedLogo = localStorage.getItem('onespace_shop_logo') || localStorage.getItem('tbc_shop_logo');
         if (cachedLogo && document.getElementById('sidebar-shop-logo-img')) document.getElementById('sidebar-shop-logo-img').src = cachedLogo;
@@ -1859,7 +1933,13 @@
         if (cachedName && document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = cachedName;
       } catch(e) {}
       initInventoryPage();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startStockApp);
+    } else {
+      startStockApp();
+    }
   </script>
 
 </body>
