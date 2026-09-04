@@ -938,22 +938,41 @@
                     </div>
                   </div>
 
-                  <!-- 3. Free Delivery Above -->
+                  <!-- 3. Free Delivery Above (With ON / OFF Toggle Switch) -->
                   <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 shadow-2xs transition-all">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div class="space-y-1 max-w-lg">
+                    <div class="flex flex-col gap-3.5">
+                      <div class="flex items-center justify-between gap-3">
                         <div class="flex items-center gap-2">
                           <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 font-bold text-xs flex items-center justify-center shrink-0">3</span>
                           <h4 class="text-sm font-semibold text-slate-900">Free Delivery Above</h4>
-                          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/60">Free Shipping Minimum</span>
+                          <span id="ctrl-free-shipping-status-pill"
+                            class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">ENABLED</span>
                         </div>
-                        <p class="text-xs text-slate-500">Cart subtotal threshold in ₹ where shipping charges become automatically waived for 100% free delivery.</p>
+                        
+                        <!-- ON / OFF SWITCH -->
+                        <div class="flex items-center gap-2">
+                          <label class="relative inline-flex items-center cursor-pointer" title="Turn Free Shipping ON or OFF">
+                            <input type="checkbox" id="ctrl-free-shipping-toggle" class="sr-only peer" checked
+                              onchange="window.updateFreeShippingToggle(this)">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                          </label>
+                        </div>
                       </div>
-                      <div class="w-full sm:w-48 shrink-0">
-                        <div class="relative">
-                          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">₹</span>
-                          <input type="number" id="ctrl-free-shipping-min" placeholder="999" value="999"
-                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-900 font-semibold outline-none focus:border-black focus:bg-white transition">
+
+                      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1 border-t border-slate-100">
+                        <p class="text-xs text-slate-500 max-w-lg">
+                          When enabled, orders exceeding this cart subtotal receive 100% free delivery. Switch off to always charge standard regional delivery rates on all orders.
+                        </p>
+                        
+                        <div id="ctrl-free-shipping-input-box" class="w-full sm:w-56 shrink-0 transition-opacity">
+                          <div class="flex items-center gap-2">
+                            <span class="text-xs font-medium text-slate-600 whitespace-nowrap">Cart Min:</span>
+                            <div class="relative flex-1">
+                              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">₹</span>
+                              <input type="number" id="ctrl-free-shipping-min" placeholder="999" value="999"
+                                class="w-full bg-slate-50/80 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2 text-xs text-slate-900 font-semibold outline-none focus:border-black focus:bg-white transition">
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -3842,6 +3861,32 @@
       }
     };
 
+    window.updateFreeShippingToggle = function (checkboxEl) {
+      const isChecked = checkboxEl ? checkboxEl.checked : true;
+      const pill = document.getElementById('ctrl-free-shipping-status-pill');
+      const inputBox = document.getElementById('ctrl-free-shipping-input-box');
+      const input = document.getElementById('ctrl-free-shipping-min');
+      if (pill) {
+        if (isChecked) {
+          pill.textContent = 'ENABLED';
+          pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200';
+        } else {
+          pill.textContent = 'DISABLED';
+          pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800 border border-rose-200/60';
+        }
+      }
+      if (inputBox) {
+        if (isChecked) {
+          inputBox.classList.remove('opacity-40', 'pointer-events-none');
+        } else {
+          inputBox.classList.add('opacity-40', 'pointer-events-none');
+        }
+      }
+      if (input) {
+        input.disabled = !isChecked;
+      }
+    };
+
     document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('admin-email').value.trim();
@@ -3969,6 +4014,11 @@
         if (document.getElementById('ctrl-delivery-tn')) document.getElementById('ctrl-delivery-tn').value = comp.deliveryTnPrice !== undefined ? comp.deliveryTnPrice : (comp.deliveryTnFee !== undefined ? comp.deliveryTnFee : 0);
         if (document.getElementById('ctrl-delivery-non-tn')) document.getElementById('ctrl-delivery-non-tn').value = comp.deliveryNonTnPrice !== undefined ? comp.deliveryNonTnPrice : (comp.deliveryFee !== undefined ? comp.deliveryFee : 60);
         if (document.getElementById('ctrl-free-shipping-min') && comp.freeShippingMin !== undefined) document.getElementById('ctrl-free-shipping-min').value = comp.freeShippingMin;
+        const freeShippingToggle = document.getElementById('ctrl-free-shipping-toggle');
+        if (freeShippingToggle) {
+          freeShippingToggle.checked = comp.isFreeShippingEnabled !== undefined ? Boolean(comp.isFreeShippingEnabled) : (comp.freeShippingEnabled !== undefined ? Boolean(comp.freeShippingEnabled) : true);
+          window.updateFreeShippingToggle(freeShippingToggle);
+        }
         if (document.getElementById('ctrl-courier-partner') && comp.courierPartner) document.getElementById('ctrl-courier-partner').value = comp.courierPartner;
         if (document.getElementById('ctrl-tracking-pattern') && comp.trackingPattern) document.getElementById('ctrl-tracking-pattern').value = comp.trackingPattern;
 
@@ -4413,11 +4463,14 @@
       const deliveryTnPrice = Number(document.getElementById('ctrl-delivery-tn')?.value || 0);
       const deliveryNonTnPrice = Number(document.getElementById('ctrl-delivery-non-tn')?.value || 60);
       const freeShippingMin = Number(document.getElementById('ctrl-free-shipping-min')?.value || 999);
+      const isFreeShippingEnabled = document.getElementById('ctrl-free-shipping-toggle')?.checked ?? true;
 
       const res = await updateCompanySettings({
         deliveryTnPrice,
         deliveryNonTnPrice,
-        freeShippingMin
+        freeShippingMin,
+        isFreeShippingEnabled,
+        freeShippingEnabled: isFreeShippingEnabled
       }, COMPANY_ID);
 
       if (res.success) {

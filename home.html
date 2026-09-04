@@ -128,23 +128,44 @@
       pointer-events: none;
     }
 
-    #loading-screen {
+    /* Splash Screen Styles & Animations */
+    #splash-screen {
       position: fixed;
       inset: 0;
-      background: #f9f9f9;
-      z-index: 9999;
+      background: #09090b;
+      z-index: 99999;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0;
-      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s ease;
+      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.45s ease;
     }
 
-    #loading-screen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
+    .splash-fade-zoom-card {
+      animation: splashFadeZoom 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes splashFadeZoom {
+      0% {
+        opacity: 0;
+        transform: scale(0.84);
+        filter: blur(8px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+      }
+    }
+
+    #splash-screen.splash-exit,
+    #splash-screen.hidden {
+      opacity: 0 !important;
+      transform: scale(1.03);
+      filter: blur(4px);
+      visibility: hidden !important;
+      pointer-events: none !important;
+      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), transform 0.45s ease, filter 0.45s ease, visibility 0.45s ease;
     }
 
     .loading-bar-wrap {
@@ -215,16 +236,54 @@
 
 <body class="bg-background text-on-surface font-sans antialiased">
 
-  <!-- Loading Screen with Progression Bar & Percentage -->
-  <div id="loading-screen">
-    <div class="flex flex-col items-center text-center">
-      <img id="loading-company-logo" alt="OneSpaceCommerce Logo" class="h-12 object-contain rounded-xl" src="assets/onespace-commerce-logo.png"
-        onerror="this.src='assets/Onespace Commerce Logo PNG.png'">
-      <span class="text-[11px] font-bold uppercase tracking-[0.28em] text-neutral-800 mt-3">THE BANIYAN COMPANY</span>
-      <div class="loading-bar-wrap">
-        <div class="loading-bar-fill" id="loading-bar-fill"></div>
+  <!-- Splash Screen with Fade Zoom In Animation -->
+  <div id="splash-screen" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#09090b] text-white select-none cursor-pointer transition-all duration-500 overflow-hidden" title="Tap anywhere to enter">
+    
+    <!-- Ambient Radial Glow Behind Brand -->
+    <div class="absolute w-[500px] h-[500px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" style="background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 40%, transparent 70%);"></div>
+
+    <!-- Center Content with Fade Zoom-In Animation -->
+    <div class="splash-fade-zoom-card relative z-10 flex flex-col items-center text-center px-6 max-w-sm mx-auto">
+      
+      <!-- Shop Logo with Subtle Ring -->
+      <div class="relative mb-4">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-black/50 p-1 border border-white/15 shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-md">
+          <img id="splash-shop-logo" 
+            src="assets/tbclogo.jpeg" 
+            alt="The Baniyan Company" 
+            class="w-full h-full object-cover rounded-xl"
+            onerror="this.src='assets/tbclogo.jpeg'">
+        </div>
+        <div class="absolute -inset-1 rounded-2xl bg-white/10 filter blur-sm -z-10 animate-pulse"></div>
       </div>
-      <span id="loading-pct" class="text-[11px] font-semibold font-mono tracking-wider text-neutral-600 mt-2">0%</span>
+
+      <!-- Shop Name: THE BANIYAN COMPANY -->
+      <h1 class="text-xl sm:text-2xl font-black uppercase tracking-[0.28em] text-white drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)] leading-tight">
+        THE BANIYAN COMPANY
+      </h1>
+      <p class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400 mt-1.5">
+        Everyday Luxury &amp; Streetwear
+      </p>
+
+      <!-- Minimal Progress Line -->
+      <div class="w-36 h-[3px] bg-white/10 rounded-full overflow-hidden mt-6 relative shadow-inner">
+        <div id="splash-progress-bar" class="h-full bg-white rounded-full transition-all duration-150 ease-out" style="width: 0%;"></div>
+      </div>
+      <span id="splash-pct" class="text-[10px] font-bold font-mono tracking-widest text-neutral-400 mt-2">0%</span>
+
+      <!-- Below: Powered by OneSpace Commerce with logo -->
+      <div class="mt-8 pt-5 border-t border-white/10 flex items-center justify-center gap-2.5 w-full">
+        <span class="text-[10px] font-medium tracking-[0.22em] uppercase text-neutral-400">powered by</span>
+        <img 
+          src="assets/onespace-commerce-logo.png" 
+          onerror="this.src='assets/Onespace Commerce Logo PNG.png'" 
+          alt="OneSpace Commerce Logo" 
+          class="h-5 sm:h-6 w-auto object-contain rounded drop-shadow"
+        >
+        <span class="text-xs font-bold tracking-[0.18em] uppercase text-white">OneSpace Commerce</span>
+      </div>
+
+      <span class="text-[9px] font-medium tracking-[0.2em] uppercase text-neutral-500 mt-4">Tap anywhere to enter</span>
     </div>
   </div>
 

@@ -1,6 +1,7 @@
 /**
- * THE BANIYAN COMPANY — Loading Controller
- * Provides smooth, realistic progression loading bars and live percentage counters (0% - 100%).
+ * THE BANIYAN COMPANY — Loading & Splash Screen Controller
+ * Provides smooth cinematic progression, cached logo hydration,
+ * and seamless fade-out / zoom transitions.
  */
 
 (function () {
@@ -25,6 +26,8 @@
         if (logoImg && !logoImg.src.includes(logoUrl)) logoImg.src = logoUrl;
         const loadImg = document.getElementById('loading-company-logo');
         if (loadImg && !loadImg.src.includes(logoUrl)) loadImg.src = logoUrl;
+        const splashLogo = document.getElementById('splash-shop-logo');
+        if (splashLogo && !splashLogo.src.includes(logoUrl)) splashLogo.src = logoUrl;
       };
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', applyLogoImg);
@@ -36,25 +39,25 @@
 
   function createPageLoader(options) {
     const opts = Object.assign({
-      screenId: 'loading-screen',
-      barId: 'loading-bar-fill',
-      pctId: 'loading-pct',
+      screenId: 'splash-screen',
+      barId: 'splash-progress-bar',
+      pctId: 'splash-pct',
       statusId: 'loading-status',
       autoStart: true,
       minDuration: 400,
-      maxDuration: 5000,
+      maxDuration: 4500,
       onFinish: null
     }, options || {});
 
     let currentPct = 0;
-    let targetPct = 20;
+    let targetPct = 25;
     let isComplete = false;
     let timer = null;
     let animFrame = null;
 
-    const screenEl = document.getElementById(opts.screenId);
-    const barEl = document.getElementById(opts.barId) || screenEl?.querySelector('.loading-bar-fill');
-    const pctEl = document.getElementById(opts.pctId) || screenEl?.querySelector('.loading-percent') || screenEl?.querySelector('#loading-pct');
+    const screenEl = document.getElementById(opts.screenId) || document.getElementById('splash-screen') || document.getElementById('loading-screen');
+    const barEl = document.getElementById(opts.barId) || screenEl?.querySelector('#splash-progress-bar') || screenEl?.querySelector('.loading-bar-fill');
+    const pctEl = document.getElementById(opts.pctId) || screenEl?.querySelector('#splash-pct') || screenEl?.querySelector('.loading-percent') || screenEl?.querySelector('#loading-pct');
     const statusEl = document.getElementById(opts.statusId) || screenEl?.querySelector('.loading-status');
 
     function updateUI(val) {
@@ -69,19 +72,19 @@
 
     function step() {
       if (isComplete) {
-        currentPct += (100 - currentPct) * 0.3;
-        if (currentPct >= 99.5) {
+        currentPct += (100 - currentPct) * 0.35;
+        if (currentPct >= 99.4) {
           currentPct = 100;
           updateUI(100);
           cancelAnimationFrame(animFrame);
           clearInterval(timer);
-          setTimeout(fadeOutAndHide, 120);
+          setTimeout(fadeOutAndHide, 160);
           return;
         }
       } else {
         if (currentPct < targetPct) {
           const diff = targetPct - currentPct;
-          currentPct += Math.max(0.3, diff * 0.08);
+          currentPct += Math.max(0.35, diff * 0.08);
         }
       }
       updateUI(currentPct);
@@ -90,19 +93,22 @@
 
     function advanceStage() {
       if (isComplete) return;
-      if (targetPct < 40) {
-        targetPct = 40 + Math.random() * 15;
-      } else if (targetPct < 75) {
-        targetPct = 75 + Math.random() * 15;
-      } else if (targetPct < 92) {
-        targetPct = 92 + Math.random() * 5;
+      if (targetPct < 45) {
+        targetPct = 45 + Math.random() * 15;
+      } else if (targetPct < 80) {
+        targetPct = 80 + Math.random() * 12;
+      } else if (targetPct < 95) {
+        targetPct = 95 + Math.random() * 4;
       }
     }
 
     function fadeOutAndHide() {
       if (screenEl) {
-        screenEl.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s ease';
+        screenEl.classList.add('splash-exit');
+        screenEl.style.transition = 'opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), transform 0.45s ease, filter 0.45s ease, visibility 0.45s ease';
         screenEl.style.opacity = '0';
+        screenEl.style.transform = 'scale(1.03)';
+        screenEl.style.filter = 'blur(4px)';
         screenEl.style.pointerEvents = 'none';
         setTimeout(() => {
           screenEl.classList.add('hidden');
@@ -110,19 +116,27 @@
           if (typeof opts.onFinish === 'function') {
             opts.onFinish();
           }
-        }, 400);
+        }, 460);
       }
+    }
+
+    // Skip on click / tap
+    if (screenEl) {
+      screenEl.addEventListener('click', () => {
+        finish();
+        fadeOutAndHide();
+      });
     }
 
     function start() {
       if (!screenEl) return;
       screenEl.style.opacity = '1';
       screenEl.style.visibility = 'visible';
-      screenEl.classList.remove('hidden');
+      screenEl.classList.remove('hidden', 'splash-exit');
       updateUI(0);
 
       animFrame = requestAnimationFrame(step);
-      timer = setInterval(advanceStage, 250);
+      timer = setInterval(advanceStage, 220);
 
       setTimeout(() => {
         finish();
@@ -160,12 +174,12 @@
   };
 
   function initScreen() {
-    const screen = document.getElementById('loading-screen');
+    const screen = document.getElementById('splash-screen') || document.getElementById('loading-screen');
     if (screen && !window._pageLoaderInstance) {
       window._pageLoaderInstance = createPageLoader({
-        screenId: 'loading-screen',
-        barId: 'loading-bar-fill',
-        pctId: 'loading-pct',
+        screenId: screen.id,
+        barId: screen.id === 'splash-screen' ? 'splash-progress-bar' : 'loading-bar-fill',
+        pctId: screen.id === 'splash-screen' ? 'splash-pct' : 'loading-pct',
         autoStart: true
       });
     }
@@ -181,14 +195,16 @@
     if (window._pageLoaderInstance) {
       window._pageLoaderInstance.finish();
     } else {
-      const screen = document.getElementById('loading-screen');
+      const screen = document.getElementById('splash-screen') || document.getElementById('loading-screen');
       if (screen) {
-        screen.style.transition = 'opacity 0.4s ease';
+        screen.classList.add('splash-exit');
+        screen.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
         screen.style.opacity = '0';
+        screen.style.transform = 'scale(1.03)';
         setTimeout(() => {
           screen.classList.add('hidden');
           screen.style.display = 'none';
-        }, 400);
+        }, 450);
       }
     }
   };
@@ -197,6 +213,6 @@
   window.addEventListener('load', () => {
     setTimeout(() => {
       window.finishPageLoading();
-    }, 200);
+    }, 280);
   });
 })();

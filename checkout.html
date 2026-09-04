@@ -680,7 +680,29 @@
 
     let deliveryTnPrice = 0;
     let deliveryNonTnPrice = 60;
+    let freeShippingMin = 999;
+    let isFreeShippingEnabled = true;
     let pincodeFetchDebounce = null;
+
+    function getOrderDeliveryInfo(stateStr, subtotalVal = 0) {
+      const isTN = (stateStr || '').toLowerCase().includes('tamil nadu') || (stateStr || '').toLowerCase().includes('tn');
+      if (isFreeShippingEnabled && subtotalVal >= freeShippingMin) {
+        return {
+          deliveryFee: 0,
+          deliveryLabel: `FREE (Order over ₹${freeShippingMin})`,
+          isFree: true
+        };
+      }
+      const fee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+      const label = isTN
+        ? (deliveryTnPrice === 0 ? 'FREE (Tamil Nadu)' : `₹${deliveryTnPrice}`)
+        : `₹${deliveryNonTnPrice} (Outside TN)`;
+      return {
+        deliveryFee: fee,
+        deliveryLabel: label,
+        isFree: fee === 0
+      };
+    }
 
     import { getCompany } from './js/products-service.js';
     import { fetchIndiaPincodeDetails } from './js/pincode-service.js';
@@ -779,6 +801,9 @@
         }
         if (comp.deliveryTnPrice !== undefined) deliveryTnPrice = Number(comp.deliveryTnPrice);
         if (comp.deliveryNonTnPrice !== undefined) deliveryNonTnPrice = Number(comp.deliveryNonTnPrice);
+        if (comp.freeShippingMin !== undefined) freeShippingMin = Number(comp.freeShippingMin);
+        if (comp.isFreeShippingEnabled !== undefined) isFreeShippingEnabled = Boolean(comp.isFreeShippingEnabled);
+        else if (comp.freeShippingEnabled !== undefined) isFreeShippingEnabled = Boolean(comp.freeShippingEnabled);
         if (comp.isCodEnabled !== undefined) {
           const codWrapper = document.getElementById('cod-option-wrapper');
           if (codWrapper) {
@@ -884,11 +909,10 @@
       const totals = tbcCart.getCartTotals();
       const state = (document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
 
-      const isTN = state.toLowerCase().includes('tamil nadu');
-      const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
-      const deliveryLabel = isTN
-        ? (deliveryTnPrice === 0 ? 'FREE (Tamil Nadu)' : `₹${deliveryTnPrice}`)
-        : `₹${deliveryNonTnPrice} (Outside TN)`;
+      const deliveryInfo = getOrderDeliveryInfo(state, totals.subtotal);
+      const deliveryFee = deliveryInfo.deliveryFee;
+      const deliveryLabel = deliveryInfo.deliveryLabel;
+      const isDeliveryFree = deliveryInfo.isFree;
 
       const grandTotal = totals.grandTotal + deliveryFee;
       const box = document.getElementById('order-summary-box');
@@ -961,7 +985,7 @@
               <span>₹${totals.tax.toLocaleString('en-IN')}</span>
             </div>
           ` : ''}
-          <div class="flex justify-between ${isTN && deliveryTnPrice === 0 ? 'text-emerald-600 font-bold' : 'text-secondary font-semibold'}">
+          <div class="flex justify-between ${isDeliveryFree ? 'text-emerald-600 font-bold' : 'text-secondary font-semibold'}">
             <span>Express Shipping 🚚</span>
             <span>${deliveryLabel}</span>
           </div>
@@ -1073,8 +1097,8 @@
       const items = window.tbcCart ? window.tbcCart.getCart() : [];
       const totals = window.tbcCart ? window.tbcCart.getCartTotals() : { grandTotal: 0, itemCount: 0, subtotal: 0 };
       
-      const isTN = (cust.state || '').toLowerCase().includes('tamil nadu');
-      const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+      const deliveryInfo = getOrderDeliveryInfo(cust.state, totals.subtotal);
+      const deliveryFee = deliveryInfo.deliveryFee;
       const grandTotal = totals.grandTotal + deliveryFee;
 
       pendingConfirmedOrderAction = actionType;
@@ -1110,7 +1134,7 @@
       if (cityStateEl) cityStateEl.textContent = `${cust.city}, ${cust.state}`;
       if (pinEl) pinEl.textContent = cust.pincode;
       if (itemsCountEl) itemsCountEl.textContent = `${totals.itemCount || items.length} Item${(totals.itemCount || items.length) !== 1 ? 's' : ''}`;
-      if (shippingEl) shippingEl.textContent = isTN ? (deliveryTnPrice === 0 ? 'FREE (Tamil Nadu)' : `₹${deliveryTnPrice}`) : `₹${deliveryNonTnPrice} (Outside TN)`;
+      if (shippingEl) shippingEl.textContent = deliveryInfo.deliveryLabel;
       if (totalEl) totalEl.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
 
       const selectedPayRadio = document.querySelector('input[name="pay-method"]:checked')?.value || 'Razorpay';
@@ -1205,9 +1229,9 @@
       const customer = getCustomerDetails();
       const items = tbcCart.getCart();
       const totals = tbcCart.getCartTotals();
-      const state = (document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
-      const isTN = state.toLowerCase().includes('tamil nadu') || state.toLowerCase().includes('tn');
-      const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+      const state = (document.getElementById('cust-state')?.value || customer.state || 'Tamil Nadu').trim();
+      const deliveryInfo = getOrderDeliveryInfo(state, totals.subtotal);
+      const deliveryFee = deliveryInfo.deliveryFee;
       const finalTotal = totals.grandTotal + deliveryFee;
       const cleanPhone = (customer.phone || '').replace(/\D/g, '').slice(-10);
 
@@ -1285,9 +1309,9 @@
       const customer = getCustomerDetails();
       const items = tbcCart.getCart();
       const totals = tbcCart.getCartTotals();
-      const state = (document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
-      const isTN = state.toLowerCase().includes('tamil nadu') || state.toLowerCase().includes('tn');
-      const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+      const state = (document.getElementById('cust-state')?.value || customer.state || 'Tamil Nadu').trim();
+      const deliveryInfo = getOrderDeliveryInfo(state, totals.subtotal);
+      const deliveryFee = deliveryInfo.deliveryFee;
       const finalTotal = totals.grandTotal + deliveryFee;
       const cleanPhone = (customer.phone || '').replace(/\D/g, '').slice(-10);
 
@@ -1373,8 +1397,8 @@
 
       const liveKey = 'rzp_live_TM8qhpQTojuGA9';
       const stateStr = (customer.state || document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
-      const isTN = stateStr.toLowerCase().includes('tamil nadu') || stateStr.toLowerCase().includes('tn');
-      const deliveryFee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
+      const deliveryInfo = getOrderDeliveryInfo(stateStr, totals.subtotal);
+      const deliveryFee = deliveryInfo.deliveryFee;
       const finalTotal = totals.grandTotal + deliveryFee;
       const finalAmountPaise = Math.round(finalTotal * 100);
       const cleanPhone = (customer.phone || '').replace(/\D/g, '').slice(-10);

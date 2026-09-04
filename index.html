@@ -1,146 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>THE BANIYAN COMPANY — Coming Soon | Becoming Bigger</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  
+  <title>THE BANIYAN COMPANY — Official Apparel Store</title>
   <!-- Favicon Logo -->
   <link rel="icon" type="image/png" href="assets/onespace-commerce-logo.png">
   <link rel="shortcut icon" href="assets/onespace-commerce-logo.png">
   <link rel="apple-touch-icon" href="assets/onespace-commerce-logo.png">
-  <meta name="description" content="THE BANIYAN COMPANY — Coming Soon. Something bigger is on the way. Premium Everyday Luxury & Streetwear Essentials.">
-  
-  <!-- Fonts & Material Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,300;1,700;1,900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
+  <meta name="description"
+    content="Shop afforable clothing, co-ords, undershirts, and streetwear essentials at The Baniyan Company.">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    name="viewport">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet">
+  <script src="./js/loading-controller.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
     tailwind.config = {
+      darkMode: "class",
       theme: {
         extend: {
-          fontFamily: {
-            montserrat: ['Montserrat', 'sans-serif'],
-            sans: ['Inter', 'sans-serif'],
-          }
+          colors: {
+            "background": "#f9f9f9",
+            "on-surface": "#1b1b1b",
+            "primary": "#000000",
+            "on-primary": "#ffffff",
+            "secondary": "#5e5e5e",
+            "surface": "#f9f9f9",
+            "surface-container": "#eeeeee",
+            "surface-container-low": "#f3f3f3",
+            "surface-container-high": "#e8e8e8",
+            "surface-container-highest": "#e2e2e2",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff"
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
       }
     }
   </script>
-
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
+    body {
+      text-transform: uppercase;
     }
 
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100vh;
-      background-color: #050505;
-      color: #ffffff;
-      font-family: 'Montserrat', sans-serif;
-      overflow-x: hidden;
+    .material-symbols-outlined,
+    .material-symbols-rounded,
+    .material-icons,
+    svg,
+    script,
+    style {
+      text-transform: none !important;
     }
 
-    /* Ambient Background Radial Glows */
-    .bg-glow-main {
-      position: fixed;
-      width: 750px;
-      height: 750px;
-      background: radial-gradient(circle, rgba(234, 179, 8, 0.12) 0%, rgba(217, 119, 6, 0.05) 35%, transparent 70%);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 0;
-      animation: pulseGlow 7s infinite ease-in-out;
-    }
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
 
-    .bg-glow-subtle {
-      position: fixed;
-      width: 900px;
-      height: 900px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 65%);
-      top: 45%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
-    }
-
-    /* Shimmer Gradient Text Effect */
-    .shimmer-text-gold {
-      background: linear-gradient(135deg, #ffffff 0%, #fef08a 35%, #eab308 65%, #ffffff 100%);
-      background-size: 250% auto;
-      color: transparent;
-      -webkit-background-clip: text;
-      background-clip: text;
-      animation: shineGold 4s linear infinite;
-    }
-
-    @keyframes shineGold {
-      to {
-        background-position: 250% center;
+      100% {
+        background-position: 200% 0;
       }
     }
 
-    .shimmer-text-white {
-      background: linear-gradient(135deg, #ffffff 0%, #94a3b8 50%, #ffffff 100%);
-      background-size: 200% auto;
-      color: transparent;
-      -webkit-background-clip: text;
-      background-clip: text;
-      animation: shineGold 5s linear infinite;
+    .shimmer-light {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%) !important;
+      background-size: 200% 100% !important;
+      animation: shimmer 1.5s infinite linear !important;
     }
 
-    /* Animated Gold Luxury Line */
-    .glow-line {
-      height: 2px;
+    /* ── Golden Glowing Luxury Offer Chip ── */
+    @keyframes goldAuraGlow {
+      0%, 100% {
+        box-shadow: 0 0 8px rgba(234, 179, 8, 0.4), 0 0 16px rgba(217, 119, 6, 0.2), inset 0 0 6px rgba(253, 224, 71, 0.2);
+        border-color: #EAB308;
+        outline-color: rgba(234, 179, 8, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 16px rgba(250, 204, 21, 0.8), 0 0 28px rgba(234, 179, 8, 0.45), inset 0 0 12px rgba(254, 240, 138, 0.4);
+        border-color: #FDE047;
+        outline-color: rgba(250, 204, 21, 0.9);
+      }
+    }
+
+    @keyframes goldShimmerSweep {
+      0% { transform: translateX(-150%) skewX(-20deg); }
+      35%, 100% { transform: translateX(220%) skewX(-20deg); }
+    }
+
+    .golden-offer-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: linear-gradient(135deg, #141108 0%, #241c09 50%, #100d04 100%);
+      color: #FDE047;
+      border: 1.5px solid #EAB308;
+      outline: 1.5px solid rgba(234, 179, 8, 0.45);
+      outline-offset: 1.5px;
+      border-radius: 9999px;
+      padding: 2.5px 8px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      animation: goldAuraGlow 2.5s infinite ease-in-out;
+      user-select: none;
+      vertical-align: middle;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      white-space: nowrap;
+    }
+
+    .golden-offer-chip::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      max-width: 320px;
-      background: linear-gradient(90deg, transparent 0%, #eab308 30%, #fde047 50%, #eab308 70%, transparent 100%);
-      box-shadow: 0 0 16px rgba(234, 179, 8, 0.7);
-      animation: lineExpand 2.2s ease-out forwards;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
+      animation: goldShimmerSweep 3.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
     }
 
-    @keyframes lineExpand {
-      0% { transform: scaleX(0); opacity: 0; }
-      100% { transform: scaleX(1); opacity: 1; }
+    /* Splash Screen Styles & Animations */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      background: #09090b;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.45s ease;
     }
 
-    /* Entrance Fade & Grow Animations */
-    .animate-grow-title {
-      opacity: 0;
-      animation: growTitle 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+    .splash-fade-zoom-card {
+      animation: splashFadeZoom 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .animate-fade-up {
-      opacity: 0;
-      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
-    }
-
-    .animate-fade-up-delayed {
-      opacity: 0;
-      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
-    }
-
-    @keyframes growTitle {
+    @keyframes splashFadeZoom {
       0% {
         opacity: 0;
-        transform: scale(0.88);
-        letter-spacing: 0.15em;
-        filter: blur(12px);
+        transform: scale(0.84);
+        filter: blur(8px);
       }
       100% {
         opacity: 1;
@@ -149,105 +158,1201 @@
       }
     }
 
-    @keyframes fadeUp {
+    #splash-screen.splash-exit,
+    #splash-screen.hidden {
+      opacity: 0 !important;
+      transform: scale(1.03);
+      filter: blur(4px);
+      visibility: hidden !important;
+      pointer-events: none !important;
+      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), transform 0.45s ease, filter 0.45s ease, visibility 0.45s ease;
+    }
+
+    .loading-bar-wrap {
+      width: 160px;
+      height: 3.5px;
+      background: #e5e5e5;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      margin-top: 14px;
+    }
+
+    .loading-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #000000;
+      border-radius: 999px;
+      transition: width 0.08s linear;
+      position: relative;
+    }
+
+    /* Category circle cards scroll */
+    .category-circle-card {
+      scroll-snap-align: start;
+      flex-shrink: 0;
+    }
+
+    /* Testimonial slider */
+    .testimonial-carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .testimonial-item {
+      scroll-snap-align: center;
+      flex-shrink: 0;
+    }
+
+    /* Liquid Pop Animation for Wishlist buttons */
+    @keyframes liquidPop {
       0% {
-        opacity: 0;
-        transform: translateY(22px);
+        transform: scale(1);
       }
+
+      40% {
+        transform: scale(1.45) rotate(-12deg);
+        filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.7));
+      }
+
+      70% {
+        transform: scale(0.85) rotate(6deg);
+      }
+
       100% {
-        opacity: 1;
-        transform: translateY(0);
+        transform: scale(1) rotate(0deg);
       }
     }
 
-    /* Floating Badge Animation */
-    @keyframes floatSlow {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .animate-float {
-      animation: floatSlow 4s ease-in-out infinite;
-    }
-
-    /* Golden Chip Glow */
-    .gold-glow-chip {
-      box-shadow: 0 0 15px rgba(234, 179, 8, 0.25), inset 0 0 10px rgba(254, 240, 138, 0.15);
-      border: 1px solid rgba(234, 179, 8, 0.5);
+    .animate-liquid-pop {
+      animation: liquidPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
   </style>
 </head>
-<body class="flex flex-col justify-between items-center min-h-screen px-4 py-8 relative selection:bg-yellow-500 selection:text-black">
 
-  <!-- Background Glow Elements -->
-  <div class="bg-glow-main"></div>
-  <div class="bg-glow-subtle"></div>
+<body class="bg-background text-on-surface font-sans antialiased">
 
-  <!-- Top Header Navigation / Brand Badge -->
-  <header class="relative z-10 w-full max-w-screen-xl flex justify-between items-center py-2 px-2 md:px-6">
-    <div class="flex items-center gap-3">
-      <img 
-        src="assets/onespace-commerce-logo.png" 
-        onerror="this.src='assets/Onespace Commerce Logo PNG.png'" 
-        alt="The Baniyan Company Logo" 
-        class="h-10 md:h-12 w-auto object-contain rounded-xl shadow-lg border border-white/10"
-      >
-      <span class="text-xs md:text-sm font-extrabold tracking-[0.25em] uppercase text-white/90">
+  <!-- Splash Screen with Fade Zoom In Animation -->
+  <div id="splash-screen" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#09090b] text-white select-none cursor-pointer transition-all duration-500 overflow-hidden" title="Tap anywhere to enter">
+    
+    <!-- Ambient Radial Glow Behind Brand -->
+    <div class="absolute w-[500px] h-[500px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" style="background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 40%, transparent 70%);"></div>
+
+    <!-- Center Content with Fade Zoom-In Animation -->
+    <div class="splash-fade-zoom-card relative z-10 flex flex-col items-center text-center px-6 max-w-sm mx-auto">
+      
+      <!-- Shop Logo with Subtle Ring -->
+      <div class="relative mb-4">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-black/50 p-1 border border-white/15 shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-md">
+          <img id="splash-shop-logo" 
+            src="assets/tbclogo.jpeg" 
+            alt="The Baniyan Company" 
+            class="w-full h-full object-cover rounded-xl"
+            onerror="this.src='assets/tbclogo.jpeg'">
+        </div>
+        <div class="absolute -inset-1 rounded-2xl bg-white/10 filter blur-sm -z-10 animate-pulse"></div>
+      </div>
+
+      <!-- Shop Name: THE BANIYAN COMPANY -->
+      <h1 class="text-xl sm:text-2xl font-black uppercase tracking-[0.28em] text-white drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)] leading-tight">
         THE BANIYAN COMPANY
-      </span>
+      </h1>
+      <p class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400 mt-1.5">
+        Everyday Luxury &amp; Streetwear
+      </p>
+
+      <!-- Minimal Progress Line -->
+      <div class="w-36 h-[3px] bg-white/10 rounded-full overflow-hidden mt-6 relative shadow-inner">
+        <div id="splash-progress-bar" class="h-full bg-white rounded-full transition-all duration-150 ease-out" style="width: 0%;"></div>
+      </div>
+      <span id="splash-pct" class="text-[10px] font-bold font-mono tracking-widest text-neutral-400 mt-2">0%</span>
+
+      <!-- Below: Powered by OneSpace Commerce with logo -->
+      <div class="mt-8 pt-5 border-t border-white/10 flex items-center justify-center gap-2.5 w-full">
+        <span class="text-[10px] font-medium tracking-[0.22em] uppercase text-neutral-400">powered by</span>
+        <img 
+          src="assets/onespace-commerce-logo.png" 
+          onerror="this.src='assets/Onespace Commerce Logo PNG.png'" 
+          alt="OneSpace Commerce Logo" 
+          class="h-5 sm:h-6 w-auto object-contain rounded drop-shadow"
+        >
+        <span class="text-xs font-bold tracking-[0.18em] uppercase text-white">OneSpace Commerce</span>
+      </div>
+
+      <span class="text-[9px] font-medium tracking-[0.2em] uppercase text-neutral-500 mt-4">Tap anywhere to enter</span>
     </div>
+  </div>
 
-    <!-- Direct Store Entry Button -->
-    
-  </header>
+  <!-- Header -->
+  <header
+    class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-all">
+    <div class="max-w-screen-xl mx-auto h-16 px-4 md:px-8 flex items-center justify-between">
+      <!-- Wishlist Button -->
+      <a href="whislist" aria-label="Wishlist"
+        class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors">
+        <span class="material-symbols-outlined text-on-surface text-[22px]">favorite_border</span>
+      </a>
 
-  <!-- Main Hero Content Center -->
-  <main class="relative z-10 flex-1 flex flex-col justify-center items-center text-center max-w-4xl mx-auto py-12 px-2">
-    
-    <!-- Top Pill Badge -->
-    <div class="animate-float mb-6">
-      <div class="gold-glow-chip inline-flex items-center gap-2 bg-black/60 backdrop-blur-xl px-4 py-1.5 rounded-full text-yellow-300 text-[10px] md:text-xs font-extrabold uppercase tracking-[0.3em]">
-        <span class="w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span>
-        OFFICIAL LAUNCHING SOON
+      <!-- Center Logo & Store Name -->
+      <a href="home" class="flex items-center gap-2.5">
+        <img id="nav-company-logo" alt="The Baniyan Company" class="h-9 w-9 object-cover rounded-full border border-black/10"
+          src="assets/tbclogo.jpeg" onerror="this.src='assets/tbclogo.jpg';">
+        <span id="nav-company-name"
+          class="font-semibold tracking-[0.12em] text-sm md:text-base text-primary uppercase hidden sm:inline-block">THE
+          BANIYAN COMPANY</span>
+      </a>
+
+      <!-- Top Right Actions: Search, Cart & Profile Dropdown -->
+      <div class="flex items-center gap-2 md:gap-3">
+        <a href="shop.html?focus=search" aria-label="Search"
+          class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors">
+          <span class="material-symbols-outlined text-on-surface text-[22px]">search</span>
+        </a>
+
+        <!-- Header Cart Icon Button -->
+        <a href="cart" aria-label="Cart"
+          class="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors">
+          <span class="material-symbols-outlined text-on-surface text-[22px]">shopping_bag</span>
+          <span
+            class="cart-badge-count absolute -top-0.5 -right-0.5 bg-red-600 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm">0</span>
+        </a>
+
+        <!-- Profile Dropdown -->
+        <div class="relative">
+          <button onclick="toggleProfileDropdown(event)" aria-label="Profile Menu"
+            class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary hover:opacity-90 transition-opacity focus:outline-none shadow-sm">
+            <span class="material-symbols-outlined text-[18px]">person</span>
+          </button>
+
+          <div id="profile-dropdown"
+            class="hidden absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-black/10 py-2 z-50 transition-all">
+            <a href="profile"
+              class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-black/5 transition-colors">
+              <span class="material-symbols-outlined text-[18px]">person</span> My Profile
+            </a>
+            <a href="whislist"
+              class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-black/5 transition-colors">
+              <span class="material-symbols-outlined text-[18px]">favorite</span> Wishlist
+            </a>
+            <a href="profile#orders"
+              class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-black/5 transition-colors">
+              <span class="material-symbols-outlined text-[18px]">local_shipping</span> My Orders
+            </a>
+          </div>
+        </div>
       </div>
     </div>
+  </header>
 
-    <!-- Brand Name Highlight -->
-    <h2 class="text-xs sm:text-sm md:text-base font-extrabold tracking-[0.4em] uppercase text-neutral-400 mb-3 animate-fade-up">
-      THE BANIYAN COMPANY
-    </h2>
+  <main class="pt-16 pb-28 md:pb-20 bg-background min-h-screen">
+    <div class="w-full">
 
-    <!-- HUGE "COMING SOON" TITLE -->
-    <h1 class="animate-grow-title text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-none mb-4 shimmer-text-gold drop-shadow-[0_10px_35px_rgba(234,179,8,0.3)]">
-      COMING SOON
-    </h1>
+      <!-- Dynamic Hero Banner Carousel -->
+      <section class="max-w-screen-xl mx-auto px-4 md:px-8 pt-3 pb-1">
+        <div
+          class="relative w-full h-[210px] sm:h-[260px] md:h-[300px] overflow-hidden rounded-3xl group shadow-md border border-black/5">
+          <!-- Slides Wrapper -->
+          <div id="hero-banner-slider" class="w-full h-full flex transition-transform duration-700 ease-out">
 
-    <!-- BIG "BECOMING BIGGER" SUBTEXT -->
-    <div class="animate-fade-up">
-      <p class="text-xl sm:text-3xl md:text-4xl font-extrabold tracking-[0.2em] text-white uppercase mb-6 shimmer-text-white">
-        BECOMING BIGGER. STAY TUNED.
-      </p>
+            <!-- Primary Banner Slide -->
+            <div class="w-full h-full flex-shrink-0 relative flex items-end">
+              <div
+                class="absolute inset-0 bg-cover bg-center transition-all duration-500 bg-gradient-to-r from-black via-neutral-900 to-black">
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+              <div class="relative z-10 px-5 md:px-8 pb-5 md:pb-6 w-full">
+                <span
+                  class="text-[10px] md:text-xs tracking-[0.25em] uppercase mb-1 block font-medium text-white/80">THE
+                  BANIYAN COMPANY</span>
+                <h1 class="text-xl sm:text-2xl md:text-4xl font-bold text-white mb-2 leading-tight">Premium Apparel
+                  Collection</h1>
+                <div class="flex flex-wrap gap-2">
+                  <a href="shop"
+                    class="bg-white text-black px-4 py-2 rounded-xl font-semibold text-[11px] tracking-wider uppercase hover:bg-surface-container transition-transform active:scale-95 shadow-md">Shop
+                    Catalog</a>
+                  <a href="reels"
+                    class="border border-white/80 text-white px-4 py-2 rounded-xl font-semibold text-[11px] tracking-wider uppercase backdrop-blur-md hover:bg-white/10 transition-colors flex items-center gap-1">Watch
+                    Reels <span class="material-symbols-outlined text-[14px]">play_circle</span></a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Navigation Arrows -->
+          <button onclick="prevHeroSlide()" aria-label="Previous Slide"
+            class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all opacity-0 group-hover:opacity-100">
+            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+          </button>
+          <button onclick="nextHeroSlide()" aria-label="Next Slide"
+            class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all opacity-0 group-hover:opacity-100">
+            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+          </button>
+
+          <!-- Pagination Slide Indicator Dots -->
+          <div
+            class="absolute top-3 right-4 z-20 flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+            <button onclick="setHeroSlide(0)" id="hero-dot-0"
+              class="w-2 h-2 rounded-full bg-white transition-all shadow-md scale-125"></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories Section: Compact Curved Square Icon Badges -->
+      <section class="max-w-screen-xl mx-auto px-4 md:px-8 py-3 md:py-4">
+        <div class="flex flex-col mb-3">
+          <span class="text-[10px] text-secondary tracking-widest uppercase mb-0.5 font-semibold">Discover</span>
+          <h2 class="text-base md:text-lg font-bold text-on-surface">Shop by Category</h2>
+        </div>
+
+        <div id="home-category-list" class="flex items-center gap-4 md:gap-6 overflow-x-auto no-scrollbar py-1">
+          <div class="animate-pulse flex gap-4">
+            <div class="w-[64px] h-[64px] rounded-2xl bg-surface-container"></div>
+            <div class="w-[64px] h-[64px] rounded-2xl bg-surface-container"></div>
+            <div class="w-[64px] h-[64px] rounded-2xl bg-surface-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Curated Collections Section (Optimized Spacing for Phone View) -->
+      <section class="bg-surface-container-low pt-[5px] pb-4 md:pb-8">
+        <div class="max-w-screen-xl mx-auto px-4 md:px-8">
+          <div class="flex justify-between items-end mb-3">
+            <div>
+              <span class="text-[10px] text-secondary tracking-widest uppercase mb-0.5 font-semibold">Fresh</span>
+              <h2 class="text-lg md:text-xl font-bold text-on-surface">Curated Collections</h2>
+            </div>
+            <a class="text-xs font-semibold text-primary underline underline-offset-4" href="shop">See All</a>
+          </div>
+
+          <!-- Filter Options Pills -->
+          <div class="home-filter-pills flex gap-2 overflow-x-auto no-scrollbar mb-6 py-1">
+            <button onclick="filterHomeCategory('all', this)"
+              class="home-filter-btn bg-black text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all">All</button>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5" id="home-product-grid">
+            <div class="col-span-full py-8 text-center text-xs text-secondary flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Loading Products...
+            </div>
+          </div>
+
+          <!-- Home Pagination Sentinel -->
+          <div id="home-pagination-sentinel" class="py-6 flex flex-col items-center justify-center gap-2 text-center hidden">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full shadow-sm text-xs font-semibold text-neutral-700">
+              <svg class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Loading next 20 products...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Explore More Reels Banner Card -->
+      <section class="max-w-screen-xl mx-auto px-4 md:px-8 py-6">
+        <a href="reels"
+          class="group relative block w-full rounded-3xl overflow-hidden shadow-lg bg-gradient-to-r from-neutral-900 via-black to-neutral-900 border border-black/10 p-6 md:p-10 transition-transform active:scale-[0.99]">
+          <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10"></div>
+          <div class="relative z-20 max-w-md">
+            <div
+              class="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest mb-3">
+              <span class="material-symbols-outlined text-[14px]">movie</span> Video Lookbook
+            </div>
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">Explore More Reels</h2>
+            <p class="text-xs md:text-sm text-white/80 mb-5">See our latest looks, outfits, and styling videos in
+              immersive full screen.</p>
+            <span
+              class="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider group-hover:bg-neutral-200 transition-colors shadow-md">
+              Watch All Reels <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </span>
+          </div>
+        </a>
+      </section>
+
+      <!-- Feedback & Automatic Horizontal Scroll Testimonials Slider -->
+      <section class="max-w-screen-xl mx-auto px-4 md:px-8 py-16">
+        <div class="text-center mb-10">
+          <span class="text-xs text-secondary tracking-widest uppercase mb-2 block font-semibold">Customers</span>
+          <h2 class="text-2xl md:text-3xl font-bold text-on-surface mb-3">Loved by Thousands</h2>
+          <div class="flex items-center justify-center gap-2">
+            <div class="flex text-amber-500">
+              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span class="material-symbols-outlined text-[20px]"
+                style="font-variation-settings: 'FILL' 1;">star_half</span>
+            </div>
+            <span class="text-sm font-semibold text-on-surface">4.8 · 3,200+ verified reviews</span>
+          </div>
+        </div>
+
+        <!-- Testimonials Horizontal Automatic Carousel -->
+        <div class="relative">
+          <div id="testimonialCarousel" class="testimonial-carousel flex gap-6 overflow-x-auto no-scrollbar py-4 px-2">
+
+            <!-- Testimonial 1 -->
+            <div
+              class="testimonial-item w-full md:w-[420px] bg-white p-6 rounded-2xl shadow-sm border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-start mb-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 rounded-full bg-primary text-on-primary font-bold flex items-center justify-center">
+                      P</div>
+                    <div>
+                      <p class="font-semibold text-sm text-on-surface">Priya Sharma</p>
+                      <span class="text-[11px] text-emerald-600 font-semibold uppercase flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[14px]">verified</span> Verified Buyer
+                      </span>
+                    </div>
+                  </div>
+                  <span class="text-xs text-secondary">14 July 2026</span>
+                </div>
+                <p class="text-sm text-secondary italic leading-relaxed">"The quality is absolutely stunning. I've
+                  ordered twice now and every time the fabric, stitching — everything is perfect. Super fast delivery
+                  too!"</p>
+              </div>
+              <span
+                class="mt-4 inline-block text-xs text-secondary bg-surface-container px-2.5 py-1 rounded-md w-fit">Size
+                purchased: S</span>
+            </div>
+
+            <!-- Testimonial 2 -->
+            <div
+              class="testimonial-item w-full md:w-[420px] bg-white p-6 rounded-2xl shadow-sm border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-start mb-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 rounded-full bg-primary text-on-primary font-bold flex items-center justify-center">
+                      R</div>
+                    <div>
+                      <p class="font-semibold text-sm text-on-surface">Rahul Mehta</p>
+                      <span class="text-[11px] text-emerald-600 font-semibold uppercase flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[14px]">verified</span> Verified Buyer
+                      </span>
+                    </div>
+                  </div>
+                  <span class="text-xs text-secondary">02 August 2026</span>
+                </div>
+                <p class="text-sm text-secondary italic leading-relaxed">"THE BANIYAN COMPANY truly understands fit. As
+                  someone who struggles with off-the-shelf sizes, their tailored basic luxury approach is refreshing."
+                </p>
+              </div>
+              <span
+                class="mt-4 inline-block text-xs text-secondary bg-surface-container px-2.5 py-1 rounded-md w-fit">Size
+                purchased: L</span>
+            </div>
+
+            <!-- Testimonial 3 -->
+            <div
+              class="testimonial-item w-full md:w-[420px] bg-white p-6 rounded-2xl shadow-sm border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-start mb-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 rounded-full bg-primary text-on-primary font-bold flex items-center justify-center">
+                      A</div>
+                    <div>
+                      <p class="font-semibold text-sm text-on-surface">Ananya Roy</p>
+                      <span class="text-[11px] text-emerald-600 font-semibold uppercase flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[14px]">verified</span> Verified Buyer
+                      </span>
+                    </div>
+                  </div>
+                  <span class="text-xs text-secondary">20 July 2026</span>
+                </div>
+                <p class="text-sm text-secondary italic leading-relaxed">"The Ethereal White Co-ord exceeded my
+                  expectations! Smooth fabric, feels heavy and luxurious."</p>
+              </div>
+              <span
+                class="mt-4 inline-block text-xs text-secondary bg-surface-container px-2.5 py-1 rounded-md w-fit">Size
+                purchased: M</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Trust Signals Cards below Feedback (2x2 Mobile Grid / 4 Desktop Columns) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mt-8 md:mt-12">
+          <div
+            class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-black/5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div
+              class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-surface-container flex items-center justify-center text-primary flex-shrink-0">
+              <span class="material-symbols-outlined text-[24px] md:text-[28px]">verified_user</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs md:text-sm text-on-surface">Secure Package</h3>
+              <p class="text-[10px] md:text-xs text-secondary mt-0.5">256-bit SSL encrypted</p>
+            </div>
+          </div>
+
+          <div
+            class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-black/5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div
+              class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-surface-container flex items-center justify-center text-primary flex-shrink-0">
+              <span class="material-symbols-outlined text-[24px] md:text-[28px]">local_shipping</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs md:text-sm text-on-surface">Fast Delivery</h3>
+              <p class="text-[10px] md:text-xs text-secondary mt-0.5">2–5 days pan India</p>
+            </div>
+          </div>
+
+          <div id="trusted-card-sec"
+            class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-black/5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div
+              class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[24px] md:text-[28px]">verified</span>
+            </div>
+            <div>
+              <div class="flex items-baseline gap-1">
+                <span id="counter-1l" class="font-extrabold text-sm md:text-lg text-on-surface">0</span>
+              </div>
+              <h3 class="font-bold text-xs md:text-sm text-on-surface">Trusted Customers</h3>
+              <p class="text-[10px] md:text-xs text-secondary mt-0.5">1L+ happy verified buyers</p>
+            </div>
+          </div>
+
+          <div
+            class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-black/5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div
+              class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-surface-container flex items-center justify-center text-primary flex-shrink-0">
+              <span class="material-symbols-outlined text-[24px] md:text-[28px]">support_agent</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs md:text-sm text-on-surface">24×7 Support</h3>
+              <p class="text-[10px] md:text-xs text-secondary mt-0.5">Dedicated assistance</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Linear WhatsApp Banner Card -->
+      <section class="max-w-screen-xl mx-auto px-4 md:px-8 mb-8 md:mb-10">
+        <div
+          class="bg-[#f2f4ed] rounded-3xl p-4 md:p-6 flex items-center gap-4 sm:gap-6 shadow-sm border border-black/5">
+          <div
+            class="w-12 h-12 md:w-14 md:h-14 bg-[#25D366] rounded-2xl flex items-center justify-center text-white flex-shrink-0 shadow-md">
+            <svg class="w-7 h-7 md:w-8 md:h-8 fill-current" viewBox="0 0 24 24">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z">
+              </path>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-bold text-sm md:text-base text-on-surface truncate">Need help? Chat with us</h3>
+            <p class="text-xs text-secondary mt-0.5 truncate">Available 9 AM – 9 PM · Reply in minutes</p>
+          </div>
+          <a href="https://wa.me/918110061911" target="_blank"
+            class="bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md flex-shrink-0">
+            Chat <span class="material-symbols-outlined text-[16px]">chat</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Instagram Social Loop Section (Lookbook Preview & Mobile Grid) -->
+      <section class="max-w-screen-xl mx-auto px-4 md:px-8 mb-12">
+        <a href="https://instagram.com" id="link-instagram-card" target="_blank"
+          class="block group relative overflow-hidden bg-gradient-to-br from-[#180829] via-[#12061e] to-black p-5 sm:p-7 md:p-8 rounded-3xl border border-white/10 shadow-2xl hover:border-pink-500/40 transition-all">
+
+          <!-- Background Ambient Glow -->
+          <div
+            class="absolute -top-16 -right-16 w-60 h-60 bg-gradient-to-tr from-pink-600/20 via-purple-600/20 to-yellow-500/10 rounded-full blur-3xl pointer-events-none">
+          </div>
+
+          <div class="relative z-10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-6">
+
+            <!-- Left Text Content -->
+            <div class="flex-1 space-y-4">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                  <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                    <path
+                      d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                  </svg>
+                </div>
+                <div>
+                  <span class="text-[11px] font-bold uppercase tracking-widest text-pink-400 block">Social Loop</span>
+                  <span class="text-xs font-semibold text-white/80" id="display-ig-handle">@thebaniyancompany</span>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Follow Us on Instagram</h3>
+                <p class="text-xs sm:text-sm text-white/70 mt-1 max-w-md leading-relaxed">
+                  Explore street lookbooks, luxury drops &amp; behind-the-scenes fitting sessions.
+                </p>
+              </div>
+
+              <div class="pt-1">
+                <span
+                  class="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg group-hover:from-pink-600 group-hover:to-purple-700 transition-all">
+                  Follow @thebaniyancompany <span class="material-symbols-outlined text-[16px]">arrow_outward</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Right Lookbook Image Previews (3-Thumbnail Cards Grid for Mobile & Desktop) -->
+            <div class="grid grid-cols-3 gap-2.5 sm:gap-3 flex-shrink-0">
+              <div
+                class="relative aspect-[3/4] w-20 sm:w-24 md:w-28 rounded-2xl overflow-hidden shadow-lg border border-white/10 group-hover:scale-105 transition-transform duration-300">
+                <img class="w-full h-full object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmMc6t81D85qcK88-AoEaixZdCckjEijh7L0klxGRZykEiyLhBlGEVyUxy8quhm3CXbnsR1fHGNR8x4LCBhCZv6yD_WEjpxv5lwA4dVABOMD4ny_cV9cL8zVZx0416FNHrn8XgrOowm71KGGibilhYlu0Xtc24lN5-9hE7GjuPaznFEIydGIgqu2KqFRL4BOBPAOGw1UAkLsaAiLV3UTrI2T4dLOcCXKnD9JOt824w69wt48rA9iKFaeA9iEnZKpiHIKa_nv1QdUR2"
+                  alt="Noir Lookbook">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <span class="absolute bottom-1.5 left-2 text-[9px] font-bold text-white/90">#Noir</span>
+              </div>
+
+              <div
+                class="relative aspect-[3/4] w-20 sm:w-24 md:w-28 rounded-2xl overflow-hidden shadow-lg border border-white/10 group-hover:scale-105 transition-transform duration-300 delay-75">
+                <img class="w-full h-full object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiht_triT3pSEHmJ_tQLWcfUaB8ljMq7MPq6C1xSRJg1f3TM7n5cHR1g1uhoeF8dIbladQKySQflPvTruAA1XGkxXoPFeOiSZUMuRb7wQsFmJGc7_2R3ILzTrTOAN9mkLQoNjSTzGWYpAjxHmTOYdyNuP3ky-CrO0q2ZGZgexzfo7kvIFGSiDXEP48RGuHBPxIwryLjwgVdvrTC1PpLI5RYXwDf4VBERj4Dcfist4OBTOLrCmEPS7COCsUfI-nlSh200oFJAgM8Oq7"
+                  alt="Scarlet Lookbook">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <span class="absolute bottom-1.5 left-2 text-[9px] font-bold text-white/90">#Scarlet</span>
+              </div>
+
+              <div
+                class="relative aspect-[3/4] w-20 sm:w-24 md:w-28 rounded-2xl overflow-hidden shadow-lg border border-white/10 group-hover:scale-105 transition-transform duration-300 delay-150">
+                <img class="w-full h-full object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAphJxmESW7pwQ4vzU8hjz9sgNwlHkW9fE4sRcuCfYWriyVhQW4GXzHSL81k25Av-h9L4pd7cFxPFNdBv7x031NobyDkLh8ay5H7LW_NTNr_Ubk7Lay0XHry3zOCFTPWSkFP4QF0z2UVE8NpwBihn3mQtr5MpqplafKkoDGRKOXfRMtRhMwaZObsaJ58B0b2AG_Tq7RKK6vk3Y6bd9DXVW3paxZY4KIgyUJ1NF7HGaCN2A56F1j4u1J2YOT8VRdtP4N_AW_1NSZAGHB"
+                  alt="Street Lookbook">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <span class="absolute bottom-1.5 left-2 text-[9px] font-bold text-white/90">#Street</span>
+              </div>
+            </div>
+
+          </div>
+        </a>
+      </section>
+
     </div>
-
-    <!-- Glowing Divider Line -->
-    <div class="glow-line my-4 mx-auto"></div>
-
-    <!-- Description Paragraph -->
-    <p class="animate-fade-up-delayed text-sm sm:text-base md:text-lg font-medium text-neutral-300 max-w-2xl leading-relaxed mt-4 mb-8">
-      We are redefining everyday fashion, basic luxury, and streetwear essentials with unprecedented quality &amp; design. 
-    </p>
-
-    
-
   </main>
 
-  <!-- Footer Info -->
-  <footer class="relative z-10 w-full max-w-screen-xl flex flex-col sm:flex-row justify-between items-center gap-4 py-4 px-4 text-center sm:text-left border-t border-white/10 text-neutral-500 text-[11px] font-semibold tracking-wider uppercase">
-    <div>
-      © 2026 THE BANIYAN COMPANY. All rights reserved.
+  <!-- Footer -->
+  <footer class="bg-black text-white pt-16 pb-28 md:pb-24">
+    <div class="max-w-screen-xl mx-auto px-6 md:px-8">
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 pb-12 border-b border-white/10">
+        <div class="flex items-center gap-4">
+          <img id="footer-company-logo" alt="OneSpaceCommerce Logo" class="h-10 object-contain rounded-xl"
+            src="assets/onespace-commerce-logo.png" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
+          <span class="font-bold tracking-[0.2em] text-lg uppercase">THE BANIYAN COMPANY</span>
+        </div>
+        <p class="text-white/60 text-xs md:text-sm max-w-md">Quality everyday fashion &amp; essentials.</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 py-12 text-sm text-white/70">
+        <div class="flex flex-col gap-3">
+          <span class="font-bold text-white uppercase text-xs tracking-wider">Navigation</span>
+          <a href="home" class="hover:text-white transition-colors">Home</a>
+          <a href="shop" class="hover:text-white transition-colors">Shop All</a>
+          <a href="shop.html?focus=search" class="hover:text-white transition-colors">Search</a>
+        </div>
+        <div class="flex flex-col gap-3">
+          <span class="font-bold text-white uppercase text-xs tracking-wider">Account</span>
+          <a href="profile" class="hover:text-white transition-colors">My Profile</a>
+          <a href="whislist" class="hover:text-white transition-colors">Wishlist</a>
+          <a href="cart" class="hover:text-white transition-colors">Shopping Bag</a>
+        </div>
+        <div class="flex flex-col gap-3">
+          <span class="font-bold text-white uppercase text-xs tracking-wider">Help</span>
+          <a href="shipping.html" class="hover:text-white transition-colors">Shipping Policy</a>
+          <a href="faqs.html" class="hover:text-white transition-colors">FAQs</a>
+        </div>
+        <div class="flex flex-col gap-3">
+          <span class="font-bold text-white uppercase text-xs tracking-wider">Contact</span>
+          <a href="https://api.whatsapp.com/send?phone=919999999999" target="_blank"
+            class="hover:text-white transition-colors">WhatsApp Support</a>
+          <a href="email.html" class="hover:text-white transition-colors">Email Us</a>
+        </div>
+      </div>
+
+      <div
+        class="pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center text-xs text-white/40 gap-4">
+        <p>© 2026 THE BANIYAN COMPANY. All rights reserved. · Powered by OneSpaceCommerce</p>
+        <p>Crafted with purpose &amp; precision.</p>
+      </div>
     </div>
-    
   </footer>
 
+  <!-- Floating Pill Rounded Bottom Navigation Bar -->
+  <div class="fixed bottom-[5px] left-1/2 -translate-x-1/2 z-50 max-w-lg w-[95%] sm:w-auto">
+    <nav
+      class="bg-black/90 backdrop-blur-xl text-white rounded-full px-6 py-3 shadow-2xl border border-white/15 flex items-center justify-between gap-5 md:gap-8">
+      <a href="home"
+        class="flex flex-col items-center gap-0.5 text-white font-bold transition-transform active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">home</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Home</span>
+      </a>
+      <a href="reels"
+        class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">video_library</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Reels</span>
+      </a>
+      <a href="shop"
+        class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">grid_view</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Shop</span>
+      </a>
+      <a href="cart"
+        class="relative flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+        <span
+          class="cart-badge-count absolute -top-1 right-2.5 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm border border-black">0</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Cart</span>
+      </a>
+      <a href="profile"
+        class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">person</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Profile</span>
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    // Profile Dropdown Toggle
+    window.toggleProfileDropdown = function (e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      const dropdown = document.getElementById('profile-dropdown');
+      if (dropdown) dropdown.classList.toggle('hidden');
+    };
+
+    document.addEventListener('click', () => {
+      const dropdown = document.getElementById('profile-dropdown');
+      if (dropdown && !dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // Counter Animation for Trusted by 1L+ Customers
+    document.addEventListener('DOMContentLoaded', () => {
+      const counterEl = document.getElementById('counter-1l');
+      if (!counterEl) return;
+      let started = false;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !started) {
+            started = true;
+            let count = 0;
+            const target = 100000;
+            const step = Math.ceil(target / 45);
+            const timer = setInterval(() => {
+              count += step;
+              if (count >= target) {
+                counterEl.textContent = '100,000+';
+                clearInterval(timer);
+              } else {
+                counterEl.textContent = count.toLocaleString('en-IN') + '+';
+              }
+            }, 35);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      const card = document.getElementById('trusted-card-sec');
+      if (card) observer.observe(card);
+    });
+
+    // Liquid Pop Wishlist Toggle
+    function toggleFav(btn) {
+      btn.classList.remove('animate-liquid-pop');
+      void btn.offsetWidth; // trigger reflow
+      btn.classList.add('animate-liquid-pop');
+
+      const icon = btn.querySelector('span');
+      if (icon.style.fontVariationSettings && icon.style.fontVariationSettings.includes("'FILL' 1")) {
+        icon.style.fontVariationSettings = "'FILL' 0";
+        icon.classList.remove('text-error');
+      } else {
+        icon.style.fontVariationSettings = "'FILL' 1";
+        icon.classList.add('text-error');
+      }
+    }
+
+    // Hero Banner Slider Logic
+    let currentHeroSlide = 0;
+    let heroAutoInterval = null;
+
+    function getActualSlideCount() {
+      const slider = document.getElementById('hero-banner-slider');
+      if (!slider) return 1;
+      const slides = slider.querySelectorAll(':scope > div');
+      return Math.max(1, slides.length);
+    }
+
+    function updateHeroSlider() {
+      const total = getActualSlideCount();
+      if (currentHeroSlide >= total) currentHeroSlide = 0;
+      const slider = document.getElementById('hero-banner-slider');
+      if (slider) {
+        slider.style.transform = `translateX(-${currentHeroSlide * 100}%)`;
+      }
+    }
+
+    function setHeroSlide(index) {
+      currentHeroSlide = index;
+      updateHeroSlider();
+      resetHeroTimer();
+    }
+
+    function nextHeroSlide() {
+      const total = getActualSlideCount();
+      if (total <= 1) return;
+      currentHeroSlide = (currentHeroSlide + 1) % total;
+      updateHeroSlider();
+      resetHeroTimer();
+    }
+
+    function prevHeroSlide() {
+      const total = getActualSlideCount();
+      if (total <= 1) return;
+      currentHeroSlide = (currentHeroSlide - 1 + total) % total;
+      updateHeroSlider();
+      resetHeroTimer();
+    }
+
+    function resetHeroTimer() {
+      if (heroAutoInterval) clearInterval(heroAutoInterval);
+      const total = getActualSlideCount();
+      if (total > 1) {
+        heroAutoInterval = setInterval(() => {
+          currentHeroSlide = (currentHeroSlide + 1) % total;
+          updateHeroSlider();
+        }, 4500);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateHeroSlider();
+      resetHeroTimer();
+    });
+
+    // Home Page Collection Category Filter
+    function filterHomeCategory(tag, btn) {
+      document.querySelectorAll('.home-filter-btn').forEach(b => {
+        b.className = 'home-filter-btn bg-white text-on-surface hover:bg-black/10 px-5 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all border border-black/5';
+      });
+      btn.className = 'home-filter-btn bg-black text-white px-5 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all';
+
+      const cards = document.querySelectorAll('.home-card');
+      cards.forEach(card => {
+        const tags = card.getAttribute('data-tag');
+        if (tag === 'all' || (tags && tags.includes(tag))) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function updateReelIndicators(activeIndex) {
+      const dot0 = document.getElementById('dot-0');
+      const dot1 = document.getElementById('dot-1');
+      if (dot0 && dot1) {
+        if (activeIndex === 0) {
+          dot0.className = 'w-3 h-3 rounded-full bg-white transition-all shadow-md scale-125';
+          dot1.className = 'w-3 h-3 rounded-full bg-white/40 transition-all shadow-md';
+        } else {
+          dot0.className = 'w-3 h-3 rounded-full bg-white/40 transition-all shadow-md';
+          dot1.className = 'w-3 h-3 rounded-full bg-white transition-all shadow-md scale-125';
+        }
+      }
+    }
+
+    function scrollToReel(index) {
+      const box = document.getElementById('reel-scroll-box');
+      const items = box.querySelectorAll('.reel-item');
+      if (items[index]) {
+        box.scrollTo({ top: items[index].offsetTop, behavior: 'smooth' });
+        updateReelIndicators(index);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const reelBox = document.getElementById('reel-scroll-box');
+      if (reelBox) {
+        reelBox.addEventListener('scroll', () => {
+          const scrollTop = reelBox.scrollTop;
+          const h = reelBox.clientHeight;
+          const activeIndex = Math.round(scrollTop / h);
+          updateReelIndicators(activeIndex);
+        });
+      }
+
+      // Testimonials Auto-scroll
+      const carousel = document.getElementById('testimonialCarousel');
+      let scrollPos = 0;
+      if (carousel) {
+        setInterval(() => {
+          const items = carousel.querySelectorAll('.testimonial-item');
+          if (items.length > 0) {
+            const itemWidth = items[0].offsetWidth + 24;
+            scrollPos = (scrollPos + 1) % items.length;
+            carousel.scrollTo({ left: scrollPos * itemWidth, behavior: 'smooth' });
+          }
+        }, 3800);
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener('click', function (e) {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('//')) return;
+      const page = href.split('?')[0];
+      if (!page.endsWith('.html')) return;
+      if (page === 'loading.html') return;
+      if (window.location.protocol === 'file:') return; // Direct navigation under file://
+      e.preventDefault();
+      window.location.href = 'loading.html?next=' + encodeURIComponent(href);
+    });
+  </script>
+
+  <!-- Dynamic Cart & Real-Time Storefront Integration -->
+  <script type="module">
+    import tbcCart from './js/cart-store.js';
+    import { subscribeToProducts, subscribeToCategories, getCompany, subscribeToCompanyBanner, getProductTotalStock, isProductOutOfStock, getProductPricing } from './js/products-service.js';
+
+    // Safe helpers — never throw, even on broken data
+    function safePrice(p) {
+      if (p.price && p.price > 0) return p.price;
+      if (Array.isArray(p.variants) && p.variants.length > 0) {
+        for (const v of p.variants) {
+          const vp = Number(v.price || v.sellingPrice || v.mrp || 0);
+          if (vp > 0) return vp;
+        }
+      }
+      return 0;
+    }
+
+    function safeImage(p) {
+      if (Array.isArray(p.imageUrls) && p.imageUrls[0]) return p.imageUrls[0];
+      if (Array.isArray(p.images) && p.images[0]) return p.images[0];
+      if (typeof p.imageUrl === 'string' && p.imageUrl) return p.imageUrl;
+      if (typeof p.image === 'string' && p.image) return p.image;
+      return 'https://placehold.co/400x500/f0f0f0/999?text=No+Image';
+    }
+
+    function safeMoney(val) {
+      const n = Number(val || 0);
+      return '\u20B9' + n.toLocaleString('en-IN');
+    }
+
+    let allProductsStore = [];
+    let currentActiveTag = 'all';
+
+    function renderHomeCard(p) {
+      const pricing = getProductPricing(p);
+      const price = pricing.price || safePrice(p);
+      const origP = pricing.mrp;
+      const discountPct = pricing.discountPct;
+      const img = safeImage(p);
+
+      // Determine product badge text & real-time stock
+      const isOut = isProductOutOfStock(p);
+      let badgeText = isOut ? 'OUT OF STOCK' : (p.tag || (Array.isArray(p.tags) && p.tags[0]) || '');
+      if (!badgeText && !isOut) {
+        if (p.isBestSeller) badgeText = 'Best Seller';
+        else if (p.isNewArrival || p.isNew) badgeText = 'New Arrival';
+        else if (p.isTrending) badgeText = 'Trending';
+        else if (p.isExclusive) badgeText = 'Exclusive';
+        else if (p.isHot) badgeText = 'Hot';
+      }
+
+      const tagLabel = isOut
+        ? `<div class="absolute top-2 left-2 bg-rose-600 text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shadow-sm z-10">OUT OF STOCK</div>`
+        : (badgeText ? `<div class="absolute top-2 left-2 bg-black text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shadow-sm z-10">${String(badgeText).toUpperCase()}</div>` : '');
+
+      const offerBadge = (discountPct > 0 && origP && origP > price)
+        ? `<div class="absolute bottom-2 left-2 golden-offer-chip shadow-md z-10"><span class="material-symbols-outlined !text-[11px] text-amber-300">local_fire_department</span>${discountPct}% OFFER</div>`
+        : '';
+
+      const origLabel = (origP && origP > price)
+        ? `<span class="text-xs text-rose-600 font-bold line-through">MRP ${safeMoney(origP)}</span>`
+        : '';
+
+      return `
+      <a href="product-detail?id=${encodeURIComponent(p.id)}"
+         onclick="return handleProductCardClick(event, 'product-detail?id=${encodeURIComponent(p.id)}', ${isOut})"
+         data-tag="${badgeText || ''}"
+         class="home-card flex flex-col group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-shadow">
+        <div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-surface-container">
+          <img alt="${p.name || 'Product'}" loading="lazy"
+               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+               src="${img}"
+               onerror="this.src='https://placehold.co/400x500/f0f0f0/999?text=No+Image'">
+          ${tagLabel}
+          ${offerBadge}
+          <button onclick="event.preventDefault(); toggleFav(this)"
+                  class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-[18px]">favorite</span>
+          </button>
+        </div>
+        <span class="text-[11px] text-secondary uppercase font-semibold">${p.category || ''}</span>
+        <h3 class="font-semibold text-sm text-on-surface truncate">${p.name || 'Product'}</h3>
+        <div class="flex items-baseline gap-2 mt-auto pt-2 flex-wrap">
+          <span class="font-bold text-base text-primary">${safeMoney(price)}</span>
+          ${origLabel}
+        </div>
+      </a>`;
+    }
+
+    let homeVisibleLimit = 20;
+    let homePaginationObserver = null;
+
+    function initHomePaginationObserver() {
+      const sentinel = document.getElementById('home-pagination-sentinel');
+      if (!sentinel) return;
+      if (homePaginationObserver) homePaginationObserver.disconnect();
+
+      homePaginationObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && sentinel.style.display !== 'none' && !sentinel.classList.contains('hidden')) {
+            homeVisibleLimit += 20;
+            applyHomeProductFilter(true);
+          }
+        });
+      }, { rootMargin: '300px' });
+
+      homePaginationObserver.observe(sentinel);
+    }
+
+    function applyHomeProductFilter(isScrollAppend = false) {
+      if (!isScrollAppend) {
+        homeVisibleLimit = 20;
+      }
+
+      const grid = document.getElementById('home-product-grid');
+      if (!grid) return;
+
+      const tagLower = (currentActiveTag || 'all').toLowerCase();
+      const filtered = (tagLower === 'all')
+        ? allProductsStore
+        : allProductsStore.filter(p => {
+          const t = ((p.tag || '') + ' ' + (Array.isArray(p.tags) ? p.tags.join(' ') : '') + ' ' + (p.category || '')).toLowerCase();
+          if (t.includes(tagLower)) return true;
+          if (tagLower.includes('seller') && p.isBestSeller) return true;
+          if (tagLower.includes('new') && (p.isNewArrival || p.isNew)) return true;
+          if (tagLower.includes('trend') && p.isTrending) return true;
+          if (tagLower.includes('exclusiv') && p.isExclusive) return true;
+          if (tagLower.includes('hot') && p.isHot) return true;
+          return false;
+        });
+
+      const totalCount = filtered.length;
+      const countToDisplay = Math.min(homeVisibleLimit, totalCount);
+
+      if (totalCount > 0) {
+        const paginated = filtered.slice(0, countToDisplay);
+        const cardsHTML = paginated.map(p => {
+          try { return renderHomeCard(p); } catch (e) { return ''; }
+        }).join('');
+        grid.innerHTML = cardsHTML;
+      } else {
+        grid.innerHTML = (allProductsStore.length > 0)
+          ? '<div class="col-span-full py-8 text-center text-xs text-secondary">No products match this filter tag.</div>'
+          : '<div class="col-span-full py-12 text-center text-secondary">No products found in catalog.</div>';
+      }
+
+      // Sentinel visibility
+      const sentinel = document.getElementById('home-pagination-sentinel');
+      if (sentinel) {
+        if (countToDisplay < totalCount) {
+          sentinel.classList.remove('hidden');
+          sentinel.style.display = 'flex';
+        } else {
+          sentinel.classList.add('hidden');
+          sentinel.style.display = 'none';
+        }
+      }
+
+      if (!homePaginationObserver) {
+        initHomePaginationObserver();
+      }
+    }
+
+    window.filterHomeCategory = function (tag, btn) {
+      currentActiveTag = tag || 'all';
+      document.querySelectorAll('.home-filter-btn').forEach(b => {
+        b.className = 'home-filter-btn bg-white text-on-surface hover:bg-black/10 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all border border-black/5';
+      });
+      if (btn) btn.className = 'home-filter-btn bg-black text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all';
+
+      applyHomeProductFilter();
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      tbcCart.updateCartBadges();
+
+      const grid = document.getElementById('home-product-grid');
+      const catList = document.getElementById('home-category-list');
+      const filterBar = document.querySelector('.home-filter-pills');
+
+      try {
+        // 1. Setup default filter pills
+        if (filterBar) {
+          const defaultTags = ['Best Seller', 'New Arrival', 'Trending', 'Exclusive', 'Hot'];
+          const pills = defaultTags.map(tag =>
+            `<button onclick="filterHomeCategory('${tag.toLowerCase()}', this)"
+                   class="home-filter-btn bg-white text-on-surface hover:bg-black/10 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all border border-black/5">${tag}</button>`
+          ).join('');
+          filterBar.innerHTML =
+            `<button onclick="filterHomeCategory('all', this)" class="home-filter-btn bg-black text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all">All</button>` +
+            pills;
+        }
+
+        // 2. Real-Time Category Listener
+        subscribeToCategories((categories) => {
+          if (catList && categories && categories.length > 0) {
+            const sortedCategories = [...categories].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            catList.innerHTML = sortedCategories.map(c => `
+            <a href="shop.html?category=${encodeURIComponent(c.name || c.id)}"
+               class="flex flex-col items-center gap-2 group flex-shrink-0">
+              <div class="w-[68px] h-[68px] rounded-2xl overflow-hidden bg-surface-container border border-black/10 p-0.5 shadow-sm group-hover:scale-105 group-hover:border-primary transition-all flex items-center justify-center">
+                ${c.imageUrl
+                ? `<img class="w-full h-full object-cover rounded-[14px]" src="${c.imageUrl}" alt="${c.name || 'Category'}" onerror="this.style.display='none'">`
+                : `<span class="material-symbols-outlined text-2xl text-secondary">${c.icon || 'grid_view'}</span>`}
+              </div>
+              <span class="text-xs font-bold text-on-surface group-hover:text-primary">${c.name || 'Category'}</span>
+            </a>`).join('');
+          }
+        });
+
+        // 3. Real-Time Company Branding & Hero Banner Listener
+        const applyCompanyBranding = (c) => {
+          if (!c) return;
+          const logoEl = document.getElementById('nav-company-logo');
+          const fLogoEl = document.getElementById('footer-company-logo');
+          const nameEl = document.getElementById('nav-company-name');
+          if (c.logo) {
+            try { localStorage.setItem('onespace_shop_logo', c.logo); } catch (_) {}
+            if (logoEl) logoEl.src = c.logo;
+            if (fLogoEl) fLogoEl.src = c.logo;
+          }
+          if (c.name) {
+            try { localStorage.setItem('onespace_shop_name', c.name); } catch (_) {}
+            if (nameEl) nameEl.textContent = c.name;
+          }
+
+          // Dynamic Hero Banner update if set by Admin
+          if (c.heroMediaUrl) {
+            const heroSlide = document.querySelector('#hero-banner-slider .bg-cover');
+            if (heroSlide) heroSlide.style.backgroundImage = `url('${c.heroMediaUrl}')`;
+          }
+          if (c.heroHeading) {
+            const heroTitle = document.querySelector('#hero-banner-slider h1');
+            if (heroTitle) heroTitle.textContent = c.heroHeading;
+          }
+          if (c.heroSubheading) {
+            const heroSub = document.querySelector('#hero-banner-slider span');
+            if (heroSub) heroSub.textContent = c.heroSubheading;
+          }
+        };
+
+        getCompany().then(applyCompanyBranding).catch(() => { });
+        subscribeToCompanyBanner(applyCompanyBranding);
+
+        // 4. REAL-TIME LIVE PRODUCTS SUBSCRIPTION
+        // Whenever a product is added, updated, or stock changes in Firestore, homepage reflects it instantly
+        subscribeToProducts((liveProducts) => {
+          allProductsStore = liveProducts || [];
+          applyHomeProductFilter();
+          if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
+        }, (err) => {
+          console.error('[TBC] Real-time products error:', err);
+        });
+
+      } catch (e) {
+        console.error('[TBC] Home load error:', e);
+        if (grid) grid.innerHTML = `<div class="col-span-full py-12 text-center text-red-500">Error loading products: ${e.message}</div>`;
+      } finally {
+        if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
+      }
+    });
+  </script>
+
+  <!-- Out of Stock Confirmation Modal -->
+  <div id="out-of-stock-modal"
+    class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
+    <div
+      class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4 animate-scale-up border border-black/10">
+      <div
+        class="w-20 h-20 mx-auto rounded-full bg-rose-50 flex items-center justify-center border-2 border-rose-100 shadow-inner">
+        <span class="material-symbols-outlined text-4xl text-rose-600">block</span>
+      </div>
+      <div>
+        <span
+          class="inline-block bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider mb-2">Out
+          of Stock ❌</span>
+        <h3 class="font-bold text-lg text-primary">Item Currently Sold Out</h3>
+        <p class="text-xs text-secondary mt-1 leading-relaxed">Are you sure you want to visit this product page? You
+          won't be able to buy it until restocked.</p>
+      </div>
+      <div class="flex gap-2.5 pt-2">
+        <button onclick="closeOutOfStockModal()"
+          class="flex-1 bg-surface-container hover:bg-neutral-200 text-primary py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors">
+          Cancel
+        </button>
+        <button id="oos-confirm-btn" onclick="proceedToOutOfStockProduct()"
+          class="flex-1 bg-black hover:bg-neutral-800 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider shadow-md transition-all">
+          Yes, View
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let pendingOosUrl = '';
+
+    window.handleProductCardClick = function (e, url, isOut) {
+      if (isOut) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        pendingOosUrl = url;
+        const modal = document.getElementById('out-of-stock-modal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          if (confirm('This product is out of stock! Are you sure you want to view it?')) {
+            window.location.href = url;
+          }
+        }
+        return false;
+      }
+      return true;
+    };
+
+    window.closeOutOfStockModal = function () {
+      const modal = document.getElementById('out-of-stock-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    };
+
+    window.proceedToOutOfStockProduct = function () {
+      if (pendingOosUrl) {
+        window.location.href = pendingOosUrl;
+      }
+      closeOutOfStockModal();
+    };
+  </script>
 </body>
+
 </html>
