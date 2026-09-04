@@ -153,26 +153,29 @@
             <span>Dashboard &amp; Sales</span>
           </button>
 
+          <a href="analytics.html" id="side-tab-analytics"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3 hover:bg-slate-100 text-slate-700">
+            <span class="material-symbols-outlined text-lg text-indigo-600">query_stats</span>
+            <span>Analytics</span>
+          </a>
+
           <button id="side-tab-products" onclick="switchAdminTab('products')"
             class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
             <span class="material-symbols-outlined text-lg">inventory_2</span>
             <span>Products &amp; Stock</span>
           </button>
 
-          <a href="stock-availabilities.html"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center justify-between group hover:bg-slate-100 text-slate-700">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-lg text-amber-500">warehouse</span>
-              <span class="font-semibold text-slate-900">Stock Availabilities</span>
-            </div>
-            <span class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full font-bold">Live</span>
+          <a href="stock-availabilities.html" id="side-tab-stock"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3 hover:bg-slate-100 text-slate-700">
+            <span class="material-symbols-outlined text-lg text-amber-500">warehouse</span>
+            <span>Stock Availabilities</span>
           </a>
 
-          <button id="side-tab-orders" onclick="switchAdminTab('orders')"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
-            <span class="material-symbols-outlined text-lg">local_shipping</span>
+          <a href="orders.html" id="side-tab-orders"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3 hover:bg-slate-100 text-slate-700">
+            <span class="material-symbols-outlined text-lg text-blue-600">local_shipping</span>
             <span>Orders &amp; Shipping</span>
-          </button>
+          </a>
 
           <button id="side-tab-customers" onclick="switchAdminTab('customers')"
             class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
@@ -198,13 +201,10 @@
             <span>Reels &amp; Media</span>
           </button>
 
-          <a href="banners.html"
-            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center justify-between group hover:bg-slate-100 text-slate-700">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-lg text-indigo-600">view_carousel</span>
-              <span class="font-semibold text-slate-900">Hero Banners</span>
-            </div>
-            <span class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full font-bold">New</span>
+          <a href="banners.html" id="side-tab-banners"
+            class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3 hover:bg-slate-100 text-slate-700">
+            <span class="material-symbols-outlined text-lg text-indigo-600">view_carousel</span>
+            <span>Hero Banners</span>
           </a>
 
           <button id="side-tab-settings" onclick="switchAdminTab('settings')"
@@ -550,9 +550,6 @@
                 </div>
 
                 <div class="flex items-center gap-2 flex-wrap">
-                  <a href="orders.html" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 transition">
-                    <span class="material-symbols-outlined text-sm">fullscreen</span> Fullscreen Orders View →
-                  </a>
                   <select id="order-payment-filter" onchange="handleOrderPaymentFilter(this.value)" class="shopify-input text-slate-700 px-2.5 py-1.5 rounded-lg text-xs outline-none font-medium bg-white cursor-pointer">
                     <option value="all">All Payment Methods</option>
                     <option value="paid">Paid (Online / Razorpay)</option>
@@ -2074,6 +2071,11 @@
         initSalesChart();
       }
     };
+
+    try {
+      const urlTab = new URLSearchParams(window.location.search).get('tab');
+      if (urlTab) setTimeout(() => window.switchAdminTab(urlTab), 50);
+    } catch(e) {}
 
     window.setDashboardMode = function(mode) {
       const btnSimple = document.getElementById('mode-btn-simple');

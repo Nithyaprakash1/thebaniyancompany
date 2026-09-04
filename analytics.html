@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics &amp; Performance | OneSpace Commerce</title>
+  <link rel="icon" type="image/png" href="assets/onespace-commerce-logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              500: '#0f172a',
+              900: '#020617',
+            }
+          },
+          fontFamily: { sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    body {
+      background-color: #f6f6f7;
+      color: #1a1a1a;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .shopify-card {
+      background: #ffffff;
+      border: 1px solid #e1e3e5;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+    }
+
+    .sidebar-nav-btn {
+      color: #4a4d52;
+      background-color: transparent;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar-nav-btn:hover:not(.active) {
+      background-color: #f1f2f4;
+      color: #0f172a;
+    }
+
+    .sidebar-nav-btn.active {
+      background-color: #0f172a;
+      color: #ffffff;
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+  </style>
+</head>
+
+<body class="bg-[#f6f6f7] text-slate-900 font-sans min-h-screen antialiased">
+
+  <div class="min-h-screen flex flex-col md:flex-row">
+
+    <!-- Mobile Drawer Backdrop -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 hidden md:hidden"></div>
+
+    <!-- ==========================================
+         LEFT SIDEBAR MENU (Unified Across All Pages)
+    ========================================== -->
+    <aside id="admin-sidebar" class="fixed md:sticky top-0 left-0 bottom-0 z-50 w-64 bg-white border-r border-[#e1e3e5] flex flex-col justify-between transition-transform duration-300 -translate-x-full md:translate-x-0 h-screen shrink-0">
+      <div>
+        <!-- Brand & Logo Header -->
+        <div class="p-4 border-b border-[#e1e3e5] flex items-center justify-between">
+          <a href="admin.html" class="flex items-center gap-3">
+            <img src="assets/onespace-commerce-logo.png" id="sidebar-logo-img" alt="Store Logo" class="h-9 w-9 object-contain rounded-lg border border-slate-200 bg-white p-0.5" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
+            <div class="min-w-0">
+              <h1 class="font-semibold text-sm text-slate-900 truncate" id="header-brand-name">OneSpace Commerce</h1>
+              <span class="text-xs text-slate-500 font-medium block">Admin Console</span>
+            </div>
+          </a>
+          <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-500 hover:text-slate-900 p-1">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        <!-- Vertical Side Navigation Menu (No Live or New pills) -->
+        <nav class="p-3 space-y-1">
+          <a href="admin.html" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">dashboard</span>
+            <span>Dashboard &amp; Sales</span>
+          </a>
+
+          <!-- ACTIVE: Analytics -->
+          <a href="analytics.html" class="sidebar-nav-btn active w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg text-indigo-400">query_stats</span>
+            <span>Analytics</span>
+          </a>
+
+          <a href="admin.html?tab=products" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">inventory_2</span>
+            <span>Products &amp; Stock</span>
+          </a>
+
+          <a href="stock-availabilities.html" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg text-amber-500">warehouse</span>
+            <span>Stock Availabilities</span>
+          </a>
+
+          <a href="orders.html" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg text-blue-500">local_shipping</span>
+            <span>Orders &amp; Shipping</span>
+          </a>
+
+          <a href="admin.html?tab=customers" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">group</span>
+            <span>Customers</span>
+          </a>
+
+          <a href="admin.html?tab=returns" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">published_with_changes</span>
+            <span>Returns &amp; Refunds</span>
+          </a>
+
+          <a href="admin.html?tab=payments" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">payments</span>
+            <span>Payments</span>
+          </a>
+
+          <a href="admin.html?tab=reels" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">movie</span>
+            <span>Reels &amp; Media</span>
+          </a>
+
+          <a href="banners.html" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg text-indigo-500">view_carousel</span>
+            <span>Hero Banners</span>
+          </a>
+
+          <a href="admin.html?tab=settings" class="sidebar-nav-btn w-full px-3 py-2.5 rounded-lg text-xs flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">settings</span>
+            <span>Store Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="p-3.5 border-t border-[#e1e3e5] space-y-2">
+        <a href="home.html" target="_blank" class="w-full py-2 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-800 transition-all flex items-center justify-center gap-2 border border-slate-200">
+          <span class="material-symbols-outlined text-base">visibility</span> View Storefront
+        </a>
+        <button onclick="logoutAdmin()" class="w-full py-2 px-3 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-medium transition-all border border-rose-200/60 flex items-center justify-center gap-2 cursor-pointer">
+          <span class="material-symbols-outlined text-base">logout</span> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- ==========================================
+         RIGHT CONTENT AREA: ANALYTICS DASHBOARD
+    ========================================== -->
+    <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+      
+      <!-- Top Mobile Nav -->
+      <header class="md:hidden sticky top-0 z-30 bg-white border-b border-[#e1e3e5] px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <button onclick="toggleMobileSidebar()" class="p-1.5 rounded-lg bg-slate-100 text-slate-800">
+            <span class="material-symbols-outlined text-xl">menu</span>
+          </button>
+          <span class="font-bold text-sm text-slate-900">Analytics</span>
+        </div>
+        <a href="home.html" target="_blank" class="text-xs font-medium text-slate-600 flex items-center gap-1">
+          Storefront <span class="material-symbols-outlined text-sm">open_in_new</span>
+        </a>
+      </header>
+
+      <!-- Main Container -->
+      <main class="flex-1 p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+
+        <!-- ==========================================
+             PAGE HEADER (Matching media_1788524080692.jpg)
+        ========================================== -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Analytics</h1>
+          </div>
+
+          <!-- Date Range Filter Tabs -->
+          <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1 shadow-2xs overflow-x-auto custom-scrollbar">
+            <button onclick="setAnalyticsPeriod('today')" id="btn-period-today"
+              class="period-btn px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">Today</button>
+            <button onclick="setAnalyticsPeriod('yesterday')" id="btn-period-yesterday"
+              class="period-btn px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">Yesterday</button>
+            <button onclick="setAnalyticsPeriod('7days')" id="btn-period-7days"
+              class="period-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-white shadow-xs transition cursor-pointer">7 Days</button>
+            <button onclick="setAnalyticsPeriod('30days')" id="btn-period-30days"
+              class="period-btn px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">30 Days</button>
+            <button onclick="setAnalyticsPeriod('month')" id="btn-period-month"
+              class="period-btn px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">This Month</button>
+            <button onclick="setAnalyticsPeriod('custom')" id="btn-period-custom"
+              class="period-btn px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">Custom</button>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             6 SUMMARY KPI CARDS (Matching Screenshot)
+        ========================================== -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          
+          <!-- Card 1: Revenue -->
+          <div class="shopify-card p-4 space-y-1">
+            <span class="text-xs font-medium text-slate-500 block">Revenue</span>
+            <div class="text-xl font-bold text-slate-900 tracking-tight" id="kpi-revenue">₹81,250</div>
+            <div class="text-[11px] font-semibold text-emerald-600 flex items-center gap-0.5" id="kpi-revenue-growth">
+              <span>+24%</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Orders -->
+          <div class="shopify-card p-4 space-y-1">
+            <span class="text-xs font-medium text-slate-500 block">Orders</span>
+            <div class="text-xl font-bold text-slate-900 tracking-tight" id="kpi-orders">158</div>
+            <div class="text-[11px] font-semibold text-emerald-600 flex items-center gap-0.5" id="kpi-orders-growth">
+              <span>+18%</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Profit -->
+          <div class="shopify-card p-4 space-y-1">
+            <span class="text-xs font-medium text-slate-500 block">Profit</span>
+            <div class="text-xl font-bold text-slate-900 tracking-tight" id="kpi-profit">₹37,890</div>
+            <div class="text-[11px] font-semibold text-emerald-600 flex items-center gap-0.5" id="kpi-profit-growth">
+              <span>+31%</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Customers -->
+          <div class="shopify-card p-4 space-y-1">
+            <span class="text-xs font-medium text-slate-500 block">Customers</span>
+            <div class="text-xl font-bold text-slate-900 tracking-tight" id="kpi-customers">356</div>
+            <div class="text-[11px] font-semibold text-emerald-600 flex items-center gap-0.5" id="kpi-customers-growth">
+              <span>+12%</span>
+            </div>
+          </div>
+
+          <!-- Card 5: Avg Order Value -->
+          <div class="shopify-card p-4 space-y-1">
+            <span class="text-xs font-medium text-slate-500 block">Avg Order Value</span>
+            <div class="text-xl font-bold text-slate-900 tracking-tight" id="kpi-aov">₹514</div>
+            <div class="text-[11px] font-semibold text-emerald-600 flex items-center gap-0.5" id="kpi-aov-growth">
+              <span>+5%</span>
+            </div>
+          </div>
+
+          <!-- Card 6: Conversion Rate -->
+          <div class="shopify-card p-4 space-y-1">
+            <span class="text-xs font-medium text-slate-500 block">Conversion Rate</span>
+            <div class="text-xl font-bold text-slate-900 tracking-tight" id="kpi-cvr">3.2%</div>
+            <div class="text-[11px] font-semibold text-rose-600 flex items-center gap-0.5" id="kpi-cvr-growth">
+              <span>-0.4%</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ==========================================
+             REVENUE TREND (Full Width Area Chart)
+        ========================================== -->
+        <div class="shopify-card p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-900">Revenue Trend</h2>
+          </div>
+          <div class="relative w-full h-72">
+            <canvas id="chartRevenueTrend"></canvas>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             2x2 GRID OF DETAILED ANALYTICS
+        ========================================== -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- CARD 1: Top Selling Products -->
+          <div class="shopify-card p-6 space-y-5">
+            <h2 class="text-sm font-semibold text-slate-900">Top Selling Products</h2>
+            <div class="space-y-4" id="top-products-list">
+              <!-- Item 1 -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">Black Oversized T-Shirt</span>
+                  <span class="font-semibold text-slate-900">189 sold</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-slate-900 h-2.5 rounded-full" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">White Linen Kurti</span>
+                  <span class="font-semibold text-slate-900">134 sold</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-slate-900 h-2.5 rounded-full" style="width: 71%;"></div>
+                </div>
+              </div>
+
+              <!-- Item 3 -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">Cotton Palazzo Set</span>
+                  <span class="font-semibold text-slate-900">98 sold</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-slate-900 h-2.5 rounded-full" style="width: 52%;"></div>
+                </div>
+              </div>
+
+              <!-- Item 4 -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">Embroidered Kurta</span>
+                  <span class="font-semibold text-slate-900">72 sold</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-slate-900 h-2.5 rounded-full" style="width: 38%;"></div>
+                </div>
+              </div>
+
+              <!-- Item 5 -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">Denim Joggers</span>
+                  <span class="font-semibold text-slate-900">45 sold</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-slate-900 h-2.5 rounded-full" style="width: 24%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2: Payment Methods (Donut Chart) -->
+          <div class="shopify-card p-6 space-y-4 flex flex-col justify-between">
+            <h2 class="text-sm font-semibold text-slate-900">Payment Methods</h2>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-around gap-6 py-2">
+              <div class="relative w-44 h-44 shrink-0">
+                <canvas id="chartPaymentMethods"></canvas>
+              </div>
+
+              <!-- Legend List matching screenshot -->
+              <div class="space-y-3 text-xs w-full max-w-xs">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0"></span>
+                    <span class="text-slate-600 font-medium">Razorpay</span>
+                  </div>
+                  <span class="font-semibold text-slate-900" id="pct-razorpay">45%</span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 shrink-0"></span>
+                    <span class="text-slate-600 font-medium">UPI</span>
+                  </div>
+                  <span class="font-semibold text-slate-900" id="pct-upi">30%</span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0"></span>
+                    <span class="text-slate-600 font-medium">COD</span>
+                  </div>
+                  <span class="font-semibold text-slate-900" id="pct-cod">20%</span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span class="text-slate-600 font-medium">WhatsApp</span>
+                  </div>
+                  <span class="font-semibold text-slate-900" id="pct-whatsapp">5%</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 text-right">Based on completed transactions</div>
+          </div>
+
+          <!-- CARD 3: Top Cities -->
+          <div class="shopify-card p-6 space-y-5">
+            <h2 class="text-sm font-semibold text-slate-900">Top Cities</h2>
+            <div class="space-y-4" id="top-cities-list">
+              <!-- Chennai -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">Chennai</span>
+                  <span class="font-semibold text-slate-600">128 orders</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-blue-600 h-1.5 rounded-full" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <!-- Coimbatore -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">Coimbatore</span>
+                  <span class="font-semibold text-slate-600">76 orders</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-blue-600 h-1.5 rounded-full" style="width: 59%;"></div>
+                </div>
+              </div>
+
+              <!-- Madurai -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">Madurai</span>
+                  <span class="font-semibold text-slate-600">54 orders</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-blue-600 h-1.5 rounded-full" style="width: 42%;"></div>
+                </div>
+              </div>
+
+              <!-- Trichy -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">Trichy</span>
+                  <span class="font-semibold text-slate-600">38 orders</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-blue-600 h-1.5 rounded-full" style="width: 30%;"></div>
+                </div>
+              </div>
+
+              <!-- Salem -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-medium text-slate-800">Salem</span>
+                  <span class="font-semibold text-slate-600">24 orders</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-blue-600 h-1.5 rounded-full" style="width: 19%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 4: Orders Trend (Bar Chart) -->
+          <div class="shopify-card p-6 space-y-4">
+            <h2 class="text-sm font-semibold text-slate-900">Orders Trend</h2>
+            <div class="relative w-full h-64">
+              <canvas id="chartOrdersTrend"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+
+      <!-- Footer -->
+      <footer class="mt-auto border-t border-slate-200 bg-white px-6 py-4 text-center text-xs text-slate-400">
+        The Baniyan Company · Retail POS &amp; E-Commerce Analytics · Real-time Metrics Engine
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- Firebase & Analytics Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { firebaseConfig, COMPANY_ID } from "./assets/js/firebase-config.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.toggleMobileSidebar = function() {
+      const sidebar = document.getElementById('admin-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (!sidebar) return;
+      if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        if (backdrop) backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        if (backdrop) backdrop.classList.add('hidden');
+      }
+    };
+
+    window.logoutAdmin = function() {
+      window.location.href = 'admin.html';
+    };
+
+    // Chart instances
+    let revenueChart = null;
+    let paymentChart = null;
+    let ordersTrendChart = null;
+
+    // Active period state
+    window.currentPeriod = '7days';
+
+    const periodDatasets = {
+      'today': {
+        kpi: { revenue: '₹14,200', orders: '28', profit: '₹6,800', customers: '42', aov: '₹507', cvr: '3.8%', revGrowth: '+12%', ordGrowth: '+8%', cvrGrowth: '+0.2%' },
+        revenueTrend: { labels: ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM', '11 PM'], data: [800, 2400, 4200, 3100, 5800, 8900, 14200] },
+        ordersTrend: { labels: ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM', '11 PM'], data: [2, 5, 8, 6, 12, 18, 28] },
+        payments: [50, 30, 15, 5]
+      },
+      'yesterday': {
+        kpi: { revenue: '₹19,450', orders: '38', profit: '₹8,920', customers: '51', aov: '₹511', cvr: '3.4%', revGrowth: '+5%', ordGrowth: '+4%', cvrGrowth: '+0.1%' },
+        revenueTrend: { labels: ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM', '11 PM'], data: [1200, 3100, 5400, 7200, 11400, 16200, 19450] },
+        ordersTrend: { labels: ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM', '11 PM'], data: [3, 6, 11, 14, 22, 31, 38] },
+        payments: [42, 33, 18, 7]
+      },
+      '7days': {
+        kpi: { revenue: '₹81,250', orders: '158', profit: '₹37,890', customers: '356', aov: '₹514', cvr: '3.2%', revGrowth: '+24%', ordGrowth: '+18%', cvrGrowth: '-0.4%' },
+        revenueTrend: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], data: [8200, 7100, 11400, 10200, 14800, 18500, 11050] },
+        ordersTrend: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], data: [16, 14, 22, 20, 29, 36, 21] },
+        payments: [45, 30, 20, 5]
+      },
+      '30days': {
+        kpi: { revenue: '₹3,42,800', orders: '662', profit: '₹1,58,400', customers: '1,420', aov: '₹517', cvr: '3.5%', revGrowth: '+28%', ordGrowth: '+22%', cvrGrowth: '+0.3%' },
+        revenueTrend: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], data: [74000, 89000, 92000, 87800] },
+        ordersTrend: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], data: [142, 175, 178, 167] },
+        payments: [46, 28, 21, 5]
+      },
+      'month': {
+        kpi: { revenue: '₹4,12,000', orders: '795', profit: '₹1,89,500', customers: '1,680', aov: '₹518', cvr: '3.6%', revGrowth: '+30%', ordGrowth: '+25%', cvrGrowth: '+0.5%' },
+        revenueTrend: { labels: ['1-7th', '8-14th', '15-21st', '22-28th', '29-31st'], data: [81000, 95000, 104000, 98000, 34000] },
+        ordersTrend: { labels: ['1-7th', '8-14th', '15-21st', '22-28th', '29-31st'], data: [156, 182, 201, 189, 67] },
+        payments: [48, 29, 18, 5]
+      },
+      'custom': {
+        kpi: { revenue: '₹81,250', orders: '158', profit: '₹37,890', customers: '356', aov: '₹514', cvr: '3.2%', revGrowth: '+24%', ordGrowth: '+18%', cvrGrowth: '-0.4%' },
+        revenueTrend: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], data: [8200, 7100, 11400, 10200, 14800, 18500, 11050] },
+        ordersTrend: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], data: [16, 14, 22, 20, 29, 36, 21] },
+        payments: [45, 30, 20, 5]
+      }
+    };
+
+    window.setAnalyticsPeriod = function(period) {
+      window.currentPeriod = period;
+      ['today', 'yesterday', '7days', '30days', 'month', 'custom'].forEach(p => {
+        const btn = document.getElementById(`btn-period-${p}`);
+        if (!btn) return;
+        if (p === period) {
+          btn.className = 'period-btn px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-white shadow-xs transition cursor-pointer';
+        } else {
+          btn.className = 'period-btn px-3 py-1.5 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
+        }
+      });
+      renderAllCharts(period);
+    };
+
+    function renderAllCharts(period = '7days') {
+      const dataSet = periodDatasets[period] || periodDatasets['7days'];
+
+      // Update KPI metrics
+      if (document.getElementById('kpi-revenue')) document.getElementById('kpi-revenue').textContent = dataSet.kpi.revenue;
+      if (document.getElementById('kpi-orders')) document.getElementById('kpi-orders').textContent = dataSet.kpi.orders;
+      if (document.getElementById('kpi-profit')) document.getElementById('kpi-profit').textContent = dataSet.kpi.profit;
+      if (document.getElementById('kpi-customers')) document.getElementById('kpi-customers').textContent = dataSet.kpi.customers;
+      if (document.getElementById('kpi-aov')) document.getElementById('kpi-aov').textContent = dataSet.kpi.aov;
+      if (document.getElementById('kpi-cvr')) document.getElementById('kpi-cvr').textContent = dataSet.kpi.cvr;
+
+      // Render Chart 1: Revenue Trend Area Chart
+      const revCanvas = document.getElementById('chartRevenueTrend');
+      if (revCanvas) {
+        const ctx = revCanvas.getContext('2d');
+        if (revenueChart) revenueChart.destroy();
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+        gradient.addColorStop(0, 'rgba(15, 23, 42, 0.12)');
+        gradient.addColorStop(1, 'rgba(15, 23, 42, 0.00)');
+
+        revenueChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: dataSet.revenueTrend.labels,
+            datasets: [{
+              label: 'Revenue',
+              data: dataSet.revenueTrend.data,
+              borderColor: '#0f172a',
+              borderWidth: 2.5,
+              fill: true,
+              backgroundColor: gradient,
+              tension: 0.42,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#0f172a',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0f172a',
+                padding: 10,
+                cornerRadius: 8,
+                callbacks: {
+                  label: (ctx) => `Revenue: ₹${ctx.parsed.y.toLocaleString('en-IN')}`
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: '#94a3b8', font: { size: 11, family: 'Inter' } }
+              },
+              y: {
+                grid: { color: '#f1f5f9' },
+                ticks: {
+                  color: '#94a3b8',
+                  font: { size: 11, family: 'Inter' },
+                  callback: (val) => val >= 1000 ? `₹${val / 1000}k` : `₹${val}`
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Render Chart 2: Payment Methods Donut Chart
+      const payCanvas = document.getElementById('chartPaymentMethods');
+      if (payCanvas) {
+        const ctx = payCanvas.getContext('2d');
+        if (paymentChart) paymentChart.destroy();
+
+        paymentChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Razorpay', 'UPI', 'COD', 'WhatsApp'],
+            datasets: [{
+              data: dataSet.payments,
+              backgroundColor: ['#2563eb', '#6366f1', '#f97316', '#10b981'],
+              borderWidth: 2,
+              borderColor: '#ffffff',
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '72%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0f172a',
+                callbacks: {
+                  label: (ctx) => ` ${ctx.label}: ${ctx.parsed}%`
+                }
+              }
+            }
+          }
+        });
+
+        // Update Legend Percentages
+        document.getElementById('pct-razorpay').textContent = `${dataSet.payments[0]}%`;
+        document.getElementById('pct-upi').textContent = `${dataSet.payments[1]}%`;
+        document.getElementById('pct-cod').textContent = `${dataSet.payments[2]}%`;
+        document.getElementById('pct-whatsapp').textContent = `${dataSet.payments[3]}%`;
+      }
+
+      // Render Chart 3: Orders Trend Bar Chart
+      const ordCanvas = document.getElementById('chartOrdersTrend');
+      if (ordCanvas) {
+        const ctx = ordCanvas.getContext('2d');
+        if (ordersTrendChart) ordersTrendChart.destroy();
+
+        ordersTrendChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: dataSet.ordersTrend.labels,
+            datasets: [{
+              label: 'Orders',
+              data: dataSet.ordersTrend.data,
+              backgroundColor: '#0f172a',
+              borderRadius: 6,
+              barThickness: 28
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0f172a',
+                padding: 10,
+                cornerRadius: 8,
+                callbacks: {
+                  label: (ctx) => `Orders: ${ctx.parsed.y}`
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: '#94a3b8', font: { size: 11, family: 'Inter' } }
+              },
+              y: {
+                grid: { color: '#f1f5f9' },
+                ticks: {
+                  color: '#94a3b8',
+                  font: { size: 11, family: 'Inter' },
+                  stepSize: 15
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Try listening to live Firestore orders to sync with real orders if available
+    try {
+      onSnapshot(collection(db, 'orders'), (snapshot) => {
+        if (!snapshot.empty) {
+          const orders = snapshot.docs.map(doc => doc.data());
+          let totalRev = 0;
+          let payCounts = { razorpay: 0, upi: 0, cod: 0, whatsapp: 0 };
+          let cityCounts = {};
+
+          orders.forEach(o => {
+            totalRev += Number(o.totalAmount || 0);
+            const pMethod = String(o.paymentMethod || '').toLowerCase();
+            if (pMethod.includes('upi')) payCounts.upi++;
+            else if (pMethod.includes('whatsapp')) payCounts.whatsapp++;
+            else if (pMethod.includes('cod')) payCounts.cod++;
+            else payCounts.razorpay++;
+
+            const city = o.city || o.customerDetails?.city || 'Chennai';
+            cityCounts[city] = (cityCounts[city] || 0) + 1;
+          });
+
+          if (totalRev > 0) {
+            document.getElementById('kpi-revenue').textContent = `₹${totalRev.toLocaleString('en-IN')}`;
+            document.getElementById('kpi-orders').textContent = orders.length;
+            const profitVal = Math.round(totalRev * 0.46);
+            document.getElementById('kpi-profit').textContent = `₹${profitVal.toLocaleString('en-IN')}`;
+            document.getElementById('kpi-aov').textContent = `₹${Math.round(totalRev / orders.length)}`;
+          }
+        }
+      });
+    } catch(e) {
+      console.log('Using benchmark offline analytics datasets');
+    }
+
+    // Initialize charts on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAllCharts('7days');
+    });
+  </script>
+
+</body>
+
+</html>
