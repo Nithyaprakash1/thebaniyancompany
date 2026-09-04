@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -183,7 +183,7 @@
           <!-- Shop Capsule Pill (The Baniyan Company with Logo) -->
           <div class="w-full bg-[#151720] border border-[#222634] rounded-xl px-3 py-2 flex items-center justify-between shadow-xs">
             <div class="flex items-center gap-2.5 min-w-0">
-              <img id="sidebar-shop-logo-img" src="assets/tbclogo.jpeg" alt="TBC" class="w-6 h-6 rounded-full object-cover border border-white/20 shrink-0" onerror="this.src='assets/tbclogo.jpg';">
+              <img id="sidebar-shop-logo-img" src="assets/tbclogo.jpeg" alt="TBC" class="w-6 h-6 rounded-full object-cover border border-white/20 shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
               <span class="text-[11px] font-medium tracking-wider text-slate-200 uppercase truncate" id="sidebar-shop-name">THE BANIYAN COMPANY</span>
             </div>
             <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
@@ -1141,7 +1141,7 @@
 
               <!-- Profile Logo -->
               <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
-                <img src="assets/tbclogo.jpeg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs" onerror="this.src='assets/tbclogo.jpg';">
+                <img src="assets/tbclogo.jpeg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs" onerror="this.src='assets/tbclogo.jpeg';">
               </div>
             </div>
           </div>
@@ -1355,7 +1355,7 @@
 
               <!-- Profile Logo -->
               <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
-                <img src="assets/tbclogo.jpeg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs" onerror="this.src='assets/tbclogo.jpg';">
+                <img src="assets/tbclogo.jpeg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs" onerror="this.src='assets/tbclogo.jpeg';">
               </div>
             </div>
           </div>
@@ -1508,7 +1508,7 @@
 
               <!-- Profile Logo -->
               <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
-                <img src="assets/tbclogo.jpeg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs" onerror="this.src='assets/tbclogo.jpg';">
+                <img src="assets/tbclogo.jpeg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs" onerror="this.src='assets/tbclogo.jpeg';">
               </div>
             </div>
           </div>
@@ -3682,8 +3682,13 @@
       if (!tbody) return;
 
       try {
-        const snap = await getDocs(collection(db, 'products'));
-        window.allProductsData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const compSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'products'));
+        const rootSnap = await getDocs(collection(db, 'products'));
+        const map = new Map();
+        rootSnap.docs.forEach(d => map.set(d.id, { id: d.id, ...d.data() }));
+        compSnap.docs.forEach(d => map.set(d.id, { id: d.id, ...d.data() }));
+
+        window.allProductsData = Array.from(map.values());
 
         // Populate Category Filter dropdown dynamically
         populateCategoryDropdown(window.allProductsData);
@@ -3691,7 +3696,7 @@
         applyProductFilters();
       } catch (err) {
         console.error('Error loading products catalog:', err);
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-600 font-medium">Error loading products catalog.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">Currently OverTraffic please try again later</td></tr>`;
       }
     }
 
@@ -3774,7 +3779,7 @@
       if (!tbody) return;
 
       if (!products || products.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">No products matching the selected filters found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">Currently OverTraffic please try again later</td></tr>`;
         return;
       }
 
@@ -4002,8 +4007,7 @@
         if (document.getElementById('ctrl-whatsapp-num')) document.getElementById('ctrl-whatsapp-num').value = comp.whatsappNumber || '+91 98765 43210';
         if (document.getElementById('ctrl-store-address')) document.getElementById('ctrl-store-address').value = comp.storeAddress || '14, Anna Nagar, Chennai - 600040';
         if (document.getElementById('ctrl-store-logo')) document.getElementById('ctrl-store-logo').value = comp.logo || '';
-        if (document.getElementById('sidebar-shop-logo-img') && comp.logo) document.getElementById('sidebar-shop-logo-img').src = comp.logo;
-        if (document.getElementById('sidebar-logo-img') && comp.logo) document.getElementById('sidebar-logo-img').src = comp.logo;
+        if (document.getElementById('sidebar-shop-logo-img')) document.getElementById('sidebar-shop-logo-img').src = comp.logo || 'assets/tbclogo.jpeg';
         if (document.getElementById('login-logo-img') && comp.logo) document.getElementById('login-logo-img').src = comp.logo;
         if (comp.logo) {
           try {
@@ -4433,7 +4437,6 @@
         if (document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = name;
         if (document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = name;
         if (document.getElementById('sidebar-shop-logo-img') && logo) document.getElementById('sidebar-shop-logo-img').src = logo;
-        if (document.getElementById('sidebar-logo-img') && logo) document.getElementById('sidebar-logo-img').src = logo;
       } else {
         alert('Error updating settings: ' + res.error);
       }

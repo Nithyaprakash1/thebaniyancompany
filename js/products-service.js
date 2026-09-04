@@ -370,7 +370,8 @@ export function clearTbcCache() {
 export async function deleteProduct(id) {
   if (!id) return false;
   try {
-    await deleteDoc(doc(db, 'products', id));
+    try { await deleteDoc(doc(db, 'companies', COMPANY_ID, 'products', id)); } catch (_) {}
+    try { await deleteDoc(doc(db, 'products', id)); } catch (_) {}
     if (Array.isArray(_cachedProducts)) {
       _cachedProducts = _cachedProducts.filter(p => p.id !== id && p.productId !== id);
     }
@@ -518,7 +519,7 @@ export async function getEcomCategories(companyId = COMPANY_ID) {
  * @param {Function} [onError]
  * @returns {Function} Unsubscribe function
  */
-export function subscribeToProducts(onUpdate, onError) {
+export function subscribeToProducts(onUpdate, onError, companyId = COMPANY_ID) {
   if (typeof onUpdate !== 'function') return () => {};
 
   // Instant render from memory if available
@@ -526,23 +527,58 @@ export function subscribeToProducts(onUpdate, onError) {
     onUpdate(_cachedProducts);
   }
 
-  try {
-    const ref = collection(db, 'products');
-    return onSnapshot(ref, (snapshot) => {
-      const normalized = snapshot.docs
-        .map(d => normalizeProduct(d.id, d.data()))
-        .filter(p => p.id && p.showInEcom !== false);
+  const productsMap = new Map();
 
-      _cachedProducts = normalized;
-      onUpdate(normalized);
+  function notifySubscribers() {
+    const list = Array.from(productsMap.values())
+      .filter(p => p.id && p.showInEcom !== false);
+    _cachedProducts = list;
+    onUpdate(list);
+  }
+
+  let unsubComp = () => {};
+  let unsubRoot = () => {};
+
+  try {
+    const compRef = collection(db, 'companies', companyId, 'products');
+    unsubComp = onSnapshot(compRef, (snapshot) => {
+      snapshot.docs.forEach(d => {
+        productsMap.set(d.id, normalizeProduct(d.id, { ...d.data(), companyId }));
+      });
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'removed') {
+          productsMap.delete(change.doc.id);
+        }
+      });
+      notifySubscribers();
     }, (err) => {
-      console.warn('[TBC Real-Time] subscribeToProducts warning:', err);
+      console.warn('[TBC Real-Time] subscribeToProducts company warning:', err);
       if (typeof onError === 'function') onError(err);
     });
   } catch (err) {
-    console.error('[TBC Real-Time] subscribeToProducts error:', err);
-    return () => {};
+    console.error('[TBC Real-Time] subscribeToProducts company error:', err);
   }
+
+  try {
+    const rootRef = collection(db, 'products');
+    unsubRoot = onSnapshot(rootRef, (snapshot) => {
+      snapshot.docs.forEach(d => {
+        if (!productsMap.has(d.id)) {
+          productsMap.set(d.id, normalizeProduct(d.id, d.data()));
+        }
+      });
+      notifySubscribers();
+    }, (err) => {
+      console.warn('[TBC Real-Time] subscribeToProducts root warning:', err);
+    });
+  } catch (err) {
+    console.error('[TBC Real-Time] subscribeToProducts root error:', err);
+  }
+
+  return () => {
+    try { unsubComp(); } catch (_) {}
+    try { unsubRoot(); } catch (_) {}
+  };
 }
 
 /**
@@ -562,11 +598,35 @@ export async function getProducts(companyId = COMPANY_ID, limitCount = null) {
 
 export async function revalidateProducts(companyId = COMPANY_ID) {
   try {
-    const ref = collection(db, 'products');
-    const snapshot = await getDocs(ref);
-    const normalized = snapshot.docs
-      .map(d => normalizeProduct(d.id, d.data()))
-      .filter(p => p.id && p.showInEcom !== false); // Strict filter: exclude any product marked showInEcom = false
+    const targetCompanyId = companyId || COMPANY_ID;
+    const productsMap = new Map();
+
+    // 1. Fetch from company products collection (Primary)
+    try {
+      const compRef = collection(db, 'companies', targetCompanyId, 'products');
+      const compSnap = await getDocs(compRef);
+      compSnap.docs.forEach(d => {
+        productsMap.set(d.id, normalizeProduct(d.id, { ...d.data(), companyId: targetCompanyId }));
+      });
+    } catch (err) {
+      console.warn('[TBC] Company products fetch error:', err);
+    }
+
+    // 2. Fetch from root products collection (Fallback / Secondary)
+    try {
+      const rootRef = collection(db, 'products');
+      const rootSnap = await getDocs(rootRef);
+      rootSnap.docs.forEach(d => {
+        if (!productsMap.has(d.id)) {
+          productsMap.set(d.id, normalizeProduct(d.id, d.data()));
+        }
+      });
+    } catch (err) {
+      console.warn('[TBC] Root products fetch error:', err);
+    }
+
+    const normalized = Array.from(productsMap.values())
+      .filter(p => p.id && p.showInEcom !== false);
 
     _cachedProducts = normalized;
     return _cachedProducts || [];
@@ -577,42 +637,14 @@ export async function revalidateProducts(companyId = COMPANY_ID) {
 }
 
 /**
- * Fetches all products enabled for E-Commerce (where showInEcom == true)
- * Path: companies/{companyId}/products (or global products collection where companyId == companyId)
+ * Fetches all products enabled for E-Commerce.
+ * Path: companies/{companyId}/products and root products collection
  * @param {string} [companyId]
  * @returns {Promise<object[]>}
  */
 export async function getEcomProducts(companyId = COMPANY_ID) {
-  try {
-    const targetCompanyId = companyId || COMPANY_ID;
-    const companyProductsRef = collection(db, `companies/${targetCompanyId}/products`);
-    const q1 = query(companyProductsRef, where('showInEcom', '==', true));
-    const snapshot1 = await getDocs(q1);
-
-    let products = snapshot1.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    if (products.length === 0) {
-      const rootRef = collection(db, 'products');
-      const q2 = query(rootRef, where('showInEcom', '==', true));
-      const snapshot2 = await getDocs(q2);
-      products = snapshot2.docs
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-        .filter(p => !p.companyId || p.companyId === targetCompanyId);
-    }
-
-    return products;
-  } catch (err) {
-    console.error('[TBC] getEcomProducts error:', err);
-    return [];
-  }
+  return revalidateProducts(companyId);
 }
-
 
 /**
  * Fetch a single product by its Firestore document ID or productId field live from Firestore.
@@ -622,7 +654,25 @@ export async function getEcomProducts(companyId = COMPANY_ID) {
 export async function getProductById(id) {
   if (!id) return null;
 
-  // 1. Direct Firestore document lookup (Guarantees real-time accurate stock & price)
+  // 1. Direct Firestore document lookup in company collection
+  try {
+    const compSnap = await getDoc(doc(db, 'companies', COMPANY_ID, 'products', id));
+    if (compSnap.exists()) {
+      const p = normalizeProduct(compSnap.id, { ...compSnap.data(), companyId: COMPANY_ID });
+      return p.showInEcom !== false ? p : null;
+    }
+
+    const qComp = query(collection(db, 'companies', COMPANY_ID, 'products'), where('productId', '==', id), limit(1));
+    const snapComp = await getDocs(qComp);
+    if (!snapComp.empty) {
+      const p = normalizeProduct(snapComp.docs[0].id, { ...snapComp.docs[0].data(), companyId: COMPANY_ID });
+      return p.showInEcom !== false ? p : null;
+    }
+  } catch (err) {
+    console.warn(`[TBC] getProductById(${id}) company fetch error:`, err);
+  }
+
+  // 2. Direct Firestore document lookup in root products collection
   try {
     const snap = await getDoc(doc(db, 'products', id));
     if (snap.exists()) {
@@ -640,7 +690,7 @@ export async function getProductById(id) {
     console.error(`[TBC] getProductById(${id}) direct fetch error:`, err);
   }
 
-  // 2. Fallback to active in-memory list if offline or network glitch
+  // 3. Fallback to active in-memory list if offline or network glitch
   if (Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
     const match = _cachedProducts.find(p => (p.id === id || p.productId === id) && p.showInEcom !== false);
     if (match) return match;
@@ -684,29 +734,52 @@ export function subscribeToProduct(id, onUpdate, onError) {
     if (cachedMatch) onUpdate(cachedMatch);
   }
 
+  let unsubComp = () => {};
+  let unsubRoot = () => {};
+
   try {
-    const docRef = doc(db, 'products', id);
-    return onSnapshot(docRef, (docSnap) => {
+    const compDocRef = doc(db, 'companies', COMPANY_ID, 'products', id);
+    unsubComp = onSnapshot(compDocRef, (docSnap) => {
       if (docSnap.exists()) {
-        const liveProd = normalizeProduct(docSnap.id, docSnap.data());
-        
-        // Update in-memory registry
+        const liveProd = normalizeProduct(docSnap.id, { ...docSnap.data(), companyId: COMPANY_ID });
         if (Array.isArray(_cachedProducts)) {
           const idx = _cachedProducts.findIndex(p => p.id === id || p.productId === id);
           if (idx > -1) _cachedProducts[idx] = liveProd;
           else _cachedProducts.push(liveProd);
         }
-
         onUpdate(liveProd);
       }
     }, (err) => {
-      console.warn('[TBC Real-Time] subscribeToProduct error:', err);
+      console.warn('[TBC Real-Time] subscribeToProduct comp error:', err);
+    });
+  } catch (err) {
+    console.error('[TBC Real-Time] subscribeToProduct comp exception:', err);
+  }
+
+  try {
+    const docRef = doc(db, 'products', id);
+    unsubRoot = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const liveProd = normalizeProduct(docSnap.id, docSnap.data());
+        if (Array.isArray(_cachedProducts)) {
+          const idx = _cachedProducts.findIndex(p => p.id === id || p.productId === id);
+          if (idx > -1) _cachedProducts[idx] = liveProd;
+          else _cachedProducts.push(liveProd);
+        }
+        onUpdate(liveProd);
+      }
+    }, (err) => {
+      console.warn('[TBC Real-Time] subscribeToProduct root error:', err);
       if (typeof onError === 'function') onError(err);
     });
   } catch (err) {
-    console.error('[TBC Real-Time] subscribeToProduct exception:', err);
-    return () => {};
+    console.error('[TBC Real-Time] subscribeToProduct root exception:', err);
   }
+
+  return () => {
+    try { unsubComp(); } catch (_) {}
+    try { unsubRoot(); } catch (_) {}
+  };
 }
 
 
@@ -1096,11 +1169,17 @@ export const saveOrderToFirestore = saveEcomOrder;
  */
 export async function decrementVariantStock(productId, variantKey, qty = 1, branchId = BRANCH_ID, sizeParam = '', colorParam = '') {
   if (!productId) return { success: false, error: 'No productId provided.' };
-  const productRef = doc(db, 'products', productId);
+  const compProductRef = doc(db, 'companies', COMPANY_ID, 'products', productId);
+  const rootProductRef = doc(db, 'products', productId);
 
   try {
     await runTransaction(db, async (transaction) => {
-      const productSnap = await transaction.get(productRef);
+      let targetRef = compProductRef;
+      let productSnap = await transaction.get(compProductRef);
+      if (!productSnap.exists()) {
+        productSnap = await transaction.get(rootProductRef);
+        targetRef = rootProductRef;
+      }
 
       if (!productSnap.exists()) {
         throw new Error(`Product ${productId} not found.`);
@@ -1190,7 +1269,7 @@ export async function decrementVariantStock(productId, variantKey, qty = 1, bran
         updates.variants = variants;
       }
 
-      transaction.update(productRef, updates);
+      transaction.update(targetRef, updates);
     });
 
     console.info(`[TBC] Stock successfully decremented for product ${productId}, qty ${qty}`);
