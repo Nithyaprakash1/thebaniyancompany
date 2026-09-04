@@ -2187,6 +2187,7 @@
     };
 
     window.logoutAdmin = function() {
+      localStorage.removeItem('tbc_admin_authed');
       window.location.href = 'admin.html';
     };
 
