@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -1029,7 +1030,7 @@
 <!-- Dynamic Products Integration -->
 <script type="module">
   import tbcCart from './js/cart-store.js';
-  import { subscribeToProducts, subscribeToCategories, getCompany, getProductTotalStock, isProductOutOfStock, getProductPricing } from './js/products-service.js';
+  import { subscribeToProducts, subscribeToCategories, getCompany, getProductTotalStock, isProductOutOfStock, getProductPricing, getOverTrafficHtml } from './js/products-service.js';
   import { toggleWishlistItem, hasWishlistItem } from './js/wishlist-store.js';
 
   getCompany().then(comp => {
@@ -1064,10 +1065,10 @@
         try { return renderProductCard(p); }
         catch(err) { console.warn('[TBC] Card render error for', p.id, err); return ''; }
       }).join('');
-      grid.innerHTML = cards || '<div class="col-span-full py-16 text-center text-secondary font-medium tracking-wide">Currently OverTraffic please try again later</div>';
+      grid.innerHTML = cards || getOverTrafficHtml();
       if (typeof applyAdvancedFilters === 'function') applyAdvancedFilters();
     } else {
-      grid.innerHTML = '<div class="col-span-full py-16 text-center text-secondary font-medium tracking-wide">Currently OverTraffic please try again later</div>';
+      grid.innerHTML = getOverTrafficHtml();
     }
   }
 

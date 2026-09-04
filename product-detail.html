@@ -1594,7 +1594,7 @@
           }
         }
 
-        if (!product) throw new Error('Currently OverTraffic please try again later');
+        if (!product) throw new Error('Right Now many users trying Please try again later');
 
         // Safely ensure properties
         const images = (Array.isArray(product.imageUrls) && product.imageUrls.length > 0)
@@ -1864,7 +1864,7 @@
         const productContent = document.getElementById('product-content');
         if (productContent) { productContent.classList.remove('hidden'); productContent.style.display = 'grid'; }
         const title = document.querySelector('main h1');
-        if (title) title.textContent = 'Product details loading...';
+        if (title) title.textContent = 'Right Now many users trying Please try again later';
       } finally {
         if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
         else document.getElementById('loading-screen')?.classList.add('hidden');

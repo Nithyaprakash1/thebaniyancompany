@@ -323,7 +323,7 @@ try {
 let _cachedProducts = null;
 let _cachedCategories = null;
 
-// Session-level browser caching (survives tab navigation, cleared on close or refresh)
+// Session-level browser caching (survives tab navigation and reload, cleared on tab close)
 export function getSessionData(key) {
   try {
     if (typeof sessionStorage === 'undefined') return null;
@@ -351,6 +351,9 @@ export function removeSessionData(key) {
 export function clearProductSessionCache(companyId = COMPANY_ID) {
   _cachedProducts = null;
   _cachedCategories = null;
+  removeSessionData(`ecommerce_products_${companyId}`);
+  removeSessionData(`ecommerce_categories_${companyId}`);
+  removeSessionData(`ecommerce_company_${companyId}`);
   removeSessionData(`tbc_session_products_${companyId}`);
   removeSessionData(`tbc_session_categories_${companyId}`);
   removeSessionData(`tbc_session_company_${companyId}`);
@@ -373,9 +376,9 @@ export function setCachedCategories(categories) {
   _cachedCategories = categories;
 }
 
-export function getCachedCompany() {
+export function getCachedCompany(companyId = COMPANY_ID) {
   try {
-    const sessionCompany = getSessionData(`tbc_session_company_${COMPANY_ID}`);
+    const sessionCompany = getSessionData(`ecommerce_company_${companyId}`) || getSessionData(`tbc_session_company_${companyId}`);
     if (sessionCompany) return sessionCompany;
 
     const raw = localStorage.getItem('tbc_cache_company');
@@ -387,22 +390,52 @@ export function getCachedCompany() {
   }
 }
 
-export function setCachedCompany(company) {
+export function setCachedCompany(company, companyId = COMPANY_ID) {
   try {
-    setSessionData(`tbc_session_company_${COMPANY_ID}`, company);
+    setSessionData(`ecommerce_company_${companyId}`, company);
     localStorage.setItem('tbc_cache_company', JSON.stringify({ time: Date.now(), data: company }));
   } catch (e) {}
 }
 
-export function clearTbcCache() {
+export function clearTbcCache(companyId = COMPANY_ID) {
   try {
-    clearProductSessionCache(COMPANY_ID);
+    clearProductSessionCache(companyId);
     localStorage.removeItem('tbc_cache_products');
     localStorage.removeItem('tbc_cache_categories');
     localStorage.removeItem('tbc_cache_company');
   } catch (e) {}
   _cachedProducts = null;
   _cachedCategories = null;
+}
+
+/**
+ * Standard OverTraffic empty state markup with Lottie animation
+ * Displays: "Right Now many users trying Please try again later"
+ */
+export function getOverTrafficHtml() {
+  return `
+    <div class="col-span-full py-16 px-4 flex flex-col items-center justify-center text-center max-w-md mx-auto animate-fade-in">
+      <div class="w-44 h-44 mb-3 flex items-center justify-center relative">
+        <lottie-player src="https://assets5.lottiefiles.com/packages/lf20_tmsiddoc.json" background="transparent" speed="1" style="width: 170px; height: 170px;" loop autoplay></lottie-player>
+      </div>
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold rounded-full uppercase tracking-wider mb-2.5 shadow-xs">
+        <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span> High Server Traffic
+      </div>
+      <h3 class="text-base sm:text-lg font-bold text-neutral-900 leading-snug">
+        Right Now many users trying Please try again later
+      </h3>
+      <p class="text-xs text-neutral-500 mt-1 max-w-xs leading-relaxed">
+        Our store is experiencing high traffic. Please wait a moment and try again.
+      </p>
+      <button onclick="window.location.reload()" class="mt-4 px-5 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold rounded-xl uppercase tracking-wider shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+        <span class="material-symbols-outlined text-sm">refresh</span> Try Again
+      </button>
+    </div>
+  `;
+}
+
+if (typeof window !== 'undefined') {
+  window.getOverTrafficHtml = getOverTrafficHtml;
 }
 
 export async function deleteProduct(id) {
@@ -454,65 +487,132 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Real-time live listener for categories.
+ * Fetch all categories for navigation bar & filter menus
+ * Path: companies/{companyId}/categories
+ * Caches in sessionStorage under ecommerce_categories_${companyId}
+ * @param {string} [companyId]
+ * @returns {Promise<object[]>}
+ */
+export async function getStoreCategories(companyId = COMPANY_ID) {
+  const targetCompanyId = companyId || COMPANY_ID;
+  const cacheKey = `ecommerce_categories_${targetCompanyId}`;
+
+  // 1. Check in-memory cache
+  if (_cachedCategories && Array.isArray(_cachedCategories) && _cachedCategories.length > 0) {
+    return _cachedCategories;
+  }
+
+  // 2. Check sessionStorage
+  const cached = getSessionData(cacheKey) || getSessionData(`tbc_session_categories_${targetCompanyId}`);
+  if (Array.isArray(cached) && cached.length > 0) {
+    _cachedCategories = cached;
+    return cached;
+  }
+
+  // 3. One-time read from Firestore: companies/{companyId}/categories
+  const categoriesMap = new Map();
+  try {
+    const categoriesRef = collection(db, 'companies', targetCompanyId, 'categories');
+    const snapshot = await getDocs(categoriesRef);
+    snapshot.docs.forEach(doc => {
+      categoriesMap.set(doc.id, normalizeCategory(doc.id, { ...doc.data(), companyId: targetCompanyId }));
+    });
+  } catch (err) {
+    console.warn('[TBC] getStoreCategories company fetch error:', err);
+  }
+
+  // Fallback to root categories if company subcollection is empty
+  if (categoriesMap.size === 0) {
+    try {
+      const rootRef = collection(db, 'categories');
+      const rootSnap = await getDocs(rootRef);
+      rootSnap.docs.forEach(doc => {
+        categoriesMap.set(doc.id, normalizeCategory(doc.id, doc.data()));
+      });
+    } catch (err) {
+      console.warn('[TBC] getStoreCategories root fallback fetch error:', err);
+    }
+  }
+
+  const normalized = Array.from(categoriesMap.values())
+    .filter(c => c.id)
+    .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+  if (normalized.length > 0) {
+    _cachedCategories = normalized;
+    setSessionData(cacheKey, normalized);
+  }
+
+  return normalized;
+}
+
+/**
+ * Controlled manual refresh for categories
+ * @param {string} [companyId]
+ * @returns {Promise<object[]>}
+ */
+export async function refreshStoreCategories(companyId = COMPANY_ID) {
+  const targetCompanyId = companyId || COMPANY_ID;
+  _cachedCategories = null;
+  removeSessionData(`ecommerce_categories_${targetCompanyId}`);
+  removeSessionData(`tbc_session_categories_${targetCompanyId}`);
+  return await getStoreCategories(targetCompanyId);
+}
+
+/**
+ * Category listener & fetcher.
+ * Uses session-level caching for public storefront (0 redundant Firestore reads).
+ * Pass options.realtime = true for continuous live Firestore onSnapshot listeners.
+ *
  * @param {Function} onUpdate
  * @param {Function} [onError]
+ * @param {string}   [companyId]
+ * @param {object}   [options]
  * @returns {Function} Unsubscribe function
  */
-export function subscribeToCategories(onUpdate, onError) {
+export function subscribeToCategories(onUpdate, onError, companyId = COMPANY_ID, options = {}) {
   if (typeof onUpdate !== 'function') return () => {};
 
-  if (_cachedCategories && _cachedCategories.length > 0) {
-    onUpdate(_cachedCategories);
+  // For storefront: load from sessionStorage / one-time read
+  getStoreCategories(companyId).then(cats => {
+    onUpdate(cats);
+  }).catch(err => {
+    if (typeof onError === 'function') onError(err);
+  });
+
+  if (!options.realtime) {
+    return () => {};
   }
 
   try {
-    const ref = collection(db, 'categories');
+    const ref = collection(db, 'companies', companyId, 'categories');
     return onSnapshot(ref, (snapshot) => {
       const normalized = snapshot.docs
-        .map(d => normalizeCategory(d.id, d.data()))
+        .map(d => normalizeCategory(d.id, { ...d.data(), companyId }))
         .filter(c => c.id)
         .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-
       _cachedCategories = normalized;
+      setSessionData(`ecommerce_categories_${companyId}`, normalized);
       onUpdate(normalized);
     }, (err) => {
-      console.warn('[TBC Real-Time] subscribeToCategories warning:', err);
       if (typeof onError === 'function') onError(err);
     });
   } catch (err) {
-    console.error('[TBC Real-Time] subscribeToCategories error:', err);
     return () => {};
   }
 }
 
 /**
- * Fetch all category documents from /categories.
+ * Fetch all category documents using sessionStorage cache.
  * @param {string} [companyId]
  * @returns {Promise<object[]>}
  */
 export async function getCategories(companyId = COMPANY_ID) {
-  if (_cachedCategories && _cachedCategories.length > 0) {
-    return _cachedCategories;
-  }
-  return await revalidateCategories(companyId);
+  return await getStoreCategories(companyId);
 }
 
 export async function revalidateCategories(companyId = COMPANY_ID) {
-  try {
-    const ref = collection(db, 'categories');
-    const snapshot = await getDocs(ref);
-    const normalized = snapshot.docs
-      .map(d => normalizeCategory(d.id, d.data()))
-      .filter(c => c.id && (!companyId || c.companyId === companyId || true))
-      .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-
-    _cachedCategories = normalized;
-    return _cachedCategories || [];
-  } catch (err) {
-    console.error('[TBC] getCategories error:', err);
-    return _cachedCategories || [];
-  }
+  return await refreshStoreCategories(companyId);
 }
 
 /**
@@ -568,12 +668,23 @@ export async function getEcomCategories(companyId = COMPANY_ID) {
  * @param {object}   [options]
  * @returns {Function} Unsubscribe function
  */
+/**
+ * Product listener & fetcher.
+ * Uses session-level caching for public storefront (zero unnecessary onSnapshot/reads).
+ * Admin can specify options.realtime = true for live order/inventory synchronization.
+ *
+ * @param {Function} onUpdate
+ * @param {Function} [onError]
+ * @param {string}   [companyId]
+ * @param {object}   [options]
+ * @returns {Function} Unsubscribe function
+ */
 export function subscribeToProducts(onUpdate, onError, companyId = COMPANY_ID, options = {}) {
   if (typeof onUpdate !== 'function') return () => {};
 
   // For public storefront: use session-level cache & one-time getDocs (no continuous real-time read quota usage)
   if (!options.realtime) {
-    getProducts(companyId).then(products => {
+    getStoreProducts(companyId).then(products => {
       onUpdate(products);
     }).catch(err => {
       console.warn('[TBC] subscribeToProducts session fetch warning:', err);
@@ -589,7 +700,7 @@ export function subscribeToProducts(onUpdate, onError, companyId = COMPANY_ID, o
     const list = Array.from(productsMap.values())
       .filter(p => p.id && p.showInEcom !== false);
     _cachedProducts = list;
-    setSessionData(`tbc_session_products_${companyId}`, list);
+    setSessionData(`ecommerce_products_${companyId}`, list);
     onUpdate(list);
   }
 
@@ -639,10 +750,83 @@ export function subscribeToProducts(onUpdate, onError, companyId = COMPANY_ID, o
 }
 
 /**
+ * Fetch all active products for the eCommerce storefront
+ * Path: companies/{companyId}/products
+ * Uses sessionStorage (ecommerce_products_{companyId}) for 0 redundant reads across pages.
+ *
+ * @param {string} [companyId]
+ * @returns {Promise<object[]>}
+ */
+export async function getStoreProducts(companyId = COMPANY_ID) {
+  const targetCompanyId = companyId || COMPANY_ID;
+  const cacheKey = `ecommerce_products_${targetCompanyId}`;
+
+  // 1. Check in-memory cache
+  if (_cachedProducts && Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
+    return _cachedProducts;
+  }
+
+  // 2. Check browser sessionStorage
+  const cached = getSessionData(cacheKey) || getSessionData(`tbc_session_products_${targetCompanyId}`);
+  if (Array.isArray(cached) && cached.length > 0) {
+    _cachedProducts = cached;
+    return cached;
+  }
+
+  // 3. One-time read from Firestore: companies/{companyId}/products
+  const productsMap = new Map();
+  try {
+    const productsRef = collection(db, 'companies', targetCompanyId, 'products');
+    const snapshot = await getDocs(productsRef);
+    snapshot.docs.forEach(d => {
+      productsMap.set(d.id, normalizeProduct(d.id, { ...d.data(), companyId: targetCompanyId }));
+    });
+  } catch (err) {
+    console.warn('[TBC] getStoreProducts company fetch error:', err);
+  }
+
+  // Fallback to root products collection if company subcollection is empty
+  if (productsMap.size === 0) {
+    try {
+      const rootRef = collection(db, 'products');
+      const rootSnap = await getDocs(rootRef);
+      rootSnap.docs.forEach(d => {
+        productsMap.set(d.id, normalizeProduct(d.id, d.data()));
+      });
+    } catch (err) {
+      console.warn('[TBC] getStoreProducts root fallback error:', err);
+    }
+  }
+
+  const normalized = Array.from(productsMap.values())
+    .filter(p => p.id && p.showInEcom !== false);
+
+  if (normalized.length > 0) {
+    _cachedProducts = normalized;
+    setSessionData(cacheKey, normalized);
+  }
+
+  return normalized;
+}
+
+/**
+ * Controlled manual refresh for store products
+ * Clears sessionStorage for this company and refetches fresh data.
+ *
+ * @param {string} [companyId]
+ * @returns {Promise<object[]>}
+ */
+export async function refreshStoreProducts(companyId = COMPANY_ID) {
+  const targetCompanyId = companyId || COMPANY_ID;
+  _cachedProducts = null;
+  removeSessionData(`ecommerce_products_${targetCompanyId}`);
+  removeSessionData(`tbc_session_products_${targetCompanyId}`);
+  return await getStoreProducts(targetCompanyId);
+}
+
+/**
  * Fetch all products for a given company with session-level caching.
- * First visit: fetches from Firestore and stores in sessionStorage.
- * While browsing: uses cached data (ZERO Firestore reads).
- * On reload or fresh window: fetches fresh data.
+ * A normal page reload continues using the existing sessionStorage data.
  *
  * @param {string} [companyId]
  * @param {number} [limitCount]
@@ -650,76 +834,15 @@ export function subscribeToProducts(onUpdate, onError, companyId = COMPANY_ID, o
  * @returns {Promise<object[]>}
  */
 export async function getProducts(companyId = COMPANY_ID, limitCount = null, forceRefresh = false) {
-  const targetCompanyId = companyId || COMPANY_ID;
-
-  // Detect page reload: clear session cache to fetch fresh on reload
-  if (!forceRefresh && typeof window !== 'undefined' && window.performance?.getEntriesByType) {
-    const navEntries = window.performance.getEntriesByType('navigation');
-    if (navEntries.length > 0 && navEntries[0].type === 'reload') {
-      if (!window.__tbcReloadCacheBusted) {
-        window.__tbcReloadCacheBusted = true;
-        forceRefresh = true;
-        clearProductSessionCache(targetCompanyId);
-      }
-    }
+  if (forceRefresh) {
+    return await refreshStoreProducts(companyId);
   }
-
-  if (!forceRefresh) {
-    if (_cachedProducts && Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
-      return limitCount ? _cachedProducts.slice(0, limitCount) : _cachedProducts;
-    }
-
-    const sessionCached = getSessionData(`tbc_session_products_${targetCompanyId}`);
-    if (Array.isArray(sessionCached) && sessionCached.length > 0) {
-      _cachedProducts = sessionCached;
-      console.info(`[TBC Cache] Loaded ${sessionCached.length} products from browser session cache (0 Firestore reads).`);
-      return limitCount ? sessionCached.slice(0, limitCount) : sessionCached;
-    }
-  }
-
-  const products = await revalidateProducts(targetCompanyId);
+  const products = await getStoreProducts(companyId);
   return limitCount ? products.slice(0, limitCount) : products;
 }
 
 export async function revalidateProducts(companyId = COMPANY_ID) {
-  try {
-    const targetCompanyId = companyId || COMPANY_ID;
-    const productsMap = new Map();
-
-    // 1. Fetch from company products collection: companies/{companyId}/products (Primary)
-    try {
-      const compRef = collection(db, 'companies', targetCompanyId, 'products');
-      const compSnap = await getDocs(compRef);
-      compSnap.docs.forEach(d => {
-        productsMap.set(d.id, normalizeProduct(d.id, { ...d.data(), companyId: targetCompanyId }));
-      });
-    } catch (err) {
-      console.warn('[TBC] Company products fetch error:', err);
-    }
-
-    // 2. Fetch from root products collection (Fallback / Secondary)
-    try {
-      const rootRef = collection(db, 'products');
-      const rootSnap = await getDocs(rootRef);
-      rootSnap.docs.forEach(d => {
-        if (!productsMap.has(d.id)) {
-          productsMap.set(d.id, normalizeProduct(d.id, d.data()));
-        }
-      });
-    } catch (err) {
-      console.warn('[TBC] Root products fetch error:', err);
-    }
-
-    const normalized = Array.from(productsMap.values())
-      .filter(p => p.id && p.showInEcom !== false);
-
-    _cachedProducts = normalized;
-    setSessionData(`tbc_session_products_${targetCompanyId}`, normalized);
-    return _cachedProducts || [];
-  } catch (err) {
-    console.error('[TBC] revalidateProducts error:', err);
-    return _cachedProducts || [];
-  }
+  return await refreshStoreProducts(companyId);
 }
 
 /**
@@ -729,7 +852,56 @@ export async function revalidateProducts(companyId = COMPANY_ID) {
  * @returns {Promise<object[]>}
  */
 export async function getEcomProducts(companyId = COMPANY_ID) {
-  return getProducts(companyId);
+  return getStoreProducts(companyId);
+}
+
+/**
+ * Fetch a single product by ID for product details page.
+ * Path: companies/{companyId}/products/{productId}
+ * Checks sessionStorage cache first (0 redundant Firestore reads).
+ *
+ * @param {string} productId
+ * @param {string} [companyId]
+ * @returns {Promise<object|null>}
+ */
+export async function getStoreProductById(productId, companyId = COMPANY_ID) {
+  if (!productId) return null;
+  const targetCompanyId = companyId || COMPANY_ID;
+
+  // 1. Check in-memory cache
+  if (Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
+    const match = _cachedProducts.find(p => (p.id === productId || p.productId === productId) && p.showInEcom !== false);
+    if (match) return match;
+  }
+
+  // 2. Check sessionStorage cache
+  const cached = getSessionData(`ecommerce_products_${targetCompanyId}`) || getSessionData(`tbc_session_products_${targetCompanyId}`);
+  if (Array.isArray(cached) && cached.length > 0) {
+    const match = cached.find(p => (p.id === productId || p.productId === productId) && p.showInEcom !== false);
+    if (match) return match;
+  }
+
+  // 3. One-time read from Firestore: companies/{companyId}/products/{productId}
+  try {
+    const productRef = doc(db, 'companies', targetCompanyId, 'products', productId);
+    const snapshot = await getDoc(productRef);
+    if (snapshot.exists()) {
+      return normalizeProduct(snapshot.id, { ...snapshot.data(), companyId: targetCompanyId });
+    }
+  } catch (err) {
+    console.warn(`[TBC] getStoreProductById(${productId}) error:`, err);
+  }
+
+  // Fallback check root products collection
+  try {
+    const rootRef = doc(db, 'products', productId);
+    const rootSnap = await getDoc(rootRef);
+    if (rootSnap.exists()) {
+      return normalizeProduct(rootSnap.id, rootSnap.data());
+    }
+  } catch (_) {}
+
+  return null;
 }
 
 /**
@@ -742,62 +914,25 @@ export async function getEcomProducts(companyId = COMPANY_ID) {
  */
 export async function getProductById(id, companyId = COMPANY_ID, forceLive = false) {
   if (!id) return null;
-  const targetCompanyId = companyId || COMPANY_ID;
-
-  // 1. If not forcing live read, check memory & session cache first (ZERO reads)
   if (!forceLive) {
-    if (Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
-      const match = _cachedProducts.find(p => (p.id === id || p.productId === id) && p.showInEcom !== false);
-      if (match) return match;
-    }
-    const sessionList = getSessionData(`tbc_session_products_${targetCompanyId}`);
-    if (Array.isArray(sessionList)) {
-      const match = sessionList.find(p => (p.id === id || p.productId === id) && p.showInEcom !== false);
-      if (match) return match;
-    }
+    const cached = await getStoreProductById(id, companyId);
+    if (cached) return cached;
   }
 
-  // 2. Direct Firestore document lookup in company collection
+  const targetCompanyId = companyId || COMPANY_ID;
   try {
     const compSnap = await getDoc(doc(db, 'companies', targetCompanyId, 'products', id));
     if (compSnap.exists()) {
-      const p = normalizeProduct(compSnap.id, { ...compSnap.data(), companyId: targetCompanyId });
-      return p.showInEcom !== false ? p : null;
+      return normalizeProduct(compSnap.id, { ...compSnap.data(), companyId: targetCompanyId });
     }
+  } catch (_) {}
 
-    const qComp = query(collection(db, 'companies', targetCompanyId, 'products'), where('productId', '==', id), limit(1));
-    const snapComp = await getDocs(qComp);
-    if (!snapComp.empty) {
-      const p = normalizeProduct(snapComp.docs[0].id, { ...snapComp.docs[0].data(), companyId: targetCompanyId });
-      return p.showInEcom !== false ? p : null;
-    }
-  } catch (err) {
-    console.warn(`[TBC] getProductById(${id}) company fetch error:`, err);
-  }
-
-  // 3. Direct Firestore document lookup in root products collection
   try {
     const snap = await getDoc(doc(db, 'products', id));
     if (snap.exists()) {
-      const p = normalizeProduct(snap.id, snap.data());
-      return p.showInEcom !== false ? p : null;
+      return normalizeProduct(snap.id, snap.data());
     }
-
-    const q = query(collection(db, 'products'), where('productId', '==', id), limit(1));
-    const snap2 = await getDocs(q);
-    if (!snap2.empty) {
-      const p = normalizeProduct(snap2.docs[0].id, snap2.docs[0].data());
-      return p.showInEcom !== false ? p : null;
-    }
-  } catch (err) {
-    console.error(`[TBC] getProductById(${id}) direct fetch error:`, err);
-  }
-
-  // 4. Fallback to active in-memory list if offline or network glitch
-  if (Array.isArray(_cachedProducts) && _cachedProducts.length > 0) {
-    const match = _cachedProducts.find(p => (p.id === id || p.productId === id) && p.showInEcom !== false);
-    if (match) return match;
-  }
+  } catch (_) {}
 
   return null;
 }
@@ -811,7 +946,7 @@ export async function getProductById(id, companyId = COMPANY_ID, forceLive = fal
 export async function getRelatedProducts(product, max = 4) {
   if (!product?.category) return [];
   try {
-    const all = await getProducts();
+    const all = await getStoreProducts();
     return all
       .filter(p => p.id !== product.id && p.category === product.category && p.showInEcom !== false)
       .slice(0, max);
@@ -823,65 +958,44 @@ export async function getRelatedProducts(product, max = 4) {
 
 /**
  * Real-time live listener for a single product's stock & availability.
+ * On public storefront, reads from sessionStorage/cache (0 reads) without continuous onSnapshot.
  * @param {string} id
  * @param {Function} onUpdate
  * @param {Function} [onError]
+ * @param {string} [companyId]
+ * @param {object} [options]
  * @returns {Function} Unsubscribe function
  */
-export function subscribeToProduct(id, onUpdate, onError) {
+export function subscribeToProduct(id, onUpdate, onError, companyId = COMPANY_ID, options = {}) {
   if (!id || typeof onUpdate !== 'function') return () => {};
 
-  // Instant in-memory match if available
-  if (Array.isArray(_cachedProducts)) {
-    const cachedMatch = _cachedProducts.find(p => p.id === id || p.productId === id);
-    if (cachedMatch) onUpdate(cachedMatch);
+  // Instant cache match (0 Firestore reads)
+  getStoreProductById(id, companyId).then(cached => {
+    if (cached) onUpdate(cached);
+  }).catch(() => {});
+
+  if (!options.realtime) {
+    return () => {};
   }
 
   let unsubComp = () => {};
-  let unsubRoot = () => {};
-
   try {
-    const compDocRef = doc(db, 'companies', COMPANY_ID, 'products', id);
+    const compDocRef = doc(db, 'companies', companyId, 'products', id);
     unsubComp = onSnapshot(compDocRef, (docSnap) => {
       if (docSnap.exists()) {
-        const liveProd = normalizeProduct(docSnap.id, { ...docSnap.data(), companyId: COMPANY_ID });
-        if (Array.isArray(_cachedProducts)) {
-          const idx = _cachedProducts.findIndex(p => p.id === id || p.productId === id);
-          if (idx > -1) _cachedProducts[idx] = liveProd;
-          else _cachedProducts.push(liveProd);
-        }
+        const liveProd = normalizeProduct(docSnap.id, { ...docSnap.data(), companyId });
         onUpdate(liveProd);
       }
     }, (err) => {
       console.warn('[TBC Real-Time] subscribeToProduct comp error:', err);
-    });
-  } catch (err) {
-    console.error('[TBC Real-Time] subscribeToProduct comp exception:', err);
-  }
-
-  try {
-    const docRef = doc(db, 'products', id);
-    unsubRoot = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const liveProd = normalizeProduct(docSnap.id, docSnap.data());
-        if (Array.isArray(_cachedProducts)) {
-          const idx = _cachedProducts.findIndex(p => p.id === id || p.productId === id);
-          if (idx > -1) _cachedProducts[idx] = liveProd;
-          else _cachedProducts.push(liveProd);
-        }
-        onUpdate(liveProd);
-      }
-    }, (err) => {
-      console.warn('[TBC Real-Time] subscribeToProduct root error:', err);
       if (typeof onError === 'function') onError(err);
     });
   } catch (err) {
-    console.error('[TBC Real-Time] subscribeToProduct root exception:', err);
+    console.error('[TBC Real-Time] subscribeToProduct exception:', err);
   }
 
   return () => {
     try { unsubComp(); } catch (_) {}
-    try { unsubRoot(); } catch (_) {}
   };
 }
 

@@ -19,6 +19,7 @@
     rel="stylesheet">
   <script src="./js/loading-controller.js"></script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -1024,7 +1025,7 @@
   <!-- Dynamic Cart & Real-Time Storefront Integration -->
   <script type="module">
     import tbcCart from './js/cart-store.js';
-    import { subscribeToProducts, subscribeToCategories, getCompany, subscribeToCompanyBanner, getProductTotalStock, isProductOutOfStock, getProductPricing } from './js/products-service.js';
+    import { subscribeToProducts, subscribeToCategories, getCompany, subscribeToCompanyBanner, getProductTotalStock, isProductOutOfStock, getProductPricing, getOverTrafficHtml } from './js/products-service.js';
 
     // Safe helpers — never throw, even on broken data
     function safePrice(p) {
@@ -1164,7 +1165,7 @@
       } else {
         grid.innerHTML = (allProductsStore.length > 0)
           ? '<div class="col-span-full py-8 text-center text-xs text-secondary">No products match this filter tag.</div>'
-          : '<div class="col-span-full py-16 text-center text-secondary font-medium tracking-wide">Currently OverTraffic please try again later</div>';
+          : getOverTrafficHtml();
       }
 
       // Sentinel visibility
