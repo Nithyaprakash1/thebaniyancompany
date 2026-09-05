@@ -515,24 +515,14 @@
        APPLICATION & FIRESTORE SCRIPT
   ========================================== -->
   <script type="module">
-    import { db } from './js/firebase-config.js';
-    import { 
-      collection, 
-      getDocs, 
-      doc, 
-      setDoc, 
-      updateDoc, 
-      serverTimestamp,
-      query,
-      orderBy,
-      limit
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { 
       COMPANY_ID,
       getCachedOrders,
       getCachedOrdersInfo,
       setCachedOrders,
-      fetchOnlineOrders
+      fetchOnlineOrders,
+      subscribeToOnlineOrders,
+      setOrderStatus
     } from './js/products-service.js';
 
     // State
@@ -571,7 +561,7 @@
       return 'Pending';
     }
 
-    // Clean order normalizer
+    // Clean order normalizer preserving all fields and metadata
     function normalizeOrderDoc(docId, data = {}) {
       let dateText = '';
       if (data.createdAt?.seconds) {
@@ -595,6 +585,7 @@
 
       const rawItems = Array.isArray(data.items) ? data.items : (Array.isArray(data.orderItems) ? data.orderItems : []);
       const cleanItems = rawItems.map(i => ({
+        ...i,
         name: i.name || 'Apparel Item',
         size: i.size || 'M',
         color: i.color || 'Standard',
@@ -604,6 +595,7 @@
       }));
 
       return {
+        ...data,
         id: docId || data.id || data.orderId || data.invoiceId,
         customerName: data.customer?.name || data.customerName || data.customerDetails?.name || 'Customer',
         phone: data.customer?.phone || data.customerPhoneNumber || data.customerPhone || 'Not provided',
@@ -617,6 +609,7 @@
         paymentStatus: rawPaymentStatus,
         status: rawStatus,
         orderStatus: rawStatus,
+        isFromCompanyOrders: data.isFromCompanyOrders ?? true,
         createdAtFormatted: dateText,
         createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : (data.createdAt ? new Date(data.createdAt).getTime() : (data.timestamp || 0)),
         items: cleanItems
@@ -660,16 +653,9 @@
       }
     }
 
-    // Smart Sync & 1-Minute Polling ("in a next min")
+    // Direct Firestore fetch & sync
     async function syncOrders(force = false) {
       if (isSyncing) return;
-
-      // Read optimization: skip network if cache is fresh (< 30s) and not forced
-      const cacheInfo = getCachedOrdersInfo(COMPANY_ID, 30000);
-      if (!force && cacheInfo.isFresh && window.liveOrders.length > 0) {
-        updateSyncUI('Cached (Up to date)', false);
-        return;
-      }
 
       isSyncing = true;
       updateSyncUI(force ? 'Syncing orders...' : 'Checking updates...', true);
@@ -689,7 +675,7 @@
 
         lastSyncTimestamp = Date.now();
         const nowTimeStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-        updateSyncUI(`Synced ${nowTimeStr} · Auto 1m`, false);
+        updateSyncUI(`Synced ${nowTimeStr}`, false);
 
         // Alert user if newly placed orders arrived
         if (newArrivals.length > 0 && previousIds.size > 0) {
@@ -914,23 +900,10 @@
       }
 
       try {
-        const orderRef1 = doc(db, 'companies', COMPANY_ID, 'orders', orderId);
-        const orderRef2 = doc(db, 'companies', COMPANY_ID, 'invoices', orderId);
-        const orderRef3 = doc(db, 'invoices', orderId);
-        const payload = {
-          status: newStatus,
-          orderStatus: newStatus,
-          updatedAt: serverTimestamp(),
-          [`statusHistory.${newStatus}`]: serverTimestamp()
-        };
-        await Promise.allSettled([
-          updateDoc(orderRef1, payload),
-          updateDoc(orderRef2, payload),
-          updateDoc(orderRef3, payload),
-          setDoc(orderRef1, payload, { merge: true }),
-          setDoc(orderRef2, payload, { merge: true }),
-          setDoc(orderRef3, payload, { merge: true })
-        ]);
+        const res = await setOrderStatus(orderId, newStatus, COMPANY_ID);
+        if (res && res.success === false) {
+          console.warn('[Orders Admin] Status update warning:', res.error);
+        }
         showStatusToast(`Order #${orderId} status set to ${newStatus}`);
       } catch (e) {
         console.warn('Order status update notice:', e);
@@ -1004,18 +977,29 @@
         return canonicalStatus(o.status || o.orderStatus).toLowerCase() === st;
       }).length;
 
-      document.getElementById('count-all').textContent = all.length;
-      document.getElementById('count-pending').textContent = countFor('pending');
-      document.getElementById('count-accepted').textContent = countFor('accepted');
-      document.getElementById('count-packing').textContent = countFor('packing');
-      document.getElementById('count-shipped').textContent = countFor('shipped');
-      document.getElementById('count-delivered').textContent = countFor('delivered');
-      document.getElementById('count-cancelled').textContent = countFor('cancelled');
-      document.getElementById('count-returned').textContent = countFor('returned');
+      const setBadge = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
+      setBadge('count-all', all.length);
+      setBadge('count-pending', countFor('pending'));
+      setBadge('count-accepted', countFor('accepted'));
+      setBadge('count-packing', countFor('packing'));
+      setBadge('count-shipped', countFor('shipped'));
+      setBadge('count-delivered', countFor('delivered'));
+      setBadge('count-cancelled', countFor('cancelled'));
+      setBadge('count-returned', countFor('returned'));
     }
 
     window.setOrderStatusFilter = function(status) {
-      window.activeOrderStatusFilter = status;
+      window.activeOrderStatusFilter = status || 'all';
+      try {
+        const targetStatus = window.activeOrderStatusFilter.toLowerCase();
+        const newUrl = targetStatus === 'all' ? 'orders.html' : `orders.html?status=${targetStatus}`;
+        window.history.replaceState({ status: targetStatus }, '', newUrl);
+      } catch (_) {}
+
       document.querySelectorAll('.order-tab-btn').forEach(btn => {
         btn.classList.remove('bg-black', 'text-white', 'font-semibold');
         btn.classList.add('bg-slate-100', 'text-slate-600', 'font-medium');
@@ -1078,11 +1062,31 @@
       // 1. Instantly load from cache in 0ms (no waiting, no network lag)
       loadCachedOrders();
 
-      // 2. Immediate fresh fetch from Firestore
-      syncOrders(true);
+      // 2. Real-time Firestore streaming across orders collections
+      subscribeToOnlineOrders(orders => {
+        if (!Array.isArray(orders)) return;
+        const normalized = orders.map(o => normalizeOrderDoc(o.id, o));
+        normalized.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
 
-      // 3. Start 1-minute auto-poll ("in a next min")
-      startAutoSync();
+        // Detect newly placed orders
+        const previousIds = new Set(window.liveOrders.map(o => o.id));
+        const newArrivals = normalized.filter(o => !previousIds.has(o.id));
+
+        window.liveOrders = normalized;
+        applyOrderFilters();
+
+        lastSyncTimestamp = Date.now();
+        const nowTimeStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+        updateSyncUI(`Live Stream · ${nowTimeStr}`, false);
+
+        // Alert user if newly placed orders arrived
+        if (newArrivals.length > 0 && previousIds.size > 0) {
+          notifyNewOrderArrival(newArrivals[0]);
+        }
+      });
+
+      // 3. Fallback direct sync
+      syncOrders(false);
 
       // 4. Tab focus & visibility change listener
       document.addEventListener('visibilitychange', () => {
@@ -1102,6 +1106,13 @@
 
       window.addEventListener('tbc_orders_updated', () => {
         loadCachedOrders();
+      });
+
+      // 6. Browser popstate navigation
+      window.addEventListener('popstate', () => {
+        const p = new URLSearchParams(window.location.search);
+        const st = p.get('status') || p.get('filter') || 'all';
+        setOrderStatusFilter(st);
       });
     }
 

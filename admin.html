@@ -392,7 +392,7 @@
             </div>
 
             <!-- 2. Today's Orders -->
-            <div onclick="switchAdminTab('orders'); setOrderFilter('all');" class="shopify-card p-4 space-y-2 cursor-pointer hover:border-slate-300 transition-all">
+            <div onclick="window.location.href='orders.html';" class="shopify-card p-4 space-y-2 cursor-pointer hover:border-slate-300 transition-all">
               <div class="w-8 h-8 rounded-lg bg-sky-100/70 text-sky-700 flex items-center justify-center">
                 <span class="material-symbols-outlined text-lg">shopping_bag</span>
               </div>
@@ -404,7 +404,7 @@
             </div>
 
             <!-- 3. Pending Orders (HIGHLIGHTED CARD) -->
-            <div onclick="switchAdminTab('orders'); setOrderFilter('pending');"
+            <div onclick="window.location.href='orders.html?status=pending';"
               class="shopify-card p-4 space-y-2 border-2 border-amber-400 ring-2 ring-amber-400/20 cursor-pointer hover:bg-amber-50/20 transition-all">
               <div class="w-8 h-8 rounded-lg bg-amber-100/80 text-amber-800 flex items-center justify-center">
                 <span class="material-symbols-outlined text-lg">schedule</span>
@@ -570,7 +570,7 @@
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5">Track orders moving through each stage from pending to delivery.</p>
               </div>
-              <button onclick="switchAdminTab('orders'); setOrderFilter('all');" class="text-xs font-semibold text-slate-600 hover:text-black flex items-center gap-1 transition cursor-pointer">
+              <button onclick="window.location.href='orders.html';" class="text-xs font-semibold text-slate-600 hover:text-black flex items-center gap-1 transition cursor-pointer">
                 View All Orders <span class="material-symbols-outlined text-sm">arrow_forward</span>
               </button>
             </div>
@@ -589,7 +589,7 @@
             <!-- 5 Pipeline Stage Action Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="pipeline-stages-grid">
               <!-- Pending -->
-              <div onclick="switchAdminTab('orders'); setOrderFilter('pending');" class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 cursor-pointer transition-all space-y-1">
+              <div onclick="window.location.href='orders.html?status=pending';" class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 cursor-pointer transition-all space-y-1">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-semibold text-amber-800">Pending</span>
                   <span class="w-2 h-2 rounded-full bg-amber-400"></span>
@@ -598,7 +598,7 @@
                 <span class="text-[11px] text-amber-700 font-medium block">Action required</span>
               </div>
               <!-- Accepted -->
-              <div onclick="switchAdminTab('orders'); setOrderFilter('accepted');" class="p-3.5 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-sky-50 cursor-pointer transition-all space-y-1">
+              <div onclick="window.location.href='orders.html?status=accepted';" class="p-3.5 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-sky-50 cursor-pointer transition-all space-y-1">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-semibold text-sky-800">Accepted</span>
                   <span class="w-2 h-2 rounded-full bg-sky-500"></span>
@@ -607,7 +607,7 @@
                 <span class="text-[11px] text-sky-700 font-medium block">Ready to pack</span>
               </div>
               <!-- Packing -->
-              <div onclick="switchAdminTab('orders'); setOrderFilter('packing');" class="p-3.5 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-purple-50 cursor-pointer transition-all space-y-1">
+              <div onclick="window.location.href='orders.html?status=packing';" class="p-3.5 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-purple-50 cursor-pointer transition-all space-y-1">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-semibold text-purple-800">Packing</span>
                   <span class="w-2 h-2 rounded-full bg-purple-500"></span>
@@ -616,7 +616,7 @@
                 <span class="text-[11px] text-purple-700 font-medium block">Packaging stage</span>
               </div>
               <!-- Shipped -->
-              <div onclick="switchAdminTab('orders'); setOrderFilter('shipped');" class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 cursor-pointer transition-all space-y-1">
+              <div onclick="window.location.href='orders.html?status=shipped';" class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 cursor-pointer transition-all space-y-1">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-semibold text-indigo-800">Shipped</span>
                   <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
@@ -625,7 +625,7 @@
                 <span class="text-[11px] text-indigo-700 font-medium block">In transit</span>
               </div>
               <!-- Delivered -->
-              <div onclick="switchAdminTab('orders'); setOrderFilter('delivered');" class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 cursor-pointer transition-all space-y-1 col-span-2 sm:col-span-1">
+              <div onclick="window.location.href='orders.html?status=delivered';" class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 cursor-pointer transition-all space-y-1 col-span-2 sm:col-span-1">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-semibold text-emerald-800">Delivered</span>
                   <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -732,7 +732,7 @@
                     <span class="material-symbols-outlined text-slate-400 group-hover:text-rose-700 transition-colors text-base">arrow_forward</span>
                   </a>
 
-                  <button onclick="switchAdminTab('orders'); setOrderFilter('pending');" class="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-amber-300 hover:bg-amber-50/30 transition-all text-left cursor-pointer group">
+                  <button onclick="window.location.href='orders.html?status=pending';" class="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-amber-300 hover:bg-amber-50/30 transition-all text-left cursor-pointer group">
                     <div class="flex items-center gap-2.5">
                       <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
                         <span class="material-symbols-outlined text-sm">pending_actions</span>
@@ -4700,11 +4700,10 @@
     };
 
     function renderOrders(orders) {
-      window.currentAllOrders = orders || [];
-      const rawList = window.currentAllOrders;
-      if (rawList.length > 0) {
-        try { setCachedOrders(rawList, COMPANY_ID); } catch(e) {}
+      if (orders && Array.isArray(orders)) {
+        window.currentAllOrders = orders;
       }
+      const rawList = window.currentAllOrders || [];
       const listEl = document.getElementById('admin-orders-list');
       if (!listEl) return;
 
