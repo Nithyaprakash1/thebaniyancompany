@@ -432,12 +432,16 @@
 
     <!-- Pagination Scroll Sentinel & Loading Indicator -->
     <div id="pagination-sentinel" class="py-8 flex flex-col items-center justify-center gap-2 text-center hidden">
-      <div class="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white border border-black/10 rounded-full shadow-sm text-xs font-semibold text-neutral-700">
+      <button onclick="loadNextShopProducts()" class="px-6 py-2.5 rounded-full bg-black text-white hover:bg-neutral-800 transition shadow-sm text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer">
+        <span>Load More Products</span>
+        <span class="material-symbols-outlined text-sm">expand_more</span>
+      </button>
+      <div id="shop-loading-more-shimmer" class="hidden inline-flex items-center gap-2.5 px-4 py-2 bg-white border border-black/10 rounded-full shadow-sm text-xs font-semibold text-neutral-700">
         <svg class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span>Loading next 20 products...</span>
+        <span>Loading next 8 products...</span>
       </div>
     </div>
 
@@ -882,8 +886,18 @@
   }
   window.filterCategory = filterCategory;
 
-  let visibleProductLimit = 20;
+  let visibleProductLimit = 8;
   let paginationObserver = null;
+
+  window.loadNextShopProducts = function() {
+    const shimmerIndicator = document.getElementById('shop-loading-more-shimmer');
+    if (shimmerIndicator) shimmerIndicator.classList.remove('hidden');
+    setTimeout(() => {
+      visibleProductLimit += 8;
+      applyAdvancedFilters(true);
+      if (shimmerIndicator) shimmerIndicator.classList.add('hidden');
+    }, 250);
+  };
 
   function initPaginationObserver() {
     const sentinel = document.getElementById('pagination-sentinel');
@@ -893,18 +907,17 @@
     paginationObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting && sentinel.style.display !== 'none' && !sentinel.classList.contains('hidden')) {
-          visibleProductLimit += 20;
-          applyAdvancedFilters(true);
+          window.loadNextShopProducts();
         }
       });
-    }, { rootMargin: '300px' });
+    }, { rootMargin: '200px' });
 
     paginationObserver.observe(sentinel);
   }
 
   function applyAdvancedFilters(isScrollAppend = false) {
     if (!isScrollAppend) {
-      visibleProductLimit = 20;
+      visibleProductLimit = 8;
     }
 
     const cards = document.querySelectorAll('.product-card');

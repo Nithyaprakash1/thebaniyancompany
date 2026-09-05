@@ -68,6 +68,7 @@
       }
     }
 
+    .skeleton-shimmer,
     .shimmer-light {
       background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%) !important;
       background-size: 200% 100% !important;
@@ -437,19 +438,69 @@
           </div>
 
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5" id="home-product-grid">
-            <div class="col-span-full py-8 text-center text-xs text-secondary flex items-center justify-center gap-2">
-              <span class="material-symbols-outlined animate-spin text-[18px]">motion_photos_on</span> Loading Products...
+            <!-- 8 Skeleton Shimmer Placeholders -->
+            <div class="flex flex-col bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+              <div class="aspect-[3/4] rounded-xl skeleton-shimmer bg-slate-200"></div>
+              <div class="h-3 w-16 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-4 w-3/4 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-5 w-20 skeleton-shimmer rounded bg-slate-200 mt-auto"></div>
+            </div>
+            <div class="flex flex-col bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+              <div class="aspect-[3/4] rounded-xl skeleton-shimmer bg-slate-200"></div>
+              <div class="h-3 w-16 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-4 w-3/4 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-5 w-20 skeleton-shimmer rounded bg-slate-200 mt-auto"></div>
+            </div>
+            <div class="flex flex-col bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+              <div class="aspect-[3/4] rounded-xl skeleton-shimmer bg-slate-200"></div>
+              <div class="h-3 w-16 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-4 w-3/4 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-5 w-20 skeleton-shimmer rounded bg-slate-200 mt-auto"></div>
+            </div>
+            <div class="flex flex-col bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+              <div class="aspect-[3/4] rounded-xl skeleton-shimmer bg-slate-200"></div>
+              <div class="h-3 w-16 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-4 w-3/4 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-5 w-20 skeleton-shimmer rounded bg-slate-200 mt-auto"></div>
+            </div>
+            <div class="flex flex-col bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+              <div class="aspect-[3/4] rounded-xl skeleton-shimmer bg-slate-200"></div>
+              <div class="h-3 w-16 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-4 w-3/4 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-5 w-20 skeleton-shimmer rounded bg-slate-200 mt-auto"></div>
+            </div>
+            <div class="flex flex-col bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+              <div class="aspect-[3/4] rounded-xl skeleton-shimmer bg-slate-200"></div>
+              <div class="h-3 w-16 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-4 w-3/4 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-5 w-20 skeleton-shimmer rounded bg-slate-200 mt-auto"></div>
+            </div>
+            <div class="flex flex-col bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+              <div class="aspect-[3/4] rounded-xl skeleton-shimmer bg-slate-200"></div>
+              <div class="h-3 w-16 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-4 w-3/4 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-5 w-20 skeleton-shimmer rounded bg-slate-200 mt-auto"></div>
+            </div>
+            <div class="flex flex-col bg-white rounded-2xl p-3 shadow-sm border border-slate-100 space-y-3">
+              <div class="aspect-[3/4] rounded-xl skeleton-shimmer bg-slate-200"></div>
+              <div class="h-3 w-16 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-4 w-3/4 skeleton-shimmer rounded bg-slate-200"></div>
+              <div class="h-5 w-20 skeleton-shimmer rounded bg-slate-200 mt-auto"></div>
             </div>
           </div>
 
           <!-- Home Pagination Sentinel -->
           <div id="home-pagination-sentinel" class="py-6 flex flex-col items-center justify-center gap-2 text-center hidden">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full shadow-sm text-xs font-semibold text-neutral-700">
-              <svg class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <button onclick="loadNextHomeProducts()" class="px-6 py-2.5 rounded-full bg-black text-white hover:bg-neutral-800 transition shadow-sm text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer">
+              <span>Load More Products</span>
+              <span class="material-symbols-outlined text-sm">expand_more</span>
+            </button>
+            <div id="home-loading-more-shimmer" class="hidden inline-flex items-center gap-2 text-xs text-neutral-500 font-medium">
+              <svg class="animate-spin h-3.5 w-3.5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span>Loading next 20 products...</span>
+              <span>Loading next 8 products...</span>
             </div>
           </div>
         </div>
@@ -1111,8 +1162,18 @@
       </a>`;
     }
 
-    let homeVisibleLimit = 20;
+    let homeVisibleLimit = 8;
     let homePaginationObserver = null;
+
+    window.loadNextHomeProducts = function() {
+      const shimmerIndicator = document.getElementById('home-loading-more-shimmer');
+      if (shimmerIndicator) shimmerIndicator.classList.remove('hidden');
+      setTimeout(() => {
+        homeVisibleLimit += 8;
+        applyHomeProductFilter(true);
+        if (shimmerIndicator) shimmerIndicator.classList.add('hidden');
+      }, 250);
+    };
 
     function initHomePaginationObserver() {
       const sentinel = document.getElementById('home-pagination-sentinel');
@@ -1122,18 +1183,17 @@
       homePaginationObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting && sentinel.style.display !== 'none' && !sentinel.classList.contains('hidden')) {
-            homeVisibleLimit += 20;
-            applyHomeProductFilter(true);
+            window.loadNextHomeProducts();
           }
         });
-      }, { rootMargin: '300px' });
+      }, { rootMargin: '200px' });
 
       homePaginationObserver.observe(sentinel);
     }
 
     function applyHomeProductFilter(isScrollAppend = false) {
       if (!isScrollAppend) {
-        homeVisibleLimit = 20;
+        homeVisibleLimit = 8;
       }
 
       const grid = document.getElementById('home-product-grid');

@@ -512,10 +512,29 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live Feed
                   </span>
                 </div>
-                <!-- Only needed period toggles: 7 Days & 30 Days -->
-                <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
-                  <button onclick="setChartPeriod('7days')" id="chart-tab-7days" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white shadow-xs transition-all cursor-pointer">7 Days</button>
-                  <button onclick="setChartPeriod('30days')" id="chart-tab-30days" class="px-3 py-1 text-xs font-medium rounded-lg text-slate-600 hover:bg-white transition-all cursor-pointer">30 Days</button>
+                <!-- Date Filter Suite: Today, Yesterday, This Week, This Month, This Year, Particular Date, Custom Range -->
+                <div class="flex items-center gap-2 flex-wrap">
+                  <select id="rev-period-select" onchange="handleRevenuePeriodChange(this.value)" class="shopify-input text-slate-700 px-3 py-1.5 rounded-lg text-xs outline-none font-semibold bg-slate-50 border border-slate-200 cursor-pointer shadow-2xs">
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="this_week" selected>This Week</option>
+                    <option value="this_month">This Month</option>
+                    <option value="this_year">This Year</option>
+                    <option value="single_date">Particular Date...</option>
+                    <option value="custom_range">Date Range...</option>
+                  </select>
+
+                  <!-- Single Date Picker -->
+                  <div id="rev-single-date-box" class="hidden items-center bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-2xs">
+                    <input type="date" id="rev-single-date-input" onchange="renderSalesChart()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer">
+                  </div>
+
+                  <!-- Date Range Picker -->
+                  <div id="rev-range-date-box" class="hidden items-center gap-1.5 bg-white p-1 px-2 rounded-lg border border-slate-200 shadow-2xs">
+                    <input type="date" id="rev-start-date-input" onchange="renderSalesChart()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer">
+                    <span class="text-[11px] text-slate-400 font-medium">to</span>
+                    <input type="date" id="rev-end-date-input" onchange="renderSalesChart()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer">
+                  </div>
                 </div>
               </div>
 
@@ -538,6 +557,217 @@
               <div class="relative h-56 w-full">
                 <div id="chart-shimmer-loader" class="absolute inset-0 skeleton-shimmer rounded-xl z-10"></div>
                 <canvas id="salesOverviewChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Fulfillment Pipeline Card -->
+          <div class="shopify-card p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <h2 class="font-bold text-sm text-slate-900 tracking-tight flex items-center gap-2">
+                  <span class="material-symbols-outlined text-slate-700 text-base">alt_route</span> Order Fulfillment Pipeline
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Track orders moving through each stage from pending to delivery.</p>
+              </div>
+              <button onclick="switchAdminTab('orders'); setOrderFilter('all');" class="text-xs font-semibold text-slate-600 hover:text-black flex items-center gap-1 transition cursor-pointer">
+                View All Orders <span class="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
+            </div>
+
+            <!-- Fulfillment Progress Track -->
+            <div class="space-y-2">
+              <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden flex" id="pipeline-progress-bar">
+                <div id="pipe-bar-pending" class="bg-amber-400 h-full transition-all duration-500" style="width: 0%"></div>
+                <div id="pipe-bar-accepted" class="bg-sky-500 h-full transition-all duration-500" style="width: 0%"></div>
+                <div id="pipe-bar-packing" class="bg-purple-500 h-full transition-all duration-500" style="width: 0%"></div>
+                <div id="pipe-bar-shipped" class="bg-indigo-500 h-full transition-all duration-500" style="width: 0%"></div>
+                <div id="pipe-bar-delivered" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- 5 Pipeline Stage Action Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="pipeline-stages-grid">
+              <!-- Pending -->
+              <div onclick="switchAdminTab('orders'); setOrderFilter('pending');" class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 cursor-pointer transition-all space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-amber-800">Pending</span>
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                </div>
+                <div class="text-xl font-bold text-slate-900" id="pipe-count-pending"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
+                <span class="text-[11px] text-amber-700 font-medium block">Action required</span>
+              </div>
+              <!-- Accepted -->
+              <div onclick="switchAdminTab('orders'); setOrderFilter('accepted');" class="p-3.5 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-sky-50 cursor-pointer transition-all space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-sky-800">Accepted</span>
+                  <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                </div>
+                <div class="text-xl font-bold text-slate-900" id="pipe-count-accepted"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
+                <span class="text-[11px] text-sky-700 font-medium block">Ready to pack</span>
+              </div>
+              <!-- Packing -->
+              <div onclick="switchAdminTab('orders'); setOrderFilter('packing');" class="p-3.5 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-purple-50 cursor-pointer transition-all space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-purple-800">Packing</span>
+                  <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                </div>
+                <div class="text-xl font-bold text-slate-900" id="pipe-count-packing"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
+                <span class="text-[11px] text-purple-700 font-medium block">Packaging stage</span>
+              </div>
+              <!-- Shipped -->
+              <div onclick="switchAdminTab('orders'); setOrderFilter('shipped');" class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 cursor-pointer transition-all space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-indigo-800">Shipped</span>
+                  <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                </div>
+                <div class="text-xl font-bold text-slate-900" id="pipe-count-shipped"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
+                <span class="text-[11px] text-indigo-700 font-medium block">In transit</span>
+              </div>
+              <!-- Delivered -->
+              <div onclick="switchAdminTab('orders'); setOrderFilter('delivered');" class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 cursor-pointer transition-all space-y-1 col-span-2 sm:col-span-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-emerald-800">Delivered</span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                </div>
+                <div class="text-xl font-bold text-slate-900" id="pipe-count-delivered"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
+                <span class="text-[11px] text-emerald-700 font-medium block">Fulfilled</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Grid: Top Selling Products & Quick Operations Command Center -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left 2 Cols: Top Selling Products Leaderboard -->
+            <div class="lg:col-span-2 shopify-card p-5 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+                <div>
+                  <h2 class="font-bold text-sm text-slate-900 tracking-tight flex items-center gap-2">
+                    <span class="material-symbols-outlined text-amber-500 text-base">workspace_premium</span> Top Selling Products
+                  </h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Leaderboard of best-performing items based on customer purchases.</p>
+                </div>
+                <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">Live Store Data</span>
+              </div>
+
+              <!-- Top Products List with Shimmer Placeholders -->
+              <div class="space-y-2.5" id="top-selling-products-list">
+                <!-- Skeleton Shimmer Placeholders (3 rows) -->
+                <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-12 rounded-lg bg-slate-200 skeleton-shimmer shrink-0"></div>
+                    <div class="space-y-1.5">
+                      <div class="h-4 w-40 bg-slate-200 skeleton-shimmer rounded"></div>
+                      <div class="h-3 w-24 bg-slate-200 skeleton-shimmer rounded"></div>
+                    </div>
+                  </div>
+                  <div class="space-y-1.5 text-right">
+                    <div class="h-4 w-16 ml-auto bg-slate-200 skeleton-shimmer rounded"></div>
+                    <div class="h-3 w-12 ml-auto bg-slate-200 skeleton-shimmer rounded"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-12 rounded-lg bg-slate-200 skeleton-shimmer shrink-0"></div>
+                    <div class="space-y-1.5">
+                      <div class="h-4 w-36 bg-slate-200 skeleton-shimmer rounded"></div>
+                      <div class="h-3 w-20 bg-slate-200 skeleton-shimmer rounded"></div>
+                    </div>
+                  </div>
+                  <div class="space-y-1.5 text-right">
+                    <div class="h-4 w-16 ml-auto bg-slate-200 skeleton-shimmer rounded"></div>
+                    <div class="h-3 w-12 ml-auto bg-slate-200 skeleton-shimmer rounded"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-12 rounded-lg bg-slate-200 skeleton-shimmer shrink-0"></div>
+                    <div class="space-y-1.5">
+                      <div class="h-4 w-32 bg-slate-200 skeleton-shimmer rounded"></div>
+                      <div class="h-3 w-16 bg-slate-200 skeleton-shimmer rounded"></div>
+                    </div>
+                  </div>
+                  <div class="space-y-1.5 text-right">
+                    <div class="h-4 w-16 ml-auto bg-slate-200 skeleton-shimmer rounded"></div>
+                    <div class="h-3 w-12 ml-auto bg-slate-200 skeleton-shimmer rounded"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Col: Quick Actions Command Center -->
+            <div class="shopify-card p-5 sm:p-6 space-y-4 flex flex-col justify-between">
+              <div class="space-y-3">
+                <div class="border-b border-slate-100 pb-3">
+                  <h2 class="font-bold text-sm text-slate-900 tracking-tight flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-700 text-base">bolt</span> Quick Store Operations
+                  </h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Shortcuts for frequent daily admin operations.</p>
+                </div>
+
+                <div class="space-y-2">
+                  <button onclick="openAddProductModal()" class="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-slate-900 hover:bg-slate-50 transition-all text-left cursor-pointer group">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-sm">add_box</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-900 block group-hover:text-black">Add New Product</span>
+                        <span class="text-[11px] text-slate-500">Upload item, pricing &amp; sizes</span>
+                      </div>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400 group-hover:text-slate-900 transition-colors text-base">arrow_forward</span>
+                  </button>
+
+                  <a href="stock-availabilities.html" class="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-rose-300 hover:bg-rose-50/30 transition-all text-left group">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-sm">inventory</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-900 block group-hover:text-rose-900">Restock Low Inventory</span>
+                        <span class="text-[11px] text-slate-500">Check branch-wise levels</span>
+                      </div>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400 group-hover:text-rose-700 transition-colors text-base">arrow_forward</span>
+                  </a>
+
+                  <button onclick="switchAdminTab('orders'); setOrderFilter('pending');" class="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-amber-300 hover:bg-amber-50/30 transition-all text-left cursor-pointer group">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-sm">pending_actions</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-900 block group-hover:text-amber-900">Process Pending Orders</span>
+                        <span class="text-[11px] text-slate-500">Accept &amp; initiate packing</span>
+                      </div>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400 group-hover:text-amber-700 transition-colors text-base">arrow_forward</span>
+                  </button>
+
+                  <button onclick="switchAdminTab('customers');" class="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-purple-300 hover:bg-purple-50/30 transition-all text-left cursor-pointer group">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-sm">group</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-900 block group-hover:text-purple-900">Customer Directory</span>
+                        <span class="text-[11px] text-slate-500">Order histories &amp; contacts</span>
+                      </div>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400 group-hover:text-purple-700 transition-colors text-base">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Live Store Health Indicator -->
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-slate-500 font-medium flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Store Status: <strong class="text-emerald-700 font-semibold">Online &amp; Active</strong>
+                </span>
+                <a href="index.html" target="_blank" class="font-semibold text-slate-700 hover:text-black flex items-center gap-0.5">
+                  Open Store <span class="material-symbols-outlined text-xs">open_in_new</span>
+                </a>
               </div>
             </div>
           </div>
@@ -1227,72 +1457,6 @@
               <div>
                 <h3 class="text-2xl font-bold text-sky-600" id="pay-kpi-cod"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
                 <span class="text-xs font-medium text-slate-500">COD Pending</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Payment Methods Section (Razorpay, Cash on Delivery, WhatsApp Order) -->
-          <div class="space-y-3">
-            <h2 class="font-semibold text-xs text-slate-500 uppercase tracking-wider">Payment Methods</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <!-- Method 1: Razorpay -->
-              <div class="shopify-card p-4 space-y-3 flex flex-col justify-between">
-                <div class="flex items-start justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center">
-                      <span class="material-symbols-outlined text-xl">credit_card</span>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-sm text-slate-900">Razorpay</h4>
-                      <p class="text-xs text-slate-500">Accept cards, UPI, netbanking, wallets</p>
-                      <span class="text-[11px] text-slate-500 font-medium block mt-0.5">Online Gateway · UPI, Cards, Netbanking</span>
-                    </div>
-                  </div>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ ACTIVE</span>
-                </div>
-                <div class="text-right pt-2 border-t border-slate-100">
-                  <button onclick="switchAdminTab('settings')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-medium rounded-md transition-all cursor-pointer">Manage</button>
-                </div>
-              </div>
-
-              <!-- Method 2: Cash on Delivery -->
-              <div class="shopify-card p-4 space-y-3 flex flex-col justify-between">
-                <div class="flex items-start justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center">
-                      <span class="material-symbols-outlined text-xl">payments</span>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-sm text-slate-900">Cash on Delivery</h4>
-                      <p class="text-xs text-slate-500">Collect payment on delivery</p>
-                      <span class="text-[11px] text-slate-500 font-medium block mt-0.5">Pay with cash upon delivery</span>
-                    </div>
-                  </div>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ ACTIVE</span>
-                </div>
-                <div class="text-right pt-2 border-t border-slate-100">
-                  <button onclick="switchAdminTab('settings')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-medium rounded-md transition-all cursor-pointer">Manage</button>
-                </div>
-              </div>
-
-              <!-- Method 3: WhatsApp Order -->
-              <div class="shopify-card p-4 space-y-3 flex flex-col justify-between">
-                <div class="flex items-start justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center">
-                      <span class="material-symbols-outlined text-xl">chat</span>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-sm text-slate-900">WhatsApp Order</h4>
-                      <p class="text-xs text-slate-500">Let customers order via WhatsApp</p>
-                      <span class="text-[11px] text-slate-500 font-medium block mt-0.5">Direct checkout via WhatsApp chat</span>
-                    </div>
-                  </div>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ ACTIVE</span>
-                </div>
-                <div class="text-right pt-2 border-t border-slate-100">
-                  <button onclick="switchAdminTab('settings')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-medium rounded-md transition-all cursor-pointer">Manage</button>
-                </div>
               </div>
             </div>
           </div>
@@ -2347,20 +2511,56 @@
     }
 
     let salesChartInstance = null;
-    window.currentChartPeriod = '7days';
+    window.currentRevenuePeriod = 'this_week';
 
-    window.setChartPeriod = function(period) {
-      window.currentChartPeriod = (period === '30days') ? '30days' : '7days';
-      ['7days', '30days'].forEach(p => {
-        const tab = document.getElementById(`chart-tab-${p}`);
-        if (!tab) return;
-        if (p === window.currentChartPeriod) {
-          tab.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white shadow-xs transition-all cursor-pointer';
+    window.handleRevenuePeriodChange = function(val) {
+      window.currentRevenuePeriod = val;
+      const singleBox = document.getElementById('rev-single-date-box');
+      const rangeBox = document.getElementById('rev-range-date-box');
+      const singleInput = document.getElementById('rev-single-date-input');
+      const startInput = document.getElementById('rev-start-date-input');
+      const endInput = document.getElementById('rev-end-date-input');
+
+      if (singleBox) {
+        if (val === 'single_date') {
+          singleBox.classList.remove('hidden');
+          singleBox.classList.add('flex');
+          if (singleInput && !singleInput.value) {
+            singleInput.value = new Date().toISOString().split('T')[0];
+          }
         } else {
-          tab.className = 'px-3 py-1 text-xs font-medium rounded-lg text-slate-600 hover:bg-white transition-all cursor-pointer';
+          singleBox.classList.add('hidden');
+          singleBox.classList.remove('flex');
         }
-      });
+      }
+
+      if (rangeBox) {
+        if (val === 'custom_range') {
+          rangeBox.classList.remove('hidden');
+          rangeBox.classList.add('flex');
+          if (startInput && !startInput.value) {
+            const d = new Date();
+            d.setDate(d.getDate() - 7);
+            startInput.value = d.toISOString().split('T')[0];
+          }
+          if (endInput && !endInput.value) {
+            endInput.value = new Date().toISOString().split('T')[0];
+          }
+        } else {
+          rangeBox.classList.add('hidden');
+          rangeBox.classList.remove('flex');
+        }
+      }
+
       renderSalesChart();
+    };
+
+    // Backward compatibility shim
+    window.setChartPeriod = function(period) {
+      const select = document.getElementById('rev-period-select');
+      const mapped = (period === '30days') ? 'this_month' : 'this_week';
+      if (select) select.value = mapped;
+      window.handleRevenuePeriodChange(mapped);
     };
 
     function initSalesChart() {
@@ -2380,8 +2580,118 @@
       let periodRevenue = 0;
       let periodOrderCount = 0;
 
-      if (window.currentChartPeriod === '30days') {
-        labels = ['Day 1-6', 'Day 7-12', 'Day 13-18', 'Day 19-24', 'Day 25-30'];
+      if (window.currentRevenuePeriod === 'today') {
+        labels = ['12 AM', '3 AM', '6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'];
+        revenueData = [0, 0, 0, 0, 0, 0, 0, 0];
+        const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const endToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999).getTime();
+
+        orders.forEach(o => {
+          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          if (ts >= startToday && ts <= endToday) {
+            const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+            periodRevenue += amt;
+            periodOrderCount++;
+            const hr = new Date(ts).getHours();
+            const slotIdx = Math.min(7, Math.max(0, Math.floor(hr / 3)));
+            revenueData[slotIdx] += amt;
+          }
+        });
+      } else if (window.currentRevenuePeriod === 'yesterday') {
+        labels = ['12 AM', '3 AM', '6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'];
+        revenueData = [0, 0, 0, 0, 0, 0, 0, 0];
+        const yest = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+        const startYest = new Date(yest.getFullYear(), yest.getMonth(), yest.getDate()).getTime();
+        const endYest = new Date(yest.getFullYear(), yest.getMonth(), yest.getDate(), 23, 59, 59, 999).getTime();
+
+        orders.forEach(o => {
+          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          if (ts >= startYest && ts <= endYest) {
+            const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+            periodRevenue += amt;
+            periodOrderCount++;
+            const hr = new Date(ts).getHours();
+            const slotIdx = Math.min(7, Math.max(0, Math.floor(hr / 3)));
+            revenueData[slotIdx] += amt;
+          }
+        });
+      } else if (window.currentRevenuePeriod === 'single_date') {
+        labels = ['12 AM', '3 AM', '6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'];
+        revenueData = [0, 0, 0, 0, 0, 0, 0, 0];
+        const targetDateStr = document.getElementById('rev-single-date-input')?.value || new Date().toISOString().split('T')[0];
+        const targetParts = targetDateStr.split('-').map(Number);
+        const targetStart = new Date(targetParts[0], targetParts[1] - 1, targetParts[2]).getTime();
+        const targetEnd = new Date(targetParts[0], targetParts[1] - 1, targetParts[2], 23, 59, 59, 999).getTime();
+
+        orders.forEach(o => {
+          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          if (ts >= targetStart && ts <= targetEnd) {
+            const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+            periodRevenue += amt;
+            periodOrderCount++;
+            const hr = new Date(ts).getHours();
+            const slotIdx = Math.min(7, Math.max(0, Math.floor(hr / 3)));
+            revenueData[slotIdx] += amt;
+          }
+        });
+      } else if (window.currentRevenuePeriod === 'this_year') {
+        labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        revenueData = new Array(12).fill(0);
+        const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
+
+        orders.forEach(o => {
+          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          if (ts >= startOfYear) {
+            const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+            periodRevenue += amt;
+            periodOrderCount++;
+            const m = new Date(ts).getMonth();
+            revenueData[m] += amt;
+          }
+        });
+      } else if (window.currentRevenuePeriod === 'custom_range') {
+        const sVal = document.getElementById('rev-start-date-input')?.value;
+        const eVal = document.getElementById('rev-end-date-input')?.value;
+        const sDate = sVal ? new Date(sVal + 'T00:00:00') : new Date(Date.now() - 7 * 86400000);
+        const eDate = eVal ? new Date(eVal + 'T23:59:59.999') : new Date();
+        const sMs = sDate.getTime();
+        const eMs = eDate.getTime();
+        const diffDays = Math.max(1, Math.round((eMs - sMs) / 86400000));
+
+        if (diffDays <= 7) {
+          labels = [];
+          revenueData = new Array(diffDays).fill(0);
+          for (let i = 0; i < diffDays; i++) {
+            const cur = new Date(sMs + i * 86400000);
+            labels.push(cur.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }));
+          }
+          orders.forEach(o => {
+            const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+            if (ts >= sMs && ts <= eMs) {
+              const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+              periodRevenue += amt;
+              periodOrderCount++;
+              const dIdx = Math.min(diffDays - 1, Math.max(0, Math.floor((ts - sMs) / 86400000)));
+              revenueData[dIdx] += amt;
+            }
+          });
+        } else {
+          labels = ['Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5'];
+          revenueData = [0, 0, 0, 0, 0];
+          const step = (eMs - sMs) / 5;
+          orders.forEach(o => {
+            const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+            if (ts >= sMs && ts <= eMs) {
+              const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
+              periodRevenue += amt;
+              periodOrderCount++;
+              const slot = Math.min(4, Math.max(0, Math.floor((ts - sMs) / step)));
+              revenueData[slot] += amt;
+            }
+          });
+        }
+      } else if (window.currentRevenuePeriod === 'this_month') {
+        labels = ['Day 1-6', 'Day 7-12', 'Day 13-18', 'Day 19-24', 'Day 25-31'];
         revenueData = [0, 0, 0, 0, 0];
         const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
 
@@ -2396,7 +2706,7 @@
             revenueData[slotIdx] += amt;
           }
         });
-      } else { // '7days' default
+      } else { // 'this_week' default
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         labels = [];
         revenueData = [0, 0, 0, 0, 0, 0, 0];
@@ -2524,7 +2834,122 @@
           }
         }
       });
+
+      renderDashboardWidgets(orders);
     }
+
+    window.renderDashboardWidgets = function(orders) {
+      const orderList = Array.isArray(orders) ? orders : (window.currentAllOrders || []);
+
+      // 1. Order Fulfillment Pipeline Breakdown
+      const pipeCounts = {
+        pending: 0,
+        accepted: 0,
+        packing: 0,
+        shipped: 0,
+        delivered: 0
+      };
+
+      orderList.forEach(o => {
+        const st = canonicalStatus(o.orderStatus || o.status).toLowerCase();
+        if (pipeCounts[st] !== undefined) {
+          pipeCounts[st]++;
+        } else {
+          pipeCounts.pending++;
+        }
+      });
+
+      ['pending', 'accepted', 'packing', 'shipped', 'delivered'].forEach(stage => {
+        const countEl = document.getElementById(`pipe-count-${stage}`);
+        if (countEl) countEl.textContent = pipeCounts[stage];
+      });
+
+      const totalPipelineOrders = Object.values(pipeCounts).reduce((a, b) => a + b, 0);
+      if (totalPipelineOrders > 0) {
+        ['pending', 'accepted', 'packing', 'shipped', 'delivered'].forEach(stage => {
+          const barEl = document.getElementById(`pipe-bar-${stage}`);
+          if (barEl) {
+            const pct = (pipeCounts[stage] / totalPipelineOrders) * 100;
+            barEl.style.width = `${pct}%`;
+          }
+        });
+      }
+
+      // 2. Top Selling Products Leaderboard
+      const listEl = document.getElementById('top-selling-products-list');
+      if (listEl) {
+        const productSalesMap = {};
+        orderList.forEach(o => {
+          const items = Array.isArray(o.items) ? o.items : [];
+          items.forEach(i => {
+            const name = (i.name || i.title || 'Product').trim();
+            const qty = Number(i.qty || i.quantity || 1);
+            const price = Number(i.price || 0);
+            const img = i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'https://placehold.co/100x120/f0f0f0/999?text=Product';
+
+            if (!productSalesMap[name]) {
+              productSalesMap[name] = { name, img, totalUnits: 0, totalRevenue: 0 };
+            }
+            productSalesMap[name].totalUnits += qty;
+            productSalesMap[name].totalRevenue += (price * qty);
+          });
+        });
+
+        let sortedProds = Object.values(productSalesMap).sort((a, b) => b.totalUnits - a.totalUnits || b.totalRevenue - a.totalRevenue);
+
+        if (sortedProds.length === 0 && Array.isArray(window.allProductsData) && window.allProductsData.length > 0) {
+          sortedProds = window.allProductsData.slice(0, 4).map(p => ({
+            name: p.name || p.title || 'Product',
+            img: p.imageUrl || p.image || (Array.isArray(p.imageUrls) ? p.imageUrls[0] : '') || 'https://placehold.co/100x120/f0f0f0/999?text=Product',
+            totalUnits: 0,
+            totalRevenue: 0,
+            inCatalogOnly: true
+          }));
+        }
+
+        if (sortedProds.length === 0) {
+          listEl.innerHTML = `
+            <div class="text-center py-6 border border-dashed border-slate-200 rounded-xl">
+              <span class="material-symbols-outlined text-slate-300 text-3xl">shopping_cart</span>
+              <p class="text-xs text-slate-500 mt-1">No product sales recorded yet.</p>
+            </div>
+          `;
+        } else {
+          const rankColors = [
+            { bg: 'bg-amber-100', text: 'text-amber-800', border: 'border-amber-200' },
+            { bg: 'bg-slate-100', text: 'text-slate-700', border: 'border-slate-300' },
+            { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
+            { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' },
+            { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' }
+          ];
+
+          listEl.innerHTML = sortedProds.slice(0, 5).map((p, idx) => {
+            const rankStyle = rankColors[idx] || rankColors[3];
+            const unitsText = p.inCatalogOnly ? 'In Catalog' : `${p.totalUnits} Units Sold`;
+            const revText = p.inCatalogOnly ? 'Active Product' : `₹${p.totalRevenue.toLocaleString('en-IN')}`;
+
+            return `
+              <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/50 transition-all gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="w-6 h-6 rounded-lg ${rankStyle.bg} ${rankStyle.text} border ${rankStyle.border} flex items-center justify-center text-xs font-bold shrink-0">
+                    #${idx + 1}
+                  </span>
+                  <img src="${p.img}" alt="${p.name}" class="w-10 h-12 object-cover rounded-lg bg-white border border-slate-200 shrink-0" onerror="this.src='https://placehold.co/100x120/f0f0f0/999?text=Product'">
+                  <div class="min-w-0">
+                    <span class="text-xs font-bold text-slate-900 block truncate">${p.name}</span>
+                    <span class="text-[11px] text-slate-500 block truncate">${unitsText}</span>
+                  </div>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-xs font-bold text-slate-900 block">${revText}</span>
+                  ${!p.inCatalogOnly ? `<span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Top Rank</span>` : ''}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+    };
 
     function isDateInSelectedRange(dateInput, filterVal, startDateStr, endDateStr) {
       if (filterVal === 'all' || !filterVal) return true;
@@ -3796,6 +4221,11 @@
 
         window.allProductsData = Array.from(map.values());
 
+        // Refresh dashboard widgets with loaded catalog if needed
+        if (typeof window.renderDashboardWidgets === 'function') {
+          window.renderDashboardWidgets(window.currentAllOrders);
+        }
+
         // Populate Category Filter dropdown dynamically
         populateCategoryDropdown(window.allProductsData);
         
@@ -4218,6 +4648,7 @@
           renderCustomersTable();
           renderPaymentsTable();
           renderReturnsTable();
+          renderDashboardWidgets(cached);
         }
       } catch (e) {}
 
@@ -4227,6 +4658,7 @@
         renderCustomersTable();
         renderPaymentsTable();
         renderReturnsTable();
+        renderDashboardWidgets(orders);
       });
     }
 

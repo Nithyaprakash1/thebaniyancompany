@@ -1966,60 +1966,64 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
     const docsMap2 = new Map();
     const docsMap3 = new Map();
 
+    let notifyTimer = null;
     const combineAndNotify = () => {
-      const ordersMap = new Map();
+      if (notifyTimer) clearTimeout(notifyTimer);
+      notifyTimer = setTimeout(() => {
+        const ordersMap = new Map();
 
-      // 1. All documents in companies/{companyId}/orders are orders by definition! Unconditionally included!
-      docsMap3.forEach((val, id) => {
-        ordersMap.set(id, { ...val, isFromCompanyOrders: true });
-      });
+        // 1. All documents in companies/{companyId}/orders are orders by definition! Unconditionally included!
+        docsMap3.forEach((val, id) => {
+          ordersMap.set(id, { ...val, isFromCompanyOrders: true });
+        });
 
-      // 2. Merge from companies/{companyId}/invoices
-      docsMap2.forEach((val, id) => {
-        if (!ordersMap.has(id)) {
-          ordersMap.set(id, val);
-        } else {
-          ordersMap.set(id, { ...val, ...ordersMap.get(id) });
-        }
-      });
+        // 2. Merge from companies/{companyId}/invoices
+        docsMap2.forEach((val, id) => {
+          if (!ordersMap.has(id)) {
+            ordersMap.set(id, val);
+          } else {
+            ordersMap.set(id, { ...val, ...ordersMap.get(id) });
+          }
+        });
 
-      // 3. Merge from root invoices
-      docsMap1.forEach((val, id) => {
-        if (!ordersMap.has(id)) {
-          ordersMap.set(id, val);
-        } else {
-          ordersMap.set(id, { ...val, ...ordersMap.get(id) });
-        }
-      });
+        // 3. Merge from root invoices
+        docsMap1.forEach((val, id) => {
+          if (!ordersMap.has(id)) {
+            ordersMap.set(id, val);
+          } else {
+            ordersMap.set(id, { ...val, ...ordersMap.get(id) });
+          }
+        });
 
-      let orders = Array.from(ordersMap.values())
-        .filter(d => {
-          if (d.isFromCompanyOrders) return true;
+        let orders = Array.from(ordersMap.values())
+          .filter(d => {
+            if (d.isFromCompanyOrders) return true;
 
-          const orderType = String(d.orderType || '').toLowerCase().trim();
-          const source = String(d.customerSource || d.source || '').toLowerCase().trim();
-          const method = String(d.payment?.method || d.paymentMethod || '').toLowerCase().trim();
+            const orderType = String(d.orderType || '').toLowerCase().trim();
+            const source = String(d.customerSource || d.source || '').toLowerCase().trim();
+            const method = String(d.payment?.method || d.paymentMethod || '').toLowerCase().trim();
 
-          const isOnlineOrder = (
-            orderType === 'online' ||
-            source === 'website' ||
-            Boolean(d.razorpayPaymentId) ||
-            Boolean(d.razorpayOrderId) ||
-            Boolean(d.whatsappOrder) ||
-            method.includes('razorpay') ||
-            method.includes('online') ||
-            method.includes('whatsapp') ||
-            method.includes('cod') ||
-            method.includes('cash on delivery')
-          );
+            const isOnlineOrder = (
+              orderType === 'online' ||
+              source === 'website' ||
+              Boolean(d.razorpayPaymentId) ||
+              Boolean(d.razorpayOrderId) ||
+              Boolean(d.whatsappOrder) ||
+              method.includes('razorpay') ||
+              method.includes('online') ||
+              method.includes('whatsapp') ||
+              method.includes('cod') ||
+              method.includes('cash on delivery')
+            );
 
-          return isOnlineOrder;
-        })
-        .sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
+            return isOnlineOrder;
+          })
+          .sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
 
-      setCachedOrders(orders, companyId);
-      console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order(s) across collections.`);
-      onUpdate(orders);
+        setCachedOrders(orders, companyId);
+        console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order(s) across collections.`);
+        onUpdate(orders);
+      }, 100);
     };
 
     const unsub1 = onSnapshot(ref1, (snapshot) => {
@@ -2059,6 +2063,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
     });
 
     return () => {
+      if (notifyTimer) clearTimeout(notifyTimer);
       try { unsub1(); } catch (_) {}
       try { unsub2(); } catch (_) {}
       try { unsub3(); } catch (_) {}
@@ -2071,7 +2076,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
 
 /**
  * Fetch online orders with read optimization and intelligent local caching.
- * If force is false and cache is fresh (< 60s), returns cached orders without Firestore reads.
+ * If force is false and cache is fresh (< 30s), returns cached orders without Firestore reads.
  * Otherwise fetches latest orders from company orders subcollection and fallback collections.
  *
  * @param {string} [companyId]
@@ -2080,7 +2085,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
  */
 export async function fetchOnlineOrders(companyId = COMPANY_ID, force = false) {
   if (!force) {
-    const info = getCachedOrdersInfo(companyId);
+    const info = getCachedOrdersInfo(companyId, 30000);
     if (info.isFresh && Array.isArray(info.orders) && info.orders.length > 0) {
       return info.orders;
     }
@@ -2091,12 +2096,7 @@ export async function fetchOnlineOrders(companyId = COMPANY_ID, force = false) {
   // 1. Primary: companies/{companyId}/orders
   try {
     const ordCol = collection(db, `companies/${companyId}/orders`);
-    let snap;
-    try {
-      snap = await getDocs(query(ordCol, orderBy('createdAt', 'desc'), limit(100)));
-    } catch (_) {
-      snap = await getDocs(ordCol);
-    }
+    const snap = await getDocs(ordCol);
     snap.docs.forEach(d => {
       const data = d.data();
       const id = data.id || d.id;
@@ -2109,12 +2109,7 @@ export async function fetchOnlineOrders(companyId = COMPANY_ID, force = false) {
   // 2. Secondary: companies/{companyId}/invoices
   try {
     const invCol = collection(db, `companies/${companyId}/invoices`);
-    let invSnap;
-    try {
-      invSnap = await getDocs(query(invCol, orderBy('createdAt', 'desc'), limit(50)));
-    } catch (_) {
-      invSnap = await getDocs(invCol);
-    }
+    const invSnap = await getDocs(invCol);
     invSnap.docs.forEach(d => {
       const data = d.data();
       const id = data.id || d.id;
@@ -2129,12 +2124,7 @@ export async function fetchOnlineOrders(companyId = COMPANY_ID, force = false) {
   // 3. Fallback: root invoices (always merged if matching companyId)
   try {
     const rootCol = collection(db, 'invoices');
-    let rootSnap;
-    try {
-      rootSnap = await getDocs(query(rootCol, orderBy('createdAt', 'desc'), limit(50)));
-    } catch (_) {
-      rootSnap = await getDocs(query(rootCol, limit(50)));
-    }
+    const rootSnap = await getDocs(query(rootCol, limit(50)));
     rootSnap.docs.forEach(d => {
       const data = d.data();
       const id = data.id || d.id;
