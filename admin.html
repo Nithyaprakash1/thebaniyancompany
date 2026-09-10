@@ -2706,6 +2706,11 @@
       return 0;
     }
 
+    function getOrderTimestamp(o) {
+      return getUniversalTimestamp(o);
+    }
+    window.getOrderTimestamp = getOrderTimestamp;
+
     function initSalesChart() {
       setTimeout(() => renderSalesChart(), 50);
     }

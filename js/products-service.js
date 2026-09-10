@@ -1147,6 +1147,9 @@ export function getOrderTimestamp(o) {
   }
   return Date.now();
 }
+if (typeof window !== 'undefined') {
+  window.getOrderTimestamp = getOrderTimestamp;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // 3.  INVENTORY PRE-VALIDATION & MULTI-TENANT ORDER CREATION
