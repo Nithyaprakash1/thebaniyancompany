@@ -352,7 +352,7 @@
 </script>
 
 <script type="module">
-  import { subscribeToProducts, getCompany, formatMoney, getProductPricing } from './js/products-service.js';
+  import { subscribeToProducts, getCompany, formatMoney, getProductPricing, getSessionData } from './js/products-service.js';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
 
   function extractYouTubeId(url) {
@@ -371,82 +371,19 @@
     return arr;
   }
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const company = await getCompany();
-      const feed = document.getElementById('reels-container');
-      if (!feed) return;
+  let cachedLogo = '';
+  let cachedName = 'THE BANIYAN COMPANY';
+  let companyHandle = '@thebaniyancompany';
 
-      const youtubeLinks = (company && Array.isArray(company.youtubeLinks)) ? company.youtubeLinks : [];
-      let currentCompany = company;
+  try {
+    cachedLogo = localStorage.getItem('onespace_shop_logo') || '';
+    cachedName = localStorage.getItem('onespace_shop_name') || 'THE BANIYAN COMPANY';
+    companyHandle = '@' + cachedName.toLowerCase().replace(/[^a-z0-9]/g, '');
+  } catch (_) {}
 
-      const companyNameStr = company?.name || 'OneSpace Commerce';
-      const companyHandleStr = company?.handle || '@thebaniyancompany';
-      const companyLogoStr = company?.logo || '';
-      if (companyLogoStr) {
-        try { localStorage.setItem('onespace_shop_logo', companyLogoStr); } catch (_) {}
-      }
-      if (companyNameStr) {
-        try { localStorage.setItem('onespace_shop_name', companyNameStr); } catch (_) {}
-      }
-
-      // Update header logo / name if element exists
-      const logoEl = document.getElementById('nav-company-logo');
-      if (logoEl && companyLogoStr) logoEl.src = companyLogoStr;
-      const headerBrand = document.querySelector('header .font-bold.tracking-\\[0\\.2em\\]');
-      if (headerBrand) headerBrand.textContent = companyNameStr;
-
-      let initialRenderDone = false;
-
-      subscribeToProducts((products) => {
-        // Build YouTube Short reel items
-        const ytReels = youtubeLinks.map((ytUrl, i) => {
-          const ytId = extractYouTubeId(ytUrl);
-          const assocProduct = (products && products.length > 0) ? products[i % products.length] : null;
-          return {
-            id: assocProduct ? assocProduct.id : `yt-short-${i}`,
-            name: assocProduct ? assocProduct.name : 'Exclusive Streetwear Drop',
-            category: 'YouTube Shorts',
-            youtubeUrl: ytUrl,
-            youtubeId: ytId,
-            imageUrls: [ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (assocProduct?.imageUrls?.[0] || '')],
-            price: assocProduct ? assocProduct.price : 1499,
-            originalPrice: assocProduct ? assocProduct.originalPrice : 2499,
-            description: assocProduct ? assocProduct.description : 'Watch our latest YouTube Short & shop the drop live!'
-          };
-        });
-
-        // Combine products and YouTube Shorts
-        let allReelItems = [...(products || [])];
-        
-        // Attach youtubeId to products if their videoUrl/youtubeUrl has one
-        allReelItems = allReelItems.map(p => {
-          const ytId = extractYouTubeId(p.youtubeUrl || p.videoUrl);
-          return ytId ? { ...p, youtubeId: ytId } : p;
-        });
-
-        // Merge standalone YouTube Shorts links from admin
-        if (ytReels.length > 0) {
-          allReelItems = [...allReelItems, ...ytReels];
-        }
-
-        if (!allReelItems || allReelItems.length === 0) {
-          feed.innerHTML = `
-            <div class="h-screen w-full flex items-center justify-center text-center p-8">
-              <p class="text-secondary text-sm">No reels available right now.</p>
-            </div>`;
-          return;
-        }
-
-        if (!initialRenderDone) {
-          const shuffledReels = shuffleArray(allReelItems);
-          feed.innerHTML = renderReelList(shuffledReels);
-          initialRenderDone = true;
-          if (typeof setupIntersectionObserver === 'function') {
-            setupIntersectionObserver();
-          }
-        }
-      });
+  let youtubeLinks = [];
+  let currentReelItems = [];
+  let reelObserver = null;
 
   window.handleReelDoubleTap = function(card, idx) {
     const btn = card.querySelector('.like-btn-box');
@@ -457,7 +394,6 @@
       }
     }
 
-    // Floating heart animation in center
     const heart = document.createElement('div');
     heart.className = 'absolute inset-0 flex items-center justify-center pointer-events-none z-40 animate-liquid-pop';
     heart.innerHTML = '<span class="material-symbols-outlined text-red-500 text-7xl drop-shadow-2xl" style="font-variation-settings: \'FILL\' 1;">favorite</span>';
@@ -467,17 +403,18 @@
 
   function renderReelList(list) {
     return list.map((product, idx) => {
-      const image = (product.imageUrls && product.imageUrls[0]) ? product.imageUrls[0] : 'https://placehold.co/600x900/000/fff?text=TBC';
+      const image = (product.imageUrls && product.imageUrls[0]) ? product.imageUrls[0] : (product.thumbnail || 'assets/onespace-commerce-logo.png');
       const pricing = getProductPricing(product);
       const price = pricing.price;
+      const origPrice = pricing.mrp;
       const reelPct = pricing.hasDiscount ? pricing.discountPct : 0;
       const discountBadge = reelPct > 0
         ? `<span class="golden-offer-chip !text-[10px] !py-0.5 !px-2"><span class="material-symbols-outlined !text-[12px] text-amber-300">local_fire_department</span>${reelPct}% OFFER</span>`
         : '';
 
-      const logoMarkup = companyLogoStr
-        ? `<img src="${companyLogoStr}" class="w-full h-full object-cover rounded-full">`
-        : `<div class="w-full h-full rounded-full bg-white text-black font-bold flex items-center justify-center border border-white/40 shadow-md">${companyNameStr.charAt(0)}</div>`;
+      const logoMarkup = cachedLogo
+        ? `<img src="${cachedLogo}" class="w-full h-full object-cover rounded-full" onerror="this.src='assets/tbclogo.jpeg';">`
+        : `<div class="w-full h-full rounded-full bg-white text-black font-bold flex items-center justify-center border border-white/40 shadow-md">${cachedName.charAt(0)}</div>`;
 
       const ytId = product.youtubeId || extractYouTubeId(product.youtubeUrl || product.videoUrl);
       const isMp4 = product.videoUrl && product.videoUrl.endsWith('.mp4');
@@ -487,7 +424,7 @@
         mediaMarkup = `
           <div class="reel-media-holder w-full h-full relative overflow-hidden bg-black flex items-center justify-center pointer-events-none"
                data-ytid="${esc(ytId)}" data-bgimg="${esc(image)}">
-            <img class="w-full h-full object-cover shimmer" src="${esc(image)}" alt="${esc(product.name)}" onload="this.classList.remove('shimmer')">
+            <img class="w-full h-full object-cover" src="${esc(image)}" alt="${esc(product.name)}" onerror="this.src='assets/onespace-commerce-logo.png';">
           </div>`;
       } else if (isMp4) {
         mediaMarkup = `
@@ -498,7 +435,7 @@
       } else {
         mediaMarkup = `
           <div class="w-full h-full relative overflow-hidden bg-black flex items-center justify-center pointer-events-none">
-            <img class="reel-video w-full h-full object-cover shimmer" src="${esc(image)}" alt="${esc(product.name)}" onload="this.classList.remove('shimmer')">
+            <img class="reel-video w-full h-full object-cover" src="${esc(image)}" alt="${esc(product.name)}" onerror="this.src='assets/onespace-commerce-logo.png';">
           </div>`;
       }
 
@@ -509,14 +446,12 @@
 
           <!-- Right Action Sidebar (ONLY Like, Share, Thumbnail) -->
           <div class="absolute right-4 bottom-20 md:bottom-24 md:right-8 flex flex-col items-center gap-5 z-30 pb-[env(safe-area-inset-bottom)]">
-            <!-- Like Button (Without Count Text) -->
             <button onclick="toggleLike(this)" class="flex flex-col items-center group" aria-label="Like">
               <div class="like-btn-box w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
                 <span class="material-symbols-outlined text-[24px]">favorite</span>
               </div>
             </button>
 
-            <!-- Share Button -->
             <button onclick="shareReel('${esc(product.name).replace(/'/g, "\\'")}')" class="flex flex-col items-center group" aria-label="Share">
               <div class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
                 <span class="material-symbols-outlined text-[24px]">send</span>
@@ -524,13 +459,12 @@
               <span class="text-[10px] font-semibold mt-1 text-white">Share</span>
             </button>
 
-            <!-- Product Thumbnail -->
             <a href="product-detail?id=${encodeURIComponent(product.id)}" class="w-12 h-12 rounded-xl border-2 border-white/80 overflow-hidden shadow-lg hover:scale-105 transition-transform mt-1 bg-neutral-900">
-              <img class="w-full h-full object-cover shimmer" alt="${esc(product.name)}" src="${esc(image)}" onload="this.classList.remove('shimmer')">
+              <img class="w-full h-full object-cover" alt="${esc(product.name)}" src="${esc(image)}" onerror="this.src='assets/onespace-commerce-logo.png';">
             </a>
           </div>
 
-          <!-- Bottom Reel Info (Positioned cleanly above bottom navbar) -->
+          <!-- Bottom Reel Info -->
           <div class="absolute bottom-20 md:bottom-24 left-4 right-20 md:left-8 max-w-md z-30 space-y-2 pb-[env(safe-area-inset-bottom)]">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full overflow-hidden border border-white/40 shadow-md">
@@ -563,61 +497,120 @@
     }).join('');
   }
 
-      // Render initial shuffled set
-      feed.innerHTML = renderReelList(shuffledReels);
+  function setupObserver() {
+    const feed = document.getElementById('reels-container');
+    if (!feed) return;
+    if (reelObserver) reelObserver.disconnect();
 
-      // IntersectionObserver for 60fps butter smooth reels scrolling
-      const reelObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          const card = entry.target;
-          const holder = card.querySelector('.reel-media-holder');
-          if (!holder) return;
+    reelObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const card = entry.target;
+        const holder = card.querySelector('.reel-media-holder');
+        if (!holder) return;
 
-          const ytId = holder.dataset.ytid;
-          const mp4Url = holder.dataset.mp4;
+        const ytId = holder.dataset.ytid;
+        const mp4Url = holder.dataset.mp4;
 
-          if (entry.isIntersecting) {
-            if (ytId && !holder.querySelector('iframe')) {
-              holder.innerHTML = `
-                <iframe class="w-full h-full object-cover pointer-events-none scale-[1.35]"
-                        src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                </iframe>`;
-            } else if (mp4Url) {
-              let vid = holder.querySelector('video');
-              if (vid) vid.play().catch(() => {});
-            }
-          } else {
-            if (ytId && holder.querySelector('iframe')) {
-              const bgImg = holder.dataset.bgimg || '';
-              holder.innerHTML = `<img class="w-full h-full object-cover shimmer" src="${bgImg}" onload="this.classList.remove('shimmer')">`;
-            } else if (mp4Url) {
-              let vid = holder.querySelector('video');
-              if (vid) vid.pause();
-            }
+        if (entry.isIntersecting) {
+          if (ytId && !holder.querySelector('iframe')) {
+            holder.innerHTML = `
+              <iframe class="w-full h-full object-cover pointer-events-none scale-[1.35]"
+                      src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen>
+              </iframe>`;
+          } else if (mp4Url) {
+            let vid = holder.querySelector('video');
+            if (vid) vid.play().catch(() => {});
           }
-        });
-      }, { root: feed, threshold: 0.5 });
-
-      document.querySelectorAll('.reel-card').forEach(card => reelObserver.observe(card));
-
-      // Infinite Looping Scroll Logic:
-      let appendCount = 0;
-      feed.addEventListener('scroll', () => {
-        if (feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 100) {
-          appendCount++;
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = renderReelList(shuffleArray(shuffledReels));
-          while (tempDiv.firstChild) {
-            feed.appendChild(tempDiv.firstChild);
+        } else {
+          if (ytId && holder.querySelector('iframe')) {
+            const bgImg = holder.dataset.bgimg || '';
+            holder.innerHTML = `<img class="w-full h-full object-cover" src="${bgImg}" onerror="this.src='assets/onespace-commerce-logo.png';">`;
+          } else if (mp4Url) {
+            let vid = holder.querySelector('video');
+            if (vid) vid.pause();
           }
         }
       });
+    }, { root: feed, threshold: 0.5 });
 
-    } catch (error) {
-      console.error('Unable to load reels:', error);
+    document.querySelectorAll('.reel-card').forEach(card => reelObserver.observe(card));
+  }
+
+  function updateReelsFeed(products) {
+    const feed = document.getElementById('reels-container');
+    if (!feed) return;
+
+    const ytReels = (youtubeLinks || []).map((ytUrl, i) => {
+      const ytId = extractYouTubeId(ytUrl);
+      const assocProduct = (products && products.length > 0) ? products[i % products.length] : null;
+      return {
+        id: assocProduct ? assocProduct.id : `yt-short-${i}`,
+        name: assocProduct ? assocProduct.name : 'Exclusive Streetwear Drop',
+        category: 'YouTube Shorts',
+        youtubeUrl: ytUrl,
+        youtubeId: ytId,
+        imageUrls: [ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (assocProduct?.imageUrls?.[0] || '')],
+        price: assocProduct ? assocProduct.price : 1499,
+        originalPrice: assocProduct ? assocProduct.originalPrice : 2499,
+        description: assocProduct ? assocProduct.description : 'Watch our latest YouTube Short & shop the drop live!'
+      };
+    });
+
+    let allReelItems = [...(products || [])];
+    allReelItems = allReelItems.map(p => {
+      const ytId = extractYouTubeId(p.youtubeUrl || p.videoUrl);
+      return ytId ? { ...p, youtubeId: ytId } : p;
+    });
+
+    if (ytReels.length > 0) {
+      allReelItems = [...allReelItems, ...ytReels];
+    }
+
+    if (!allReelItems || allReelItems.length === 0) {
+      feed.innerHTML = `
+        <div class="h-screen w-full flex items-center justify-center text-center p-8">
+          <p class="text-secondary text-sm">No reels available right now.</p>
+        </div>`;
+      return;
+    }
+
+    currentReelItems = shuffleArray(allReelItems);
+    feed.innerHTML = renderReelList(currentReelItems);
+    setupObserver();
+  }
+
+  // 1. INSTANT 0MS CACHE HYDRATION
+  try {
+    const cachedProds = getSessionData('ecommerce_products_thebaniyancompany') || getSessionData('tbc_cache_products') || [];
+    if (Array.isArray(cachedProds) && cachedProds.length > 0) {
+      updateReelsFeed(cachedProds);
+    }
+  } catch (_) {}
+
+  // 2. PARALLEL COMPANY PROFILE FETCH (Non-blocking)
+  getCompany().then(comp => {
+    if (comp) {
+      cachedName = comp.name || cachedName;
+      companyHandle = comp.handle || ('@' + cachedName.toLowerCase().replace(/[^a-z0-9]/g, ''));
+      cachedLogo = comp.logo || cachedLogo;
+      youtubeLinks = Array.isArray(comp.youtubeLinks) ? comp.youtubeLinks : [];
+
+      const logoEl = document.getElementById('nav-company-logo');
+      if (logoEl && comp.logo) logoEl.src = comp.logo;
+
+      if (currentReelItems.length > 0) {
+        updateReelsFeed(currentReelItems);
+      }
+    }
+  }).catch(() => {});
+
+  // 3. PARALLEL PRODUCT STREAM SUBSCRIPTION (Non-blocking)
+  subscribeToProducts((products) => {
+    if (Array.isArray(products) && products.length > 0) {
+      updateReelsFeed(products);
     }
   });
 </script>
