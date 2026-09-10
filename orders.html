@@ -266,13 +266,13 @@
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-6">
 
     <!-- PAGE HEADER -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Orders &amp; Shipping</h1>
-        <p class="text-xs text-slate-500 mt-1">Full pipeline fulfillment: from new pending orders to packing, delivery, and returns.</p>
+        <p class="text-xs text-slate-500 mt-0.5">Full pipeline fulfillment: from new pending orders to packing, delivery, and returns.</p>
       </div>
 
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2 flex-wrap">
         <div id="sync-status-indicator" class="hidden sm:inline-flex items-center gap-2 text-[11px] font-medium text-slate-600 bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-2xs">
           <span id="sync-pulse-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="sync-status-text">Auto-sync: 1 min</span>
@@ -280,40 +280,40 @@
 
         <a
           href="create-order.html"
-          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
+          class="bg-black hover:bg-neutral-800 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0"
         >
           <span class="material-symbols-outlined text-base">add_circle</span>
-          <span>Create Manual Order</span>
+          <span>Create Order</span>
         </a>
 
         <a
           href="stock-availabilities.html"
-          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition shadow-2xs flex items-center gap-1.5"
+          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-3 py-2.5 rounded-xl transition shadow-2xs flex items-center gap-1.5 shrink-0"
         >
           <i data-lucide="boxes" class="w-3.5 h-3.5"></i>
-          <span>Stock Availabilities</span>
+          <span>Stock</span>
         </a>
+
         <button
           type="button"
           id="refresh-feed-btn"
           onclick="refreshOrdersFeed()"
-          class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-3 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-2xs cursor-pointer shrink-0"
         >
           <i data-lucide="refresh-cw" id="refresh-icon" class="w-3.5 h-3.5"></i>
-          <span id="refresh-btn-label">Refresh Feed</span>
+          <span id="refresh-btn-label">Refresh</span>
         </button>
       </div>
     </div>
 
     <!-- ==========================================
-         8 ORDER STATUS FILTER TABS (Requested by User)
-         All Orders, Pending, Accepted, Packing, Shipped, Delivered, Cancelled, Returned
+         FILTERS: Search, Date Scope, View Mode, Status Pills
     ========================================== -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3.5">
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
       
-      <!-- Top Filters: Search + Payment Filter + Sort -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div class="relative flex-1 max-w-md">
+      <!-- Row 1: Search + Payment Filter + Sort -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+        <div class="relative flex-1">
           <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
           <input
             type="text"
@@ -324,42 +324,112 @@
           >
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap">
+        <div class="flex items-center gap-2">
           <!-- Payment Filter -->
           <select
             id="order-payment-filter"
             onchange="applyOrderFilters()"
-            class="bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
+            class="flex-1 sm:flex-initial bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
           >
             <option value="all">All Payments</option>
             <option value="paid">Paid (Razorpay / Online)</option>
             <option value="cod">COD (Pending)</option>
-            <option value="whatsapp">WhatsApp Orders</option>
+            <option value="whatsapp">WhatsApp</option>
           </select>
 
           <!-- Sorter -->
           <select
             id="order-sort-filter"
             onchange="applyOrderFilters()"
-            class="bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
+            class="flex-1 sm:flex-initial bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
           >
-            <option value="newest">Sort: Newest First</option>
-            <option value="oldest">Sort: Oldest First</option>
-            <option value="amount_high">Sort: Amount (High to Low)</option>
-            <option value="amount_low">Sort: Amount (Low to High)</option>
+            <option value="newest">Sort: Newest</option>
+            <option value="oldest">Sort: Oldest</option>
+            <option value="amount_high">Amount (High)</option>
+            <option value="amount_low">Amount (Low)</option>
           </select>
         </div>
       </div>
 
-      <!-- 8 STATUS PILLS ROW -->
-      <div class="flex items-center gap-2 pt-2 border-t border-slate-100 overflow-x-auto custom-scrollbar pb-1">
+      <!-- Row 2: Date Scope (Today by Default!) & View Mode Toggle (Grid vs List) -->
+      <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+        
+        <!-- Date Scope Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-0.5 flex-1 min-w-0" id="date-scope-group">
+          <button
+            type="button"
+            id="date-scope-today"
+            onclick="setDateScopeFilter('today')"
+            class="date-scope-btn px-2.5 py-1.5 rounded-xl text-xs font-bold transition bg-black text-white shrink-0 shadow-2xs flex items-center gap-1"
+          >
+            <span>Today</span>
+            <span id="badge-today-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-mono">0</span>
+          </button>
+
+          <button
+            type="button"
+            id="date-scope-yesterday"
+            onclick="setDateScopeFilter('yesterday')"
+            class="date-scope-btn px-2.5 py-1.5 rounded-xl text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0"
+          >
+            Yesterday
+          </button>
+
+          <button
+            type="button"
+            id="date-scope-week"
+            onclick="setDateScopeFilter('week')"
+            class="date-scope-btn px-2.5 py-1.5 rounded-xl text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0"
+          >
+            Week
+          </button>
+
+          <button
+            type="button"
+            id="date-scope-all"
+            onclick="setDateScopeFilter('all')"
+            class="date-scope-btn px-2.5 py-1.5 rounded-xl text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 flex items-center gap-1"
+          >
+            <span>All</span>
+            <span id="badge-all-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-700 font-mono">0</span>
+          </button>
+        </div>
+
+        <!-- View Mode Switcher: Grid View vs List View -->
+        <div class="inline-flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-200 shrink-0">
+          <button
+            type="button"
+            id="view-mode-grid-btn"
+            onclick="setViewMode('grid')"
+            class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-white text-slate-900 shadow-2xs"
+            title="Grid View (Optimized 2-Column Phone View)"
+          >
+            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+            <span class="text-[11px]">Grid</span>
+          </button>
+          <button
+            type="button"
+            id="view-mode-list-btn"
+            onclick="setViewMode('list')"
+            class="px-2 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1 text-slate-500 hover:text-slate-900"
+            title="Detailed List View"
+          >
+            <i data-lucide="list" class="w-3.5 h-3.5"></i>
+            <span class="text-[11px]">List</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Row 3: 8 Status Pills -->
+      <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100 overflow-x-auto custom-scrollbar pb-1">
         <button
           type="button"
           onclick="setOrderStatusFilter('all')"
           id="btn-status-all"
           class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-black text-white shrink-0 transition"
         >
-          All Orders (<span id="count-all">0</span>)
+          All (<span id="count-all">0</span>)
         </button>
 
         <button
@@ -425,6 +495,18 @@
           Returned (<span id="count-returned">0</span>)
         </button>
       </div>
+
+    </div>
+
+    <!-- Friendly Notice when Today has 0 orders -->
+    <div id="today-empty-banner" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3 shadow-2xs">
+      <div class="flex items-center gap-2">
+        <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0"></i>
+        <span>No orders received yet today.</span>
+      </div>
+      <button type="button" onclick="setDateScopeFilter('all')" class="underline font-bold hover:text-amber-950 shrink-0 cursor-pointer">
+        View All Time Orders (<span id="banner-all-count">0</span>)
+      </button>
     </div>
 
     <!-- ==========================================
@@ -432,7 +514,7 @@
     ========================================== -->
     <!-- Skeleton Shimmer Loading Placeholder -->
     <div id="orders-shimmer-container" class="space-y-4">
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div class="flex items-center gap-3">
             <div class="h-6 w-28 skeleton-shimmer rounded-lg"></div>
@@ -443,7 +525,7 @@
             <div class="h-6 w-24 skeleton-shimmer rounded-full"></div>
           </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div class="space-y-2">
             <div class="h-3 w-16 skeleton-shimmer rounded"></div>
             <div class="h-4 w-32 skeleton-shimmer rounded"></div>
@@ -454,21 +536,8 @@
             <div class="h-4 w-3/4 skeleton-shimmer rounded"></div>
           </div>
         </div>
-        <div class="p-4 bg-slate-50 rounded-xl space-y-2">
-          <div class="h-3 w-28 skeleton-shimmer rounded"></div>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-12 skeleton-shimmer rounded-lg"></div>
-              <div class="space-y-1.5">
-                <div class="h-4 w-40 skeleton-shimmer rounded"></div>
-                <div class="h-3 w-24 skeleton-shimmer rounded"></div>
-              </div>
-            </div>
-            <div class="h-5 w-16 skeleton-shimmer rounded"></div>
-          </div>
-        </div>
       </div>
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div class="flex items-center gap-3">
             <div class="h-6 w-28 skeleton-shimmer rounded-lg"></div>
@@ -479,7 +548,7 @@
             <div class="h-6 w-24 skeleton-shimmer rounded-full"></div>
           </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div class="space-y-2">
             <div class="h-3 w-16 skeleton-shimmer rounded"></div>
             <div class="h-4 w-32 skeleton-shimmer rounded"></div>
@@ -501,7 +570,7 @@
     <div id="orders-empty-state" class="hidden bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-400 shadow-xs">
       <i data-lucide="package-x" class="w-12 h-12 mx-auto mb-2 text-slate-300 stroke-1"></i>
       <h3 class="font-bold text-sm text-slate-700">No orders found</h3>
-      <p class="text-xs text-slate-400 mt-1">There are no orders matching your selected status or filter.</p>
+      <p class="text-xs text-slate-400 mt-1">There are no orders matching your selected status or date period.</p>
     </div>
 
     <!-- New Order Live Notification Toast -->
@@ -536,7 +605,9 @@
     // State
     window.liveOrders = [];
     window.activeOrderStatusFilter = 'all';
+    window.activeDateScope = 'today'; // Default to Today for speed and optimization!
     window.activeOrderSearch = '';
+    window.activeViewMode = (window.innerWidth < 768) ? 'grid' : 'list'; // Default to Grid on mobile phones!
 
     let isSyncing = false;
     let syncIntervalTimer = null;
@@ -765,24 +836,39 @@
       const c = canonicalStatus(status);
       const isConfirmed = String(status || '').trim().toLowerCase() === 'confirmed';
       if (c === 'Pending') {
-        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">${isConfirmed ? 'Confirmed · Awaiting Fulfillment' : 'Pending Acceptance'}</span>`;
+        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 shrink-0">${isConfirmed ? 'Confirmed' : 'Pending'}</span>`;
       } else if (c === 'Accepted') {
-        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">Accepted</span>`;
+        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-200 shrink-0">Accepted</span>`;
       } else if (c === 'Packing') {
-        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">Packing</span>`;
+        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 shrink-0">Packing</span>`;
       } else if (c === 'Shipped') {
-        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">Shipped</span>`;
+        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">Shipped</span>`;
       } else if (c === 'Delivered') {
-        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>`;
+        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">Delivered</span>`;
       } else if (c === 'Cancelled') {
-        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>`;
+        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 shrink-0">Cancelled</span>`;
       } else if (c === 'Returned') {
-        return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">Returned</span>`;
+        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-700 border border-orange-200 shrink-0">Returned</span>`;
       }
-      return `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">${status}</span>`;
+      return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 shrink-0">${status}</span>`;
     }
 
-    // Render Orders Cards
+    // Quick Action Button for Grid Cards
+    function renderQuickActionBtn(orderId, currentStatus) {
+      const c = canonicalStatus(currentStatus);
+      if (c === 'Pending') {
+        return `<button onclick="updateOrderStatus('${orderId}', 'Accepted')" class="px-2.5 py-1.5 bg-black hover:bg-neutral-800 text-white font-bold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1 shrink-0"><i data-lucide="check" class="w-3 h-3"></i> Accept</button>`;
+      } else if (c === 'Accepted') {
+        return `<button onclick="updateOrderStatus('${orderId}', 'Packing')" class="px-2.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1 shrink-0"><i data-lucide="package" class="w-3 h-3"></i> Pack</button>`;
+      } else if (c === 'Packing') {
+        return `<button onclick="updateOrderStatus('${orderId}', 'Shipped')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1 shrink-0"><i data-lucide="truck" class="w-3 h-3"></i> Ship</button>`;
+      } else if (c === 'Shipped') {
+        return `<button onclick="updateOrderStatus('${orderId}', 'Delivered')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1 shrink-0"><i data-lucide="check-circle" class="w-3 h-3"></i> Deliver</button>`;
+      }
+      return '';
+    }
+
+    // Render Orders in Grid View or List View
     function renderOrdersView(orders) {
       const container = document.getElementById('orders-cards-container');
       const emptyState = document.getElementById('orders-empty-state');
@@ -797,100 +883,184 @@
       }
       emptyState.classList.add('hidden');
 
-      container.innerHTML = orders.map(o => {
-        const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
-        const payBadge = isPaid 
-          ? `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">PAID (${o.paymentMethod})</span>`
-          : `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">${o.paymentMethod}</span>`;
+      // ================= GRID VIEW (2-Column Phone View / Compact Tiles) =================
+      if (window.activeViewMode === 'grid') {
+        container.className = 'grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5';
+        container.innerHTML = orders.map(o => {
+          const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
+          const payBadge = isPaid 
+            ? `<span class="inline-flex items-center text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200 shrink-0">PAID</span>`
+            : `<span class="inline-flex items-center text-[9px] sm:text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200 shrink-0">${o.paymentMethod || 'COD'}</span>`;
 
-        const curCanonical = canonicalStatus(o.status || o.orderStatus);
+          const curCanonical = canonicalStatus(o.status || o.orderStatus);
+          const itemCount = (o.items || []).reduce((acc, i) => acc + (i.qty || 1), 0);
+          const shortId = String(o.id || '').replace(/^ORD-/, '');
 
-        return `
-          <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 hover:border-slate-300 transition">
-            
-            <!-- Card Header: ID, Date & Time, Status Badge -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-slate-100">
-              <div class="flex items-center gap-3 flex-wrap">
-                <span class="font-mono text-xs font-bold bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg">
-                  ${o.id}
-                </span>
-                
-                <!-- PROMINENT DATE WITH TIME -->
-                <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
-                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
-                  <span>${o.createdAtFormatted}</span>
+          return `
+            <div class="bg-white border border-slate-200 rounded-2xl p-2.5 sm:p-4 shadow-xs space-y-2 sm:space-y-3 hover:border-slate-300 transition flex flex-col justify-between">
+              <div>
+                <!-- Top Header: Short ID + Status Badge -->
+                <div class="flex items-center justify-between gap-1 pb-2 border-b border-slate-100">
+                  <span class="font-mono text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded truncate" title="${o.id}">
+                    #${shortId.length > 8 ? shortId.slice(-6) : shortId}
+                  </span>
+                  <div class="flex items-center gap-1 shrink-0">
+                    ${payBadge}
+                    ${getStatusBadge(o.status)}
+                  </div>
+                </div>
+
+                <!-- Customer Details & Tap to Call -->
+                <div class="pt-1.5 sm:pt-2 space-y-1">
+                  <div class="flex items-center justify-between gap-1">
+                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm truncate" title="${o.customerName}">${o.customerName}</h4>
+                    <a href="tel:${o.phone}" class="inline-flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded transition shrink-0" title="Call Customer">
+                      <i data-lucide="phone" class="w-2.5 h-2.5 text-emerald-600"></i>
+                      <span class="hidden sm:inline">Call</span>
+                    </a>
+                  </div>
+
+                  <div class="flex items-center gap-1 text-[11px] text-slate-500 font-medium truncate">
+                    <i data-lucide="map-pin" class="w-2.5 h-2.5 text-slate-400 shrink-0"></i>
+                    <span class="truncate">${o.city ? o.city : (o.address || 'Local')}</span>
+                  </div>
+
+                  <div class="flex items-center gap-1 text-[10px] text-slate-400 font-medium truncate">
+                    <i data-lucide="clock" class="w-2.5 h-2.5 text-slate-400 shrink-0"></i>
+                    <span class="truncate">${o.createdAtFormatted.split(',')[1] || o.createdAtFormatted}</span>
+                  </div>
+                </div>
+
+                <!-- Items Mini Strip -->
+                <div class="mt-2 p-1.5 sm:p-2 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                  <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <span>${itemCount} Item(s)</span>
+                    <span class="text-slate-600 font-mono">${(o.items && o.items[0]?.size) || 'M'}</span>
+                  </div>
+                  <div class="text-[11px] text-slate-700 truncate font-medium">
+                    ${(o.items && o.items[0]?.name) || 'Apparel Item'}${itemCount > 1 ? ` +${itemCount - 1}` : ''}
+                  </div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-2">
-                ${payBadge}
-                ${getStatusBadge(o.status)}
+              <!-- Bottom: Total Amount & Status Actions -->
+              <div class="pt-2 border-t border-slate-100 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] sm:text-xs text-slate-400 font-medium">Total:</span>
+                  <span class="text-xs sm:text-sm font-bold text-slate-900">₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+                </div>
+
+                <div class="flex items-center gap-1">
+                  <select onchange="updateOrderStatus('${o.id}', this.value)" class="flex-1 text-[10px] sm:text-xs font-semibold text-slate-800 px-1 py-1 sm:py-1.5 rounded-lg bg-white border border-slate-200 focus:border-black outline-none cursor-pointer">
+                    ${['Pending', 'Accepted', 'Packing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(st => `
+                      <option value="${st}" ${curCanonical === st ? 'selected' : ''}>${st}</option>
+                    `).join('')}
+                  </select>
+                  ${renderQuickActionBtn(o.id, o.status)}
+                </div>
               </div>
             </div>
+          `;
+        }).join('');
+      } 
+      // ================= LIST VIEW (Detailed Horizontal Cards) =================
+      else {
+        container.className = 'space-y-4';
+        container.innerHTML = orders.map(o => {
+          const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
+          const payBadge = isPaid 
+            ? `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">PAID (${o.paymentMethod})</span>`
+            : `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">${o.paymentMethod}</span>`;
 
-            <!-- Customer & Delivery Address Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          const curCanonical = canonicalStatus(o.status || o.orderStatus);
+
+          return `
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 hover:border-slate-300 transition">
               
-              <!-- Customer Info -->
-              <div class="space-y-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Customer</span>
-                <h4 class="font-bold text-slate-900 text-sm">${o.customerName}</h4>
-                <p class="text-slate-600 flex items-center gap-1">
-                  <i data-lucide="phone" class="w-3 h-3 text-slate-400"></i>
-                  <span>${o.phone}</span>
-                </p>
-                ${o.email ? `<p class="text-slate-400">${o.email}</p>` : ''}
-              </div>
-
-              <!-- Shipping Address -->
-              <div class="space-y-1 md:col-span-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Delivery Address</span>
-                <p class="text-slate-700 font-medium leading-relaxed">
-                  ${o.address}, ${o.city ? o.city + ', ' : ''}${o.state ? o.state + ' - ' : ''}<strong>${o.pincode}</strong>
-                </p>
-              </div>
-            </div>
-
-            <!-- Ordered Items List -->
-            <div class="p-3 bg-slate-50/70 border border-slate-100 rounded-xl space-y-2">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Items in Order (${(o.items || []).length})</span>
-              <div class="divide-y divide-slate-100">
-                ${(o.items || []).map(i => `
-                  <div class="flex items-center justify-between py-2 text-xs">
-                    <div class="flex items-center gap-2.5">
-                      <img src="${i.imageUrl || 'https://placehold.co/80x100?text=Product'}" class="w-9 h-11 object-cover rounded-lg bg-white border border-slate-200">
-                      <div>
-                        <span class="font-bold text-slate-800">${i.name}</span>
-                        <span class="text-[11px] text-slate-500 block">Size: ${i.size || 'M'} · Color: ${i.color || 'Standard'} · Qty: ${i.qty || 1}</span>
-                      </div>
-                    </div>
-                    <span class="font-bold text-slate-900">₹${Number(i.price || 0).toLocaleString('en-IN')}</span>
+              <!-- Card Header: ID, Date & Time, Status Badge -->
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span class="font-mono text-xs font-bold bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg">
+                    ${o.id}
+                  </span>
+                  
+                  <!-- PROMINENT DATE WITH TIME -->
+                  <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>${o.createdAtFormatted}</span>
                   </div>
-                `).join('')}
-              </div>
-            </div>
+                </div>
 
-            <!-- Card Footer: Total Amount, Status Dropdown & Action Buttons -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-100">
-              <div class="flex items-baseline gap-2">
-                <span class="text-xs text-slate-500 font-medium">Order Total:</span>
-                <span class="text-lg font-bold text-slate-900">₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+                <div class="flex items-center gap-2">
+                  ${payBadge}
+                  ${getStatusBadge(o.status)}
+                </div>
               </div>
 
-              <!-- Status Dropdown & Action Buttons -->
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs font-semibold text-slate-600">Status:</span>
-                <select onchange="updateOrderStatus('${o.id}', this.value)" class="shopify-input text-xs font-semibold text-slate-900 px-3 py-1.5 rounded-lg outline-none bg-white border border-slate-300 hover:border-slate-400 focus:border-black cursor-pointer shadow-2xs transition">
-                  ${['Pending', 'Accepted', 'Packing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(st => `
-                    <option value="${st}" ${curCanonical === st ? 'selected' : ''}>${st}</option>
+              <!-- Customer & Delivery Address Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                
+                <!-- Customer Info -->
+                <div class="space-y-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Customer</span>
+                  <h4 class="font-bold text-slate-900 text-sm">${o.customerName}</h4>
+                  <p class="text-slate-600 flex items-center gap-1">
+                    <i data-lucide="phone" class="w-3 h-3 text-slate-400"></i>
+                    <span>${o.phone}</span>
+                  </p>
+                  ${o.email ? `<p class="text-slate-400">${o.email}</p>` : ''}
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="space-y-1 md:col-span-2">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Delivery Address</span>
+                  <p class="text-slate-700 font-medium leading-relaxed">
+                    ${o.address}, ${o.city ? o.city + ', ' : ''}${o.state ? o.state + ' - ' : ''}<strong>${o.pincode}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Ordered Items List -->
+              <div class="p-3 bg-slate-50/70 border border-slate-100 rounded-xl space-y-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Items in Order (${(o.items || []).length})</span>
+                <div class="divide-y divide-slate-100">
+                  ${(o.items || []).map(i => `
+                    <div class="flex items-center justify-between py-2 text-xs">
+                      <div class="flex items-center gap-2.5">
+                        <img src="${i.imageUrl || 'https://placehold.co/80x100?text=Product'}" class="w-9 h-11 object-cover rounded-lg bg-white border border-slate-200">
+                        <div>
+                          <span class="font-bold text-slate-800">${i.name}</span>
+                          <span class="text-[11px] text-slate-500 block">Size: ${i.size || 'M'} · Color: ${i.color || 'Standard'} · Qty: ${i.qty || 1}</span>
+                        </div>
+                      </div>
+                      <span class="font-bold text-slate-900">₹${Number(i.price || 0).toLocaleString('en-IN')}</span>
+                    </div>
                   `).join('')}
-                </select>
-                ${renderStatusActionButtons(o.id, o.status)}
+                </div>
+              </div>
+
+              <!-- Card Footer: Total Amount, Status Dropdown & Action Buttons -->
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-100">
+                <div class="flex items-baseline gap-2">
+                  <span class="text-xs text-slate-500 font-medium">Order Total:</span>
+                  <span class="text-lg font-bold text-slate-900">₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}</span>
+                </div>
+
+                <!-- Status Dropdown & Action Buttons -->
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-semibold text-slate-600">Status:</span>
+                  <select onchange="updateOrderStatus('${o.id}', this.value)" class="shopify-input text-xs font-semibold text-slate-900 px-3 py-1.5 rounded-lg outline-none bg-white border border-slate-300 hover:border-slate-400 focus:border-black cursor-pointer shadow-2xs transition">
+                    ${['Pending', 'Accepted', 'Packing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(st => `
+                      <option value="${st}" ${curCanonical === st ? 'selected' : ''}>${st}</option>
+                    `).join('')}
+                  </select>
+                  ${renderStatusActionButtons(o.id, o.status)}
+                </div>
               </div>
             </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
 
       if (window.lucide && typeof window.lucide.createIcons === 'function') {
         window.lucide.createIcons();
@@ -955,26 +1125,119 @@
       } catch(_) {}
     }
 
+    // Helper to match order with date scope
+    function isOrderDateMatch(order, scope) {
+      if (scope === 'all') return true;
+      const ts = order.createdAtTimestamp || (order.createdAt?.seconds ? order.createdAt.seconds * 1000 : 0) || (order.createdAt ? new Date(order.createdAt).getTime() : 0);
+      if (!ts) return scope === 'all';
+
+      const orderDate = new Date(ts);
+      const now = new Date();
+      
+      if (scope === 'today') {
+        return orderDate.getDate() === now.getDate() &&
+               orderDate.getMonth() === now.getMonth() &&
+               orderDate.getFullYear() === now.getFullYear();
+      }
+      
+      if (scope === 'yesterday') {
+        const yest = new Date(now);
+        yest.setDate(now.getDate() - 1);
+        return orderDate.getDate() === yest.getDate() &&
+               orderDate.getMonth() === yest.getMonth() &&
+               orderDate.getFullYear() === yest.getFullYear();
+      }
+      
+      if (scope === 'week') {
+        const startOfWeek = new Date(now);
+        const day = startOfWeek.getDay();
+        const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+        startOfWeek.setDate(diff);
+        startOfWeek.setHours(0, 0, 0, 0);
+        return orderDate >= startOfWeek;
+      }
+
+      return true;
+    }
+
+    // Date Scope Filter Switcher
+    window.setDateScopeFilter = function(scope) {
+      window.activeDateScope = scope;
+      
+      document.querySelectorAll('.date-scope-btn').forEach(btn => {
+        btn.classList.remove('bg-black', 'text-white', 'font-bold', 'shadow-2xs');
+        btn.classList.add('bg-slate-100', 'text-slate-600', 'font-medium');
+      });
+
+      const active = document.getElementById(`date-scope-${scope}`);
+      if (active) {
+        active.classList.remove('bg-slate-100', 'text-slate-600', 'font-medium');
+        active.classList.add('bg-black', 'text-white', 'font-bold', 'shadow-2xs');
+      }
+
+      applyOrderFilters();
+    };
+
+    // View Mode Switcher: Grid View vs List View
+    window.setViewMode = function(mode) {
+      window.activeViewMode = mode;
+      const gridBtn = document.getElementById('view-mode-grid-btn');
+      const listBtn = document.getElementById('view-mode-list-btn');
+
+      if (mode === 'grid') {
+        if (gridBtn) {
+          gridBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-2xs';
+        }
+        if (listBtn) {
+          listBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-500 hover:text-slate-900';
+        }
+      } else {
+        if (gridBtn) {
+          gridBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-500 hover:text-slate-900';
+        }
+        if (listBtn) {
+          listBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-2xs';
+        }
+      }
+
+      applyOrderFilters();
+    };
+
     // Filter Logic
     window.applyOrderFilters = function() {
       const statusFilter = (window.activeOrderStatusFilter || 'all').trim().toLowerCase();
+      const dateScope = window.activeDateScope || 'today';
       const search = (window.activeOrderSearch || '').trim().toLowerCase();
       const paymentFilter = document.getElementById('order-payment-filter')?.value || 'all';
       const sortFilter = document.getElementById('order-sort-filter')?.value || 'newest';
 
-      let filtered = [...window.liveOrders];
+      const baseOrders = [...window.liveOrders];
 
-      // Update counters for all 8 tabs
-      updateTabCounters();
+      // Update counters
+      updateDateAndTabCounters();
 
-      // 1. Status Filter with canonical state machine aliasing
+      // 1. Date Scope Filter (Today's orders by default!)
+      let filtered = baseOrders.filter(o => isOrderDateMatch(o, dateScope));
+
+      const emptyBanner = document.getElementById('today-empty-banner');
+      if (emptyBanner) {
+        if (dateScope === 'today' && filtered.length === 0 && baseOrders.length > 0) {
+          emptyBanner.classList.remove('hidden');
+          const bannerCount = document.getElementById('banner-all-count');
+          if (bannerCount) bannerCount.textContent = baseOrders.length;
+        } else {
+          emptyBanner.classList.add('hidden');
+        }
+      }
+
+      // 2. Status Filter
       if (statusFilter !== 'all') {
         filtered = filtered.filter(o => {
           return canonicalStatus(o.status || o.orderStatus).toLowerCase() === statusFilter;
         });
       }
 
-      // 2. Search
+      // 3. Search
       if (search) {
         filtered = filtered.filter(o => 
           String(o.id || '').toLowerCase().includes(search) ||
@@ -984,14 +1247,14 @@
         );
       }
 
-      // 3. Payment
+      // 4. Payment
       if (paymentFilter !== 'all') {
         if (paymentFilter === 'paid') filtered = filtered.filter(o => String(o.paymentStatus || '').toLowerCase() === 'paid' || String(o.paymentMethod || '').toLowerCase().includes('razorpay'));
         else if (paymentFilter === 'cod') filtered = filtered.filter(o => String(o.paymentMethod || '').toLowerCase().includes('cod') || String(o.paymentStatus || '').toLowerCase() !== 'paid');
         else if (paymentFilter === 'whatsapp') filtered = filtered.filter(o => String(o.paymentMethod || '').toLowerCase().includes('whatsapp'));
       }
 
-      // 4. Sort
+      // 5. Sort
       if (sortFilter === 'newest') filtered.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
       else if (sortFilter === 'oldest') filtered.sort((a, b) => (a.createdAtTimestamp || 0) - (b.createdAtTimestamp || 0));
       else if (sortFilter === 'amount_high') filtered.sort((a, b) => (b.totalAmount || 0) - (a.totalAmount || 0));
@@ -1000,18 +1263,26 @@
       renderOrdersView(filtered);
     };
 
-    function updateTabCounters() {
+    function updateDateAndTabCounters() {
       const all = window.liveOrders;
-      const countFor = (st) => all.filter(o => {
-        return canonicalStatus(o.status || o.orderStatus).toLowerCase() === st;
-      }).length;
+      const todayCount = all.filter(o => isOrderDateMatch(o, 'today')).length;
+      const allCount = all.length;
 
       const setBadge = (id, val) => {
         const el = document.getElementById(id);
         if (el) el.textContent = val;
       };
 
-      setBadge('count-all', all.length);
+      setBadge('badge-today-count', todayCount);
+      setBadge('badge-all-count', allCount);
+
+      // Status counters for active date scope
+      const scopeOrders = all.filter(o => isOrderDateMatch(o, window.activeDateScope || 'today'));
+      const countFor = (st) => scopeOrders.filter(o => {
+        return canonicalStatus(o.status || o.orderStatus).toLowerCase() === st;
+      }).length;
+
+      setBadge('count-all', scopeOrders.length);
       setBadge('count-pending', countFor('pending'));
       setBadge('count-accepted', countFor('accepted'));
       setBadge('count-packing', countFor('packing'));
@@ -1045,14 +1316,16 @@
 
     window.handleSearchOrders = function(val) {
       window.activeOrderSearch = val;
-      const g = document.getElementById('global-order-search');
       const t = document.getElementById('table-order-search');
-      if (g && g.value !== val) g.value = val;
       if (t && t.value !== val) t.value = val;
       applyOrderFilters();
     };
 
     window.refreshOrdersFeed = async function() {
+      const shimmer = document.getElementById('orders-shimmer-container');
+      const container = document.getElementById('orders-cards-container');
+      if (shimmer) shimmer.classList.remove('hidden');
+      if (container) container.innerHTML = '';
       await syncOrders(true);
     };
 
@@ -1087,6 +1360,9 @@
       const urlParams = new URLSearchParams(window.location.search);
       const initialStatus = urlParams.get('status') || urlParams.get('filter') || 'all';
       setOrderStatusFilter(initialStatus);
+
+      // Initialize view mode state button styles
+      setViewMode(window.activeViewMode);
 
       // 1. Instantly load from cache in 0ms (no waiting, no network lag)
       loadCachedOrders();

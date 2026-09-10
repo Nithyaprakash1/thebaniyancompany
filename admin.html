@@ -435,9 +435,9 @@
             <!-- Date Period Filter Dropdown & Custom Range -->
             <div class="flex items-center gap-2.5 flex-wrap">
               <select id="dash-period-select" onchange="handleRevenuePeriodChange(this.value)" class="h-10 px-3.5 rounded-xl border border-slate-200 bg-white text-slate-700 shadow-xs font-medium text-[11px] uppercase tracking-wider cursor-pointer outline-none focus:border-slate-400">
-                <option value="today">TODAY</option>
+                <option value="today" selected>TODAY</option>
                 <option value="yesterday">YESTERDAY</option>
-                <option value="this_week" selected>THIS WEEK</option>
+                <option value="this_week">THIS WEEK</option>
                 <option value="this_month">THIS MONTH</option>
                 <option value="this_year">THIS YEAR</option>
                 <option value="custom_range">PICK RANGE</option>
@@ -633,9 +633,9 @@
                 <!-- Date Filter Suite -->
                 <div class="flex items-center gap-2 flex-wrap">
                   <select id="rev-period-select" onchange="handleRevenuePeriodChange(this.value)" class="shopify-input text-slate-700 px-3 py-1.5 rounded-lg text-xs outline-none font-medium bg-slate-50 border border-slate-200 cursor-pointer shadow-2xs">
-                    <option value="today">Today</option>
+                    <option value="today" selected>Today</option>
                     <option value="yesterday">Yesterday</option>
-                    <option value="this_week" selected>This Week</option>
+                    <option value="this_week">This Week</option>
                     <option value="this_month">This Month</option>
                     <option value="this_year">This Year</option>
                     <option value="custom_range">Date Range...</option>
@@ -2576,7 +2576,7 @@
     };
 
     let salesChartInstance = null;
-    window.currentRevenuePeriod = 'this_week';
+    window.currentRevenuePeriod = 'today';
 
     window.handleRevenuePeriodChange = function(val) {
       window.currentRevenuePeriod = val;

@@ -38,14 +38,15 @@
     }
     .custom-input, .custom-select {
       width: 100%;
+      height: 40px;
       background-color: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      padding: 9px 14px;
+      padding: 0 12px;
       font-size: 13px;
       color: #0f172a;
       outline: none;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
     .custom-input:focus, .custom-select:focus {
       border-color: #000000;
@@ -54,96 +55,137 @@
     .custom-input::placeholder {
       color: #94a3b8;
     }
+    .skeleton-shimmer {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
   </style>
 </head>
-<body class="min-h-screen py-8 px-4 sm:px-6">
+<body class="min-h-screen py-6 sm:py-8 px-3.5 sm:px-6">
 
-  <div class="max-w-2xl mx-auto space-y-6">
+  <div class="max-w-2xl mx-auto space-y-5 sm:space-y-6">
 
     <!-- Top Navigation: Back to Orders -->
     <div>
-      <a href="orders.html" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors mb-3">
+      <a href="orders.html" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors mb-2.5">
         <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Orders
       </a>
       <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Create Manual Order</h1>
-      <p class="text-xs text-slate-500 mt-1">For phone, WhatsApp, Instagram, or walk-in orders.</p>
+      <p class="text-xs text-slate-500 mt-0.5">For phone, WhatsApp, Instagram, or walk-in orders.</p>
     </div>
 
     <!-- MAIN FORM -->
     <form id="manual-order-form" onsubmit="handleOrderSubmit(event)" class="space-y-4">
 
       <!-- ================= 1. CUSTOMER DETAILS ================= -->
-      <div class="custom-card p-5 sm:p-6 space-y-4">
-        <div class="flex items-center gap-2">
+      <div class="custom-card p-4 sm:p-6 space-y-4">
+        <div class="flex items-center gap-2.5">
           <span class="step-badge">1</span>
           <h2 class="font-bold text-sm text-slate-900">Customer Details</h2>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Customer Name</label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Customer Name</label>
             <input type="text" id="customer-name" placeholder="Priya Nair" required class="custom-input">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Phone Number</label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
             <input type="tel" id="customer-phone" placeholder="9876543210" required pattern="[0-9]{10}" maxlength="10" class="custom-input">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Delivery Address</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Delivery Address</label>
           <input type="text" id="customer-address" placeholder="Full address with pincode" required class="custom-input">
         </div>
       </div>
 
       <!-- ================= 2. PRODUCTS ================= -->
-      <div class="custom-card p-5 sm:p-6 space-y-4">
-        <div class="flex items-center gap-2">
-          <span class="step-badge">2</span>
-          <h2 class="font-bold text-sm text-slate-900">Products</h2>
+      <div class="custom-card p-4 sm:p-6 space-y-3.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="step-badge">2</span>
+            <h2 class="font-bold text-sm text-slate-900">Products</h2>
+          </div>
+          <span id="catalog-loading-badge" class="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse"></span> Loading catalog...
+          </span>
         </div>
 
-        <!-- Products Rows Container -->
-        <div id="product-rows-container" class="space-y-3">
-          <!-- Rows will be injected dynamically -->
+        <!-- Shimmer Skeleton Loading Placeholder -->
+        <div id="products-shimmer" class="p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-3">
+          <div class="flex items-center gap-2 text-[11px] font-semibold text-slate-500 px-0.5">
+            <div class="flex-[5] min-w-0"><div class="h-3.5 w-16 skeleton-shimmer rounded"></div></div>
+            <div class="flex-[2.5] min-w-0"><div class="h-3.5 w-10 skeleton-shimmer rounded"></div></div>
+            <div class="flex-[2] min-w-0 flex justify-center"><div class="h-3.5 w-8 skeleton-shimmer rounded"></div></div>
+            <div class="w-9 shrink-0"></div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="flex-[5] min-w-0"><div class="h-10 skeleton-shimmer rounded-lg"></div></div>
+            <div class="flex-[2.5] min-w-0"><div class="h-10 skeleton-shimmer rounded-lg"></div></div>
+            <div class="flex-[2] min-w-0"><div class="h-10 skeleton-shimmer rounded-lg"></div></div>
+            <div class="w-9 shrink-0 flex justify-center"><div class="h-9 w-9 skeleton-shimmer rounded-lg"></div></div>
+          </div>
+        </div>
+
+        <!-- Shaded Products Box (Matching Exact Reference Screenshot) -->
+        <div id="products-box" class="hidden p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-2.5">
+          <!-- Column Headers: Product, Size, Qty aligned with inputs -->
+          <div class="flex items-center gap-2 text-[11px] font-semibold text-slate-500 px-0.5">
+            <div class="flex-[5] min-w-0">Product</div>
+            <div class="flex-[2.5] min-w-0">Size</div>
+            <div class="flex-[2] min-w-0 text-center">Qty</div>
+            <div class="w-9 shrink-0"></div>
+          </div>
+
+          <!-- Product Rows Container -->
+          <div id="product-rows-container" class="space-y-2">
+            <!-- Dynamic product rows -->
+          </div>
         </div>
 
         <div>
           <button type="button" onclick="addProductRow()" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-800 hover:text-black py-1 cursor-pointer transition-colors">
-            <span class="text-sm font-bold">+</span> Add another product
+            <span class="text-sm font-bold leading-none">+</span> Add another product
           </button>
         </div>
       </div>
 
       <!-- ================= 3. PAYMENT ================= -->
-      <div class="custom-card p-5 sm:p-6 space-y-4">
-        <div class="flex items-center gap-2">
+      <div class="custom-card p-4 sm:p-6 space-y-4">
+        <div class="flex items-center gap-2.5">
           <span class="step-badge">3</span>
           <h2 class="font-bold text-sm text-slate-900">Payment</h2>
         </div>
 
         <!-- Payment Method Toggle Pills -->
         <div class="flex items-center gap-2 flex-wrap" id="payment-method-group">
-          <button type="button" onclick="setPaymentMethod('COD')" class="pay-pill px-4 py-2 rounded-xl text-xs font-bold transition-all bg-black text-white shadow-xs" data-method="COD">COD</button>
-          <button type="button" onclick="setPaymentMethod('UPI')" class="pay-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-700 border border-slate-200 hover:bg-slate-50" data-method="UPI">UPI</button>
-          <button type="button" onclick="setPaymentMethod('Razorpay')" class="pay-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-700 border border-slate-200 hover:bg-slate-50" data-method="Razorpay">Razorpay</button>
-          <button type="button" onclick="setPaymentMethod('WhatsApp')" class="pay-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-700 border border-slate-200 hover:bg-slate-50" data-method="WhatsApp">WhatsApp</button>
+          <button type="button" onclick="setPaymentMethod('COD')" class="pay-pill px-4 h-9 rounded-xl text-xs font-bold transition-all bg-black text-white shadow-xs" data-method="COD">COD</button>
+          <button type="button" onclick="setPaymentMethod('UPI')" class="pay-pill px-4 h-9 rounded-xl text-xs font-medium transition-all bg-white text-slate-700 border border-slate-200 hover:bg-slate-50" data-method="UPI">UPI</button>
+          <button type="button" onclick="setPaymentMethod('Razorpay')" class="pay-pill px-4 h-9 rounded-xl text-xs font-medium transition-all bg-white text-slate-700 border border-slate-200 hover:bg-slate-50" data-method="Razorpay">Razorpay</button>
+          <button type="button" onclick="setPaymentMethod('WhatsApp')" class="pay-pill px-4 h-9 rounded-xl text-xs font-medium transition-all bg-white text-slate-700 border border-slate-200 hover:bg-slate-50" data-method="WhatsApp">WhatsApp</button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Delivery Charge (₹)</label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Delivery Charge (₹)</label>
             <input type="number" id="delivery-charge" value="70" min="0" oninput="recalculateSummary()" class="custom-input">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Discount (₹)</label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Discount (₹)</label>
             <input type="number" id="discount-amount" value="0" min="0" oninput="recalculateSummary()" class="custom-input">
           </div>
         </div>
       </div>
 
       <!-- ================= ORDER SUMMARY CARD ================= -->
-      <div class="custom-card p-5 sm:p-6 space-y-3">
+      <div class="custom-card p-4 sm:p-6 space-y-3">
         <h3 class="font-bold text-sm text-slate-900">Order Summary</h3>
 
         <div class="space-y-2 text-xs">
@@ -161,17 +203,17 @@
           </div>
           <div class="border-t border-slate-100 pt-2.5 flex justify-between items-center">
             <span class="font-bold text-sm text-slate-900">Total</span>
-            <span class="font-extrabold text-lg text-slate-900" id="summary-total">₹70</span>
+            <span class="font-extrabold text-base sm:text-lg text-slate-900" id="summary-total">₹70</span>
           </div>
         </div>
       </div>
 
       <!-- BOTTOM ACTIONS -->
-      <div class="flex items-center justify-end gap-3 pt-2">
-        <a href="orders.html" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold transition-all">
+      <div class="flex items-center justify-end gap-3 pt-1">
+        <a href="orders.html" class="px-5 h-10 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold transition-all inline-flex items-center justify-center">
           Cancel
         </a>
-        <button type="submit" id="save-order-btn" class="px-6 py-2.5 rounded-xl bg-black hover:bg-neutral-800 text-white text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer">
+        <button type="submit" id="save-order-btn" class="px-6 h-10 rounded-xl bg-black hover:bg-neutral-800 text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
           <span>Save Order</span>
         </button>
       </div>
@@ -179,7 +221,7 @@
     </form>
   </div>
 
-  <!-- FIREBASE & SCRIPT INTEGRATION -->
+  <!-- FIREBASE & LOGIC -->
   <script type="module">
     import { getProducts, saveOrderToFirestore, COMPANY_ID } from './js/products-service.js';
 
@@ -187,23 +229,42 @@
     let activePaymentMethod = 'COD';
     let rowCounter = 0;
 
-    // Initialize Page
+    // Load Catalog with Shimmer and Cache Fallback
     async function initPage() {
+      const shimmerEl = document.getElementById('products-shimmer');
+      const boxEl = document.getElementById('products-box');
+      const badgeEl = document.getElementById('catalog-loading-badge');
+
       try {
-        catalog = await getProducts(false, COMPANY_ID);
-        if (!Array.isArray(catalog) || catalog.length === 0) {
-          catalog = await getProducts(true, COMPANY_ID);
+        // 1. Try instant cache for 0ms render
+        const cachedRaw = localStorage.getItem('tbc_cache_products') || sessionStorage.getItem(`ecommerce_products_${COMPANY_ID}`);
+        if (cachedRaw) {
+          try {
+            const parsed = JSON.parse(cachedRaw);
+            const list = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.data) ? parsed.data : []);
+            if (list.length > 0) catalog = list;
+          } catch (_) {}
+        }
+
+        // 2. Fetch fresh catalog if cache was empty
+        if (catalog.length === 0) {
+          catalog = await getProducts(COMPANY_ID);
         }
       } catch (err) {
         console.error('Error fetching catalog:', err);
-      }
+      } finally {
+        setTimeout(() => {
+          if (shimmerEl) shimmerEl.classList.add('hidden');
+          if (boxEl) boxEl.classList.remove('hidden');
+          if (badgeEl) badgeEl.classList.add('hidden');
 
-      // Add initial product row
-      addProductRow();
-      recalculateSummary();
+          addProductRow();
+          recalculateSummary();
+        }, 300);
+      }
     }
 
-    // Add Product Row
+    // Add Product Row (Flexbox Proportions matching Screenshot)
     window.addProductRow = function() {
       const container = document.getElementById('product-rows-container');
       if (!container) return;
@@ -213,37 +274,33 @@
 
       const rowEl = document.createElement('div');
       rowEl.id = rowId;
-      rowEl.className = 'p-3 rounded-xl bg-slate-50/70 border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-2.5';
+      rowEl.className = 'flex items-center gap-2';
 
       let productOptions = `<option value="">Select a product...</option>`;
       catalog.forEach(prod => {
-        const minPrice = prod.price || (prod.variants && prod.variants[0]?.price) || 0;
-        productOptions += `<option value="${prod.id}" data-name="${encodeURIComponent(prod.name || '')}">${prod.name} (₹${minPrice})</option>`;
+        productOptions += `<option value="${prod.id}">${prod.name}</option>`;
       });
 
       rowEl.innerHTML = `
-        <div class="flex-1 w-full sm:w-auto">
-          <label class="block text-[10px] font-semibold text-slate-500 mb-1">Product</label>
-          <select class="custom-select prod-select text-xs" onchange="handleProductChange('${rowId}')" required>
+        <div class="flex-[5] min-w-0">
+          <select class="custom-select prod-select text-xs truncate" onchange="handleProductChange('${rowId}')" required>
             ${productOptions}
           </select>
         </div>
 
-        <div class="w-full sm:w-28">
-          <label class="block text-[10px] font-semibold text-slate-500 mb-1">Size</label>
-          <select class="custom-select size-select text-xs" onchange="handleVariantChange('${rowId}')" required>
+        <div class="flex-[2.5] min-w-0">
+          <select class="custom-select size-select text-xs truncate" onchange="handleVariantChange('${rowId}')" required>
             <option value="M">M</option>
           </select>
         </div>
 
-        <div class="w-full sm:w-20">
-          <label class="block text-[10px] font-semibold text-slate-500 mb-1">Qty</label>
-          <input type="number" class="custom-input qty-input text-xs text-center" value="1" min="1" max="50" oninput="recalculateSummary()" required>
+        <div class="flex-[2] min-w-0">
+          <input type="number" class="custom-input qty-input text-xs text-center !px-1 font-semibold" value="1" min="1" max="50" oninput="recalculateSummary()" required>
         </div>
 
-        <div class="self-end sm:self-center sm:pt-4">
-          <button type="button" onclick="removeProductRow('${rowId}')" class="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer" title="Remove Item">
-            <span class="material-symbols-outlined text-base">close</span>
+        <div class="w-9 shrink-0 flex justify-center">
+          <button type="button" onclick="removeProductRow('${rowId}')" class="h-10 w-9 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer text-xs" title="Remove Item">
+            ✕
           </button>
         </div>
       `;
@@ -288,14 +345,13 @@
       if (product && Array.isArray(product.variants) && product.variants.length > 0) {
         product.variants.forEach(v => {
           const sizeName = v.size || v.name || 'Standard';
-          const colorName = v.color ? ` - ${v.color}` : '';
           const price = Number(v.price || product.price || 0);
           const opt = document.createElement('option');
           opt.value = v.size || sizeName;
           opt.dataset.price = price;
           opt.dataset.color = v.color || '';
           opt.dataset.variantKey = v.id || `${v.size}::${v.color}`;
-          opt.textContent = `${sizeName}${colorName} (₹${price})`;
+          opt.textContent = sizeName;
           sizeSelect.appendChild(opt);
         });
       } else {
@@ -303,7 +359,7 @@
         const opt = document.createElement('option');
         opt.value = 'M';
         opt.dataset.price = price;
-        opt.textContent = `Standard (₹${price})`;
+        opt.textContent = 'M';
         sizeSelect.appendChild(opt);
       }
 
@@ -320,9 +376,9 @@
       const buttons = document.querySelectorAll('#payment-method-group .pay-pill');
       buttons.forEach(btn => {
         if (btn.dataset.method === method) {
-          btn.className = 'pay-pill px-4 py-2 rounded-xl text-xs font-bold transition-all bg-black text-white shadow-xs';
+          btn.className = 'pay-pill px-4 h-9 rounded-xl text-xs font-bold transition-all bg-black text-white shadow-xs';
         } else {
-          btn.className = 'pay-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-700 border border-slate-200 hover:bg-slate-50';
+          btn.className = 'pay-pill px-4 h-9 rounded-xl text-xs font-medium transition-all bg-white text-slate-700 border border-slate-200 hover:bg-slate-50';
         }
       });
     };
