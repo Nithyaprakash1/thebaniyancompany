@@ -35,12 +35,15 @@
       display: none;
     }
 
-    body {
+    html, body {
       background-color: #f6f6f7;
       color: #1a1a1a;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden !important;
+      max-width: 100vw !important;
+      width: 100% !important;
     }
 
     .shopify-card {
@@ -106,7 +109,7 @@
 
 <body class="bg-[#f6f6f7] text-slate-900 font-sans min-h-screen antialiased">
 
-  <div class="min-h-screen flex flex-col md:flex-row">
+  <div class="min-h-screen flex flex-col md:flex-row w-full max-w-full overflow-x-hidden">
 
     <!-- Mobile Drawer Backdrop -->
     <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 hidden md:hidden"></div>
@@ -247,7 +250,7 @@
     <!-- ==========================================
          RIGHT CONTENT AREA: ANALYTICS DASHBOARD
     ========================================== -->
-    <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+    <div class="flex-1 min-w-0 flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
       
       <!-- Top Sticky Header -->
       <header class="sticky top-0 z-30 bg-white border-b border-slate-200/80 px-4 sm:px-8 py-3.5 shadow-2xs">
