@@ -45,6 +45,20 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
+    /* Clean typography: strictly regular (400) and medium (500) weights, no heavy bold */
+    body, p, span, div, a, input, select, textarea, td, li {
+      font-weight: 400;
+    }
+    h1, h2, h3, h4, h5, h6, th, label, button, .font-medium, .font-semibold, .font-bold, .font-black, strong, b {
+      font-weight: 500 !important;
+    }
+    .font-normal {
+      font-weight: 400 !important;
+    }
+    .font-medium {
+      font-weight: 500 !important;
+    }
+
     .shopify-card {
       background: #ffffff;
       border: 1px solid #e1e3e5;
@@ -181,7 +195,7 @@
         <div class="p-4 border-b border-[#1a1c25] space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-              <img src="assets/onespace-commerce-logo.png" id="sidebar-logo-img" alt="OneSpace Commerce" class="h-8 w-8 object-contain rounded-lg p-0.5 bg-white/5 border border-white/10" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
+              <img src="assets/onespace-commerce-logo.png" id="sidebar-brand-logo" alt="OneSpace Commerce" class="h-8 w-8 object-contain rounded-xl p-0.5 bg-white/5 border border-white/10 shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
               <div class="flex items-baseline gap-1">
                 <span class="text-sm font-medium text-white tracking-tight">OneSpace</span>
                 <span class="text-sm font-medium text-emerald-400 tracking-tight">Commerce</span>
@@ -198,31 +212,34 @@
               <img id="sidebar-shop-logo-img" src="assets/tbclogo.jpeg" alt="TBC" class="w-6 h-6 rounded-full object-cover border border-white/20 shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
               <span class="text-[11px] font-medium tracking-wider text-slate-200 uppercase truncate" id="sidebar-shop-name">THE BANIYAN COMPANY</span>
             </div>
-            <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-pulse"></span>
           </div>
         </div>
 
-        <!-- Vertical Side Navigation Menu (Exact Order) -->
+        <!-- Vertical Side Navigation Menu (Pure E-Commerce) -->
         <nav class="p-3 space-y-1 overflow-y-auto custom-scrollbar flex-1">
-          <!-- 1. Home -->
+          <!-- 1. Dashboard -->
           <button id="side-tab-dashboard" onclick="switchAdminTab('dashboard')"
             class="sidebar-nav-btn active w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-[19px] text-emerald-400">grid_view</span>
-              <span>Home</span>
+              <span class="font-medium">Dashboard</span>
             </div>
             <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
           </button>
 
           <!-- 2. Orders -->
-          <a href="orders.html" id="side-tab-orders"
-            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
+          <button id="side-tab-orders" onclick="switchAdminTab('orders')"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-[19px] text-blue-400">local_shipping</span>
-              <span>Orders</span>
+              <span class="font-normal">Orders</span>
             </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
+            <div class="flex items-center gap-2">
+              <span id="sidebar-order-badge" class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">0</span>
+              <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+            </div>
+          </button>
 
           <!-- 3. Products -->
           <button id="side-tab-products" onclick="switchAdminTab('products')"
@@ -234,7 +251,7 @@
             <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
           </button>
 
-          <!-- 4. Stock Check -->
+          <!-- 4. Stock Availabilities -->
           <a href="stock-availabilities.html" id="side-tab-stock"
             class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -306,9 +323,22 @@
         </nav>
       </div>
 
+      <!-- Access Level Pill Card (Matches Studio Screenshot) -->
+      <div class="px-3.5 pb-2">
+        <div class="p-3 rounded-2xl bg-[#151720] border border-[#222634] flex items-center gap-3 shadow-xs">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center font-medium text-emerald-400 text-xs shrink-0">
+            N
+          </div>
+          <div class="flex flex-col min-w-0">
+            <p class="text-[9px] font-normal uppercase tracking-widest text-slate-400 leading-none mb-1">ACCESS LEVEL</p>
+            <p class="text-[11px] font-medium uppercase text-white truncate">ADMIN</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Sidebar Footer -->
       <div class="p-3.5 border-t border-[#1a1c25] space-y-2 bg-[#0b0d13]">
-        <a href="home.html" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-[#151720] hover:bg-[#1e2230] text-xs font-normal text-slate-200 transition-all flex items-center justify-center gap-2 border border-[#232736]">
+        <a href="home.html" target="_blank" class="w-full py-2 px-3 rounded-xl bg-[#151720] hover:bg-[#1e2230] text-xs font-normal text-slate-200 transition-all flex items-center justify-center gap-2 border border-[#232736]">
           <span class="material-symbols-outlined text-base text-slate-400">visibility</span> View Storefront
         </a>
         <button onclick="logoutAdmin()" class="w-full py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-normal transition-all border border-rose-500/20 flex items-center justify-center gap-2 cursor-pointer">
@@ -320,135 +350,228 @@
     <!-- RIGHT CONTENT AREA -->
     <div class="flex-1 min-w-0 flex flex-col min-h-screen">
       
-      <!-- Top Header Bar with TB Avatar (No notification button) -->
+      <!-- Top Header Bar with Timestamp & Add Product Button -->
       <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div class="flex items-center gap-2.5">
-            <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 rounded-lg bg-slate-100 text-slate-800">
+          <div class="flex items-center gap-3">
+            <button onclick="toggleMobileSidebar()" class="p-1.5 rounded-lg bg-slate-100 text-slate-800 hover:bg-slate-200 transition" title="Toggle Sidebar">
               <span class="material-symbols-outlined text-xl">menu</span>
             </button>
-            <div>
-              <span class="font-bold text-base tracking-tight text-slate-900 block leading-tight">OneSpace Commerce</span>
-              <span class="text-[11px] text-slate-400 font-medium hidden sm:block">The Baniyan Company</span>
+            <div class="flex items-center gap-2.5">
+              <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" class="h-8 w-8 object-contain rounded-xl p-0.5 bg-white border border-slate-200/80 shadow-2xs shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
+              <div>
+                <div class="flex items-baseline gap-1">
+                  <span class="font-medium text-base tracking-tight text-slate-900 leading-tight">OneSpace</span>
+                  <span class="font-medium text-base tracking-tight text-emerald-600 leading-tight">Commerce</span>
+                </div>
+                <span class="text-[11px] text-slate-400 font-normal hidden sm:block">The Baniyan Company</span>
+              </div>
             </div>
           </div>
 
           <!-- Right Header Actions -->
-          <div class="flex items-center gap-2.5 sm:gap-3">
+          <div class="flex items-center gap-3">
+            <!-- Timestamp & Refresh Bar -->
+            <div class="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-xl text-[10px] font-normal text-slate-500 shadow-2xs">
+              <span class="material-symbols-outlined text-sm text-slate-400">schedule</span>
+              <span id="header-updated-time">UPDATED: LIVE</span>
+              <span class="h-3 w-px bg-slate-200 mx-1"></span>
+              <button onclick="refreshDashboardData()" id="btn-header-refresh" class="flex items-center gap-1 hover:text-slate-900 transition cursor-pointer font-medium" title="Refresh Live Data">
+                <span class="material-symbols-outlined text-xs" id="refresh-icon">refresh</span> REFRESH
+              </button>
+            </div>
+
+            <!-- Add Product Action -->
             <button
               type="button"
               onclick="openAddProductModal()"
-              class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+              class="bg-black hover:bg-neutral-800 text-white text-xs font-medium px-4 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
             >
               <span class="material-symbols-outlined text-sm">add</span>
               <span>Add Product</span>
             </button>
 
-            <a
-              href="home.html"
-              target="_blank"
-              class="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium px-3 py-2 rounded-xl hidden sm:flex items-center gap-1.5 transition"
-            >
-              <span class="material-symbols-outlined text-sm text-slate-500">open_in_new</span>
-              <span>View Store</span>
-            </a>
+            <!-- User Avatar Circle -->
+            <div class="w-8 h-8 rounded-xl bg-slate-900 text-white font-medium text-xs flex items-center justify-center border border-slate-200 shadow-2xs">
+              N
+            </div>
           </div>
         </div>
       </header>
 
       <main class="p-4 md:p-8 flex-1 space-y-6 max-w-7xl">
 
-        <!-- ==================== VIEW 1: DASHBOARD & SALES ==================== -->
+        <!-- ==================== VIEW 1: DASHBOARD & SALES (OneSpace Studio Theme) ==================== -->
         <div id="view-dashboard" class="space-y-6">
 
-          <!-- Greeting Header & Action Buttons -->
-          <div class="flex items-center justify-between flex-wrap gap-4 pt-1">
-            <div>
-              <h1 class="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2" id="dash-greeting">
-                Good Evening 👋
-              </h1>
-              <p class="text-xs text-slate-500 mt-1">Here's what's happening with your store today.</p>
-            </div>
+          <!-- Centered Floating New Orders Capsule Pill (From Studio Screenshot) -->
+          <div id="floating-orders-banner" class="hidden justify-center my-2 animate-in slide-in-from-top-4 duration-500">
+            <button onclick="switchAdminTab('orders'); setOrderFilter('pending');" class="group flex items-center gap-3.5 bg-black hover:bg-neutral-900 text-white px-6 h-11 rounded-full shadow-2xl ring-1 ring-white/10 hover:ring-emerald-400/40 transition-all active:scale-95 cursor-pointer">
+              <div class="relative flex items-center justify-center">
+                <span class="material-symbols-outlined text-emerald-400 text-base group-hover:rotate-12 transition-transform">notifications</span>
+                <span class="absolute -inset-1 rounded-full bg-emerald-400/25 animate-ping"></span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-[11px] font-medium uppercase tracking-[0.15em]" id="top-pill-order-text">NEW ORDERS</span>
+                <span class="h-3.5 w-px bg-white/20"></span>
+                <span class="text-[10px] font-medium text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                  PROCESS NOW <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                </span>
+              </div>
+            </button>
+          </div>
 
-            <div class="flex items-center gap-2.5">
-              <button onclick="openAddProductModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
-                <span class="material-symbols-outlined text-sm">add</span> Add Product
-              </button>
+          <!-- Greeting Header & Workspace Strip (Matches Screenshot) -->
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-1">
+            <header class="space-y-1">
+              <h1 class="text-xl md:text-2xl font-medium tracking-tight text-slate-800 uppercase" id="dash-greeting">
+                GOOD MORNING, THE BANIYAN COMPANY
+              </h1>
+              <p class="text-[10px] text-slate-400 font-normal uppercase tracking-widest" id="dash-cycle-label">
+                SEP 10, 10:20 | MAIN WORKSPACE
+              </p>
+            </header>
+
+            <!-- Date Period Filter Dropdown & Custom Range -->
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <select id="dash-period-select" onchange="handleRevenuePeriodChange(this.value)" class="h-10 px-3.5 rounded-xl border border-slate-200 bg-white text-slate-700 shadow-xs font-medium text-[11px] uppercase tracking-wider cursor-pointer outline-none focus:border-slate-400">
+                <option value="today">TODAY</option>
+                <option value="yesterday">YESTERDAY</option>
+                <option value="this_week" selected>THIS WEEK</option>
+                <option value="this_month">THIS MONTH</option>
+                <option value="this_year">THIS YEAR</option>
+                <option value="custom_range">PICK RANGE</option>
+              </select>
+
+              <!-- Custom Range Input Box for Top Bar -->
+              <div id="dash-range-date-box" class="hidden items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs text-xs">
+                <input type="date" id="dash-start-date-input" onchange="handleTopDateRangeChange()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer font-normal">
+                <span class="text-[11px] text-slate-400 font-normal">to</span>
+                <input type="date" id="dash-end-date-input" onchange="handleTopDateRangeChange()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer font-normal">
+              </div>
             </div>
           </div>
 
-          <!-- 6 KPI Metric Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5">
-            <!-- 1. Today's Sales -->
-            <div class="shopify-card p-4 space-y-2">
-              <div class="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center">
-                <span class="material-symbols-outlined text-lg">trending_up</span>
+          <!-- 4 Pastel Summary Cards (Exact Visual Styling from OneSpace Studio) -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <!-- Card 1: TOTAL SALES (Soft Indigo/Lavender) -->
+            <div onclick="switchAdminTab('orders')" class="rounded-2xl p-4 sm:p-5 bg-[#eff3fe] border border-[#dbe4ff] hover:border-indigo-200 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-medium uppercase tracking-wider text-indigo-600">TOTAL SALES</span>
+                <div class="w-8 h-8 rounded-xl bg-white/80 border border-indigo-200/60 text-indigo-600 flex items-center justify-center shadow-2xs">
+                  <span class="material-symbols-outlined text-base">shopping_bag</span>
+                </div>
               </div>
               <div>
-                <span class="text-xs font-medium text-slate-500">Today's Sales</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-sales"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
-                <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5" id="kpi-today-growth">Live Store Sales</span>
+                <h3 class="text-2xl sm:text-3xl font-normal tracking-tight text-slate-800" id="kpi-today-sales">
+                  <span class="inline-block w-24 h-7 skeleton-shimmer rounded-lg"></span>
+                </h3>
+                <span class="text-[11px] font-normal text-indigo-600/80 block mt-0.5" id="kpi-today-growth">
+                  <span class="inline-block w-20 h-3 skeleton-shimmer rounded"></span>
+                </span>
               </div>
             </div>
 
-            <!-- 2. Today's Orders -->
-            <div onclick="window.location.href='orders.html';" class="shopify-card p-4 space-y-2 cursor-pointer hover:border-slate-300 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-sky-100/70 text-sky-700 flex items-center justify-center">
-                <span class="material-symbols-outlined text-lg">shopping_bag</span>
+            <!-- Card 2: TOTAL ORDERS (Soft Emerald/Mint) -->
+            <div onclick="switchAdminTab('orders')" class="rounded-2xl p-4 sm:p-5 bg-[#eefcf5] border border-[#d1fae5] hover:border-emerald-200 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-medium uppercase tracking-wider text-emerald-600">TOTAL ORDERS</span>
+                <div class="w-8 h-8 rounded-xl bg-white/80 border border-emerald-200/60 text-emerald-600 flex items-center justify-center shadow-2xs">
+                  <span class="material-symbols-outlined text-base">receipt_long</span>
+                </div>
               </div>
               <div>
-                <span class="text-xs font-medium text-slate-500">Today's Orders</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-today-orders"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
-                <span class="text-[11px] font-medium text-slate-500 block mt-0.5" id="kpi-orders-breakdown">0 online · 0 COD</span>
+                <h3 class="text-2xl sm:text-3xl font-normal tracking-tight text-slate-800" id="kpi-today-orders">
+                  <span class="inline-block w-12 h-7 skeleton-shimmer rounded-lg"></span>
+                </h3>
+                <span class="text-[11px] font-normal text-emerald-600/80 block mt-0.5" id="kpi-orders-breakdown">
+                  <span class="inline-block w-24 h-3 skeleton-shimmer rounded"></span>
+                </span>
               </div>
             </div>
 
-            <!-- 3. Pending Orders (HIGHLIGHTED CARD) -->
-            <div onclick="window.location.href='orders.html?status=pending';"
-              class="shopify-card p-4 space-y-2 border-2 border-amber-400 ring-2 ring-amber-400/20 cursor-pointer hover:bg-amber-50/20 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-amber-100/80 text-amber-800 flex items-center justify-center">
-                <span class="material-symbols-outlined text-lg">schedule</span>
+            <!-- Card 3: STOCK VALUE (Soft Warm Amber) -->
+            <div onclick="window.location.href='stock-availabilities.html'" class="rounded-2xl p-4 sm:p-5 bg-[#fefaf0] border border-[#fef3c7] hover:border-amber-200 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-medium uppercase tracking-wider text-amber-600">STOCK VALUE</span>
+                <div class="w-8 h-8 rounded-xl bg-white/80 border border-amber-200/60 text-amber-600 flex items-center justify-center shadow-2xs">
+                  <span class="material-symbols-outlined text-base">inventory_2</span>
+                </div>
               </div>
               <div>
-                <span class="text-xs font-medium text-slate-500">Pending Orders</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-pending-orders"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
-                <span class="text-[11px] font-bold text-amber-700 block mt-0.5">Action Needed</span>
+                <h3 class="text-2xl sm:text-3xl font-normal tracking-tight text-slate-800" id="kpi-stock-value">
+                  <span class="inline-block w-28 h-7 skeleton-shimmer rounded-lg"></span>
+                </h3>
+                <span class="text-[11px] font-normal text-amber-600/80 block mt-0.5" id="kpi-stock-count-text">
+                  <span class="inline-block w-24 h-3 skeleton-shimmer rounded"></span>
+                </span>
               </div>
             </div>
 
-            <!-- 4. Customers -->
-            <div onclick="switchAdminTab('customers')" class="shopify-card p-4 space-y-2 cursor-pointer hover:border-purple-300 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-purple-100/70 text-purple-700 flex items-center justify-center">
-                <span class="material-symbols-outlined text-lg">group</span>
+            <!-- Card 4: CUSTOMERS (Soft Teal/Cyan) -->
+            <div onclick="switchAdminTab('customers')" class="rounded-2xl p-4 sm:p-5 bg-[#eefbfa] border border-[#ccfbf1] hover:border-teal-200 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-medium uppercase tracking-wider text-teal-600">CUSTOMERS</span>
+                <div class="w-8 h-8 rounded-xl bg-white/80 border border-teal-200/60 text-teal-600 flex items-center justify-center shadow-2xs">
+                  <span class="material-symbols-outlined text-base">monitoring</span>
+                </div>
               </div>
               <div>
-                <span class="text-xs font-medium text-slate-500">Customers</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-total-customers"><span class="inline-block w-10 h-6 skeleton-shimmer rounded"></span></h3>
-                <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5" id="kpi-new-customers">0 in database</span>
+                <h3 class="text-2xl sm:text-3xl font-normal tracking-tight text-slate-800" id="kpi-total-customers">
+                  <span class="inline-block w-12 h-7 skeleton-shimmer rounded-lg"></span>
+                </h3>
+                <span class="text-[11px] font-normal text-teal-600/80 block mt-0.5">Registered Shoppers</span>
               </div>
             </div>
+          </div>
 
-            <!-- 5. Avg Order Value -->
-            <div class="shopify-card p-4 space-y-2">
-              <div class="w-8 h-8 rounded-lg bg-indigo-100/70 text-indigo-700 flex items-center justify-center">
-                <span class="material-symbols-outlined text-lg">target</span>
-              </div>
+          <!-- Order Management — Live Delivery Pipeline Card (Exact Replica of OneSpace Studio) -->
+          <div class="border border-slate-100 shadow-xs rounded-[2rem] overflow-hidden bg-white">
+            <div class="p-6 border-b border-gray-50 flex flex-row items-center justify-between flex-wrap gap-2">
               <div>
-                <span class="text-xs font-medium text-slate-500">Avg Order Value</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-aov"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
-                <span class="text-[11px] font-semibold text-emerald-600 block mt-0.5">Based on orders</span>
+                <span class="text-[11px] font-normal uppercase tracking-[0.2em] text-slate-400 block">ORDER MANAGEMENT</span>
+                <p class="text-[9px] text-slate-700 font-medium uppercase mt-0.5 tracking-wider">LIVE DELIVERY PIPELINE</p>
               </div>
+              <button onclick="setOrderFilter('all'); switchAdminTab('orders');" class="h-8 px-4 rounded-xl text-[10px] font-medium uppercase tracking-wider text-emerald-600 hover:bg-emerald-50/50 flex items-center gap-1.5 transition cursor-pointer">
+                VIEW ALL <span class="material-symbols-outlined text-xs">arrow_forward</span>
+              </button>
             </div>
+            <div class="p-8 sm:p-10">
+              <div class="flex flex-col sm:flex-row justify-between items-center gap-8 sm:gap-12 relative">
+                <!-- Horizontal Connecting Track -->
+                <div class="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 hidden sm:block -z-0"></div>
+                
+                <!-- 1. Pending -->
+                <div onclick="setOrderFilter('pending'); switchAdminTab('orders');" class="relative z-10 flex flex-col items-center gap-3 bg-white px-6 cursor-pointer group">
+                  <div class="h-12 w-12 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 text-sm font-medium shadow-2xs group-hover:scale-105 transition" id="pipe-count-pending">
+                    <span class="inline-block w-4 h-4 skeleton-shimmer rounded-full"></span>
+                  </div>
+                  <span class="text-[9px] font-medium uppercase text-slate-500 tracking-wider group-hover:text-slate-900 transition">PENDING</span>
+                </div>
 
-            <!-- 6. Est. Profit -->
-            <div class="shopify-card p-4 space-y-2">
-              <div class="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center">
-                <span class="material-symbols-outlined text-lg">attach_money</span>
-              </div>
-              <div>
-                <span class="text-xs font-medium text-slate-500">Est. Profit</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-0.5" id="kpi-est-profit"><span class="inline-block w-16 h-6 skeleton-shimmer rounded"></span></h3>
-                <span class="text-[11px] font-medium text-slate-500 block mt-0.5" id="kpi-profit-margin">Margin: 47%</span>
+                <!-- 2. Processing -->
+                <div onclick="setOrderFilter('processing'); switchAdminTab('orders');" class="relative z-10 flex flex-col items-center gap-3 bg-white px-6 cursor-pointer group">
+                  <div class="h-12 w-12 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 text-sm font-medium shadow-2xs group-hover:scale-105 transition" id="pipe-count-processing">
+                    <span class="inline-block w-4 h-4 skeleton-shimmer rounded-full"></span>
+                  </div>
+                  <span class="text-[9px] font-medium uppercase text-slate-500 tracking-wider group-hover:text-slate-900 transition">PROCESSING</span>
+                </div>
+
+                <!-- 3. Delivered -->
+                <div onclick="setOrderFilter('delivered'); switchAdminTab('orders');" class="relative z-10 flex flex-col items-center gap-3 bg-white px-6 cursor-pointer group">
+                  <div class="h-12 w-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 text-sm font-medium shadow-2xs group-hover:scale-105 transition" id="pipe-count-delivered">
+                    <span class="inline-block w-4 h-4 skeleton-shimmer rounded-full"></span>
+                  </div>
+                  <span class="text-[9px] font-medium uppercase text-slate-500 tracking-wider group-hover:text-slate-900 transition">DELIVERED</span>
+                </div>
+
+                <!-- 4. Cancelled -->
+                <div onclick="setOrderFilter('cancelled'); switchAdminTab('orders');" class="relative z-10 flex flex-col items-center gap-3 bg-white px-6 cursor-pointer group">
+                  <div class="h-12 w-12 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 text-sm font-medium shadow-2xs group-hover:scale-105 transition" id="pipe-count-cancelled">
+                    <span class="inline-block w-4 h-4 skeleton-shimmer rounded-full"></span>
+                  </div>
+                  <span class="text-[9px] font-medium uppercase text-slate-500 tracking-wider group-hover:text-slate-900 transition">CANCELLED</span>
+                </div>
               </div>
             </div>
           </div>
@@ -456,13 +579,13 @@
           <!-- Split Section: Action Required Cards (Left 1/3) vs Sales Overview Chart (Right 2/3) -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- Left Column: Action Required Cards Stack (Kept only genuinely needed once) -->
+            <!-- Left Column: Action Required Cards Stack -->
             <div class="space-y-3">
               <div class="flex items-center justify-between">
-                <h2 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+                <h2 class="font-medium text-sm text-slate-900 flex items-center gap-2">
                   <span class="material-symbols-outlined text-amber-500 text-lg">error</span> Action Required
                 </h2>
-                <span class="text-[11px] font-medium text-slate-400">Live Priorities</span>
+                <span class="text-[11px] font-normal text-slate-400">Live Priorities</span>
               </div>
 
               <div class="space-y-3">
@@ -473,11 +596,11 @@
                       <span class="material-symbols-outlined text-lg">local_shipping</span>
                     </div>
                     <div class="min-w-0">
-                      <span class="text-xs font-bold text-slate-900 block truncate" id="act-pending-count-text">0 Orders to Fulfill</span>
+                      <span class="text-xs font-medium text-slate-900 block truncate" id="act-pending-count-text">0 Orders to Fulfill</span>
                       <span class="text-[11px] text-slate-500 block truncate">Awaiting acceptance &amp; packing</span>
                     </div>
                   </div>
-                  <a href="orders.html?status=pending" class="px-3 py-1.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-semibold transition-all whitespace-nowrap shadow-xs">Fulfill →</a>
+                  <button onclick="setOrderFilter('pending'); switchAdminTab('orders');" class="px-3 py-1.5 rounded-lg bg-black hover:bg-neutral-800 text-white text-xs font-medium transition-all whitespace-nowrap shadow-xs cursor-pointer">Fulfill →</button>
                 </div>
 
                 <!-- Action 2: Low Stock Products -->
@@ -487,19 +610,14 @@
                       <span class="material-symbols-outlined text-lg">inventory_2</span>
                     </div>
                     <div class="min-w-0">
-                      <span class="text-xs font-bold text-slate-900 block truncate" id="act-low-stock-text">0 Low Stock Products</span>
-                      <span class="text-[11px] text-slate-500 block truncate">≤ 5 units remaining in branch</span>
+                      <span class="text-xs font-medium text-slate-900 block truncate" id="act-low-stock-text">0 Low Stock Products</span>
+                      <span class="text-[11px] text-slate-500 block truncate">≤ 5 units remaining in stock</span>
                     </div>
                   </div>
-                  <a href="stock-availabilities.html" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold transition-all whitespace-nowrap">Restock →</a>
+                  <a href="stock-availabilities.html" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-medium transition-all whitespace-nowrap">Restock →</a>
                 </div>
 
-                <!-- Operational Status Card -->
-                <div class="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl flex items-center gap-2.5 text-xs text-emerald-800 font-medium">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
-                  <span class="truncate">Live Store Connected · Data synchronized</span>
-                </div>
-              </div>
+
             </div>
 
             <!-- Right Column: Clean Revenue Performance Chart Panel -->
@@ -507,33 +625,27 @@
               <!-- Header Strip: Title, Live Pill, Period Toggle -->
               <div class="flex items-center justify-between border-b border-slate-100 pb-3.5 flex-wrap gap-2">
                 <div class="flex items-center gap-2.5">
-                  <h2 class="font-bold text-sm text-slate-900 tracking-tight">Revenue Analytics</h2>
-                  <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                  <h2 class="font-medium text-sm text-slate-900 tracking-tight">Revenue Analytics</h2>
+                  <span class="inline-flex items-center gap-1.5 text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live Feed
                   </span>
                 </div>
-                <!-- Date Filter Suite: Today, Yesterday, This Week, This Month, This Year, Particular Date, Custom Range -->
+                <!-- Date Filter Suite -->
                 <div class="flex items-center gap-2 flex-wrap">
-                  <select id="rev-period-select" onchange="handleRevenuePeriodChange(this.value)" class="shopify-input text-slate-700 px-3 py-1.5 rounded-lg text-xs outline-none font-semibold bg-slate-50 border border-slate-200 cursor-pointer shadow-2xs">
+                  <select id="rev-period-select" onchange="handleRevenuePeriodChange(this.value)" class="shopify-input text-slate-700 px-3 py-1.5 rounded-lg text-xs outline-none font-medium bg-slate-50 border border-slate-200 cursor-pointer shadow-2xs">
                     <option value="today">Today</option>
                     <option value="yesterday">Yesterday</option>
                     <option value="this_week" selected>This Week</option>
                     <option value="this_month">This Month</option>
                     <option value="this_year">This Year</option>
-                    <option value="single_date">Particular Date...</option>
                     <option value="custom_range">Date Range...</option>
                   </select>
 
-                  <!-- Single Date Picker -->
-                  <div id="rev-single-date-box" class="hidden items-center bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-2xs">
-                    <input type="date" id="rev-single-date-input" onchange="renderSalesChart()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer">
-                  </div>
-
                   <!-- Date Range Picker -->
                   <div id="rev-range-date-box" class="hidden items-center gap-1.5 bg-white p-1 px-2 rounded-lg border border-slate-200 shadow-2xs">
-                    <input type="date" id="rev-start-date-input" onchange="renderSalesChart()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer">
-                    <span class="text-[11px] text-slate-400 font-medium">to</span>
-                    <input type="date" id="rev-end-date-input" onchange="renderSalesChart()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer">
+                    <input type="date" id="rev-start-date-input" onchange="handleChartDateRangeChange()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer font-normal">
+                    <span class="text-[11px] text-slate-400 font-normal">to</span>
+                    <input type="date" id="rev-end-date-input" onchange="handleChartDateRangeChange()" class="text-xs text-slate-700 outline-none bg-transparent cursor-pointer font-normal">
                   </div>
                 </div>
               </div>
@@ -541,15 +653,15 @@
               <!-- Revenue Snapshot Value -->
               <div class="flex items-baseline justify-between gap-4">
                 <div>
-                  <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Total Period Revenue</span>
+                  <span class="text-[11px] font-normal text-slate-400 uppercase tracking-wider block">Total Period Revenue</span>
                   <div class="flex items-baseline gap-2.5 mt-0.5">
-                    <h3 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900" id="chart-period-revenue"><span class="inline-block w-24 h-7 skeleton-shimmer rounded"></span></h3>
-                    <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200" id="chart-period-orders">0 Orders</span>
+                    <h3 class="text-2xl sm:text-3xl font-normal tracking-tight text-slate-900" id="chart-period-revenue"><span class="inline-block w-24 h-7 skeleton-shimmer rounded-lg"></span></h3>
+                    <span class="text-xs font-normal text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200" id="chart-period-orders">0 Orders</span>
                   </div>
                 </div>
                 <div class="text-right hidden sm:block">
-                  <span class="text-[11px] text-slate-400 block font-medium">Avg Order Value</span>
-                  <span class="text-sm font-bold text-slate-800" id="chart-period-aov">₹0</span>
+                  <span class="text-[11px] text-slate-400 block font-normal">Avg Order Value</span>
+                  <span class="text-sm font-medium text-slate-800" id="chart-period-aov">₹0</span>
                 </div>
               </div>
 
@@ -561,93 +673,18 @@
             </div>
           </div>
 
-          <!-- Order Fulfillment Pipeline Card -->
-          <div class="shopify-card p-5 sm:p-6 space-y-4">
-            <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-3">
-              <div>
-                <h2 class="font-bold text-sm text-slate-900 tracking-tight flex items-center gap-2">
-                  <span class="material-symbols-outlined text-slate-700 text-base">alt_route</span> Order Fulfillment Pipeline
-                </h2>
-                <p class="text-xs text-slate-500 mt-0.5">Track orders moving through each stage from pending to delivery.</p>
-              </div>
-              <button onclick="window.location.href='orders.html';" class="text-xs font-semibold text-slate-600 hover:text-black flex items-center gap-1 transition cursor-pointer">
-                View All Orders <span class="material-symbols-outlined text-sm">arrow_forward</span>
-              </button>
-            </div>
-
-            <!-- Fulfillment Progress Track -->
-            <div class="space-y-2">
-              <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden flex" id="pipeline-progress-bar">
-                <div id="pipe-bar-pending" class="bg-amber-400 h-full transition-all duration-500" style="width: 0%"></div>
-                <div id="pipe-bar-accepted" class="bg-sky-500 h-full transition-all duration-500" style="width: 0%"></div>
-                <div id="pipe-bar-packing" class="bg-purple-500 h-full transition-all duration-500" style="width: 0%"></div>
-                <div id="pipe-bar-shipped" class="bg-indigo-500 h-full transition-all duration-500" style="width: 0%"></div>
-                <div id="pipe-bar-delivered" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
-              </div>
-            </div>
-
-            <!-- 5 Pipeline Stage Action Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="pipeline-stages-grid">
-              <!-- Pending -->
-              <div onclick="window.location.href='orders.html?status=pending';" class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 cursor-pointer transition-all space-y-1">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-amber-800">Pending</span>
-                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                </div>
-                <div class="text-xl font-bold text-slate-900" id="pipe-count-pending"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
-                <span class="text-[11px] text-amber-700 font-medium block">Action required</span>
-              </div>
-              <!-- Accepted -->
-              <div onclick="window.location.href='orders.html?status=accepted';" class="p-3.5 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-sky-50 cursor-pointer transition-all space-y-1">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-sky-800">Accepted</span>
-                  <span class="w-2 h-2 rounded-full bg-sky-500"></span>
-                </div>
-                <div class="text-xl font-bold text-slate-900" id="pipe-count-accepted"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
-                <span class="text-[11px] text-sky-700 font-medium block">Ready to pack</span>
-              </div>
-              <!-- Packing -->
-              <div onclick="window.location.href='orders.html?status=packing';" class="p-3.5 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-purple-50 cursor-pointer transition-all space-y-1">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-purple-800">Packing</span>
-                  <span class="w-2 h-2 rounded-full bg-purple-500"></span>
-                </div>
-                <div class="text-xl font-bold text-slate-900" id="pipe-count-packing"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
-                <span class="text-[11px] text-purple-700 font-medium block">Packaging stage</span>
-              </div>
-              <!-- Shipped -->
-              <div onclick="window.location.href='orders.html?status=shipped';" class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 cursor-pointer transition-all space-y-1">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-indigo-800">Shipped</span>
-                  <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                </div>
-                <div class="text-xl font-bold text-slate-900" id="pipe-count-shipped"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
-                <span class="text-[11px] text-indigo-700 font-medium block">In transit</span>
-              </div>
-              <!-- Delivered -->
-              <div onclick="window.location.href='orders.html?status=delivered';" class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 cursor-pointer transition-all space-y-1 col-span-2 sm:col-span-1">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-emerald-800">Delivered</span>
-                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                </div>
-                <div class="text-xl font-bold text-slate-900" id="pipe-count-delivered"><span class="inline-block w-8 h-5 skeleton-shimmer rounded"></span></div>
-                <span class="text-[11px] text-emerald-700 font-medium block">Fulfilled</span>
-              </div>
-            </div>
-          </div>
-
           <!-- Bottom Grid: Top Selling Products & Quick Operations Command Center -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left 2 Cols: Top Selling Products Leaderboard -->
             <div class="lg:col-span-2 shopify-card p-5 sm:p-6 space-y-4">
               <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
                 <div>
-                  <h2 class="font-bold text-sm text-slate-900 tracking-tight flex items-center gap-2">
+                  <h2 class="font-medium text-sm text-slate-900 tracking-tight flex items-center gap-2">
                     <span class="material-symbols-outlined text-amber-500 text-base">workspace_premium</span> Top Selling Products
                   </h2>
-                  <p class="text-xs text-slate-500 mt-0.5">Leaderboard of best-performing items based on customer purchases.</p>
+                  <p class="text-xs text-slate-500 mt-0.5 font-normal">Leaderboard of best-performing items based on customer purchases.</p>
                 </div>
-                <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">Live Store Data</span>
+                <span class="text-[11px] font-normal text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">Live Store Data</span>
               </div>
 
               <!-- Top Products List with Shimmer Placeholders -->
@@ -699,10 +736,10 @@
             <div class="shopify-card p-5 sm:p-6 space-y-4 flex flex-col justify-between">
               <div class="space-y-3">
                 <div class="border-b border-slate-100 pb-3">
-                  <h2 class="font-bold text-sm text-slate-900 tracking-tight flex items-center gap-2">
+                  <h2 class="font-medium text-sm text-slate-900 tracking-tight flex items-center gap-2">
                     <span class="material-symbols-outlined text-slate-700 text-base">bolt</span> Quick Store Operations
                   </h2>
-                  <p class="text-xs text-slate-500 mt-0.5">Shortcuts for frequent daily admin operations.</p>
+                  <p class="text-xs text-slate-500 mt-0.5 font-normal">Shortcuts for frequent daily admin operations.</p>
                 </div>
 
                 <div class="space-y-2">
@@ -712,8 +749,8 @@
                         <span class="material-symbols-outlined text-sm">add_box</span>
                       </div>
                       <div>
-                        <span class="text-xs font-bold text-slate-900 block group-hover:text-black">Add New Product</span>
-                        <span class="text-[11px] text-slate-500">Upload item, pricing &amp; sizes</span>
+                        <span class="text-xs font-medium text-slate-900 block group-hover:text-black">Add New Product</span>
+                        <span class="text-[11px] text-slate-500 font-normal">Upload item, pricing &amp; sizes</span>
                       </div>
                     </div>
                     <span class="material-symbols-outlined text-slate-400 group-hover:text-slate-900 transition-colors text-base">arrow_forward</span>
@@ -725,8 +762,8 @@
                         <span class="material-symbols-outlined text-sm">inventory</span>
                       </div>
                       <div>
-                        <span class="text-xs font-bold text-slate-900 block group-hover:text-rose-900">Restock Low Inventory</span>
-                        <span class="text-[11px] text-slate-500">Check branch-wise levels</span>
+                        <span class="text-xs font-medium text-slate-900 block group-hover:text-rose-900">Restock Low Inventory</span>
+                        <span class="text-[11px] text-slate-500 font-normal">Check branch-wise levels</span>
                       </div>
                     </div>
                     <span class="material-symbols-outlined text-slate-400 group-hover:text-rose-700 transition-colors text-base">arrow_forward</span>
@@ -738,8 +775,8 @@
                         <span class="material-symbols-outlined text-sm">pending_actions</span>
                       </div>
                       <div>
-                        <span class="text-xs font-bold text-slate-900 block group-hover:text-amber-900">Process Pending Orders</span>
-                        <span class="text-[11px] text-slate-500">Accept &amp; initiate packing</span>
+                        <span class="text-xs font-medium text-slate-900 block group-hover:text-amber-900">Process Pending Orders</span>
+                        <span class="text-[11px] text-slate-500 font-normal">Accept &amp; initiate packing</span>
                       </div>
                     </div>
                     <span class="material-symbols-outlined text-slate-400 group-hover:text-amber-700 transition-colors text-base">arrow_forward</span>
@@ -751,8 +788,8 @@
                         <span class="material-symbols-outlined text-sm">group</span>
                       </div>
                       <div>
-                        <span class="text-xs font-bold text-slate-900 block group-hover:text-purple-900">Customer Directory</span>
-                        <span class="text-[11px] text-slate-500">Order histories &amp; contacts</span>
+                        <span class="text-xs font-medium text-slate-900 block group-hover:text-purple-900">Customer Directory</span>
+                        <span class="text-[11px] text-slate-500 font-normal">Order histories &amp; contacts</span>
                       </div>
                     </div>
                     <span class="material-symbols-outlined text-slate-400 group-hover:text-purple-700 transition-colors text-base">arrow_forward</span>
@@ -762,10 +799,10 @@
 
               <!-- Live Store Health Indicator -->
               <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                <span class="text-slate-500 font-medium flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Store Status: <strong class="text-emerald-700 font-semibold">Online &amp; Active</strong>
+                <span class="text-slate-500 font-normal flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Store Status: <strong class="text-emerald-700 font-medium">Online &amp; Active</strong>
                 </span>
-                <a href="index.html" target="_blank" class="font-semibold text-slate-700 hover:text-black flex items-center gap-0.5">
+                <a href="index.html" target="_blank" class="font-medium text-slate-700 hover:text-black flex items-center gap-0.5">
                   Open Store <span class="material-symbols-outlined text-xs">open_in_new</span>
                 </a>
               </div>
@@ -2499,59 +2536,112 @@
       }
     };
 
-    function updateDynamicGreeting(adminName = 'Nithya') {
+    function updateDynamicGreeting(compName = 'THE BANIYAN COMPANY') {
       const greetingEl = document.getElementById('dash-greeting');
-      if (!greetingEl) return;
+      const cycleEl = document.getElementById('dash-cycle-label');
+      const headerTimeEl = document.getElementById('header-updated-time');
       const hour = new Date().getHours();
-      let timeStr = 'Good Evening';
-      if (hour >= 5 && hour < 12) timeStr = 'Good Morning';
-      else if (hour >= 12 && hour < 17) timeStr = 'Good Afternoon';
+      let timeStr = 'GOOD EVENING';
+      if (hour >= 5 && hour < 12) timeStr = 'GOOD MORNING';
+      else if (hour >= 12 && hour < 17) timeStr = 'GOOD AFTERNOON';
       
-      greetingEl.textContent = `${timeStr}, ${adminName} 👋`;
+      if (greetingEl) greetingEl.textContent = `${timeStr}, ${compName.toUpperCase()}`;
+
+      const now = new Date();
+      const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      const dateStr = `${monthNames[now.getMonth()]} ${String(now.getDate()).padStart(2, '0')}, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      if (cycleEl) cycleEl.textContent = `${dateStr} | MAIN WORKSPACE`;
+      if (headerTimeEl) headerTimeEl.textContent = `UPDATED: ${dateStr}:${String(now.getSeconds()).padStart(2, '0')}`;
     }
+
+    window.refreshDashboardData = async function() {
+      const icon = document.getElementById('refresh-icon');
+      if (icon) icon.classList.add('animate-spin');
+      updateDynamicGreeting('THE BANIYAN COMPANY');
+      
+      try {
+        if (typeof loadProductsCatalog === 'function') await loadProductsCatalog();
+        if (typeof revalidateCompany === 'function') await revalidateCompany(COMPANY_ID);
+      } catch(e) {}
+
+      setTimeout(() => {
+        if (icon) icon.classList.remove('animate-spin');
+      }, 600);
+    };
 
     let salesChartInstance = null;
     window.currentRevenuePeriod = 'this_week';
 
     window.handleRevenuePeriodChange = function(val) {
       window.currentRevenuePeriod = val;
-      const singleBox = document.getElementById('rev-single-date-box');
-      const rangeBox = document.getElementById('rev-range-date-box');
-      const singleInput = document.getElementById('rev-single-date-input');
-      const startInput = document.getElementById('rev-start-date-input');
-      const endInput = document.getElementById('rev-end-date-input');
+      const dashSelect = document.getElementById('dash-period-select');
+      const revSelect = document.getElementById('rev-period-select');
+      if (dashSelect && dashSelect.value !== val) dashSelect.value = val;
+      if (revSelect && revSelect.value !== val) revSelect.value = val;
 
-      if (singleBox) {
-        if (val === 'single_date') {
-          singleBox.classList.remove('hidden');
-          singleBox.classList.add('flex');
-          if (singleInput && !singleInput.value) {
-            singleInput.value = new Date().toISOString().split('T')[0];
+      const topRangeBox = document.getElementById('dash-range-date-box');
+      const revRangeBox = document.getElementById('rev-range-date-box');
+
+      const isRange = (val === 'custom_range');
+
+      if (topRangeBox) {
+        if (isRange) {
+          topRangeBox.classList.remove('hidden');
+          topRangeBox.classList.add('flex');
+          const topStart = document.getElementById('dash-start-date-input');
+          const topEnd = document.getElementById('dash-end-date-input');
+          if (topStart && !topStart.value) {
+            const d = new Date(); d.setDate(d.getDate() - 7);
+            topStart.value = d.toISOString().split('T')[0];
+          }
+          if (topEnd && !topEnd.value) {
+            topEnd.value = new Date().toISOString().split('T')[0];
           }
         } else {
-          singleBox.classList.add('hidden');
-          singleBox.classList.remove('flex');
+          topRangeBox.classList.add('hidden');
+          topRangeBox.classList.remove('flex');
         }
       }
 
-      if (rangeBox) {
-        if (val === 'custom_range') {
-          rangeBox.classList.remove('hidden');
-          rangeBox.classList.add('flex');
-          if (startInput && !startInput.value) {
-            const d = new Date();
-            d.setDate(d.getDate() - 7);
-            startInput.value = d.toISOString().split('T')[0];
+      if (revRangeBox) {
+        if (isRange) {
+          revRangeBox.classList.remove('hidden');
+          revRangeBox.classList.add('flex');
+          const revStart = document.getElementById('rev-start-date-input');
+          const revEnd = document.getElementById('rev-end-date-input');
+          if (revStart && !revStart.value) {
+            const d = new Date(); d.setDate(d.getDate() - 7);
+            revStart.value = d.toISOString().split('T')[0];
           }
-          if (endInput && !endInput.value) {
-            endInput.value = new Date().toISOString().split('T')[0];
+          if (revEnd && !revEnd.value) {
+            revEnd.value = new Date().toISOString().split('T')[0];
           }
         } else {
-          rangeBox.classList.add('hidden');
-          rangeBox.classList.remove('flex');
+          revRangeBox.classList.add('hidden');
+          revRangeBox.classList.remove('flex');
         }
       }
 
+      renderSalesChart();
+    };
+
+    window.handleTopDateRangeChange = function() {
+      const sVal = document.getElementById('dash-start-date-input')?.value;
+      const eVal = document.getElementById('dash-end-date-input')?.value;
+      const revStart = document.getElementById('rev-start-date-input');
+      const revEnd = document.getElementById('rev-end-date-input');
+      if (revStart && sVal) revStart.value = sVal;
+      if (revEnd && eVal) revEnd.value = eVal;
+      renderSalesChart();
+    };
+
+    window.handleChartDateRangeChange = function() {
+      const sVal = document.getElementById('rev-start-date-input')?.value;
+      const eVal = document.getElementById('rev-end-date-input')?.value;
+      const dashStart = document.getElementById('dash-start-date-input');
+      const dashEnd = document.getElementById('dash-end-date-input');
+      if (dashStart && sVal) dashStart.value = sVal;
+      if (dashEnd && eVal) dashEnd.value = eVal;
       renderSalesChart();
     };
 
@@ -2579,8 +2669,12 @@
       let revenueData = [];
       let periodRevenue = 0;
       let periodOrderCount = 0;
+      let periodOnlineCount = 0;
+      let periodCodCount = 0;
+      let periodSubtitle = "Live Store Sales";
 
       if (window.currentRevenuePeriod === 'today') {
+        periodSubtitle = "Today's Sales";
         labels = ['12 AM', '3 AM', '6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'];
         revenueData = [0, 0, 0, 0, 0, 0, 0, 0];
         const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -2592,12 +2686,15 @@
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
             periodOrderCount++;
+            const isCod = String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod');
+            if (isCod) periodCodCount++; else periodOnlineCount++;
             const hr = new Date(ts).getHours();
             const slotIdx = Math.min(7, Math.max(0, Math.floor(hr / 3)));
             revenueData[slotIdx] += amt;
           }
         });
       } else if (window.currentRevenuePeriod === 'yesterday') {
+        periodSubtitle = "Yesterday's Sales";
         labels = ['12 AM', '3 AM', '6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'];
         revenueData = [0, 0, 0, 0, 0, 0, 0, 0];
         const yest = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
@@ -2610,31 +2707,15 @@
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
             periodOrderCount++;
-            const hr = new Date(ts).getHours();
-            const slotIdx = Math.min(7, Math.max(0, Math.floor(hr / 3)));
-            revenueData[slotIdx] += amt;
-          }
-        });
-      } else if (window.currentRevenuePeriod === 'single_date') {
-        labels = ['12 AM', '3 AM', '6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'];
-        revenueData = [0, 0, 0, 0, 0, 0, 0, 0];
-        const targetDateStr = document.getElementById('rev-single-date-input')?.value || new Date().toISOString().split('T')[0];
-        const targetParts = targetDateStr.split('-').map(Number);
-        const targetStart = new Date(targetParts[0], targetParts[1] - 1, targetParts[2]).getTime();
-        const targetEnd = new Date(targetParts[0], targetParts[1] - 1, targetParts[2], 23, 59, 59, 999).getTime();
-
-        orders.forEach(o => {
-          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
-          if (ts >= targetStart && ts <= targetEnd) {
-            const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
-            periodRevenue += amt;
-            periodOrderCount++;
+            const isCod = String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod');
+            if (isCod) periodCodCount++; else periodOnlineCount++;
             const hr = new Date(ts).getHours();
             const slotIdx = Math.min(7, Math.max(0, Math.floor(hr / 3)));
             revenueData[slotIdx] += amt;
           }
         });
       } else if (window.currentRevenuePeriod === 'this_year') {
+        periodSubtitle = "This Year's Sales";
         labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         revenueData = new Array(12).fill(0);
         const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
@@ -2645,13 +2726,16 @@
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
             periodOrderCount++;
+            const isCod = String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod');
+            if (isCod) periodCodCount++; else periodOnlineCount++;
             const m = new Date(ts).getMonth();
             revenueData[m] += amt;
           }
         });
       } else if (window.currentRevenuePeriod === 'custom_range') {
-        const sVal = document.getElementById('rev-start-date-input')?.value;
-        const eVal = document.getElementById('rev-end-date-input')?.value;
+        periodSubtitle = "Selected Period Sales";
+        const sVal = document.getElementById('dash-start-date-input')?.value || document.getElementById('rev-start-date-input')?.value;
+        const eVal = document.getElementById('dash-end-date-input')?.value || document.getElementById('rev-end-date-input')?.value;
         const sDate = sVal ? new Date(sVal + 'T00:00:00') : new Date(Date.now() - 7 * 86400000);
         const eDate = eVal ? new Date(eVal + 'T23:59:59.999') : new Date();
         const sMs = sDate.getTime();
@@ -2671,6 +2755,8 @@
               const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
               periodRevenue += amt;
               periodOrderCount++;
+              const isCod = String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod');
+              if (isCod) periodCodCount++; else periodOnlineCount++;
               const dIdx = Math.min(diffDays - 1, Math.max(0, Math.floor((ts - sMs) / 86400000)));
               revenueData[dIdx] += amt;
             }
@@ -2685,12 +2771,15 @@
               const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
               periodRevenue += amt;
               periodOrderCount++;
+              const isCod = String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod');
+              if (isCod) periodCodCount++; else periodOnlineCount++;
               const slot = Math.min(4, Math.max(0, Math.floor((ts - sMs) / step)));
               revenueData[slot] += amt;
             }
           });
         }
       } else if (window.currentRevenuePeriod === 'this_month') {
+        periodSubtitle = "This Month's Sales";
         labels = ['Day 1-6', 'Day 7-12', 'Day 13-18', 'Day 19-24', 'Day 25-31'];
         revenueData = [0, 0, 0, 0, 0];
         const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
@@ -2701,12 +2790,15 @@
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
             periodOrderCount++;
+            const isCod = String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod');
+            if (isCod) periodCodCount++; else periodOnlineCount++;
             const dayDiff = Math.floor((Date.now() - ts) / (24 * 60 * 60 * 1000));
             const slotIdx = 4 - Math.min(4, Math.max(0, Math.floor(dayDiff / 6)));
             revenueData[slotIdx] += amt;
           }
         });
       } else { // 'this_week' default
+        periodSubtitle = "This Week's Sales";
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         labels = [];
         revenueData = [0, 0, 0, 0, 0, 0, 0];
@@ -2721,6 +2813,8 @@
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
             periodOrderCount++;
+            const isCod = String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod');
+            if (isCod) periodCodCount++; else periodOnlineCount++;
             const dayDiff = Math.floor((Date.now() - ts) / (24 * 60 * 60 * 1000));
             const slotIdx = 6 - Math.min(6, Math.max(0, dayDiff));
             revenueData[slotIdx] += amt;
@@ -2743,29 +2837,11 @@
       const chartLoader = document.getElementById('chart-shimmer-loader');
       if (chartLoader) chartLoader.classList.add('hidden');
 
-      // Aggregate Real-time Dashboard KPIs from real orders
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-      const todayOrders = orders.filter(o => {
-        const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
-        return ts >= startOfToday;
-      });
-      const todayRev = todayOrders.reduce((sum, o) => sum + Number(o.pricing?.total ?? o.totalAmount ?? 0), 0);
-      const totalRev = orders.reduce((sum, o) => sum + Number(o.pricing?.total ?? o.totalAmount ?? 0), 0);
-      const pendingOrders = orders.filter(o => {
-        return canonicalStatus(o.orderStatus || o.status) === 'Pending';
-      });
-      const onlineTodayCount = todayOrders.filter(o => !String(o.payment?.method || o.paymentMethod || '').toLowerCase().includes('cod')).length;
-      const codTodayCount = todayOrders.length - onlineTodayCount;
-      const aovVal = orders.length > 0 ? Math.round(totalRev / orders.length) : 0;
-      const estProfitVal = Math.round(todayRev * 0.47);
-
-      if (document.getElementById('kpi-today-sales')) document.getElementById('kpi-today-sales').textContent = `₹${todayRev.toLocaleString('en-IN')}`;
-      if (document.getElementById('kpi-today-orders')) document.getElementById('kpi-today-orders').textContent = todayOrders.length;
-      if (document.getElementById('kpi-orders-breakdown')) document.getElementById('kpi-orders-breakdown').textContent = `${onlineTodayCount} online · ${codTodayCount} COD`;
-      if (document.getElementById('kpi-pending-orders')) document.getElementById('kpi-pending-orders').textContent = pendingOrders.length;
-      if (document.getElementById('kpi-aov')) document.getElementById('kpi-aov').textContent = `₹${aovVal.toLocaleString('en-IN')}`;
-      if (document.getElementById('kpi-est-profit')) document.getElementById('kpi-est-profit').textContent = `₹${estProfitVal.toLocaleString('en-IN')}`;
-      if (document.getElementById('act-pending-count-text')) document.getElementById('act-pending-count-text').textContent = `${pendingOrders.length} Orders waiting for acceptance`;
+      // Update Dashboard KPI Cards directly for the selected period
+      if (document.getElementById('kpi-today-sales')) document.getElementById('kpi-today-sales').textContent = `₹${periodRevenue.toLocaleString('en-IN')}`;
+      if (document.getElementById('kpi-today-growth')) document.getElementById('kpi-today-growth').textContent = periodSubtitle;
+      if (document.getElementById('kpi-today-orders')) document.getElementById('kpi-today-orders').textContent = periodOrderCount;
+      if (document.getElementById('kpi-orders-breakdown')) document.getElementById('kpi-orders-breakdown').textContent = `${periodOnlineCount} online · ${periodCodCount} COD`;
 
       if (salesChartInstance) {
         salesChartInstance.destroy();
@@ -2784,7 +2860,7 @@
               label: 'Revenue',
               data: revenueData,
               borderColor: '#0f172a',
-              borderWidth: 2.5,
+              borderWidth: 2,
               tension: 0.38,
               fill: true,
               backgroundColor: gradRev,
@@ -2841,38 +2917,117 @@
     window.renderDashboardWidgets = function(orders) {
       const orderList = Array.isArray(orders) ? orders : (window.currentAllOrders || []);
 
-      // 1. Order Fulfillment Pipeline Breakdown
+      // 1. Order Fulfillment Pipeline Breakdown (OneSpace 4-Stage Pipeline)
       const pipeCounts = {
         pending: 0,
-        accepted: 0,
-        packing: 0,
-        shipped: 0,
-        delivered: 0
+        processing: 0,
+        delivered: 0,
+        cancelled: 0
       };
 
       orderList.forEach(o => {
-        const st = canonicalStatus(o.orderStatus || o.status).toLowerCase();
-        if (pipeCounts[st] !== undefined) {
-          pipeCounts[st]++;
-        } else {
+        const raw = (o.orderStatus || o.status || 'Pending').toLowerCase();
+        if (raw.includes('pending') || raw.includes('awaiting')) {
           pipeCounts.pending++;
+        } else if (raw.includes('deliver')) {
+          pipeCounts.delivered++;
+        } else if (raw.includes('cancel') || raw.includes('return')) {
+          pipeCounts.cancelled++;
+        } else {
+          // Accepted, Packing, Shipped, Processing, Out for Delivery
+          pipeCounts.processing++;
         }
       });
 
-      ['pending', 'accepted', 'packing', 'shipped', 'delivered'].forEach(stage => {
-        const countEl = document.getElementById(`pipe-count-${stage}`);
-        if (countEl) countEl.textContent = pipeCounts[stage];
+      const pPending = document.getElementById('pipe-count-pending');
+      const pProcessing = document.getElementById('pipe-count-processing');
+      const pDelivered = document.getElementById('pipe-count-delivered');
+      const pCancelled = document.getElementById('pipe-count-cancelled');
+      if (pPending) pPending.textContent = pipeCounts.pending;
+      if (pProcessing) pProcessing.textContent = pipeCounts.processing;
+      if (pDelivered) pDelivered.textContent = pipeCounts.delivered;
+      if (pCancelled) pCancelled.textContent = pipeCounts.cancelled;
+
+      // Update Dynamic Header Pill & Sidebar & Floating Dock
+      const topPill = document.getElementById('top-pill-order-text');
+      const bannerEl = document.getElementById('floating-orders-banner');
+      if (topPill && bannerEl) {
+        if (pipeCounts.pending > 0) {
+          topPill.textContent = `${pipeCounts.pending} NEW ORDERS`;
+          bannerEl.classList.remove('hidden');
+          bannerEl.classList.add('flex');
+        } else {
+          bannerEl.classList.add('hidden');
+          bannerEl.classList.remove('flex');
+        }
+      }
+
+      const sideBadge = document.getElementById('sidebar-order-badge');
+      if (sideBadge) sideBadge.textContent = pipeCounts.pending;
+
+      const dockEl = document.getElementById('floating-order-dock');
+      const dockDot = document.getElementById('dock-badge-dot');
+      if (dockEl && dockDot) {
+        if (pipeCounts.pending > 0) {
+          dockDot.textContent = pipeCounts.pending;
+          dockEl.classList.remove('hidden');
+          dockEl.classList.add('flex');
+
+          // Play iOS chime when new pending orders arrive
+          if (typeof window.playIosNotificationTone === 'function' && window.prevPendingCount !== undefined && pipeCounts.pending > window.prevPendingCount) {
+            window.playIosNotificationTone();
+          }
+        } else {
+          dockEl.classList.add('hidden');
+          dockEl.classList.remove('flex');
+        }
+        window.prevPendingCount = pipeCounts.pending;
+      }
+
+      const actPending = document.getElementById('act-pending-count-text');
+      if (actPending) actPending.textContent = `${pipeCounts.pending} Orders waiting for acceptance`;
+
+      // Update Stock Value from Catalog (Real Database calculation)
+      let totalStockVal = 0;
+      let totalStockUnits = 0;
+      const prods = Array.isArray(window.allProductsData) ? window.allProductsData : [];
+      prods.forEach(p => {
+        let pStock = 0;
+        if (Array.isArray(p.variants) && p.variants.length > 0) {
+          p.variants.forEach(v => {
+            const stk = Number(v.stock?.main || v.stock || 0);
+            const pr = Number(v.price || p.price || 0);
+            pStock += stk;
+            totalStockVal += (stk * pr);
+          });
+        } else {
+          const stk = Number(p.availableStock || p.stock || 0);
+          const pr = Number(p.price || 0);
+          pStock += stk;
+          totalStockVal += (stk * pr);
+        }
+        totalStockUnits += pStock;
       });
 
-      const totalPipelineOrders = Object.values(pipeCounts).reduce((a, b) => a + b, 0);
-      if (totalPipelineOrders > 0) {
-        ['pending', 'accepted', 'packing', 'shipped', 'delivered'].forEach(stage => {
-          const barEl = document.getElementById(`pipe-bar-${stage}`);
-          if (barEl) {
-            const pct = (pipeCounts[stage] / totalPipelineOrders) * 100;
-            barEl.style.width = `${pct}%`;
-          }
+      const stockValEl = document.getElementById('kpi-stock-value');
+      if (stockValEl) {
+        stockValEl.textContent = `₹${totalStockVal.toLocaleString('en-IN')}`;
+      }
+      const stockCountEl = document.getElementById('kpi-stock-count-text');
+      if (stockCountEl) {
+        stockCountEl.textContent = `${totalStockUnits} units in stock`;
+      }
+
+      // Update Total Customers (Real Database count)
+      const custCountEl = document.getElementById('kpi-total-customers');
+      if (custCountEl) {
+        const uniqueCusts = new Set();
+        orderList.forEach(o => {
+          const phone = o.customer?.phone || o.customerPhoneNumber || o.customerPhone || o.phone;
+          if (phone) uniqueCusts.add(String(phone).replace(/\D/g, '').slice(-10));
         });
+        const totalCust = uniqueCusts.size || (window.firestoreCustomers ? window.firestoreCustomers.length : 0);
+        custCountEl.textContent = totalCust;
       }
 
       // 2. Top Selling Products Leaderboard
@@ -2911,7 +3066,7 @@
           listEl.innerHTML = `
             <div class="text-center py-6 border border-dashed border-slate-200 rounded-xl">
               <span class="material-symbols-outlined text-slate-300 text-3xl">shopping_cart</span>
-              <p class="text-xs text-slate-500 mt-1">No product sales recorded yet.</p>
+              <p class="text-xs text-slate-500 mt-1 font-normal">No product sales recorded yet.</p>
             </div>
           `;
         } else {
@@ -2931,18 +3086,18 @@
             return `
               <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/50 transition-all gap-3">
                 <div class="flex items-center gap-3 min-w-0">
-                  <span class="w-6 h-6 rounded-lg ${rankStyle.bg} ${rankStyle.text} border ${rankStyle.border} flex items-center justify-center text-xs font-bold shrink-0">
+                  <span class="w-6 h-6 rounded-lg ${rankStyle.bg} ${rankStyle.text} border ${rankStyle.border} flex items-center justify-center text-xs font-medium shrink-0">
                     #${idx + 1}
                   </span>
                   <img src="${p.img}" alt="${p.name}" class="w-10 h-12 object-cover rounded-lg bg-white border border-slate-200 shrink-0" onerror="this.src='https://placehold.co/100x120/f0f0f0/999?text=Product'">
                   <div class="min-w-0">
-                    <span class="text-xs font-bold text-slate-900 block truncate">${p.name}</span>
-                    <span class="text-[11px] text-slate-500 block truncate">${unitsText}</span>
+                    <span class="text-xs font-medium text-slate-900 block truncate">${p.name}</span>
+                    <span class="text-[11px] text-slate-500 block truncate font-normal">${unitsText}</span>
                   </div>
                 </div>
                 <div class="text-right shrink-0">
-                  <span class="text-xs font-bold text-slate-900 block">${revText}</span>
-                  ${!p.inCatalogOnly ? `<span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Top Rank</span>` : ''}
+                  <span class="text-xs font-medium text-slate-900 block">${revText}</span>
+                  ${!p.inCatalogOnly ? `<span class="text-[10px] font-normal text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Top Rank</span>` : ''}
                 </div>
               </div>
             `;
@@ -4210,7 +4365,6 @@
     window.allProductsData = [];
     async function loadProductsCatalog() {
       const tbody = document.getElementById('products-table-body');
-      if (!tbody) return;
 
       try {
         const compSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'products'));
@@ -4229,10 +4383,14 @@
         // Populate Category Filter dropdown dynamically
         populateCategoryDropdown(window.allProductsData);
         
-        applyProductFilters();
+        if (tbody) {
+          applyProductFilters();
+        }
       } catch (err) {
         console.error('Error loading products catalog:', err);
-        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">Currently OverTraffic please try again later</td></tr>`;
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">Currently OverTraffic please try again later</td></tr>`;
+        }
       }
     }
 
@@ -4604,26 +4762,28 @@
         }
       }
 
-      updateDynamicGreeting('Nithya');
+      updateDynamicGreeting(comp?.name || 'THE BANIYAN COMPANY');
       initSalesChart();
 
       try {
-        const compProdsSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'products'));
-        const rootProdsSnap = await getDocs(collection(db, 'products'));
-        const allProdsMap = new Map();
-        rootProdsSnap.forEach(d => allProdsMap.set(d.id, d.data()));
-        compProdsSnap.forEach(d => allProdsMap.set(d.id, d.data()));
-        
-        const totalProds = allProdsMap.size;
+        await loadProductsCatalog();
+        const totalProds = (window.allProductsData || []).length;
         if (document.getElementById('stat-total-products')) document.getElementById('stat-total-products').textContent = totalProds;
         
         let lowStockCount = 0;
-        allProdsMap.forEach(p => {
-          const stk = Number(p.availableStock || p.stock || 0);
+        (window.allProductsData || []).forEach(p => {
+          let stk = 0;
+          if (Array.isArray(p.variants) && p.variants.length > 0) {
+            stk = p.variants.reduce((acc, v) => acc + Number(v.stock?.main || v.stock || 0), 0);
+          } else {
+            stk = Number(p.availableStock || p.stock || 0);
+          }
           if (stk <= 5) lowStockCount++;
         });
         if (document.getElementById('act-low-stock-text')) document.getElementById('act-low-stock-text').textContent = `${lowStockCount} Products running low on stock`;
-      } catch (e) { }
+      } catch (e) {
+        console.error('Error loading initial catalog for dashboard:', e);
+      }
 
       try {
         const custSnap = await getDocs(collection(db, 'companies', COMPANY_ID, 'customers'));
@@ -4752,8 +4912,9 @@
       ['all', 'pending', 'accepted', 'packing', 'shipped', 'delivered', 'cancelled', 'returned'].forEach(f => {
         const tab = document.getElementById(`tab-filter-${f}`);
         if (!tab) return;
-        if (f === window.currentFilter) {
-          tab.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-slate-900 text-white shadow-xs shrink-0 cursor-pointer';
+        const isActive = (f === window.currentFilter) || (window.currentFilter === 'processing' && f === 'accepted');
+        if (isActive) {
+          tab.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-900 text-white shadow-xs shrink-0 cursor-pointer';
         } else {
           tab.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer';
         }
@@ -4766,6 +4927,9 @@
         const target = window.currentFilter.toLowerCase();
         filtered = filtered.filter(o => {
           const st = canonicalStatus(o.orderStatus || o.status).toLowerCase();
+          if (target === 'processing') {
+            return ['accepted', 'packing', 'shipped', 'processing'].includes(st);
+          }
           return st === target;
         });
       }
@@ -5134,12 +5298,66 @@
       }
     });
 
-    updateDynamicGreeting('Nithya');
+    // High-Fidelity iOS Notification Chime (Tri-Tone E5 -> G#5 -> C6)
+    window.playIosNotificationTone = function() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          const ctx = new AudioCtx();
+          if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+          const notes = [
+            { freq: 659.25, time: 0, dur: 0.18 },      // E5
+            { freq: 830.61, time: 0.11, dur: 0.20 },    // G#5
+            { freq: 1046.50, time: 0.22, dur: 0.36 }    // C6
+          ];
+          notes.forEach(n => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(n.freq, ctx.currentTime + n.time);
+            gain.gain.setValueAtTime(0, ctx.currentTime + n.time);
+            gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + n.time + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + n.time + n.dur);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + n.time);
+            osc.stop(ctx.currentTime + n.time + n.dur);
+          });
+          setTimeout(() => { try { ctx.close(); } catch(_) {} }, 1000);
+        }
+      } catch (_) {
+        try {
+          const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+          audio.volume = 0.5;
+          audio.play().catch(() => {});
+        } catch (_) {}
+      }
+    };
+
+    updateDynamicGreeting('THE BANIYAN COMPANY');
     initSalesChart();
     if (localStorage.getItem('tbc_admin_authed') === 'true') {
       initDashboard();
     }
   </script>
+
+  <!-- Floating Order Pulse Dock (iOS Style with Audio Chime) -->
+  <div id="floating-order-dock" class="fixed bottom-6 right-6 z-50 hidden items-center gap-3 bg-black/90 backdrop-blur-xl text-white border border-white/20 rounded-full py-2.5 px-4 shadow-[0_20px_50px_rgba(0,0,0,0.4)] transition-all duration-300 select-none">
+    <div onclick="setOrderFilter('pending'); switchAdminTab('orders');" class="flex items-center gap-3.5 cursor-pointer group">
+      <div class="relative flex items-center justify-center">
+        <span class="material-symbols-outlined text-emerald-400 text-xl group-hover:rotate-12 transition-transform">notifications</span>
+        <span id="dock-badge-dot" class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-black">0</span>
+        <span class="absolute -inset-1 rounded-full bg-emerald-400/20 animate-ping pointer-events-none"></span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-white">NEW ORDERS</span>
+        <span class="text-[8px] font-semibold text-emerald-400 uppercase tracking-widest flex items-center gap-0.5">PENDING NOW <span class="material-symbols-outlined text-[10px]">chevron_right</span></span>
+      </div>
+    </div>
+    <button onclick="document.getElementById('floating-order-dock').classList.add('hidden')" class="p-1 text-slate-400 hover:text-white transition ml-0.5 cursor-pointer" title="Dismiss notification">
+      <span class="material-symbols-outlined text-sm">close</span>
+    </button>
+  </div>
 </body>
 
 </html>

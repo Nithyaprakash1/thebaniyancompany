@@ -194,10 +194,6 @@ export async function saveEcomOrder(input: EcomOrderInput): Promise<string> {
   const companyOrderRef = doc(db, `companies/${input.companyId}/invoices`, orderId);
   batch.set(companyOrderRef, orderData);
 
-  // 3. Global Invoices Path (Real-time POS Sound Pulse)
-  const rootOrderRef = doc(db, 'invoices', orderId);
-  batch.set(rootOrderRef, orderData);
-
   await batch.commit();
   return orderId;
 }

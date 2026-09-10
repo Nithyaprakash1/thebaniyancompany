@@ -854,16 +854,12 @@
 
     async function loadAnalyticsData() {
       try {
-        const [compSnap, ordersSnap, rootSnap] = await Promise.allSettled([
+        const [compSnap, ordersSnap] = await Promise.allSettled([
           getDocs(collection(db, 'companies', COMPANY_ID, 'invoices')),
-          getDocs(collection(db, 'companies', COMPANY_ID, 'orders')),
-          getDocs(collection(db, 'invoices'))
+          getDocs(collection(db, 'companies', COMPANY_ID, 'orders'))
         ]);
         const allDocsMap = new Map();
 
-        if (rootSnap.status === 'fulfilled' && rootSnap.value) {
-          rootSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
-        }
         if (compSnap.status === 'fulfilled' && compSnap.value) {
           compSnap.value.forEach(d => allDocsMap.set(d.id, { id: d.id, ...d.data() }));
         }

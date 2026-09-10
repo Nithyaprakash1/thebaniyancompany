@@ -129,7 +129,6 @@ async function persistOrder({ customer, requestedItems, paymentMethod, paymentSt
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     };
     lines.forEach(line => transaction.update(line.ref, { variants: line.variants, updatedAt: admin.firestore.FieldValue.serverTimestamp() }));
-    transaction.set(db.collection('orders').doc(orderId), order);
     transaction.set(db.collection('companies').doc(targetCompanyId).collection('orders').doc(orderId), order);
     transaction.set(db.collection('companies').doc(targetCompanyId).collection('invoices').doc(orderId), order);
   });

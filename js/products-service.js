@@ -1496,10 +1496,8 @@ export async function createInvoice(orderData = {}) {
   // Exact Database Paths:
   // Primary: companies/{companyId}/orders/{orderId}
   // Secondary: companies/{companyId}/invoices/{orderId} (Billing POS sync)
-  // Root: invoices/{orderId} (POS real-time sound pulse)
   const companyOrderRef = doc(db, `companies/${companyId}/orders`, orderId);
   const companyInvoiceRef = doc(db, `companies/${companyId}/invoices`, orderId);
-  const rootInvoiceRef = doc(db, 'invoices', orderId);
 
   let success = false;
   let lastError = null;
@@ -1509,7 +1507,6 @@ export async function createInvoice(orderData = {}) {
       const batch = writeBatch(db);
       batch.set(companyOrderRef, payload);
       batch.set(companyInvoiceRef, payload);
-      batch.set(rootInvoiceRef, payload);
       await batch.commit();
       console.info(`[TBC] Order successfully created in companies/${companyId}/orders/${orderId} (attempt ${attempt})`);
       success = true;
@@ -1787,15 +1784,13 @@ export async function getCustomerOrders(phoneNumber, companyId = COMPANY_ID) {
   if (!cleanPhone) return [];
 
   try {
-    const q1 = query(collection(db, 'invoices'), where('customerPhoneNumber', '==', cleanPhone));
-    const q2 = query(collection(db, 'invoices'), where('customerPhone', '==', cleanPhone));
-    const q3 = query(collection(db, `companies/${companyId}/invoices`), where('customerPhoneNumber', '==', cleanPhone));
-    const q4 = query(collection(db, `companies/${companyId}/invoices`), where('customerPhone', '==', cleanPhone));
-    const q5 = query(collection(db, `companies/${companyId}/orders`), where('customerPhoneNumber', '==', cleanPhone));
-    const q6 = query(collection(db, `companies/${companyId}/orders`), where('customerPhone', '==', cleanPhone));
+    const q1 = query(collection(db, `companies/${companyId}/invoices`), where('customerPhoneNumber', '==', cleanPhone));
+    const q2 = query(collection(db, `companies/${companyId}/invoices`), where('customerPhone', '==', cleanPhone));
+    const q3 = query(collection(db, `companies/${companyId}/orders`), where('customerPhoneNumber', '==', cleanPhone));
+    const q4 = query(collection(db, `companies/${companyId}/orders`), where('customerPhone', '==', cleanPhone));
 
     const snaps = await Promise.allSettled([
-      getDocs(q1), getDocs(q2), getDocs(q3), getDocs(q4), getDocs(q5), getDocs(q6)
+      getDocs(q1), getDocs(q2), getDocs(q3), getDocs(q4)
     ]);
 
     const orderMap = new Map();
@@ -1832,11 +1827,9 @@ export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMP
   if (typeof onUpdate !== 'function') return () => {};
 
   try {
-    const ref1 = collection(db, 'invoices');
     const ref2 = collection(db, `companies/${companyId}/invoices`);
     const ref3 = collection(db, `companies/${companyId}/orders`);
 
-    const docsMap1 = new Map();
     const docsMap2 = new Map();
     const docsMap3 = new Map();
 
@@ -1849,7 +1842,7 @@ export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMP
       const cleanPhone = String(identifier).replace(/\D/g, '').slice(-10);
       const cleanEmail = String(identifier).toLowerCase().trim();
 
-      const combinedMap = new Map([...docsMap1, ...docsMap2, ...docsMap3]);
+      const combinedMap = new Map([...docsMap2, ...docsMap3]);
       const allDocs = Array.from(combinedMap.values());
 
       const matched = allDocs.filter(doc => {
@@ -1877,16 +1870,6 @@ export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMP
       onUpdate(matched);
     };
 
-    const unsub1 = onSnapshot(ref1, (snapshot) => {
-      docsMap1.clear();
-      snapshot.docs.forEach(d => {
-        const data = d.data();
-        const id = data.id || d.id;
-        docsMap1.set(id, { id, ...data });
-      });
-      combineAndNotify();
-    }, (err) => console.error('[TBC Real-Time] subscribeToCustomerOrders ref1 error:', err));
-
     const unsub2 = onSnapshot(ref2, (snapshot) => {
       docsMap2.clear();
       snapshot.docs.forEach(d => {
@@ -1908,7 +1891,6 @@ export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMP
     }, (err) => console.warn('[TBC Real-Time] subscribeToCustomerOrders ref3 warning:', err));
 
     return () => {
-      unsub1();
       unsub2();
       unsub3();
     };
@@ -1958,11 +1940,9 @@ export function renderStatusBadge(status) {
  */
 export function subscribeToOnlineOrders(onUpdate, onError, options = {}, companyId = COMPANY_ID) {
   try {
-    const ref1 = collection(db, 'invoices');
     const ref2 = collection(db, `companies/${companyId}/invoices`);
     const ref3 = collection(db, `companies/${companyId}/orders`);
 
-    const docsMap1 = new Map();
     const docsMap2 = new Map();
     const docsMap3 = new Map();
 
@@ -1979,15 +1959,6 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
 
         // 2. Merge from companies/{companyId}/invoices
         docsMap2.forEach((val, id) => {
-          if (!ordersMap.has(id)) {
-            ordersMap.set(id, val);
-          } else {
-            ordersMap.set(id, { ...val, ...ordersMap.get(id) });
-          }
-        });
-
-        // 3. Merge from root invoices
-        docsMap1.forEach((val, id) => {
           if (!ordersMap.has(id)) {
             ordersMap.set(id, val);
           } else {
@@ -2021,22 +1992,10 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
           .sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
 
         setCachedOrders(orders, companyId);
-        console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order(s) across collections.`);
+        console.info(`[TBC Ecom Admin] Streamed ${orders.length} e-commerce order(s) across company collections.`);
         onUpdate(orders);
       }, 100);
     };
-
-    const unsub1 = onSnapshot(ref1, (snapshot) => {
-      docsMap1.clear();
-      snapshot.docs.forEach(d => {
-        const data = d.data();
-        const id = data.id || d.id;
-        docsMap1.set(id, { id, ...data });
-      });
-      combineAndNotify();
-    }, (err) => {
-      console.warn('[TBC Ecom Admin] invoices ref1 notice:', err);
-    });
 
     const unsub2 = onSnapshot(ref2, (snapshot) => {
       docsMap2.clear();
@@ -2064,7 +2023,6 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
 
     return () => {
       if (notifyTimer) clearTimeout(notifyTimer);
-      try { unsub1(); } catch (_) {}
       try { unsub2(); } catch (_) {}
       try { unsub3(); } catch (_) {}
     };
@@ -2077,7 +2035,7 @@ export function subscribeToOnlineOrders(onUpdate, onError, options = {}, company
 /**
  * Fetch online orders with read optimization and intelligent local caching.
  * If force is false and cache is fresh (< 30s), returns cached orders without Firestore reads.
- * Otherwise fetches latest orders from company orders subcollection and fallback collections.
+ * Otherwise fetches latest orders from company orders subcollection and company invoices subcollection.
  *
  * @param {string} [companyId]
  * @param {boolean} [force=false]
@@ -2121,23 +2079,6 @@ export async function fetchOnlineOrders(companyId = COMPANY_ID, force = false) {
     console.warn('[TBC Orders] Fetch company invoices notice:', err);
   }
 
-  // 3. Fallback: root invoices (always merged if matching companyId)
-  try {
-    const rootCol = collection(db, 'invoices');
-    const rootSnap = await getDocs(query(rootCol, limit(50)));
-    rootSnap.docs.forEach(d => {
-      const data = d.data();
-      const id = data.id || d.id;
-      if (!ordersMap.has(id)) {
-        if (!data.companyId || data.companyId === companyId) {
-          ordersMap.set(id, { id, ...data });
-        }
-      }
-    });
-  } catch (err) {
-    console.warn('[TBC Orders] Fetch root invoices notice:', err);
-  }
-
   const orders = Array.from(ordersMap.values())
     .filter(d => {
       if (d.isFromCompanyOrders) return true;
@@ -2175,31 +2116,18 @@ export async function fetchOnlineOrders(companyId = COMPANY_ID, force = false) {
 export function subscribeToInvoice(invoiceId, onUpdate, onError, companyId = COMPANY_ID) {
   if (!invoiceId) return () => {};
 
-  const ref1 = doc(db, 'invoices', invoiceId);
   const ref2 = doc(db, `companies/${companyId}/invoices`, invoiceId);
   const ref3 = doc(db, `companies/${companyId}/orders`, invoiceId);
 
-  let doc1 = null;
   let doc2 = null;
   let doc3 = null;
 
   const notify = () => {
-    const active = doc1 || doc2 || doc3;
+    const active = doc2 || doc3;
     if (active) {
       onUpdate(active);
     }
   };
-
-  const unsub1 = onSnapshot(
-    ref1,
-    (snap) => {
-      if (snap.exists()) {
-        doc1 = { id: snap.id, ...snap.data() };
-        notify();
-      }
-    },
-    (err) => console.error(`[TBC] subscribeToInvoice(${invoiceId}) ref1 error:`, err)
-  );
 
   const unsub2 = onSnapshot(
     ref2,
@@ -2224,7 +2152,6 @@ export function subscribeToInvoice(invoiceId, onUpdate, onError, companyId = COM
   );
 
   return () => {
-    unsub1();
     unsub2();
     unsub3();
   };
@@ -2232,12 +2159,12 @@ export function subscribeToInvoice(invoiceId, onUpdate, onError, companyId = COM
 
 
 // ═══════════════════════════════════════════════════════════════
-// 7.  ORDER STATUS STATE MACHINE  —  Dual Collection Updates
+// 7.  ORDER STATUS STATE MACHINE  —  Company Collections Updates
 //     Advance status through the defined lifecycle on all stores.
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Advance an invoice to the next logical status in the lifecycle across all database collections.
+ * Advance an invoice to the next logical status in the lifecycle across database collections.
  *
  * Flow: Awaiting Acceptance → Processing → Packed → Shipped → Out for Delivery → Delivered
  *
@@ -2248,15 +2175,11 @@ export function subscribeToInvoice(invoiceId, onUpdate, onError, companyId = COM
 export async function advanceOrderStatus(invoiceId, companyId = COMPANY_ID) {
   if (!invoiceId) return { success: false, error: 'No invoiceId provided.' };
 
-  const rootRef = doc(db, 'invoices', invoiceId);
   const companyRef = doc(db, `companies/${companyId}/invoices`, invoiceId);
   const companyOrderRef = doc(db, `companies/${companyId}/orders`, invoiceId);
 
   try {
-    let snap = await getDoc(rootRef);
-    if (!snap.exists()) {
-      snap = await getDoc(companyRef);
-    }
+    let snap = await getDoc(companyRef);
     if (!snap.exists()) {
       snap = await getDoc(companyOrderRef);
     }
@@ -2285,12 +2208,11 @@ export async function advanceOrderStatus(invoiceId, companyId = COMPANY_ID) {
     };
 
     await Promise.allSettled([
-      updateDoc(rootRef, updatePayload),
       updateDoc(companyRef, updatePayload),
       updateDoc(companyOrderRef, updatePayload)
     ]);
 
-    console.info(`[TBC] Order ${invoiceId}: "${currentStatus}" → "${newStatus}" updated across collections`);
+    console.info(`[TBC] Order ${invoiceId}: "${currentStatus}" → "${newStatus}" updated across company collections`);
     return { success: true, previousStatus: currentStatus, newStatus };
 
   } catch (err) {
@@ -2300,7 +2222,7 @@ export async function advanceOrderStatus(invoiceId, companyId = COMPANY_ID) {
 }
 
 /**
- * Set an invoice/order to a specific status directly across all collections.
+ * Set an invoice/order to a specific status directly across company collections.
  *
  * @param {string} invoiceId
  * @param {string} status   Must be a value from ORDER_STATUS_FLOW or 'Cancelled' / 'Pending' / 'Paid'
@@ -2324,15 +2246,13 @@ export async function setOrderStatus(invoiceId, status, companyId = COMPANY_ID) 
     [`statusHistory.${status}`]: serverTimestamp(),
   };
 
-  const rootRef = doc(db, 'invoices', invoiceId);
   const companyRef = doc(db, `companies/${companyId}/invoices`, invoiceId);
   const companyOrderRef = doc(db, `companies/${companyId}/orders`, invoiceId);
 
   try {
     const results = await Promise.allSettled([
       updateDoc(companyOrderRef, updatePayload),
-      updateDoc(companyRef, updatePayload),
-      updateDoc(rootRef, updatePayload)
+      updateDoc(companyRef, updatePayload)
     ]);
 
     const isSuccess = results.some(r => r.status === 'fulfilled');
@@ -2343,8 +2263,7 @@ export async function setOrderStatus(invoiceId, status, companyId = COMPANY_ID) 
     // Fallback: merge if documents need setDoc
     await Promise.allSettled([
       setDoc(companyOrderRef, updatePayload, { merge: true }),
-      setDoc(companyRef, updatePayload, { merge: true }),
-      setDoc(rootRef, updatePayload, { merge: true })
+      setDoc(companyRef, updatePayload, { merge: true })
     ]);
     return { success: true };
   } catch (err) {
