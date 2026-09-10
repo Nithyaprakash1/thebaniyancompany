@@ -613,7 +613,7 @@
                   </div>
                   <a href="stock-availabilities.html" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-medium transition-all whitespace-nowrap">Restock →</a>
                 </div>
-
+              </div>
 
             </div>
 
@@ -4730,6 +4730,17 @@
     };
 
     async function initDashboard() {
+      // 0ms instant display from local cache before any async network requests
+      try {
+        const cached = getCachedOrders(COMPANY_ID);
+        if (Array.isArray(cached) && cached.length > 0) {
+          window.currentAllOrders = cached;
+          renderOrders(cached);
+          renderSalesChart(cached);
+          renderDashboardWidgets(cached);
+        }
+      } catch (e) {}
+
       const comp = await revalidateCompany(COMPANY_ID);
       if (comp) {
         if (document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = comp.name || 'OneSpace Commerce';
@@ -4838,20 +4849,6 @@
           window.allReturnsData = retSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         }
       } catch(e) {}
-
-      // 0ms instant display from local cache
-      try {
-        const cached = getCachedOrders(COMPANY_ID);
-        if (Array.isArray(cached) && cached.length > 0) {
-          window.currentAllOrders = cached;
-          renderOrders(cached);
-          renderSalesChart(cached);
-          renderCustomersTable();
-          renderPaymentsTable();
-          renderReturnsTable();
-          renderDashboardWidgets(cached);
-        }
-      } catch (e) {}
 
       subscribeToOnlineOrders(orders => {
         window.currentAllOrders = orders;
