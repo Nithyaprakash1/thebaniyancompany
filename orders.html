@@ -78,19 +78,23 @@
 
     /* Print Stylesheet for Invoices & Labels */
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #print-invoice-area, #print-invoice-area * {
-        visibility: visible;
+      body > *:not(#print-invoice-area) {
+        display: none !important;
       }
       #print-invoice-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        background: white;
-        padding: 20px;
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: #ffffff !important;
+        visibility: visible !important;
+      }
+      #print-invoice-area * {
+        visibility: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
     }
   </style>
@@ -943,7 +947,7 @@
         color: i.color || 'Standard',
         qty: Number(i.qty || i.quantity || 1),
         price: Number(i.price || 0),
-        imageUrl: i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'https://placehold.co/80x100?text=Product'
+        imageUrl: i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'assets/onespace-commerce-logo.png'
       }));
 
       // Combined products string for the table
@@ -1219,7 +1223,7 @@
           const cardBorder = !seen ? 'border-t-4 border-t-blue-500 border-slate-200' : 'border-slate-200/90';
 
           const itemImgs = (o.items || []).slice(0, 3).map(i => `
-            <img src="${i.imageUrl || 'https://placehold.co/80x100?text=Product'}" alt="${i.name}" class="w-7 h-8 object-cover rounded-md border border-slate-200 bg-white shrink-0">
+            <img src="${i.imageUrl || 'assets/onespace-commerce-logo.png'}" alt="${i.name}" class="w-7 h-8 object-cover rounded-md border border-slate-200 bg-white shrink-0" onerror="this.src='assets/onespace-commerce-logo.png';">
           `).join('');
 
           return `
@@ -1387,7 +1391,7 @@
         productsContainer.innerHTML = (order.items || []).map(item => `
           <div class="py-3.5 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3.5">
-              <img src="${item.imageUrl || 'https://placehold.co/80x100?text=Item'}" alt="${item.name}" class="w-12 h-12 object-cover rounded-xl bg-slate-100 border border-slate-200 shrink-0">
+              <img src="${item.imageUrl || 'assets/onespace-commerce-logo.png'}" alt="${item.name}" class="w-12 h-12 object-cover rounded-xl bg-slate-100 border border-slate-200 shrink-0" onerror="this.src='assets/onespace-commerce-logo.png';">
               <div>
                 <h4 class="font-bold text-sm text-slate-900 uppercase">${item.name}</h4>
                 <p class="text-xs text-slate-400 uppercase font-medium mt-0.5">${item.color || 'STANDARD'} • ${item.size || 'M'} | QTY: ${item.qty || 1}</p>
@@ -1642,10 +1646,8 @@
               </p>
             </div>
             <div style="text-align: right;">
-              <div style="display: flex; align-items: center; gap: 6px; justify-content: flex-end; margin-bottom: 8px;">
-                <span style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase;">POWERED BY</span>
-                <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" style="height: 22px; width: 22px; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact;" onerror="this.src='assets/onespace-commerce-logo.png';">
-                <span style="font-size: 11px; font-weight: 800; color: #0f172a;">OneSpace <span style="color:#10b981;">Commerce</span></span>
+              <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 8px;">
+                <img src="assets/textlogo.png" alt="Powered by OneSpace Commerce" style="height: 26px; width: auto; max-width: 180px; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact;" onerror="this.src='assets/onespace-commerce-logo.png';">
               </div>
               <p style="font-size: 14px; font-weight: 800; margin: 0;">#${order.id}</p>
               <p style="font-size: 11px; color: #666; margin: 2px 0 0 0;">${order.dateLong}</p>
@@ -1708,9 +1710,20 @@
     };
 
     // Print Shipping Label
-    window.printShippingLabel = function() {
-      const order = window.liveOrders.find(o => String(o.id) === String(window.currentViewingOrderId));
-      if (!order) return;
+    window.printShippingLabel = function(targetId, e) {
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+
+      const id = targetId || window.currentViewingOrderId;
+      const cleanId = String(id || '').replace('#', '').trim();
+      const order = (window.liveOrders || []).find(o => 
+        String(o.id) === String(id) || 
+        String(o.id).replace('#', '').trim() === cleanId
+      );
+
+      if (!order) {
+        alert(`Order #${id || ''} details not available for printing label.`);
+        return;
+      }
 
       const printArea = document.getElementById('print-invoice-area');
       if (!printArea) return;
@@ -1721,21 +1734,19 @@
           <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px;">
             <div>
               <h2 style="margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 0.5px;">THE BANIYAN COMPANY</h2>
-              <p style="margin: 2px 0 0 0; font-size: 10px; font-weight: 800; color: #64748b; tracking-wider: 1px; uppercase">SHIPPING LABEL</p>
+              <p style="margin: 2px 0 0 0; font-size: 10px; font-weight: 800; color: #64748b; uppercase">SHIPPING LABEL</p>
             </div>
-            <div style="text-align: right; display: flex; align-items: center; gap: 6px; justify-content: flex-end;">
-              <span style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase;">POWERED BY</span>
-              <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" style="height: 24px; width: 24px; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact;" onerror="this.src='assets/onespace-commerce-logo.png';">
-              <span style="font-size: 12px; font-weight: 800; color: #0f172a;">OneSpace <span style="color:#10b981;">Commerce</span></span>
+            <div style="text-align: right; display: flex; align-items: center; justify-content: flex-end;">
+              <img src="assets/textlogo.png" alt="Powered by OneSpace Commerce" style="height: 28px; width: auto; max-width: 180px; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact;" onerror="this.src='assets/onespace-commerce-logo.png';">
             </div>
           </div>
 
           <!-- SHIP TO Box (RECIPIENT FIRST) -->
           <div style="background: #f8fafc; border: 2px solid #0f172a; padding: 12px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 12px; line-height: 1.5;">
             <p style="margin: 0; font-size: 10px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">SHIP TO (RECIPIENT):</p>
-            <h3 style="margin: 3px 0 0 0; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #000;">${order.customerName}</h3>
+            <h3 style="margin: 3px 0 0 0; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #000;">${order.customerName || 'Valued Customer'}</h3>
             <p style="margin: 3px 0 0 0; font-weight: 800; color: #000; font-size: 13px;">📞 ${order.phone || 'N/A'}</p>
-            <p style="margin: 4px 0 0 0; color: #1e293b; font-size: 12px; line-height: 1.5; font-weight: 600;">${order.address}</p>
+            <p style="margin: 4px 0 0 0; color: #1e293b; font-size: 12px; line-height: 1.5; font-weight: 600;">${order.address || 'Address on file'}</p>
           </div>
 
           <!-- SHIP FROM Box (SENDER BELOW SHIP TO) -->
@@ -1754,11 +1765,16 @@
         </div>
       `;
 
+      printArea.style.display = 'block';
       printArea.classList.remove('hidden');
-      window.print();
+
       setTimeout(() => {
-        printArea.classList.add('hidden');
-      }, 1000);
+        window.print();
+        setTimeout(() => {
+          printArea.style.display = 'none';
+          printArea.classList.add('hidden');
+        }, 500);
+      }, 50);
     };
 
     // Contact Customer
@@ -1779,6 +1795,30 @@
 
     // App Initialization
     async function startApp() {
+      // 0. Hydrate Company Logo from localStorage & Firestore
+      try {
+        const cachedLogo = localStorage.getItem('onespace_shop_logo') || localStorage.getItem('tbc_shop_logo');
+        if (cachedLogo && document.getElementById('sidebar-shop-logo-img')) document.getElementById('sidebar-shop-logo-img').src = cachedLogo;
+        const cachedName = localStorage.getItem('onespace_shop_name');
+        if (cachedName && document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = cachedName;
+
+        if (window.getCompanyProfile) {
+          window.getCompanyProfile().then(comp => {
+            if (comp && comp.logo) {
+              if (document.getElementById('sidebar-shop-logo-img')) document.getElementById('sidebar-shop-logo-img').src = comp.logo;
+              try {
+                localStorage.setItem('onespace_shop_logo', comp.logo);
+                localStorage.setItem('tbc_shop_logo', comp.logo);
+              } catch(_) {}
+            }
+            if (comp && comp.name) {
+              if (document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = comp.name;
+              try { localStorage.setItem('onespace_shop_name', comp.name); } catch(_) {}
+            }
+          }).catch(() => {});
+        }
+      } catch(e) {}
+
       // 1. Instant Cache Hydration
       loadCached();
       window.hidePageLoader();

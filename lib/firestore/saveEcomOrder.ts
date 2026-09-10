@@ -63,7 +63,7 @@ export async function saveEcomOrder(input: EcomOrderInput): Promise<string> {
       color: item.color || 'Default',
       qty: Number(item.qty),
       price: Number(item.price),
-      imageUrl: item.imageUrl || ''
+      imageUrl: item.imageUrl || 'assets/onespace-commerce-logo.png'
     })),
     subtotal: input.subtotal,
     discountAmount: input.discountAmount || 0,

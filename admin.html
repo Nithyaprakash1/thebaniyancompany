@@ -3098,7 +3098,7 @@
             const name = (i.name || i.title || 'Product').trim();
             const qty = Number(i.qty || i.quantity || 1);
             const price = Number(i.price || 0);
-            const img = i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'https://placehold.co/100x120/f0f0f0/999?text=Product';
+            const img = i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'assets/onespace-commerce-logo.png';
 
             if (!productSalesMap[name]) {
               productSalesMap[name] = { name, img, totalUnits: 0, totalRevenue: 0 };
@@ -3113,7 +3113,7 @@
         if (sortedProds.length === 0 && Array.isArray(window.allProductsData) && window.allProductsData.length > 0) {
           sortedProds = window.allProductsData.slice(0, 4).map(p => ({
             name: p.name || p.title || 'Product',
-            img: p.imageUrl || p.image || (Array.isArray(p.imageUrls) ? p.imageUrls[0] : '') || 'https://placehold.co/100x120/f0f0f0/999?text=Product',
+            img: p.imageUrl || p.image || (Array.isArray(p.imageUrls) ? p.imageUrls[0] : '') || 'assets/onespace-commerce-logo.png',
             totalUnits: 0,
             totalRevenue: 0,
             inCatalogOnly: true
@@ -3147,7 +3147,7 @@
                   <span class="w-6 h-6 rounded-lg ${rankStyle.bg} ${rankStyle.text} border ${rankStyle.border} flex items-center justify-center text-xs font-medium shrink-0">
                     #${idx + 1}
                   </span>
-                  <img src="${p.img}" alt="${p.name}" class="w-10 h-12 object-cover rounded-lg bg-white border border-slate-200 shrink-0" onerror="this.src='https://placehold.co/100x120/f0f0f0/999?text=Product'">
+                  <img src="${p.img}" alt="${p.name}" class="w-10 h-12 object-cover rounded-lg bg-white border border-slate-200 shrink-0" onerror="this.src='assets/onespace-commerce-logo.png'">
                   <div class="min-w-0">
                     <span class="text-xs font-medium text-slate-900 block truncate">${p.name}</span>
                     <span class="text-[11px] text-slate-500 block truncate font-normal">${unitsText}</span>
@@ -4538,7 +4538,7 @@
       tbody.innerHTML = products.map(p => {
         const name = p.name || 'Untitled Product';
         const category = p.category || 'General';
-        const img = (Array.isArray(p.imageUrls) && p.imageUrls[0]) || p.imageUrl || p.image || 'https://placehold.co/100x120/f0f0f0/999?text=Product';
+        const img = (Array.isArray(p.imageUrls) && p.imageUrls[0]) || p.imageUrl || p.image || 'assets/onespace-commerce-logo.png';
         
         let stockCount = 0;
         if (Array.isArray(p.variants) && p.variants.length > 0) {
@@ -4558,7 +4558,7 @@
         return `
           <tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100">
             <td class="p-3.5 flex items-center gap-3">
-              <img src="${img}" alt="${name}" class="w-10 h-12 object-cover rounded-md bg-slate-100 border border-slate-200 flex-shrink-0" onerror="this.src='https://placehold.co/100x120/f0f0f0/999?text=Product'">
+              <img src="${img}" alt="${name}" class="w-10 h-12 object-cover rounded-md bg-slate-100 border border-slate-200 flex-shrink-0" onerror="this.src='assets/onespace-commerce-logo.png'">
               <div>
                 <span class="font-medium text-slate-900 block truncate max-w-xs">${name}</span>
                 <span class="text-[11px] text-slate-400 font-mono">ID: ${p.id}</span>
@@ -5125,12 +5125,12 @@
         }
 
         const itemsDetailHtml = items.length > 0 ? items.map(i => {
-          const img = i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'https://placehold.co/100x120/f0f0f0/999?text=Product';
+          const img = i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'assets/onespace-commerce-logo.png';
           const qty = i.qty || i.quantity || 1;
           const price = Number(i.price || 0);
           return `
             <div class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
-              <img src="${img}" alt="${i.name || 'Item'}" class="w-12 h-14 object-cover rounded-md bg-white border border-slate-200 flex-shrink-0" onerror="this.src='https://placehold.co/100x120/f0f0f0/999?text=Product'">
+              <img src="${img}" alt="${i.name || 'Item'}" class="w-12 h-14 object-cover rounded-md bg-white border border-slate-200 flex-shrink-0" onerror="this.src='assets/onespace-commerce-logo.png'">
               <div class="flex-1 min-w-0">
                 <span class="font-medium text-xs text-slate-900 block truncate">${i.name || 'Product'}</span>
                 <span class="text-[11px] text-slate-500 block">Size: <strong class="text-slate-800 font-semibold">${String(i.size || 'M').toUpperCase()}</strong> · Color: <strong class="text-slate-800 font-semibold">${i.color || 'Default'}</strong> · Qty: <strong class="text-slate-900 font-semibold">${qty}</strong></span>
