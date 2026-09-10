@@ -229,8 +229,8 @@
           </button>
 
           <!-- 2. Orders -->
-          <button id="side-tab-orders" onclick="switchAdminTab('orders')"
-            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+          <a href="orders.html" id="side-tab-orders"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-[19px] text-blue-400">local_shipping</span>
               <span class="font-normal">Orders</span>
@@ -239,7 +239,7 @@
               <span id="sidebar-order-badge" class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">0</span>
               <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
             </div>
-          </button>
+          </a>
 
           <!-- 3. Products -->
           <button id="side-tab-products" onclick="switchAdminTab('products')"
@@ -354,9 +354,6 @@
       <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div class="flex items-center gap-3">
-            <button onclick="toggleMobileSidebar()" class="p-1.5 rounded-lg bg-slate-100 text-slate-800 hover:bg-slate-200 transition" title="Toggle Sidebar">
-              <span class="material-symbols-outlined text-xl">menu</span>
-            </button>
             <div class="flex items-center gap-2.5">
               <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" class="h-8 w-8 object-contain rounded-xl p-0.5 bg-white border border-slate-200/80 shadow-2xs shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
               <div>
@@ -2521,7 +2518,8 @@
       } else if (tabName === 'dashboard') {
         initSalesChart();
       } else if (tabName === 'orders') {
-        renderOrders(window.currentAllOrders);
+        window.location.href = 'orders.html';
+        return;
       }
     };
 
@@ -2659,17 +2657,53 @@
       window.handleRevenuePeriodChange(mapped);
     };
 
-    function initSalesChart() {
-      setTimeout(renderSalesChart, 50);
+    function getUniversalTimestamp(o) {
+      if (!o) return 0;
+      if (typeof o === 'number' && o > 0) return o;
+      const raw = o.createdAt || o.timestamp || o.date || o.orderDate || o.updatedAt;
+      if (raw) {
+        if (typeof raw === 'number' && raw > 0) return raw;
+        if (typeof raw.toMillis === 'function') return raw.toMillis();
+        if (typeof raw.toDate === 'function') return raw.toDate().getTime();
+        if (raw.seconds) return raw.seconds * 1000 + (raw.nanoseconds ? raw.nanoseconds / 1e6 : 0);
+        if (raw._seconds) return raw._seconds * 1000 + (raw._nanoseconds ? raw._nanoseconds / 1e6 : 0);
+        if (typeof raw === 'string') {
+          const parsed = new Date(raw).getTime();
+          if (!isNaN(parsed) && parsed > 0) return parsed;
+        }
+      }
+      const id = String(o.id || o.orderId || o.invoiceId || '');
+      if (id.startsWith('ORD-')) {
+        const parts = id.split('-');
+        if (parts[1] && !isNaN(Number(parts[1]))) {
+          return Number(parts[1]);
+        }
+      }
+      return 0;
     }
 
-    function renderSalesChart() {
+    function initSalesChart() {
+      setTimeout(() => renderSalesChart(), 50);
+    }
+
+    function renderSalesChart(ordersParam) {
       const canvas = document.getElementById('salesOverviewChart');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
 
-      const orders = Array.isArray(window.currentAllOrders) ? window.currentAllOrders : [];
+      const orders = (Array.isArray(ordersParam) && ordersParam.length > 0)
+        ? ordersParam
+        : (Array.isArray(window.currentAllOrders) ? window.currentAllOrders : []);
       const now = new Date();
+
+      // Ensure selected filter value is in sync
+      const dashSelect = document.getElementById('dash-period-select');
+      const revSelect = document.getElementById('rev-period-select');
+      if (!window.currentRevenuePeriod) {
+        window.currentRevenuePeriod = dashSelect?.value || revSelect?.value || 'today';
+      }
+      if (dashSelect && dashSelect.value !== window.currentRevenuePeriod) dashSelect.value = window.currentRevenuePeriod;
+      if (revSelect && revSelect.value !== window.currentRevenuePeriod) revSelect.value = window.currentRevenuePeriod;
 
       let labels = [];
       let revenueData = [];
@@ -2687,7 +2721,7 @@
         const endToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999).getTime();
 
         orders.forEach(o => {
-          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          const ts = getUniversalTimestamp(o);
           if (ts >= startToday && ts <= endToday) {
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
@@ -2708,7 +2742,7 @@
         const endYest = new Date(yest.getFullYear(), yest.getMonth(), yest.getDate(), 23, 59, 59, 999).getTime();
 
         orders.forEach(o => {
-          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          const ts = getUniversalTimestamp(o);
           if (ts >= startYest && ts <= endYest) {
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
@@ -2727,7 +2761,7 @@
         const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
 
         orders.forEach(o => {
-          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          const ts = getUniversalTimestamp(o);
           if (ts >= startOfYear) {
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
@@ -2756,7 +2790,7 @@
             labels.push(cur.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }));
           }
           orders.forEach(o => {
-            const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+            const ts = getUniversalTimestamp(o);
             if (ts >= sMs && ts <= eMs) {
               const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
               periodRevenue += amt;
@@ -2772,7 +2806,7 @@
           revenueData = [0, 0, 0, 0, 0];
           const step = (eMs - sMs) / 5;
           orders.forEach(o => {
-            const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+            const ts = getUniversalTimestamp(o);
             if (ts >= sMs && ts <= eMs) {
               const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
               periodRevenue += amt;
@@ -2791,7 +2825,7 @@
         const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
 
         orders.forEach(o => {
-          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          const ts = getUniversalTimestamp(o);
           if (ts >= thirtyDaysAgo) {
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
@@ -2814,7 +2848,7 @@
         }
         const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
         orders.forEach(o => {
-          const ts = Number(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || 0));
+          const ts = getUniversalTimestamp(o);
           if (ts >= sevenDaysAgo) {
             const amt = Number(o.pricing?.total ?? o.totalAmount ?? 0);
             periodRevenue += amt;
@@ -4809,8 +4843,9 @@
       try {
         const cached = getCachedOrders(COMPANY_ID);
         if (Array.isArray(cached) && cached.length > 0) {
+          window.currentAllOrders = cached;
           renderOrders(cached);
-          renderSalesChart();
+          renderSalesChart(cached);
           renderCustomersTable();
           renderPaymentsTable();
           renderReturnsTable();
@@ -4819,8 +4854,9 @@
       } catch (e) {}
 
       subscribeToOnlineOrders(orders => {
+        window.currentAllOrders = orders;
         renderOrders(orders);
-        renderSalesChart();
+        renderSalesChart(orders);
         renderCustomersTable();
         renderPaymentsTable();
         renderReturnsTable();

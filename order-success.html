@@ -135,19 +135,27 @@
     invoiceEl.style.color = '#000000';
     invoiceEl.style.background = '#ffffff';
     invoiceEl.innerHTML = `
-      <div style="display:flex; justify-between; align-items:center; border-bottom:2px solid #000; padding-bottom:16px; margin-bottom:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #000; padding-bottom:16px; margin-bottom:24px;">
         <div>
           <h1 style="font-size:22px; font-weight:800; letter-spacing:2px; margin:0;">THE BANIYAN COMPANY</h1>
-          <p style="font-size:11px; color:#555; margin:4px 0 0 0;">Official Order Tax Invoice</p>
+          <p style="font-size:11px; color:#555; margin:4px 0 0 0; line-height:1.4;">
+            No: 164, Kamarajar Road, Coimbatore 641015, Tamil Nadu, India<br>
+            Phone: +91 8110061611
+          </p>
         </div>
         <div style="text-align:right;">
+          <div style="display: flex; align-items: center; gap: 6px; justify-content: flex-end; margin-bottom: 6px;">
+            <span style="font-size: 9px; color: #666; font-weight: 600; text-transform: uppercase;">Powered By</span>
+            <span style="font-size: 11px; font-weight: 800; color: #0f172a;">OneSpace <span style="color:#10b981;">Commerce</span></span>
+            <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce" style="height: 20px; width: 20px; object-fit: contain;">
+          </div>
           <span style="font-size:16px; font-weight:800;">${orderId}</span>
           <p style="font-size:11px; color:#555; margin:4px 0 0 0;">Date: ${new Date().toLocaleDateString('en-IN')}</p>
         </div>
       </div>
 
       <div style="background:#f4f4f5; padding:16px; border-radius:12px; margin-bottom:24px; font-size:12px; line-height:1.7;">
-        <p style="margin:0;"><strong>Seller:</strong> THE BANIYAN COMPANY, Coimbatore, Tamil Nadu</p>
+        <p style="margin:0;"><strong>SHIP FROM:</strong> THE BANIYAN COMPANY, +91 8110061611, No: 164, Kamarajar Road, Coimbatore 641015, Tamil Nadu, India</p>
         <p style="margin:0;"><strong>Payment Method:</strong> ${method}</p>
         <p style="margin:0;"><strong>Payment Status:</strong> ${status}</p>
         <p style="margin:0;"><strong>Dispatch Timeline:</strong> 2–4 Business Days</p>

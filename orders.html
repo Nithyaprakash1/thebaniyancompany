@@ -30,6 +30,40 @@
       border-radius: 9999px;
     }
 
+    /* Dark Obsidian iOS-Style Sidebar Navigation */
+    .sidebar-nav-btn {
+      color: #94a3b8;
+      background-color: transparent;
+      border-radius: 12px;
+      font-weight: 400;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sidebar-nav-btn:hover:not(.active) {
+      background-color: #161822;
+      color: #ffffff;
+      border-color: #232736;
+      transform: translateX(2px);
+    }
+    .sidebar-nav-btn.active {
+      background-color: #191b26;
+      color: #ffffff;
+      font-weight: 500;
+      border-color: #2c3042;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+    .sidebar-nav-btn .nav-chevron {
+      opacity: 0;
+      transition: all 0.2s ease;
+    }
+    .sidebar-nav-btn.active .nav-chevron {
+      opacity: 0.6;
+    }
+    .sidebar-nav-btn:hover .nav-chevron {
+      opacity: 0.9;
+      transform: translateX(1px);
+    }
+
     /* Skeleton Shimmer Loading Animation */
     @keyframes shimmerAnim {
       0% { background-position: -200% 0; }
@@ -63,6 +97,179 @@
 </head>
 
 <body class="bg-[#f6f8fa] text-slate-900 antialiased min-h-screen">
+
+  <div class="min-h-screen flex flex-col md:flex-row">
+
+    <!-- Mobile Drawer Backdrop -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 hidden md:hidden"></div>
+
+    <!-- LEFT SIDEBAR MENU (Dark Obsidian iOS-Style Theme matching Admin) -->
+    <aside id="admin-sidebar" class="fixed md:sticky top-0 left-0 bottom-0 z-50 w-64 bg-[#0b0d13] border-r border-[#1a1c25] flex flex-col justify-between transition-transform duration-300 -translate-x-full md:translate-x-0 h-screen text-white shrink-0">
+      <div class="flex-1 min-h-0 flex flex-col">
+        <!-- Brand & Logo Header -->
+        <div class="p-4 border-b border-[#1a1c25] space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <img src="assets/onespace-commerce-logo.png" id="sidebar-brand-logo" alt="OneSpace Commerce" class="h-8 w-8 object-contain rounded-xl p-0.5 bg-white/5 border border-white/10 shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
+              <div class="flex items-baseline gap-1">
+                <span class="text-sm font-medium text-white tracking-tight">OneSpace</span>
+                <span class="text-sm font-medium text-emerald-400 tracking-tight">Commerce</span>
+              </div>
+            </div>
+            <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">
+              <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+          </div>
+
+          <!-- Shop Capsule Pill (The Baniyan Company with Logo) -->
+          <div class="w-full bg-[#151720] border border-[#222634] rounded-xl px-3 py-2 flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <img id="sidebar-shop-logo-img" src="assets/tbclogo.jpeg" alt="TBC" class="w-6 h-6 rounded-full object-cover border border-white/20 shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
+              <span class="text-[11px] font-medium tracking-wider text-slate-200 uppercase truncate" id="sidebar-shop-name">THE BANIYAN COMPANY</span>
+            </div>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-pulse"></span>
+          </div>
+        </div>
+
+        <!-- Vertical Side Navigation Menu -->
+        <nav class="p-3 space-y-1 overflow-y-auto custom-scrollbar flex-1">
+          <!-- 1. Dashboard -->
+          <a href="admin.html?tab=dashboard" id="side-tab-dashboard"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-emerald-400">grid_view</span>
+              <span>Dashboard</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </a>
+
+          <!-- 2. Orders (ACTIVE) -->
+          <a href="orders.html" id="side-tab-orders"
+            class="sidebar-nav-btn active w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-blue-400">local_shipping</span>
+              <span class="font-medium text-white">Orders</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="sidebar-order-badge" class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">0</span>
+              <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+            </div>
+          </a>
+
+          <!-- 3. Products -->
+          <a href="admin.html?tab=products" id="side-tab-products"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-amber-400">inventory_2</span>
+              <span>Products</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </a>
+
+          <!-- 4. Stock Availabilities -->
+          <a href="stock-availabilities.html" id="side-tab-stock"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-emerald-400">check_circle</span>
+              <span>Stock Check</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </a>
+
+          <!-- 5. Customers -->
+          <a href="admin.html?tab=customers" id="side-tab-customers"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-purple-400">group</span>
+              <span>Customers</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </a>
+
+          <!-- 6. Payments -->
+          <a href="admin.html?tab=payments" id="side-tab-payments"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-emerald-400">payments</span>
+              <span>Payments</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </a>
+
+          <!-- 7. Returns -->
+          <a href="admin.html?tab=returns" id="side-tab-returns"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-rose-400">assignment_return</span>
+              <span>Returns</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </a>
+
+          <!-- 8. Settings -->
+          <a href="admin.html?tab=settings" id="side-tab-settings"
+            class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[19px] text-slate-400">settings</span>
+              <span>Settings</span>
+            </div>
+            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
+          </a>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="p-3.5 border-t border-[#1a1c25] space-y-2 bg-[#0b0d13]">
+          <a href="home.html" target="_blank" class="w-full py-2 px-3 rounded-xl bg-[#151720] hover:bg-[#1e2230] text-xs font-normal text-slate-200 transition-all flex items-center justify-center gap-2 border border-[#232736]">
+            <span class="material-symbols-outlined text-base text-slate-400">visibility</span> View Storefront
+          </a>
+          <a href="admin.html" class="w-full py-2 px-3 rounded-xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 text-xs font-normal transition-all border border-slate-700/40 flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-base">arrow_back</span> Admin Console
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT CONTENT AREA -->
+    <div class="flex-1 min-w-0 flex flex-col min-h-screen bg-[#f6f8fa]">
+      
+      <!-- Top Header Bar (NO Menu Button in Navbar) -->
+      <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3">
+        <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2.5">
+              <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" class="h-8 w-8 object-contain rounded-xl p-0.5 bg-white border border-slate-200/80 shadow-2xs shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
+              <div>
+                <div class="flex items-baseline gap-1">
+                  <span class="font-medium text-base tracking-tight text-slate-900 leading-tight">OneSpace</span>
+                  <span class="font-medium text-base tracking-tight text-emerald-600 leading-tight">Commerce</span>
+                </div>
+                <span class="text-[11px] text-slate-400 font-normal hidden sm:block">The Baniyan Company</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Header Actions -->
+          <div class="flex items-center gap-3">
+            <div class="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-xl text-[10px] font-normal text-slate-500 shadow-2xs">
+              <span class="material-symbols-outlined text-sm text-slate-400">schedule</span>
+              <span id="header-updated-time">LIVE ORDERS</span>
+            </div>
+            <a
+              href="create-order.html"
+              class="bg-black hover:bg-neutral-800 text-white text-xs font-medium px-4 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+            >
+              <span class="material-symbols-outlined text-sm">add</span>
+              <span>Create Order</span>
+            </a>
+            <div class="w-8 h-8 rounded-xl bg-slate-900 text-white font-medium text-xs flex items-center justify-center border border-slate-200 shadow-2xs">
+              N
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Body Container -->
+      <main class="flex-1 w-full">
 
   <!-- =========================================================================
        VIEW 1: ORDERS TABLE & DELIVERY MILESTONES (Screenshot 1)
@@ -200,9 +407,36 @@
           >
         </div>
 
-        <div class="flex items-center gap-2 text-xs font-bold text-slate-400 tracking-wider uppercase shrink-0">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>QUEUE: <span id="queue-count-badge" class="text-slate-700">0</span> ITEMS</span>
+        <!-- Queue Counter & View Mode Switcher -->
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+          <div class="flex items-center gap-2 text-xs font-bold text-slate-400 tracking-wider uppercase shrink-0">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>QUEUE: <span id="queue-count-badge" class="text-slate-700">0</span> ITEMS</span>
+          </div>
+
+          <!-- View Mode Switcher: List vs Grid -->
+          <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs shrink-0">
+            <button
+              type="button"
+              id="view-toggle-list-btn"
+              onclick="setOrdersDisplayMode('list')"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-[#0f172a] text-white shadow-xs"
+              title="Table / List View"
+            >
+              <span class="material-symbols-outlined text-[16px]">table_rows</span>
+              <span class="hidden sm:inline">LIST</span>
+            </button>
+            <button
+              type="button"
+              id="view-toggle-grid-btn"
+              onclick="setOrdersDisplayMode('grid')"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-slate-600 hover:text-slate-900"
+              title="Grid View"
+            >
+              <span class="material-symbols-outlined text-[16px]">grid_view</span>
+              <span class="hidden sm:inline">GRID</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -215,28 +449,36 @@
         <div class="h-14 skeleton-shimmer rounded-xl"></div>
       </div>
 
-      <!-- ORDERS TABLE -->
-      <div id="table-content-wrapper" class="overflow-x-auto custom-scrollbar hidden">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/40">
-              <th class="py-3.5 px-4 w-10 text-center">
-                <span class="w-3.5 h-3.5 rounded-full border border-slate-300 inline-block"></span>
-              </th>
-              <th class="py-3.5 px-4 font-bold">ORDER ID</th>
-              <th class="py-3.5 px-4 font-bold">DATE</th>
-              <th class="py-3.5 px-4 font-bold">CUSTOMER</th>
-              <th class="py-3.5 px-4 font-bold">PRODUCTS</th>
-              <th class="py-3.5 px-4 font-bold">AMOUNT</th>
-              <th class="py-3.5 px-4 font-bold">PAYMENT METHOD</th>
-              <th class="py-3.5 px-4 font-bold text-center">STATUS</th>
-              <th class="py-3.5 px-4 font-bold text-right pr-6">ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody id="orders-table-body" class="divide-y divide-slate-100 text-xs">
-            <!-- Dynamic Rows rendered from real Firestore orders -->
-          </tbody>
-        </table>
+      <!-- CONTENT WRAPPER FOR LIST & GRID -->
+      <div id="table-content-wrapper" class="hidden">
+        <!-- 1. TABLE CONTAINER (LIST VIEW) -->
+        <div id="orders-table-container" class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/40">
+                <th class="py-3.5 px-4 w-10 text-center">
+                  <span class="w-3.5 h-3.5 rounded-full border border-slate-300 inline-block"></span>
+                </th>
+                <th class="py-3.5 px-4 font-bold">ORDER ID</th>
+                <th class="py-3.5 px-4 font-bold">DATE</th>
+                <th class="py-3.5 px-4 font-bold">CUSTOMER</th>
+                <th class="py-3.5 px-4 font-bold">PRODUCTS</th>
+                <th class="py-3.5 px-4 font-bold">AMOUNT</th>
+                <th class="py-3.5 px-4 font-bold">PAYMENT METHOD</th>
+                <th class="py-3.5 px-4 font-bold text-center">STATUS</th>
+                <th class="py-3.5 px-4 font-bold text-right pr-6">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body" class="divide-y divide-slate-100 text-xs">
+              <!-- Dynamic Rows rendered from real Firestore orders -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 2. GRID CONTAINER (GRID VIEW) -->
+        <div id="orders-grid-container" class="hidden p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4.5 bg-slate-50/40">
+          <!-- Dynamic Cards rendered from real Firestore orders -->
+        </div>
 
         <!-- Empty State -->
         <div id="table-empty-state" class="hidden p-16 text-center text-slate-400 space-y-2">
@@ -546,6 +788,10 @@
 
   </div>
 
+      </main>
+    </div>
+  </div>
+
 
   <!-- =========================================================================
        PRINT AREA (Hidden on screen, visible during window.print())
@@ -742,11 +988,65 @@
       return list;
     }
 
-    // RENDER VIEW 1: TABLE
+    // Mobile Sidebar Drawer Toggle
+    window.toggleMobileSidebar = function() {
+      const sidebar = document.getElementById('admin-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (!sidebar) return;
+      const isClosed = sidebar.classList.contains('-translate-x-full');
+      if (isClosed) {
+        sidebar.classList.remove('-translate-x-full');
+        if (backdrop) backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        if (backdrop) backdrop.classList.add('hidden');
+      }
+    };
+
+    // Orders Display Mode: 'list' (table) vs 'grid'
+    window.currentOrdersDisplayMode = localStorage.getItem('tbc_orders_display_mode') || 'list';
+
+    window.setOrdersDisplayMode = function(mode) {
+      window.currentOrdersDisplayMode = mode;
+      try {
+        localStorage.setItem('tbc_orders_display_mode', mode);
+      } catch (_) {}
+
+      const btnList = document.getElementById('view-toggle-list-btn');
+      const btnGrid = document.getElementById('view-toggle-grid-btn');
+      const tableContainer = document.getElementById('orders-table-container');
+      const gridContainer = document.getElementById('orders-grid-container');
+
+      if (mode === 'grid') {
+        if (btnGrid) {
+          btnGrid.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-[#0f172a] text-white shadow-xs';
+        }
+        if (btnList) {
+          btnList.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-slate-600 hover:text-slate-900';
+        }
+        if (tableContainer) tableContainer.classList.add('hidden');
+        if (gridContainer) gridContainer.classList.remove('hidden');
+      } else {
+        if (btnList) {
+          btnList.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-[#0f172a] text-white shadow-xs';
+        }
+        if (btnGrid) {
+          btnGrid.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-slate-600 hover:text-slate-900';
+        }
+        if (tableContainer) tableContainer.classList.remove('hidden');
+        if (gridContainer) gridContainer.classList.add('hidden');
+      }
+
+      renderTableView();
+    };
+
+    // RENDER VIEW 1: TABLE & GRID
     function renderTableView() {
       const shimmer = document.getElementById('table-shimmer');
       const wrapper = document.getElementById('table-content-wrapper');
       const tbody = document.getElementById('orders-table-body');
+      const gridContainer = document.getElementById('orders-grid-container');
+      const tableContainer = document.getElementById('orders-table-container');
       const emptyState = document.getElementById('table-empty-state');
       const queueBadge = document.getElementById('queue-count-badge');
 
@@ -756,14 +1056,23 @@
       const filtered = getFilteredOrders();
       if (queueBadge) queueBadge.textContent = filtered.length;
 
+      // Update Sidebar pending counter
+      const sideBadge = document.getElementById('sidebar-order-badge');
+      if (sideBadge) {
+        const pendingCount = (window.liveOrders || []).filter(o => canonicalStatus(o.status) === 'Pending').length;
+        sideBadge.textContent = pendingCount;
+      }
+
       if (!filtered || filtered.length === 0) {
         if (tbody) tbody.innerHTML = '';
+        if (gridContainer) gridContainer.innerHTML = '';
         if (emptyState) emptyState.classList.remove('hidden');
         return;
       }
 
       if (emptyState) emptyState.classList.add('hidden');
 
+      // 1. POPULATE TABLE (LIST VIEW)
       if (tbody) {
         tbody.innerHTML = filtered.map(o => {
           const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
@@ -814,6 +1123,92 @@
             </tr>
           `;
         }).join('');
+      }
+
+      // 2. POPULATE GRID VIEW
+      if (gridContainer) {
+        gridContainer.innerHTML = filtered.map(o => {
+          const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
+          const payLabel = isPaid ? 'RAZORPAY ONLINE' : (String(o.paymentMethod || '').toUpperCase().includes('COD') ? 'CASH ON DELIVERY' : 'ONLINE PAYMENT');
+          const curStatus = canonicalStatus(o.status).toUpperCase();
+
+          const statusColor = (curStatus === 'DELIVERED') 
+            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+            : (curStatus === 'CANCELLED' 
+              ? 'bg-rose-50 text-rose-700 border-rose-200' 
+              : 'bg-slate-50 text-slate-700 border-slate-200');
+
+          return `
+            <div onclick="openOrderDetail('${o.id}')" class="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-400 p-4.5 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-3.5 group">
+              <!-- Header -->
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <span class="font-mono font-bold text-xs text-slate-800 group-hover:text-blue-600 transition block truncate">
+                    #${o.id}
+                  </span>
+                  <span class="text-[10px] text-slate-400 font-medium tracking-wide uppercase block mt-0.5">
+                    ${o.dateShort}
+                  </span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider border shrink-0 ${statusColor}">
+                  ${curStatus}
+                </span>
+              </div>
+
+              <!-- Customer Details -->
+              <div class="flex items-center gap-2.5 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
+                <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 font-bold text-[11px] flex items-center justify-center shrink-0">
+                  ${(o.customerName || 'C').charAt(0).toUpperCase()}
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h4 class="font-bold text-xs text-slate-900 uppercase truncate">${o.customerName}</h4>
+                  <p class="text-[10px] text-slate-400 truncate">${o.phone || 'No phone'}</p>
+                </div>
+              </div>
+
+              <!-- Items Summary -->
+              <div class="space-y-0.5">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">ITEMS</span>
+                <p class="text-xs font-semibold text-slate-700 uppercase line-clamp-2" title="${o.productsSummary}">
+                  ${o.productsSummary}
+                </p>
+              </div>
+
+              <!-- Price & Payment -->
+              <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div>
+                  <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">TOTAL</span>
+                  <span class="text-sm font-extrabold text-blue-600 block">
+                    ₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}
+                  </span>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold text-slate-500 bg-slate-50 border border-slate-200 uppercase tracking-wider truncate max-w-[120px]" title="${payLabel}">
+                  ${payLabel}
+                </span>
+              </div>
+
+              <!-- Bottom Actions -->
+              <div class="flex items-center justify-between pt-1" onclick="event.stopPropagation()">
+                <button type="button" onclick="confirmDeleteOrder('${o.id}', event)" class="text-rose-400 hover:text-rose-600 p-1 rounded-md hover:bg-rose-50 transition cursor-pointer" title="Delete Order">
+                  <span class="material-symbols-outlined text-[17px]">delete</span>
+                </button>
+                <button type="button" onclick="openOrderDetail('${o.id}')" class="text-xs font-bold text-slate-700 hover:text-black flex items-center gap-1 group-hover:translate-x-0.5 transition cursor-pointer">
+                  <span>Milestones</span>
+                  <span class="font-bold text-sm">&gt;</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Display container based on active mode
+      if (window.currentOrdersDisplayMode === 'grid') {
+        if (tableContainer) tableContainer.classList.add('hidden');
+        if (gridContainer) gridContainer.classList.remove('hidden');
+      } else {
+        if (tableContainer) tableContainer.classList.remove('hidden');
+        if (gridContainer) gridContainer.classList.add('hidden');
       }
 
       if (window.lucide && typeof window.lucide.createIcons === 'function') {
@@ -1135,40 +1530,48 @@
       if (!printArea) return;
 
       printArea.innerHTML = `
-        <div style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; color: #111;">
-          <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="font-family: sans-serif; padding: 24px; max-width: 650px; margin: 0 auto; color: #111; background: #fff;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px;">
             <div>
-              <h1 style="font-size: 20px; font-weight: bold; margin: 0;">The Baniyan Company</h1>
-              <p style="font-size: 11px; color: #666; margin: 2px 0 0 0;">Official Order Tax Invoice</p>
+              <h1 style="font-size: 20px; font-weight: 800; margin: 0; text-transform: uppercase;">THE BANIYAN COMPANY</h1>
+              <p style="font-size: 11px; color: #475569; margin: 4px 0 0 0; line-height: 1.4;">
+                No: 164, Kamarajar Road, Coimbatore 641015, Tamil Nadu, India<br>
+                Phone: +91 8110061611
+              </p>
             </div>
             <div style="text-align: right;">
-              <p style="font-size: 13px; font-weight: bold; margin: 0;">#${order.id}</p>
+              <div style="display: flex; align-items: center; gap: 6px; justify-content: flex-end; margin-bottom: 8px;">
+                <span style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase;">Powered By</span>
+                <span style="font-size: 11px; font-weight: 800; color: #0f172a;">OneSpace <span style="color:#10b981;">Commerce</span></span>
+                <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce" style="height: 22px; width: 22px; object-fit: contain;">
+              </div>
+              <p style="font-size: 14px; font-weight: 800; margin: 0;">#${order.id}</p>
               <p style="font-size: 11px; color: #666; margin: 2px 0 0 0;">${order.dateLong}</p>
             </div>
           </div>
 
-          <div style="margin-bottom: 16px; font-size: 12px;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 12px; line-height: 1.6;">
             <p style="margin: 0;"><strong>Billed To:</strong> ${order.customerName}</p>
-            <p style="margin: 2px 0;"><strong>Phone:</strong> ${order.phone}</p>
+            <p style="margin: 2px 0;"><strong>Phone:</strong> ${order.phone || 'N/A'}</p>
             <p style="margin: 2px 0;"><strong>Address:</strong> ${order.address}</p>
           </div>
 
           <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px;">
             <thead>
               <tr style="border-bottom: 1px solid #ddd; text-align: left;">
-                <th style="padding: 6px 0;">Item</th>
-                <th style="padding: 6px 0; text-align: center;">Size</th>
-                <th style="padding: 6px 0; text-align: center;">Qty</th>
-                <th style="padding: 6px 0; text-align: right;">Price</th>
+                <th style="padding: 8px 0;">Item</th>
+                <th style="padding: 8px 0; text-align: center;">Size</th>
+                <th style="padding: 8px 0; text-align: center;">Qty</th>
+                <th style="padding: 8px 0; text-align: right;">Price</th>
               </tr>
             </thead>
             <tbody>
               ${(order.items || []).map(i => `
                 <tr style="border-bottom: 1px solid #eee;">
-                  <td style="padding: 8px 0;">${i.name}</td>
+                  <td style="padding: 8px 0; font-weight: 600;">${i.name}</td>
                   <td style="padding: 8px 0; text-align: center;">${i.size}</td>
                   <td style="padding: 8px 0; text-align: center;">${i.qty}</td>
-                  <td style="padding: 8px 0; text-align: right;">₹${i.price}</td>
+                  <td style="padding: 8px 0; text-align: right; font-weight: 600;">₹${i.price}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -1177,7 +1580,7 @@
           <div style="text-align: right; font-size: 13px; margin-top: 10px;">
             <p style="margin: 2px 0;">Subtotal: <strong>₹${order.subtotal}</strong></p>
             <p style="margin: 2px 0;">Delivery: <strong>₹${order.deliveryCharge}</strong></p>
-            <p style="font-size: 16px; margin: 6px 0; font-weight: bold;">Grand Total: ₹${order.totalAmount}</p>
+            <p style="font-size: 16px; margin: 6px 0; font-weight: 800; color: #000;">Grand Total: ₹${order.totalAmount}</p>
             <p style="font-size: 11px; color: #666;">Payment: ${order.paymentMethod} (${order.paymentStatus})</p>
           </div>
         </div>
@@ -1199,15 +1602,42 @@
       if (!printArea) return;
 
       printArea.innerHTML = `
-        <div style="font-family: sans-serif; padding: 24px; border: 2px dashed #000; max-width: 450px; margin: 20px auto; border-radius: 8px;">
-          <h2 style="margin: 0 0 6px 0; font-size: 18px; font-weight: bold;">SHIP TO:</h2>
-          <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: bold; text-transform: uppercase;">${order.customerName}</h3>
-          <p style="margin: 0 0 4px 0; font-size: 13px;">📞 ${order.phone}</p>
-          <p style="margin: 0 0 16px 0; font-size: 12px; line-height: 1.5;">${order.address}</p>
-          
-          <div style="border-top: 1px solid #000; padding-top: 10px; display: flex; justify-content: space-between; font-size: 12px;">
-            <span>PKG: <strong>${(order.items || []).length} Item(s)</strong></span>
-            <span>ORDER: <strong>#${order.id}</strong></span>
+        <div style="font-family: sans-serif; padding: 24px; border: 2px solid #000; max-width: 480px; margin: 20px auto; border-radius: 12px; background: #ffffff; color: #000;">
+          <!-- Top Header Strip: Brand + Powered by OneSpace Commerce in Top Right -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px;">
+            <div>
+              <h2 style="margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 0.5px;">THE BANIYAN COMPANY</h2>
+              <p style="margin: 2px 0 0 0; font-size: 10px; font-weight: 800; color: #64748b; tracking-wider: 1px; uppercase">SHIPPING LABEL</p>
+            </div>
+            <div style="text-align: right; display: flex; align-items: center; gap: 6px; justify-content: flex-end;">
+              <div style="text-align: right;">
+                <span style="font-size: 9px; color: #64748b; font-weight: 700; display: block; text-transform: uppercase;">Powered By</span>
+                <span style="font-size: 11px; font-weight: 800; color: #0f172a;">OneSpace <span style="color:#10b981;">Commerce</span></span>
+              </div>
+              <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" style="height: 24px; width: 24px; object-fit: contain;">
+            </div>
+          </div>
+
+          <!-- SHIP FROM Box -->
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 11px; line-height: 1.5;">
+            <p style="margin: 0; font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">SHIP FROM:</p>
+            <p style="margin: 2px 0 0 0; font-weight: 800; font-size: 12px; color: #0f172a;">THE BANIYAN COMPANY</p>
+            <p style="margin: 1px 0 0 0; font-weight: 700; color: #1e293b;">📞 +91 8110061611</p>
+            <p style="margin: 1px 0 0 0; color: #334155;">No: 164, Kamarajar Road, Coimbatore 641015, Tamil Nadu, India</p>
+          </div>
+
+          <!-- SHIP TO Box -->
+          <div style="margin-bottom: 16px; font-size: 12px; line-height: 1.5; padding: 4px 0;">
+            <p style="margin: 0; font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">SHIP TO:</p>
+            <h3 style="margin: 2px 0 0 0; font-size: 16px; font-weight: 800; text-transform: uppercase; color: #000;">${order.customerName}</h3>
+            <p style="margin: 2px 0 0 0; font-weight: 700; color: #000;">📞 ${order.phone || 'N/A'}</p>
+            <p style="margin: 4px 0 0 0; color: #1e293b; font-size: 12px; line-height: 1.5; font-weight: 500;">${order.address}</p>
+          </div>
+
+          <!-- Order Summary Footer -->
+          <div style="border-top: 2px solid #000; padding-top: 10px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 800;">
+            <span>PKG: ${(order.items || []).length} Item(s)</span>
+            <span>ORDER: #${order.id}</span>
           </div>
         </div>
       `;
