@@ -258,6 +258,9 @@
       <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3">
         <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
           <div class="flex items-center gap-3">
+            <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-700 bg-slate-100 hover:bg-slate-200 p-2 rounded-xl border border-slate-200 flex items-center justify-center transition-colors shadow-2xs" aria-label="Open Menu">
+              <span class="material-symbols-outlined text-xl">menu</span>
+            </button>
             <div class="flex items-center gap-2.5">
               <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" class="h-8 w-8 object-contain rounded-xl p-0.5 bg-white border border-slate-200/80 shadow-2xs shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
               <div>
@@ -837,6 +840,8 @@
        APPLICATION LOGIC & FIRESTORE INTEGRATION (100% Real Data)
   ========================================================================= -->
   <script type="module">
+    import { db } from './js/firebase-config.js';
+    import { doc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
     import { 
       COMPANY_ID,
       getCachedOrders,
@@ -847,7 +852,7 @@
       deleteOnlineOrder
     } from './js/products-service.js';
 
-    // Application State & Seen Orders Tracking
+    // Application State & Seen Orders Tracking (Database-backed)
     window.liveOrders = [];
     window.activeQueueFilter = 'all';
     window.searchQuery = '';
@@ -855,39 +860,99 @@
     window.seenOrderIds = new Set(JSON.parse(localStorage.getItem('tbc_seen_orders') || '[]'));
 
     window.isOrderSeen = function(id) {
-      return window.seenOrderIds.has(String(id));
-    };
-
-    window.markOrderSeen = function(id) {
-      window.seenOrderIds.add(String(id));
-      try {
-        localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
-      } catch (_) {}
-      renderTableView();
-    };
-
-    window.toggleOrderSeen = function(id, event) {
-      if (event) event.stopPropagation();
       const strId = String(id);
-      if (window.seenOrderIds.has(strId)) {
-        window.seenOrderIds.delete(strId);
-      } else {
-        window.seenOrderIds.add(strId);
+      const order = (window.liveOrders || []).find(o => String(o.id) === strId);
+      if (order && order.isSeen !== undefined) {
+        return Boolean(order.isSeen);
+      }
+      return window.seenOrderIds.has(strId);
+    };
+
+    window.markOrderSeen = async function(id) {
+      const strId = String(id);
+      window.seenOrderIds.add(strId);
+      const order = (window.liveOrders || []).find(o => String(o.id) === strId);
+      if (order) {
+        order.isSeen = true;
+        order.seen = true;
       }
       try {
         localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
       } catch (_) {}
       renderTableView();
+
+      try {
+        const updatePayload = { isSeen: true, seen: true, updatedAt: serverTimestamp() };
+        const ref1 = doc(db, `companies/${COMPANY_ID}/orders`, strId);
+        const ref2 = doc(db, `companies/${COMPANY_ID}/invoices`, strId);
+        await Promise.allSettled([
+          updateDoc(ref1, updatePayload),
+          updateDoc(ref2, updatePayload)
+        ]);
+      } catch (err) {
+        console.warn('Database markOrderSeen notice:', err);
+      }
     };
 
-    window.markAllOrdersSeen = function() {
-      const filtered = getFilteredOrders();
-      if (!filtered || filtered.length === 0) return;
-      filtered.forEach(o => window.seenOrderIds.add(String(o.id)));
+    window.toggleOrderSeen = async function(id, event) {
+      if (event) event.stopPropagation();
+      const strId = String(id);
+      const order = (window.liveOrders || []).find(o => String(o.id) === strId);
+      const currentSeen = order && order.isSeen !== undefined ? Boolean(order.isSeen) : window.seenOrderIds.has(strId);
+      const newSeenState = !currentSeen;
+
+      if (order) {
+        order.isSeen = newSeenState;
+        order.seen = newSeenState;
+      }
+      if (newSeenState) {
+        window.seenOrderIds.add(strId);
+      } else {
+        window.seenOrderIds.delete(strId);
+      }
       try {
         localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
       } catch (_) {}
       renderTableView();
+
+      try {
+        const updatePayload = { isSeen: newSeenState, seen: newSeenState, updatedAt: serverTimestamp() };
+        const ref1 = doc(db, `companies/${COMPANY_ID}/orders`, strId);
+        const ref2 = doc(db, `companies/${COMPANY_ID}/invoices`, strId);
+        await Promise.allSettled([
+          updateDoc(ref1, updatePayload),
+          updateDoc(ref2, updatePayload)
+        ]);
+      } catch (err) {
+        console.warn('Database toggleOrderSeen notice:', err);
+      }
+    };
+
+    window.markAllOrdersSeen = async function() {
+      const filtered = getFilteredOrders();
+      if (!filtered || filtered.length === 0) return;
+
+      filtered.forEach(o => {
+        const strId = String(o.id);
+        o.isSeen = true;
+        o.seen = true;
+        window.seenOrderIds.add(strId);
+      });
+      try {
+        localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
+      } catch (_) {}
+      renderTableView();
+
+      const updatePayload = { isSeen: true, seen: true, updatedAt: serverTimestamp() };
+      await Promise.allSettled(filtered.map(o => {
+        const strId = String(o.id);
+        const ref1 = doc(db, `companies/${COMPANY_ID}/orders`, strId);
+        const ref2 = doc(db, `companies/${COMPANY_ID}/invoices`, strId);
+        return Promise.allSettled([
+          updateDoc(ref1, updatePayload),
+          updateDoc(ref2, updatePayload)
+        ]);
+      }));
     };
 
     // Universal status mapper to canonical stages
@@ -965,6 +1030,8 @@
       const subtotal = Number(data.pricing?.subtotal ?? (total - delivery));
       const discount = Number(data.pricing?.discountAmount ?? data.discount ?? 0);
 
+      const isSeenVal = data.isSeen !== undefined ? Boolean(data.isSeen) : (data.seen !== undefined ? Boolean(data.seen) : window.seenOrderIds.has(String(docId || data.id)));
+
       return {
         ...data,
         id: docId || data.id || data.orderId || data.invoiceId,
@@ -983,7 +1050,9 @@
         dateShort: dateShort.toUpperCase(),
         dateLong: dateLong.toUpperCase(),
         timestamp: rawTs,
-        items: cleanItems
+        items: cleanItems,
+        isSeen: isSeenVal,
+        seen: isSeenVal
       };
     }
 

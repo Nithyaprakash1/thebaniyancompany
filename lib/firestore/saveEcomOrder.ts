@@ -72,6 +72,8 @@ export async function saveEcomOrder(input: EcomOrderInput): Promise<string> {
     totalAmount: input.totalAmount,
     paymentMethod: input.paymentMethod,
     paymentStatus: input.paymentStatus,
+    isSeen: false,
+    seen: false,
     stockAdjusted: input.stockAdjusted !== undefined ? input.stockAdjusted : false,
     createdAt: serverTimestamp(),
   };
