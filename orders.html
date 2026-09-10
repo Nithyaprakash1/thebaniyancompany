@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orders &amp; Shipping | OneSpace Commerce</title>
+  <title>Orders &amp; Milestones | OneSpace Commerce</title>
   <link rel="icon" type="image/png" href="assets/onespace-commerce-logo.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -15,11 +15,12 @@
   <style>
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f6f6f7;
+      background-color: #f6f8fa;
+      color: #0f172a;
     }
     .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
       background: #f1f5f9;
@@ -27,44 +28,6 @@
     .custom-scrollbar::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 9999px;
-    }
-    /* Dark Obsidian iOS-Style Sidebar Navigation */
-    .sidebar-nav-btn {
-      color: #94a3b8;
-      background-color: transparent;
-      border-radius: 12px;
-      font-weight: 400;
-      border: 1px solid transparent;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .sidebar-nav-btn:hover:not(.active) {
-      background-color: #161822;
-      color: #ffffff;
-      border-color: #232736;
-      transform: translateX(2px);
-    }
-
-    .sidebar-nav-btn.active {
-      background-color: #191b26;
-      color: #ffffff;
-      font-weight: 500;
-      border-color: #2c3042;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-    }
-
-    .sidebar-nav-btn .nav-chevron {
-      opacity: 0;
-      transition: all 0.2s ease;
-    }
-
-    .sidebar-nav-btn.active .nav-chevron {
-      opacity: 0.6;
-    }
-
-    .sidebar-nav-btn:hover .nav-chevron {
-      opacity: 0.9;
-      transform: translateX(1px);
     }
 
     /* Skeleton Shimmer Loading Animation */
@@ -78,545 +41,544 @@
       animation: shimmerAnim 1.5s infinite;
       border-radius: 8px;
     }
+
+    /* Print Stylesheet for Invoices & Labels */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-invoice-area, #print-invoice-area * {
+        visibility: visible;
+      }
+      #print-invoice-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white;
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 
-<body class="bg-[#fafafa] text-slate-900 antialiased min-h-screen">
+<body class="bg-[#f6f8fa] text-slate-900 antialiased min-h-screen">
 
-  <div class="min-h-screen flex flex-col md:flex-row">
+  <!-- =========================================================================
+       VIEW 1: ORDERS TABLE & DELIVERY MILESTONES (Screenshot 1)
+  ========================================================================= -->
+  <div id="orders-table-view" class="block min-h-screen p-4 sm:p-8 max-w-[1440px] mx-auto space-y-6">
 
-    <!-- Mobile Drawer Backdrop -->
-    <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 hidden md:hidden"></div>
-
-    <!-- LEFT SIDEBAR MENU (Dark Obsidian iOS-Style Theme) -->
-    <aside id="admin-sidebar" class="fixed md:sticky top-0 left-0 bottom-0 z-50 w-64 bg-[#0b0d13] border-r border-[#1a1c25] flex flex-col justify-between transition-transform duration-300 -translate-x-full md:translate-x-0 h-screen text-white shrink-0">
-      <div class="flex-1 min-h-0 flex flex-col">
-        <!-- Brand & Logo Header -->
-        <div class="p-4 border-b border-[#1a1c25] space-y-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <img src="assets/onespace-commerce-logo.png" id="sidebar-logo-img" alt="OneSpace Commerce" class="h-8 w-8 object-contain rounded-lg p-0.5 bg-white/5 border border-white/10" onerror="this.src='assets/Onespace Commerce Logo PNG.png';">
-              <div class="flex items-baseline gap-1">
-                <span class="text-sm font-medium text-white tracking-tight">OneSpace</span>
-                <span class="text-sm font-medium text-emerald-400 tracking-tight">Commerce</span>
-              </div>
-            </div>
-            <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">
-              <span class="material-symbols-outlined text-lg">close</span>
-            </button>
-          </div>
-
-          <!-- Shop Capsule Pill (The Baniyan Company with Logo) -->
-          <div class="w-full bg-[#151720] border border-[#222634] rounded-xl px-3 py-2 flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <img id="sidebar-shop-logo-img" src="assets/tbclogo.jpeg" alt="TBC" class="w-6 h-6 rounded-full object-cover border border-white/20 shrink-0" onerror="this.src='assets/tbclogo.jpeg';">
-              <span class="text-[11px] font-medium tracking-wider text-slate-200 uppercase truncate" id="sidebar-shop-name">THE BANIYAN COMPANY</span>
-            </div>
-            <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
-          </div>
-        </div>
-
-        <!-- Vertical Side Navigation Menu (Exact Order) -->
-        <nav class="p-3 space-y-1 overflow-y-auto custom-scrollbar flex-1">
-          <!-- 1. Home -->
-          <a href="admin.html?tab=dashboard" class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-emerald-400">grid_view</span>
-              <span>Home</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-
-          <!-- 2. Orders (ACTIVE) -->
-          <a href="orders.html" class="sidebar-nav-btn active w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-blue-400">local_shipping</span>
-              <span>Orders</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-
-          <!-- 3. Products -->
-          <a href="admin.html?tab=products" class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-amber-400">inventory_2</span>
-              <span>Products</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-
-          <!-- 4. Stock Check -->
-          <a href="stock-availabilities.html" class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-emerald-400">check_circle</span>
-              <span>Stock Check</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-
-          <!-- 5. Customers -->
-          <a href="admin.html?tab=customers" class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-purple-400">group</span>
-              <span>Customers</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-
-          <!-- 6. Payments -->
-          <a href="admin.html?tab=payments" class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-teal-400">payments</span>
-              <span>Payments</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-
-          <!-- 7. Returns -->
-          <a href="admin.html?tab=returns" class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-rose-400">published_with_changes</span>
-              <span>Returns</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-
-          <!-- 8. Reels & Photos -->
-          <a href="admin.html?tab=reels" class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-pink-400">movie</span>
-              <span>Reels &amp; Photos</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-
-          <!-- 9. Website Banners -->
-          <a href="banners.html" class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-indigo-400">view_carousel</span>
-              <span>Website Banners</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-
-          <!-- 10. Store Settings -->
-          <a href="admin.html?tab=settings" class="sidebar-nav-btn w-full px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[19px] text-slate-400">settings</span>
-              <span>Store Settings</span>
-            </div>
-            <span class="material-symbols-outlined text-sm nav-chevron text-slate-400">chevron_right</span>
-          </a>
-        </nav>
-      </div>
-
-      <!-- Sidebar Footer -->
-      <div class="p-3.5 border-t border-[#1a1c25] space-y-2 bg-[#0b0d13]">
-        <a href="home.html" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-[#151720] hover:bg-[#1e2230] text-xs font-normal text-slate-200 transition-all flex items-center justify-center gap-2 border border-[#232736]">
-          <span class="material-symbols-outlined text-base text-slate-400">visibility</span> View Storefront
-        </a>
-        <button onclick="logoutAdmin()" class="w-full py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-normal transition-all border border-rose-500/20 flex items-center justify-center gap-2 cursor-pointer">
-          <span class="material-symbols-outlined text-base">logout</span> Logout
-        </button>
-      </div>
-    </aside>
-
-    <!-- RIGHT CONTENT AREA -->
-    <div class="flex-1 min-w-0 flex flex-col min-h-screen">
-      
-      <!-- Top Header Bar -->
-      <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          
-          <div class="flex items-center gap-2.5">
-            <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 rounded-lg bg-slate-100 text-slate-800">
-              <span class="material-symbols-outlined text-xl">menu</span>
-            </button>
-            <div>
-              <span class="font-bold text-base tracking-tight text-slate-900 block leading-tight">Orders &amp; Logistics</span>
-              <span class="text-[11px] text-slate-400 font-medium hidden sm:block">The Baniyan Company</span>
-            </div>
-          </div>
-
-          <!-- Right Header Actions -->
-          <div class="flex items-center gap-2.5 sm:gap-3">
-            <a
-              href="admin.html"
-              class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition shadow-xs"
-            >
-              <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
-              <span>Dashboard</span>
-            </a>
-
-            <a
-              href="home.html"
-              target="_blank"
-              class="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium px-3 py-2 rounded-xl hidden sm:flex items-center gap-1.5 transition"
-            >
-              <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-500"></i>
-              <span>View Store</span>
-            </a>
-          </div>
-        </div>
-      </header>
-
-  <!-- ==========================================
-       MAIN CONTENT CONTAINER
-  ========================================== -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-6">
-
-    <!-- PAGE HEADER -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <!-- TOP HEADER -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
       <div>
-        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Orders &amp; Shipping</h1>
-        <p class="text-xs text-slate-500 mt-0.5">Full pipeline fulfillment: from new pending orders to packing, delivery, and returns.</p>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight uppercase">ORDERS</h1>
+        <p class="text-[10px] sm:text-[11px] font-bold tracking-widest text-slate-400 mt-0.5 uppercase">DELIVERY MILESTONES</p>
       </div>
 
-      <div class="flex items-center gap-2 flex-wrap">
-        <div id="sync-status-indicator" class="hidden sm:inline-flex items-center gap-2 text-[11px] font-medium text-slate-600 bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-2xs">
-          <span id="sync-pulse-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span id="sync-status-text">Auto-sync: 1 min</span>
-        </div>
-
-        <a
-          href="create-order.html"
-          class="bg-black hover:bg-neutral-800 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5 shrink-0"
+      <!-- Action Buttons & Status Queue Pills -->
+      <div class="flex items-center gap-2 flex-wrap lg:justify-end">
+        
+        <!-- Utility Buttons: IMPORT, EXPORT, DELETE ALL -->
+        <button
+          type="button"
+          onclick="triggerImportOrders()"
+          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0"
         >
-          <span class="material-symbols-outlined text-base">add_circle</span>
-          <span>Create Order</span>
-        </a>
-
-        <a
-          href="stock-availabilities.html"
-          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-3 py-2.5 rounded-xl transition shadow-2xs flex items-center gap-1.5 shrink-0"
-        >
-          <i data-lucide="boxes" class="w-3.5 h-3.5"></i>
-          <span>Stock</span>
-        </a>
+          <span class="material-symbols-outlined text-[16px] text-slate-600">file_download</span>
+          <span>IMPORT</span>
+        </button>
 
         <button
           type="button"
-          id="refresh-feed-btn"
-          onclick="refreshOrdersFeed()"
-          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold px-3 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-2xs cursor-pointer shrink-0"
+          onclick="exportOrdersToCSV()"
+          class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0"
         >
-          <i data-lucide="refresh-cw" id="refresh-icon" class="w-3.5 h-3.5"></i>
-          <span id="refresh-btn-label">Refresh</span>
+          <span class="material-symbols-outlined text-[16px] text-slate-600">file_upload</span>
+          <span>EXPORT</span>
         </button>
+
+        <button
+          type="button"
+          onclick="confirmDeleteAllOrders()"
+          class="bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-500 text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0"
+        >
+          <span class="material-symbols-outlined text-[16px] text-rose-500">delete</span>
+          <span>DELETE ALL</span>
+        </button>
+
+        <!-- Status Queue Pills (Matching Screenshot 1) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-1">
+          <button
+            type="button"
+            onclick="setQueueFilter('all')"
+            id="tab-queue-all"
+            class="queue-tab-btn bg-[#0f172a] text-white font-bold rounded-full px-4 py-1.5 text-xs shadow-xs shrink-0 transition"
+          >
+            ALL QUEUE
+          </button>
+
+          <button
+            type="button"
+            onclick="setQueueFilter('awaiting_acceptance')"
+            id="tab-queue-awaiting_acceptance"
+            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+          >
+            AWAITING ACCEPTANCE
+          </button>
+
+          <button
+            type="button"
+            onclick="setQueueFilter('processing')"
+            id="tab-queue-processing"
+            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+          >
+            PROCESSING
+          </button>
+
+          <button
+            type="button"
+            onclick="setQueueFilter('packed')"
+            id="tab-queue-packed"
+            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+          >
+            PACKED
+          </button>
+
+          <button
+            type="button"
+            onclick="setQueueFilter('shipped')"
+            id="tab-queue-shipped"
+            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+          >
+            SHIPPED
+          </button>
+
+          <button
+            type="button"
+            onclick="setQueueFilter('out_for_delivery')"
+            id="tab-queue-out_for_delivery"
+            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+          >
+            OUT FOR DELIVERY
+          </button>
+
+          <button
+            type="button"
+            onclick="setQueueFilter('delivered')"
+            id="tab-queue-delivered"
+            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+          >
+            DELIVERED
+          </button>
+
+          <button
+            type="button"
+            onclick="setQueueFilter('cancelled')"
+            id="tab-queue-cancelled"
+            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+          >
+            CANCELLED
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- ==========================================
-         FILTERS: Search, Date Scope, View Mode, Status Pills
-    ========================================== -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+    <!-- MAIN ORDERS CARD (White background with table) -->
+    <div class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
       
-      <!-- Row 1: Search + Payment Filter + Sort -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5">
-        <div class="relative flex-1">
-          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+      <!-- Top Card Search Bar & Queue Live Indicator -->
+      <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
+        <div class="relative flex-1 max-w-md">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
           <input
             type="text"
-            id="table-order-search"
-            oninput="handleSearchOrders(this.value)"
-            placeholder="Search customer, phone, city, or order #..."
-            class="w-full bg-slate-50 border border-slate-200 focus:border-black focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2 outline-none transition"
+            id="order-search-input"
+            oninput="handleSearch(this.value)"
+            placeholder="FIND CLIENT, ID, ADDRESS..."
+            class="w-full bg-slate-50/70 border border-slate-200/80 focus:border-slate-400 focus:bg-white text-xs rounded-xl pl-9 pr-4 py-2.5 outline-none transition font-medium text-slate-800 placeholder:text-slate-400 uppercase tracking-wider"
           >
         </div>
 
-        <div class="flex items-center gap-2">
-          <!-- Payment Filter -->
-          <select
-            id="order-payment-filter"
-            onchange="applyOrderFilters()"
-            class="flex-1 sm:flex-initial bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
-          >
-            <option value="all">All Payments</option>
-            <option value="paid">Paid (Razorpay / Online)</option>
-            <option value="cod">COD (Pending)</option>
-            <option value="whatsapp">WhatsApp</option>
-          </select>
-
-          <!-- Sorter -->
-          <select
-            id="order-sort-filter"
-            onchange="applyOrderFilters()"
-            class="flex-1 sm:flex-initial bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 px-3 py-2 rounded-xl outline-none focus:border-black cursor-pointer"
-          >
-            <option value="newest">Sort: Newest</option>
-            <option value="oldest">Sort: Oldest</option>
-            <option value="amount_high">Amount (High)</option>
-            <option value="amount_low">Amount (Low)</option>
-          </select>
+        <div class="flex items-center gap-2 text-xs font-bold text-slate-400 tracking-wider uppercase shrink-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>QUEUE: <span id="queue-count-badge" class="text-slate-700">0</span> ITEMS</span>
         </div>
       </div>
 
-      <!-- Row 2: Date Scope (Today by Default!) & View Mode Toggle (Grid vs List) -->
-      <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
-        
-        <!-- Date Scope Pills -->
-        <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-0.5 flex-1 min-w-0" id="date-scope-group">
-          <button
-            type="button"
-            id="date-scope-today"
-            onclick="setDateScopeFilter('today')"
-            class="date-scope-btn px-2.5 py-1.5 rounded-xl text-xs font-bold transition bg-black text-white shrink-0 shadow-2xs flex items-center gap-1"
-          >
-            <span>Today</span>
-            <span id="badge-today-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-mono">0</span>
-          </button>
-
-          <button
-            type="button"
-            id="date-scope-yesterday"
-            onclick="setDateScopeFilter('yesterday')"
-            class="date-scope-btn px-2.5 py-1.5 rounded-xl text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0"
-          >
-            Yesterday
-          </button>
-
-          <button
-            type="button"
-            id="date-scope-week"
-            onclick="setDateScopeFilter('week')"
-            class="date-scope-btn px-2.5 py-1.5 rounded-xl text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0"
-          >
-            Week
-          </button>
-
-          <button
-            type="button"
-            id="date-scope-all"
-            onclick="setDateScopeFilter('all')"
-            class="date-scope-btn px-2.5 py-1.5 rounded-xl text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 flex items-center gap-1"
-          >
-            <span>All</span>
-            <span id="badge-all-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-700 font-mono">0</span>
-          </button>
-        </div>
-
-        <!-- View Mode Switcher: Grid View vs List View -->
-        <div class="inline-flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-200 shrink-0">
-          <button
-            type="button"
-            id="view-mode-grid-btn"
-            onclick="setViewMode('grid')"
-            class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-white text-slate-900 shadow-2xs"
-            title="Grid View (Optimized 2-Column Phone View)"
-          >
-            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
-            <span class="text-[11px]">Grid</span>
-          </button>
-          <button
-            type="button"
-            id="view-mode-list-btn"
-            onclick="setViewMode('list')"
-            class="px-2 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1 text-slate-500 hover:text-slate-900"
-            title="Detailed List View"
-          >
-            <i data-lucide="list" class="w-3.5 h-3.5"></i>
-            <span class="text-[11px]">List</span>
-          </button>
-        </div>
-
+      <!-- SKELETON SHIMMER LOADING PLACEHOLDER -->
+      <div id="table-shimmer" class="p-6 space-y-4">
+        <div class="h-10 skeleton-shimmer rounded-xl"></div>
+        <div class="h-14 skeleton-shimmer rounded-xl"></div>
+        <div class="h-14 skeleton-shimmer rounded-xl"></div>
+        <div class="h-14 skeleton-shimmer rounded-xl"></div>
+        <div class="h-14 skeleton-shimmer rounded-xl"></div>
       </div>
 
-      <!-- Row 3: 8 Status Pills -->
-      <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100 overflow-x-auto custom-scrollbar pb-1">
-        <button
-          type="button"
-          onclick="setOrderStatusFilter('all')"
-          id="btn-status-all"
-          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-black text-white shrink-0 transition"
-        >
-          All (<span id="count-all">0</span>)
-        </button>
+      <!-- ORDERS TABLE -->
+      <div id="table-content-wrapper" class="overflow-x-auto custom-scrollbar hidden">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/40">
+              <th class="py-3.5 px-4 w-10 text-center">
+                <span class="w-3.5 h-3.5 rounded-full border border-slate-300 inline-block"></span>
+              </th>
+              <th class="py-3.5 px-4 font-bold">ORDER ID</th>
+              <th class="py-3.5 px-4 font-bold">DATE</th>
+              <th class="py-3.5 px-4 font-bold">CUSTOMER</th>
+              <th class="py-3.5 px-4 font-bold">PRODUCTS</th>
+              <th class="py-3.5 px-4 font-bold">AMOUNT</th>
+              <th class="py-3.5 px-4 font-bold">PAYMENT METHOD</th>
+              <th class="py-3.5 px-4 font-bold text-center">STATUS</th>
+              <th class="py-3.5 px-4 font-bold text-right pr-6">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="orders-table-body" class="divide-y divide-slate-100 text-xs">
+            <!-- Dynamic Rows rendered from real Firestore orders -->
+          </tbody>
+        </table>
 
-        <button
-          type="button"
-          onclick="setOrderStatusFilter('pending')"
-          id="btn-status-pending"
-          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
-        >
-          Pending (<span id="count-pending">0</span>)
-        </button>
-
-        <button
-          type="button"
-          onclick="setOrderStatusFilter('accepted')"
-          id="btn-status-accepted"
-          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
-        >
-          Accepted (<span id="count-accepted">0</span>)
-        </button>
-
-        <button
-          type="button"
-          onclick="setOrderStatusFilter('packing')"
-          id="btn-status-packing"
-          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
-        >
-          Packing (<span id="count-packing">0</span>)
-        </button>
-
-        <button
-          type="button"
-          onclick="setOrderStatusFilter('shipped')"
-          id="btn-status-shipped"
-          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
-        >
-          Shipped (<span id="count-shipped">0</span>)
-        </button>
-
-        <button
-          type="button"
-          onclick="setOrderStatusFilter('delivered')"
-          id="btn-status-delivered"
-          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
-        >
-          Delivered (<span id="count-delivered">0</span>)
-        </button>
-
-        <button
-          type="button"
-          onclick="setOrderStatusFilter('cancelled')"
-          id="btn-status-cancelled"
-          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
-        >
-          Cancelled (<span id="count-cancelled">0</span>)
-        </button>
-
-        <button
-          type="button"
-          onclick="setOrderStatusFilter('returned')"
-          id="btn-status-returned"
-          class="order-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition"
-        >
-          Returned (<span id="count-returned">0</span>)
-        </button>
+        <!-- Empty State -->
+        <div id="table-empty-state" class="hidden p-16 text-center text-slate-400 space-y-2">
+          <i data-lucide="inbox" class="w-10 h-10 mx-auto text-slate-300 stroke-1"></i>
+          <p class="font-bold text-sm text-slate-700">No orders found in this queue</p>
+          <p class="text-xs text-slate-400">Try changing the status filter or search query.</p>
+        </div>
       </div>
 
     </div>
 
-    <!-- Friendly Notice when Today has 0 orders -->
-    <div id="today-empty-banner" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3 shadow-2xs">
-      <div class="flex items-center gap-2">
-        <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0"></i>
-        <span>No orders received yet today.</span>
-      </div>
-      <button type="button" onclick="setDateScopeFilter('all')" class="underline font-bold hover:text-amber-950 shrink-0 cursor-pointer">
-        View All Time Orders (<span id="banner-all-count">0</span>)
+    <!-- Centered Footer (Screenshot 1) -->
+    <div class="text-center py-4">
+      <p class="text-xs text-slate-400 font-medium tracking-wide">
+        Product of <span class="font-bold text-slate-600">OneSpace Technology</span>
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- =========================================================================
+       VIEW 2: ORDER DETAIL & TIMELINE VIEW (Screenshot 2)
+  ========================================================================= -->
+  <div id="order-detail-view" class="hidden min-h-screen p-4 sm:p-8 max-w-6xl mx-auto space-y-6">
+
+    <!-- Top: Back to Orders -->
+    <div>
+      <button
+        type="button"
+        onclick="closeOrderDetail()"
+        class="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer mb-3"
+      >
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        <span>Back to Orders</span>
       </button>
+
+      <!-- Order Title & Badges -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <h1 id="detail-order-id-title" class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">ORDER #ORD-...</h1>
+        <span id="detail-pay-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">PAID</span>
+        <span id="detail-status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-600 border border-amber-200">ACCEPTED</span>
+      </div>
+      <p id="detail-order-date-str" class="text-xs text-slate-400 font-medium mt-1 uppercase">10 SEP 2026, 3:24 AM</p>
     </div>
 
-    <!-- ==========================================
-         ORDERS LIST CONTAINER
-    ========================================== -->
-    <!-- Skeleton Shimmer Loading Placeholder -->
-    <div id="orders-shimmer-container" class="space-y-4">
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+    <!-- 2-COLUMN GRID (Left 2/3, Right 1/3) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- LEFT 2/3 COLUMN: Products Ordered & Order Timeline -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- 1. PRODUCTS ORDERED CARD -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">PRODUCTS ORDERED</h2>
+
+          <!-- Dynamic Products List -->
+          <div id="detail-products-container" class="divide-y divide-slate-100">
+            <!-- Rendered from real items -->
+          </div>
+
+          <!-- Price Calculation Rows -->
+          <div class="border-t border-slate-100 pt-3 space-y-2 text-xs">
+            <div class="flex justify-between items-center text-slate-600 font-medium">
+              <span>Subtotal</span>
+              <span id="detail-subtotal-val" class="font-semibold text-slate-900">₹0</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-600 font-medium">
+              <span>Delivery Charge</span>
+              <span id="detail-delivery-val" class="font-semibold text-slate-900">₹0</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-600 font-medium" id="detail-discount-row">
+              <span>Discount</span>
+              <span id="detail-discount-val" class="font-semibold text-emerald-600">-₹0</span>
+            </div>
+            <div class="border-t border-slate-100 pt-2.5 flex justify-between items-center">
+              <span class="font-bold text-sm text-slate-900">Total</span>
+              <span id="detail-total-val" class="font-extrabold text-base sm:text-lg text-slate-900">₹0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. ORDER TIMELINE CARD (Vertical Milestones with Progress Lines) -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">ORDER TIMELINE</h2>
+
+          <div class="py-2 pl-2 space-y-0" id="detail-timeline-container">
+            <!-- Step 1: ORDER PLACED -->
+            <div class="flex items-start gap-4 relative">
+              <div class="flex flex-col items-center">
+                <span id="step-node-1" class="w-6 h-6 rounded-full bg-emerald-50 border-2 border-emerald-500 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0">✓</span>
+                <span id="step-line-1" class="w-0.5 bg-emerald-500 h-9"></span>
+              </div>
+              <div class="pt-0.5">
+                <h4 class="text-xs font-bold text-slate-900 uppercase">ORDER PLACED</h4>
+                <p id="time-step-1" class="text-[11px] text-slate-400 font-medium">-</p>
+              </div>
+            </div>
+
+            <!-- Step 2: ORDER ACCEPTED -->
+            <div class="flex items-start gap-4 relative">
+              <div class="flex flex-col items-center">
+                <span id="step-node-2" class="w-6 h-6 rounded-full bg-emerald-50 border-2 border-emerald-500 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0">✓</span>
+                <span id="step-line-2" class="w-0.5 bg-slate-200 h-9"></span>
+              </div>
+              <div class="pt-0.5">
+                <h4 class="text-xs font-bold text-slate-900 uppercase">ORDER ACCEPTED</h4>
+                <p id="time-step-2" class="text-[11px] text-slate-400 font-medium">-</p>
+              </div>
+            </div>
+
+            <!-- Step 3: PACKING -->
+            <div class="flex items-start gap-4 relative">
+              <div class="flex flex-col items-center">
+                <span id="step-node-3" class="w-6 h-6 rounded-full bg-white border-2 border-slate-300 text-transparent flex items-center justify-center font-bold text-xs shrink-0">○</span>
+                <span id="step-line-3" class="w-0.5 bg-slate-200 h-9"></span>
+              </div>
+              <div class="pt-0.5">
+                <h4 class="text-xs font-bold text-slate-900 uppercase">PACKING</h4>
+                <p id="time-step-3" class="text-[11px] text-slate-400 font-medium">-</p>
+              </div>
+            </div>
+
+            <!-- Step 4: SHIPPED -->
+            <div class="flex items-start gap-4 relative">
+              <div class="flex flex-col items-center">
+                <span id="step-node-4" class="w-6 h-6 rounded-full bg-white border-2 border-slate-300 text-transparent flex items-center justify-center font-bold text-xs shrink-0">○</span>
+                <span id="step-line-4" class="w-0.5 bg-slate-200 h-9"></span>
+              </div>
+              <div class="pt-0.5">
+                <h4 class="text-xs font-bold text-slate-900 uppercase">SHIPPED</h4>
+                <p id="time-step-4" class="text-[11px] text-slate-400 font-medium">-</p>
+              </div>
+            </div>
+
+            <!-- Step 5: OUT FOR DELIVERY -->
+            <div class="flex items-start gap-4 relative">
+              <div class="flex flex-col items-center">
+                <span id="step-node-5" class="w-6 h-6 rounded-full bg-white border-2 border-slate-300 text-transparent flex items-center justify-center font-bold text-xs shrink-0">○</span>
+                <span id="step-line-5" class="w-0.5 bg-slate-200 h-9"></span>
+              </div>
+              <div class="pt-0.5">
+                <h4 class="text-xs font-bold text-slate-900 uppercase">OUT FOR DELIVERY</h4>
+                <p id="time-step-5" class="text-[11px] text-slate-400 font-medium">-</p>
+              </div>
+            </div>
+
+            <!-- Step 6: DELIVERED -->
+            <div class="flex items-start gap-4 relative">
+              <div class="flex flex-col items-center">
+                <span id="step-node-6" class="w-6 h-6 rounded-full bg-white border-2 border-slate-300 text-transparent flex items-center justify-center font-bold text-xs shrink-0">○</span>
+              </div>
+              <div class="pt-0.5">
+                <h4 class="text-xs font-bold text-slate-900 uppercase">DELIVERED</h4>
+                <p id="time-step-6" class="text-[11px] text-slate-400 font-medium">-</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT 1/3 COLUMN: Customer, Payment, Delivery -->
+      <div class="space-y-6">
+
+        <!-- 1. CUSTOMER CARD -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">CUSTOMER</h2>
+
           <div class="flex items-center gap-3">
-            <div class="h-6 w-28 skeleton-shimmer rounded-lg"></div>
-            <div class="h-4 w-32 skeleton-shimmer rounded-md"></div>
+            <div id="detail-cust-avatar" class="w-10 h-10 rounded-full bg-purple-100 text-purple-700 font-bold text-sm flex items-center justify-center shrink-0">
+              S
+            </div>
+            <div class="min-w-0">
+              <h3 id="detail-cust-name" class="text-sm font-bold text-slate-900 uppercase truncate">CUSTOMER</h3>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">CUSTOMER</p>
+            </div>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="h-6 w-20 skeleton-shimmer rounded-md"></div>
-            <div class="h-6 w-24 skeleton-shimmer rounded-full"></div>
+
+          <div class="border-t border-slate-100 pt-3 space-y-3 text-xs">
+            <div class="flex items-center gap-2 text-slate-600">
+              <i data-lucide="phone" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+              <a id="detail-cust-phone" href="#" class="font-medium text-slate-700 hover:text-black hover:underline">-</a>
+            </div>
+            <div class="flex items-start gap-2 text-slate-600">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5"></i>
+              <p id="detail-cust-address" class="leading-relaxed font-normal text-slate-600">-</p>
+            </div>
           </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div class="space-y-2">
-            <div class="h-3 w-16 skeleton-shimmer rounded"></div>
-            <div class="h-4 w-32 skeleton-shimmer rounded"></div>
-            <div class="h-3 w-24 skeleton-shimmer rounded"></div>
-          </div>
-          <div class="space-y-2 md:col-span-2">
-            <div class="h-3 w-20 skeleton-shimmer rounded"></div>
-            <div class="h-4 w-3/4 skeleton-shimmer rounded"></div>
+
+        <!-- 2. PAYMENT CARD -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs space-y-3.5">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">PAYMENT</h2>
+
+          <div class="space-y-2.5 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500">Method</span>
+              <span id="detail-pay-method-pill" class="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                ONLINE
+              </span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500">Status</span>
+              <span id="detail-pay-status-pill" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                PAID
+              </span>
+            </div>
+
+            <div class="flex justify-between items-center pt-1 border-t border-slate-100">
+              <span class="text-slate-500">Amount</span>
+              <span id="detail-pay-amount-val" class="font-bold text-sm text-slate-900">₹0</span>
+            </div>
           </div>
         </div>
+
+        <!-- 3. DELIVERY CARD -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs space-y-3">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">DELIVERY</h2>
+
+          <p id="detail-delivery-address-text" class="text-xs text-slate-600 leading-relaxed uppercase">
+            -
+          </p>
+
+          <div class="pt-2 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-blue-600">
+            <i data-lucide="truck" class="w-3.5 h-3.5 shrink-0"></i>
+            <span>Estimated: 1-3 business days</span>
+          </div>
+        </div>
+
       </div>
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div class="flex items-center gap-3">
-            <div class="h-6 w-28 skeleton-shimmer rounded-lg"></div>
-            <div class="h-4 w-32 skeleton-shimmer rounded-md"></div>
-          </div>
-          <div class="flex items-center gap-2">
-            <div class="h-6 w-20 skeleton-shimmer rounded-md"></div>
-            <div class="h-6 w-24 skeleton-shimmer rounded-full"></div>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div class="space-y-2">
-            <div class="h-3 w-16 skeleton-shimmer rounded"></div>
-            <div class="h-4 w-32 skeleton-shimmer rounded"></div>
-            <div class="h-3 w-24 skeleton-shimmer rounded"></div>
-          </div>
-          <div class="space-y-2 md:col-span-2">
-            <div class="h-3 w-20 skeleton-shimmer rounded"></div>
-            <div class="h-4 w-3/4 skeleton-shimmer rounded"></div>
-          </div>
-        </div>
+
+    </div>
+
+    <!-- BOTTOM FULL-WIDTH CARD: ORDER ACTIONS (Screenshot 2) -->
+    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">ORDER ACTIONS</h2>
+
+      <!-- 4 Primary Action Buttons in a Row -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <button
+          type="button"
+          onclick="performAction('Accepted')"
+          class="py-2.5 px-3 rounded-xl font-bold text-xs transition border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+        >
+          <span>✓</span>
+          <span>ACCEPT</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="performAction('Packing')"
+          class="py-2.5 px-3 rounded-xl font-bold text-xs transition border border-emerald-200/70 bg-emerald-50/50 hover:bg-emerald-100/80 text-emerald-800 flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+        >
+          <i data-lucide="package" class="w-3.5 h-3.5"></i>
+          <span>PACK ORDER</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="performAction('Shipped')"
+          class="py-2.5 px-3 rounded-xl font-bold text-xs transition border border-emerald-200/70 bg-emerald-50/50 hover:bg-emerald-100/80 text-emerald-800 flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+        >
+          <i data-lucide="truck" class="w-3.5 h-3.5"></i>
+          <span>MARK SHIPPED</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="performAction('Delivered')"
+          class="py-2.5 px-3 rounded-xl font-bold text-xs transition border border-emerald-200/70 bg-emerald-50/50 hover:bg-emerald-100/80 text-emerald-800 flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+        >
+          <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+          <span>MARK DELIVERED</span>
+        </button>
+      </div>
+
+      <!-- Secondary Links below -->
+      <div class="flex items-center gap-5 pt-3 border-t border-slate-100 flex-wrap text-xs font-semibold text-slate-600">
+        <button type="button" onclick="printOrderInvoice()" class="hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="printer" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Print Invoice</span>
+        </button>
+
+        <button type="button" onclick="printOrderInvoice()" class="hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Download PDF</span>
+        </button>
+
+        <button type="button" onclick="printShippingLabel()" class="hover:text-emerald-700 text-emerald-600 transition flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="tag" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>Print Label</span>
+        </button>
+
+        <button type="button" onclick="contactCustomer()" class="hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="phone" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Contact Customer</span>
+        </button>
+
+        <button type="button" onclick="cancelCurrentOrder()" class="text-rose-500 hover:text-rose-700 transition flex items-center gap-1 cursor-pointer ml-auto">
+          <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
+          <span>Cancel Order</span>
+        </button>
       </div>
     </div>
 
-    <div id="orders-cards-container" class="space-y-4">
-      <!-- Dynamic Order Cards will render here -->
-    </div>
+  </div>
 
-    <!-- Empty State -->
-    <div id="orders-empty-state" class="hidden bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-400 shadow-xs">
-      <i data-lucide="package-x" class="w-12 h-12 mx-auto mb-2 text-slate-300 stroke-1"></i>
-      <h3 class="font-bold text-sm text-slate-700">No orders found</h3>
-      <p class="text-xs text-slate-400 mt-1">There are no orders matching your selected status or date period.</p>
-    </div>
 
-    <!-- New Order Live Notification Toast -->
-    <div id="new-order-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 pointer-events-none transition-all duration-300 bg-[#0f172a] text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3.5 border border-slate-800 max-w-sm">
-      <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
-        <i data-lucide="bell-ring" class="w-4 h-4"></i>
-      </div>
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center justify-between gap-2">
-          <p class="text-xs font-bold text-white truncate" id="toast-order-title">New Order Received!</p>
-          <span class="text-[10px] text-emerald-400 font-mono font-bold" id="toast-order-amount">₹0</span>
-        </div>
-        <p class="text-[11px] text-slate-400 truncate" id="toast-order-desc">#ORD-...</p>
-      </div>
-    </div>
-  </main>
+  <!-- =========================================================================
+       PRINT AREA (Hidden on screen, visible during window.print())
+  ========================================================================= -->
+  <div id="print-invoice-area" class="hidden">
+    <!-- Populated dynamically before print -->
+  </div>
 
-  <!-- ==========================================
-       APPLICATION & FIRESTORE SCRIPT
-  ========================================== -->
+
+  <!-- =========================================================================
+       APPLICATION LOGIC & FIRESTORE INTEGRATION (100% Real Data)
+  ========================================================================= -->
   <script type="module">
     import { 
       COMPANY_ID,
       getCachedOrders,
-      getCachedOrdersInfo,
       setCachedOrders,
       fetchOnlineOrders,
       subscribeToOnlineOrders,
-      setOrderStatus
+      setOrderStatus,
+      deleteOnlineOrder
     } from './js/products-service.js';
 
-    // State
+    // Application State
     window.liveOrders = [];
-    window.activeOrderStatusFilter = 'all';
-    window.activeDateScope = 'today'; // Default to Today for speed and optimization!
-    window.activeOrderSearch = '';
-    window.activeViewMode = (window.innerWidth < 768) ? 'grid' : 'list'; // Default to Grid on mobile phones!
+    window.activeQueueFilter = 'all';
+    window.searchQuery = '';
+    window.currentViewingOrderId = null;
 
-    let isSyncing = false;
-    let syncIntervalTimer = null;
-    let lastSyncTimestamp = 0;
-
-    // Universal status mapper: maps all variants and aliases to the 7 core stages
+    // Universal status mapper to canonical stages
     function canonicalStatus(rawStatus) {
       const s = String(rawStatus || '').trim().toLowerCase();
-      if (!s || s === 'pending' || s === 'awaiting acceptance' || s === 'order placed' || s === 'placed' || s === 'new' || s === 'confirmed') {
+      if (!s || s === 'pending' || s === 'awaiting acceptance' || s === 'awaiting_acceptance' || s === 'order placed' || s === 'placed' || s === 'new' || s === 'confirmed') {
         return 'Pending';
       }
       if (s === 'accepted' || s === 'processing') {
@@ -625,8 +587,11 @@
       if (s === 'packing' || s === 'packed') {
         return 'Packing';
       }
-      if (s === 'shipped' || s === 'out for delivery' || s === 'in transit') {
+      if (s === 'shipped' || s === 'in transit') {
         return 'Shipped';
+      }
+      if (s === 'out for delivery' || s === 'out_for_delivery') {
+        return 'Out for Delivery';
       }
       if (s === 'delivered' || s === 'completed') {
         return 'Delivered';
@@ -640,22 +605,19 @@
       return 'Pending';
     }
 
-    // Clean order normalizer preserving all fields and metadata
+    // Normalizer for Firestore order doc
     function normalizeOrderDoc(docId, data = {}) {
-      let dateText = '';
-      if (data.createdAt?.seconds) {
-        const dt = new Date(data.createdAt.seconds * 1000);
-        dateText = dt.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-      } else if (data.orderDateStr) {
-        dateText = data.orderDateStr;
-      } else if (data.createdAt) {
-        try {
-          dateText = new Date(data.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-        } catch(e) {
-          dateText = 'Recently';
-        }
+      let dateShort = '';
+      let dateLong = '';
+      const rawTs = data.createdAt?.seconds ? data.createdAt.seconds * 1000 : (data.createdAt ? new Date(data.createdAt).getTime() : (data.timestamp || 0));
+
+      if (rawTs) {
+        const dt = new Date(rawTs);
+        dateShort = dt.toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
+        dateLong = dt.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
       } else {
-        dateText = 'Recently';
+        dateShort = 'Recently';
+        dateLong = 'Recently';
       }
 
       const rawStatus = data.orderStatus || data.status || 'Pending';
@@ -673,391 +635,183 @@
         imageUrl: i.imageUrl || i.image || (Array.isArray(i.imageUrls) ? i.imageUrls[0] : '') || 'https://placehold.co/80x100?text=Product'
       }));
 
+      // Combined products string for the table
+      const productsSummary = cleanItems.map(i => `${i.name}${i.qty > 1 ? ` (X${i.qty})` : ''}`).join(', ') || 'Online Order';
+
+      // Address construction
+      const street = data.shippingAddress?.addressLine1 || data.customerAddress || data.customerDetails?.address || '';
+      const city = data.shippingAddress?.city || data.city || data.customerDetails?.city || '';
+      const state = data.shippingAddress?.state || data.state || data.customerDetails?.state || '';
+      const pincode = data.shippingAddress?.pincode || data.pincode || data.customerDetails?.pincode || '';
+      const fullAddress = [street, city, state, pincode].filter(Boolean).join(', ') || 'Standard Delivery';
+
+      const total = Number(data.pricing?.total ?? data.totalAmount ?? data.finalAmount ?? data.grandTotal ?? 0);
+      const delivery = Number(data.pricing?.deliveryCharge ?? data.deliveryCharge ?? 0);
+      const subtotal = Number(data.pricing?.subtotal ?? (total - delivery));
+      const discount = Number(data.pricing?.discountAmount ?? data.discount ?? 0);
+
       return {
         ...data,
         id: docId || data.id || data.orderId || data.invoiceId,
         customerName: data.customer?.name || data.customerName || data.customerDetails?.name || 'Customer',
-        phone: data.customer?.phone || data.customerPhoneNumber || data.customerPhone || 'Not provided',
+        phone: data.customer?.phone || data.customerPhoneNumber || data.customerPhone || '',
         email: data.customer?.email || data.customerEmail || '',
-        address: data.shippingAddress?.addressLine1 || data.customerAddress || data.customerDetails?.address || '',
-        city: data.shippingAddress?.city || data.city || data.customerDetails?.city || '',
-        state: data.shippingAddress?.state || data.state || data.customerDetails?.state || '',
-        pincode: data.shippingAddress?.pincode || data.pincode || data.customerDetails?.pincode || '',
-        totalAmount: Number(data.pricing?.total ?? data.totalAmount ?? data.finalAmount ?? data.grandTotal ?? 0),
+        address: fullAddress,
+        totalAmount: total,
+        subtotal: subtotal,
+        deliveryCharge: delivery,
+        discountAmount: discount,
         paymentMethod: rawPaymentMethod,
         paymentStatus: rawPaymentStatus,
         status: rawStatus,
-        orderStatus: rawStatus,
-        isFromCompanyOrders: data.isFromCompanyOrders ?? true,
-        createdAtFormatted: dateText,
-        createdAtTimestamp: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : (data.createdAt ? new Date(data.createdAt).getTime() : (data.timestamp || 0)),
+        productsSummary: productsSummary,
+        dateShort: dateShort.toUpperCase(),
+        dateLong: dateLong.toUpperCase(),
+        timestamp: rawTs,
         items: cleanItems
       };
     }
 
-    // 0ms Synchronous Cache Hydration
-    function loadCachedOrders() {
+    // Load Cached Orders in 0ms
+    function loadCached() {
       try {
         const cached = getCachedOrders(COMPANY_ID);
         if (Array.isArray(cached) && cached.length > 0) {
           window.liveOrders = cached.map(o => normalizeOrderDoc(o.id, o));
-          window.liveOrders.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
-          applyOrderFilters();
-          updateSyncUI('Loaded from cache', false);
+          window.liveOrders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          renderTableView();
           return true;
         }
       } catch (e) {
-        console.warn('[Orders Admin] Cache load warning:', e);
+        console.warn('Cache load warning:', e);
       }
       return false;
     }
 
-    // UI Status Indicator updater
-    function updateSyncUI(text, isSpinning = false) {
-      const statusText = document.getElementById('sync-status-text');
-      const pulseDot = document.getElementById('sync-pulse-dot');
-      const refreshIcon = document.getElementById('refresh-icon');
-
-      if (statusText) statusText.textContent = text;
-      if (pulseDot) {
-        if (isSpinning) {
-          pulseDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
-        } else {
-          pulseDot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
-        }
-      }
-      if (refreshIcon) {
-        if (isSpinning) refreshIcon.classList.add('animate-spin');
-        else refreshIcon.classList.remove('animate-spin');
-      }
-    }
-
-    // Direct Firestore fetch & sync
-    async function syncOrders(force = false) {
-      if (isSyncing) return;
-
-      isSyncing = true;
-      updateSyncUI(force ? 'Syncing orders...' : 'Checking updates...', true);
-
+    // Fetch Fresh from Firestore
+    async function syncOrders() {
       try {
-        const rawOrders = await fetchOnlineOrders(COMPANY_ID, force);
-        const normalized = rawOrders.map(o => normalizeOrderDoc(o.id, o));
-        normalized.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
-
-        // Detect newly placed orders
-        const previousIds = new Set(window.liveOrders.map(o => o.id));
-        const newArrivals = normalized.filter(o => !previousIds.has(o.id));
-
+        const raw = await fetchOnlineOrders(COMPANY_ID, true);
+        const normalized = raw.map(o => normalizeOrderDoc(o.id, o));
+        normalized.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         window.liveOrders = normalized;
         setCachedOrders(normalized, COMPANY_ID);
-        applyOrderFilters();
+        renderTableView();
 
-        lastSyncTimestamp = Date.now();
-        const nowTimeStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-        updateSyncUI(`Synced ${nowTimeStr}`, false);
-
-        // Alert user if newly placed orders arrived
-        if (newArrivals.length > 0 && previousIds.size > 0) {
-          notifyNewOrderArrival(newArrivals[0]);
+        // If viewing an order detail, re-render detail view with fresh data
+        if (window.currentViewingOrderId) {
+          window.openOrderDetail(window.currentViewingOrderId);
         }
       } catch (err) {
-        console.warn('[Orders Admin] syncOrders notice:', err);
-        updateSyncUI('Sync notice (cached)', false);
-      } finally {
-        isSyncing = false;
+        console.warn('Sync orders notice:', err);
       }
     }
 
-    // New Order Toast Notification
-    function notifyNewOrderArrival(order) {
-      try {
-        const toast = document.getElementById('new-order-toast');
-        const title = document.getElementById('toast-order-title');
-        const amount = document.getElementById('toast-order-amount');
-        const desc = document.getElementById('toast-order-desc');
+    // Filter Logic for Queue
+    function getFilteredOrders() {
+      let list = [...window.liveOrders];
+      const q = window.activeQueueFilter;
 
-        if (title) title.textContent = `New Order from ${order.customerName || 'Customer'}!`;
-        if (amount) amount.textContent = `₹${Number(order.totalAmount || 0).toLocaleString('en-IN')}`;
-        if (desc) desc.textContent = `#${order.id} · ${order.city || 'Standard Delivery'}`;
-
-        if (toast) {
-          toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
-          setTimeout(() => {
-            toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
-          }, 6000);
-        }
-
-        // Authentic iOS Notification Chime (Tri-Tone E5 -> G#5 -> C6)
-        try {
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (AudioCtx) {
-            const ctx = new AudioCtx();
-            if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-            const notes = [
-              { freq: 659.25, time: 0, dur: 0.18 },      // E5
-              { freq: 830.61, time: 0.11, dur: 0.20 },    // G#5
-              { freq: 1046.50, time: 0.22, dur: 0.36 }    // C6
-            ];
-            notes.forEach(n => {
-              const osc = ctx.createOscillator();
-              const gain = ctx.createGain();
-              osc.type = 'sine';
-              osc.frequency.setValueAtTime(n.freq, ctx.currentTime + n.time);
-              gain.gain.setValueAtTime(0, ctx.currentTime + n.time);
-              gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + n.time + 0.02);
-              gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + n.time + n.dur);
-              osc.connect(gain);
-              gain.connect(ctx.destination);
-              osc.start(ctx.currentTime + n.time);
-              osc.stop(ctx.currentTime + n.time + n.dur);
-            });
-            setTimeout(() => { try { ctx.close(); } catch(_) {} }, 1000);
-          }
-        } catch (_) {
-          try {
-            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-            audio.volume = 0.5;
-            audio.play().catch(() => {});
-          } catch (_) {}
-        }
-      } catch (e) {}
-    }
-
-    // 1-Minute Polling Cycle ("in a next min")
-    function startAutoSync() {
-      if (syncIntervalTimer) clearInterval(syncIntervalTimer);
-      syncIntervalTimer = setInterval(() => {
-        syncOrders(true);
-      }, 60000);
-    }
-
-    // Format badge based on status
-    function getStatusBadge(status) {
-      const c = canonicalStatus(status);
-      const isConfirmed = String(status || '').trim().toLowerCase() === 'confirmed';
-      if (c === 'Pending') {
-        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 shrink-0">${isConfirmed ? 'Confirmed' : 'Pending'}</span>`;
-      } else if (c === 'Accepted') {
-        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-200 shrink-0">Accepted</span>`;
-      } else if (c === 'Packing') {
-        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 shrink-0">Packing</span>`;
-      } else if (c === 'Shipped') {
-        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">Shipped</span>`;
-      } else if (c === 'Delivered') {
-        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">Delivered</span>`;
-      } else if (c === 'Cancelled') {
-        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 shrink-0">Cancelled</span>`;
-      } else if (c === 'Returned') {
-        return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-700 border border-orange-200 shrink-0">Returned</span>`;
+      if (q === 'awaiting_acceptance') {
+        list = list.filter(o => canonicalStatus(o.status) === 'Pending');
+      } else if (q === 'processing') {
+        list = list.filter(o => canonicalStatus(o.status) === 'Accepted');
+      } else if (q === 'packed') {
+        list = list.filter(o => canonicalStatus(o.status) === 'Packing');
+      } else if (q === 'shipped') {
+        list = list.filter(o => canonicalStatus(o.status) === 'Shipped');
+      } else if (q === 'out_for_delivery') {
+        list = list.filter(o => canonicalStatus(o.status) === 'Out for Delivery');
+      } else if (q === 'delivered') {
+        list = list.filter(o => canonicalStatus(o.status) === 'Delivered');
+      } else if (q === 'cancelled') {
+        list = list.filter(o => canonicalStatus(o.status) === 'Cancelled');
       }
-      return `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 shrink-0">${status}</span>`;
-    }
 
-    // Quick Action Button for Grid Cards
-    function renderQuickActionBtn(orderId, currentStatus) {
-      const c = canonicalStatus(currentStatus);
-      if (c === 'Pending') {
-        return `<button onclick="updateOrderStatus('${orderId}', 'Accepted')" class="px-2.5 py-1.5 bg-black hover:bg-neutral-800 text-white font-bold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1 shrink-0"><i data-lucide="check" class="w-3 h-3"></i> Accept</button>`;
-      } else if (c === 'Accepted') {
-        return `<button onclick="updateOrderStatus('${orderId}', 'Packing')" class="px-2.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1 shrink-0"><i data-lucide="package" class="w-3 h-3"></i> Pack</button>`;
-      } else if (c === 'Packing') {
-        return `<button onclick="updateOrderStatus('${orderId}', 'Shipped')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1 shrink-0"><i data-lucide="truck" class="w-3 h-3"></i> Ship</button>`;
-      } else if (c === 'Shipped') {
-        return `<button onclick="updateOrderStatus('${orderId}', 'Delivered')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1 shrink-0"><i data-lucide="check-circle" class="w-3 h-3"></i> Deliver</button>`;
+      const s = (window.searchQuery || '').trim().toLowerCase();
+      if (s) {
+        list = list.filter(o => 
+          String(o.id || '').toLowerCase().includes(s) ||
+          String(o.customerName || '').toLowerCase().includes(s) ||
+          String(o.phone || '').includes(s) ||
+          String(o.address || '').toLowerCase().includes(s) ||
+          String(o.productsSummary || '').toLowerCase().includes(s)
+        );
       }
-      return '';
+
+      return list;
     }
 
-    // Render Orders in Grid View or List View
-    function renderOrdersView(orders) {
-      const container = document.getElementById('orders-cards-container');
-      const emptyState = document.getElementById('orders-empty-state');
-      const shimmer = document.getElementById('orders-shimmer-container');
+    // RENDER VIEW 1: TABLE
+    function renderTableView() {
+      const shimmer = document.getElementById('table-shimmer');
+      const wrapper = document.getElementById('table-content-wrapper');
+      const tbody = document.getElementById('orders-table-body');
+      const emptyState = document.getElementById('table-empty-state');
+      const queueBadge = document.getElementById('queue-count-badge');
+
       if (shimmer) shimmer.classList.add('hidden');
-      if (!container) return;
+      if (wrapper) wrapper.classList.remove('hidden');
 
-      if (!orders || orders.length === 0) {
-        container.innerHTML = '';
-        emptyState.classList.remove('hidden');
+      const filtered = getFilteredOrders();
+      if (queueBadge) queueBadge.textContent = filtered.length;
+
+      if (!filtered || filtered.length === 0) {
+        if (tbody) tbody.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
         return;
       }
-      emptyState.classList.add('hidden');
 
-      // ================= GRID VIEW (2-Column Phone View / Compact Tiles) =================
-      if (window.activeViewMode === 'grid') {
-        container.className = 'grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5';
-        container.innerHTML = orders.map(o => {
+      if (emptyState) emptyState.classList.add('hidden');
+
+      if (tbody) {
+        tbody.innerHTML = filtered.map(o => {
           const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
-          const payBadge = isPaid 
-            ? `<span class="inline-flex items-center text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200 shrink-0">PAID</span>`
-            : `<span class="inline-flex items-center text-[9px] sm:text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200 shrink-0">${o.paymentMethod || 'COD'}</span>`;
-
-          const curCanonical = canonicalStatus(o.status || o.orderStatus);
-          const itemCount = (o.items || []).reduce((acc, i) => acc + (i.qty || 1), 0);
-          const shortId = String(o.id || '').replace(/^ORD-/, '');
+          const payLabel = isPaid ? 'RAZORPAY ONLINE PAYMENT' : (String(o.paymentMethod || '').toUpperCase().includes('COD') ? 'CASH ON DELIVERY (COD)' : 'ONLINE PAYMENT');
+          const curStatus = canonicalStatus(o.status).toUpperCase();
 
           return `
-            <div class="bg-white border border-slate-200 rounded-2xl p-2.5 sm:p-4 shadow-xs space-y-2 sm:space-y-3 hover:border-slate-300 transition flex flex-col justify-between">
-              <div>
-                <!-- Top Header: Short ID + Status Badge -->
-                <div class="flex items-center justify-between gap-1 pb-2 border-b border-slate-100">
-                  <span class="font-mono text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded truncate" title="${o.id}">
-                    #${shortId.length > 8 ? shortId.slice(-6) : shortId}
-                  </span>
-                  <div class="flex items-center gap-1 shrink-0">
-                    ${payBadge}
-                    ${getStatusBadge(o.status)}
-                  </div>
+            <tr onclick="openOrderDetail('${o.id}')" class="hover:bg-slate-50/70 transition-colors cursor-pointer group">
+              <td class="py-4 px-4 text-center" onclick="event.stopPropagation()">
+                <span class="w-3.5 h-3.5 rounded-full border border-slate-300 inline-block group-hover:border-slate-400"></span>
+              </td>
+              <td class="py-4 px-4 font-mono font-bold text-slate-800 whitespace-nowrap">
+                #${o.id}
+              </td>
+              <td class="py-4 px-4 text-slate-400 whitespace-nowrap font-medium">
+                ${o.dateShort}
+              </td>
+              <td class="py-4 px-4 whitespace-nowrap">
+                <span class="font-bold text-slate-900 block uppercase">${o.customerName}</span>
+                <span class="text-[11px] text-slate-400 block">${o.phone || ''}</span>
+              </td>
+              <td class="py-4 px-4 max-w-xs truncate font-semibold text-slate-700 uppercase" title="${o.productsSummary}">
+                ${o.productsSummary}
+              </td>
+              <td class="py-4 px-4 font-bold text-blue-600 whitespace-nowrap text-sm">
+                ₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}
+              </td>
+              <td class="py-4 px-4 whitespace-nowrap">
+                <span class="px-3 py-1 rounded-full text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 uppercase tracking-wider">
+                  ${payLabel}
+                </span>
+              </td>
+              <td class="py-4 px-4 text-center whitespace-nowrap">
+                <span class="px-3 py-1 rounded-full text-[10px] font-bold text-slate-600 bg-slate-50 border border-slate-200 uppercase tracking-wider">
+                  ${curStatus}
+                </span>
+              </td>
+              <td class="py-4 px-4 text-right pr-6 whitespace-nowrap" onclick="event.stopPropagation()">
+                <div class="flex items-center justify-end gap-2">
+                  <button type="button" onclick="confirmDeleteOrder('${o.id}', event)" class="text-rose-400 hover:text-rose-600 p-1 transition cursor-pointer" title="Delete Order">
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                  <button type="button" onclick="openOrderDetail('${o.id}')" class="text-slate-300 group-hover:text-slate-600 p-1 transition cursor-pointer font-bold text-sm" title="View Milestones">
+                    &gt;
+                  </button>
                 </div>
-
-                <!-- Customer Details & Tap to Call -->
-                <div class="pt-1.5 sm:pt-2 space-y-1">
-                  <div class="flex items-center justify-between gap-1">
-                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm truncate" title="${o.customerName}">${o.customerName}</h4>
-                    <a href="tel:${o.phone}" class="inline-flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded transition shrink-0" title="Call Customer">
-                      <i data-lucide="phone" class="w-2.5 h-2.5 text-emerald-600"></i>
-                      <span class="hidden sm:inline">Call</span>
-                    </a>
-                  </div>
-
-                  <div class="flex items-center gap-1 text-[11px] text-slate-500 font-medium truncate">
-                    <i data-lucide="map-pin" class="w-2.5 h-2.5 text-slate-400 shrink-0"></i>
-                    <span class="truncate">${o.city ? o.city : (o.address || 'Local')}</span>
-                  </div>
-
-                  <div class="flex items-center gap-1 text-[10px] text-slate-400 font-medium truncate">
-                    <i data-lucide="clock" class="w-2.5 h-2.5 text-slate-400 shrink-0"></i>
-                    <span class="truncate">${o.createdAtFormatted.split(',')[1] || o.createdAtFormatted}</span>
-                  </div>
-                </div>
-
-                <!-- Items Mini Strip -->
-                <div class="mt-2 p-1.5 sm:p-2 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
-                  <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    <span>${itemCount} Item(s)</span>
-                    <span class="text-slate-600 font-mono">${(o.items && o.items[0]?.size) || 'M'}</span>
-                  </div>
-                  <div class="text-[11px] text-slate-700 truncate font-medium">
-                    ${(o.items && o.items[0]?.name) || 'Apparel Item'}${itemCount > 1 ? ` +${itemCount - 1}` : ''}
-                  </div>
-                </div>
-              </div>
-
-              <!-- Bottom: Total Amount & Status Actions -->
-              <div class="pt-2 border-t border-slate-100 space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-[10px] sm:text-xs text-slate-400 font-medium">Total:</span>
-                  <span class="text-xs sm:text-sm font-bold text-slate-900">₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}</span>
-                </div>
-
-                <div class="flex items-center gap-1">
-                  <select onchange="updateOrderStatus('${o.id}', this.value)" class="flex-1 text-[10px] sm:text-xs font-semibold text-slate-800 px-1 py-1 sm:py-1.5 rounded-lg bg-white border border-slate-200 focus:border-black outline-none cursor-pointer">
-                    ${['Pending', 'Accepted', 'Packing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(st => `
-                      <option value="${st}" ${curCanonical === st ? 'selected' : ''}>${st}</option>
-                    `).join('')}
-                  </select>
-                  ${renderQuickActionBtn(o.id, o.status)}
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } 
-      // ================= LIST VIEW (Detailed Horizontal Cards) =================
-      else {
-        container.className = 'space-y-4';
-        container.innerHTML = orders.map(o => {
-          const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
-          const payBadge = isPaid 
-            ? `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">PAID (${o.paymentMethod})</span>`
-            : `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">${o.paymentMethod}</span>`;
-
-          const curCanonical = canonicalStatus(o.status || o.orderStatus);
-
-          return `
-            <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 hover:border-slate-300 transition">
-              
-              <!-- Card Header: ID, Date & Time, Status Badge -->
-              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-slate-100">
-                <div class="flex items-center gap-3 flex-wrap">
-                  <span class="font-mono text-xs font-bold bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg">
-                    ${o.id}
-                  </span>
-                  
-                  <!-- PROMINENT DATE WITH TIME -->
-                  <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
-                    <span>${o.createdAtFormatted}</span>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                  ${payBadge}
-                  ${getStatusBadge(o.status)}
-                </div>
-              </div>
-
-              <!-- Customer & Delivery Address Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                
-                <!-- Customer Info -->
-                <div class="space-y-1">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Customer</span>
-                  <h4 class="font-bold text-slate-900 text-sm">${o.customerName}</h4>
-                  <p class="text-slate-600 flex items-center gap-1">
-                    <i data-lucide="phone" class="w-3 h-3 text-slate-400"></i>
-                    <span>${o.phone}</span>
-                  </p>
-                  ${o.email ? `<p class="text-slate-400">${o.email}</p>` : ''}
-                </div>
-
-                <!-- Shipping Address -->
-                <div class="space-y-1 md:col-span-2">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Delivery Address</span>
-                  <p class="text-slate-700 font-medium leading-relaxed">
-                    ${o.address}, ${o.city ? o.city + ', ' : ''}${o.state ? o.state + ' - ' : ''}<strong>${o.pincode}</strong>
-                  </p>
-                </div>
-              </div>
-
-              <!-- Ordered Items List -->
-              <div class="p-3 bg-slate-50/70 border border-slate-100 rounded-xl space-y-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Items in Order (${(o.items || []).length})</span>
-                <div class="divide-y divide-slate-100">
-                  ${(o.items || []).map(i => `
-                    <div class="flex items-center justify-between py-2 text-xs">
-                      <div class="flex items-center gap-2.5">
-                        <img src="${i.imageUrl || 'https://placehold.co/80x100?text=Product'}" class="w-9 h-11 object-cover rounded-lg bg-white border border-slate-200">
-                        <div>
-                          <span class="font-bold text-slate-800">${i.name}</span>
-                          <span class="text-[11px] text-slate-500 block">Size: ${i.size || 'M'} · Color: ${i.color || 'Standard'} · Qty: ${i.qty || 1}</span>
-                        </div>
-                      </div>
-                      <span class="font-bold text-slate-900">₹${Number(i.price || 0).toLocaleString('en-IN')}</span>
-                    </div>
-                  `).join('')}
-                </div>
-              </div>
-
-              <!-- Card Footer: Total Amount, Status Dropdown & Action Buttons -->
-              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-baseline gap-2">
-                  <span class="text-xs text-slate-500 font-medium">Order Total:</span>
-                  <span class="text-lg font-bold text-slate-900">₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}</span>
-                </div>
-
-                <!-- Status Dropdown & Action Buttons -->
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-xs font-semibold text-slate-600">Status:</span>
-                  <select onchange="updateOrderStatus('${o.id}', this.value)" class="shopify-input text-xs font-semibold text-slate-900 px-3 py-1.5 rounded-lg outline-none bg-white border border-slate-300 hover:border-slate-400 focus:border-black cursor-pointer shadow-2xs transition">
-                    ${['Pending', 'Accepted', 'Packing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(st => `
-                      <option value="${st}" ${curCanonical === st ? 'selected' : ''}>${st}</option>
-                    `).join('')}
-                  </select>
-                  ${renderStatusActionButtons(o.id, o.status)}
-                </div>
-              </div>
-            </div>
+              </td>
+            </tr>
           `;
         }).join('');
       }
@@ -1067,368 +821,466 @@
       }
     }
 
-    function renderStatusActionButtons(orderId, currentStatus) {
-      const c = canonicalStatus(currentStatus);
-      let html = '';
+    // Set Queue Pill Filter
+    window.setQueueFilter = function(queueKey) {
+      window.activeQueueFilter = queueKey;
 
-      if (c === 'Pending') {
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Accepted')" class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white font-semibold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Accept Order</button>`;
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Cancelled')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs border border-rose-200 transition cursor-pointer">Cancel</button>`;
-      } else if (c === 'Accepted') {
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Packing')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1"><i data-lucide="package" class="w-3.5 h-3.5"></i> Mark Packing</button>`;
-      } else if (c === 'Packing') {
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Shipped')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Mark Shipped</button>`;
-      } else if (c === 'Shipped') {
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Delivered')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer shadow-xs flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Mark Delivered</button>`;
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Returned')" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-semibold rounded-lg text-xs border border-orange-200 transition cursor-pointer">Return</button>`;
-      } else if (c === 'Delivered') {
-        html += `<button onclick="updateOrderStatus('${orderId}', 'Returned')" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 font-semibold rounded-lg text-xs border border-orange-200 transition cursor-pointer">Return / Refund</button>`;
+      document.querySelectorAll('.queue-tab-btn').forEach(btn => {
+        btn.className = 'queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition';
+      });
+
+      const activeBtn = document.getElementById(`tab-queue-${queueKey}`);
+      if (activeBtn) {
+        activeBtn.className = 'queue-tab-btn bg-[#0f172a] text-white font-bold rounded-full px-4 py-1.5 text-xs shadow-xs shrink-0 transition';
       }
 
-      return html;
+      renderTableView();
+    };
+
+    // Live Search
+    window.handleSearch = function(val) {
+      window.searchQuery = val;
+      renderTableView();
+    };
+
+    // RENDER VIEW 2: ORDER DETAIL & TIMELINE (Screenshot 2)
+    window.openOrderDetail = function(orderId) {
+      const order = window.liveOrders.find(o => String(o.id) === String(orderId));
+      if (!order) return;
+
+      window.currentViewingOrderId = order.id;
+
+      // Toggle views
+      document.getElementById('orders-table-view').classList.add('hidden');
+      document.getElementById('order-detail-view').classList.remove('hidden');
+
+      // Update URL query state without reload
+      try {
+        window.history.pushState({ orderId: order.id }, '', `?id=${order.id}`);
+      } catch (_) {}
+
+      // Top Title & Date
+      document.getElementById('detail-order-id-title').textContent = `ORDER #${order.id}`;
+      document.getElementById('detail-order-date-str').textContent = order.dateLong || 'RECENTLY';
+
+      // Badges
+      const isPaid = (String(order.paymentStatus || '').toLowerCase() === 'paid') || String(order.paymentMethod || '').toLowerCase().includes('razorpay');
+      const payBadge = document.getElementById('detail-pay-badge');
+      if (payBadge) {
+        payBadge.textContent = isPaid ? 'PAID' : (String(order.paymentMethod || '').toUpperCase().includes('COD') ? 'COD' : 'PENDING');
+        payBadge.className = isPaid 
+          ? 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200' 
+          : 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-600 border border-amber-200';
+      }
+
+      const curStatus = canonicalStatus(order.status).toUpperCase();
+      const statusBadge = document.getElementById('detail-status-badge');
+      if (statusBadge) {
+        statusBadge.textContent = curStatus;
+        statusBadge.className = (curStatus === 'DELIVERED') 
+          ? 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200'
+          : (curStatus === 'CANCELLED' 
+            ? 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200'
+            : 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-600 border border-amber-200');
+      }
+
+      // 1. PRODUCTS ORDERED
+      const productsContainer = document.getElementById('detail-products-container');
+      if (productsContainer) {
+        productsContainer.innerHTML = (order.items || []).map(item => `
+          <div class="py-3.5 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <img src="${item.imageUrl || 'https://placehold.co/80x100?text=Item'}" alt="${item.name}" class="w-12 h-12 object-cover rounded-xl bg-slate-100 border border-slate-200 shrink-0">
+              <div>
+                <h4 class="font-bold text-sm text-slate-900 uppercase">${item.name}</h4>
+                <p class="text-xs text-slate-400 uppercase font-medium mt-0.5">${item.color || 'STANDARD'} • ${item.size || 'M'} | QTY: ${item.qty || 1}</p>
+              </div>
+            </div>
+            <span class="font-bold text-sm text-slate-900 whitespace-nowrap">
+              ₹${Number(item.price || 0).toLocaleString('en-IN')}
+            </span>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('detail-subtotal-val').textContent = `₹${Number(order.subtotal || order.totalAmount || 0).toLocaleString('en-IN')}`;
+      document.getElementById('detail-delivery-val').textContent = `₹${Number(order.deliveryCharge || 0).toLocaleString('en-IN')}`;
+      document.getElementById('detail-total-val').textContent = `₹${Number(order.totalAmount || 0).toLocaleString('en-IN')}`;
+
+      const discRow = document.getElementById('detail-discount-row');
+      const discVal = document.getElementById('detail-discount-val');
+      if (order.discountAmount > 0) {
+        discRow.classList.remove('hidden');
+        discVal.textContent = `-₹${Number(order.discountAmount).toLocaleString('en-IN')}`;
+      } else {
+        discRow.classList.add('hidden');
+      }
+
+      // 2. TIMELINE MILESTONES
+      updateTimelineMilestones(order);
+
+      // 3. CUSTOMER CARD
+      const initial = (order.customerName || 'C').charAt(0).toUpperCase();
+      document.getElementById('detail-cust-avatar').textContent = initial;
+      document.getElementById('detail-cust-name').textContent = order.customerName || 'CUSTOMER';
+      const phoneEl = document.getElementById('detail-cust-phone');
+      if (phoneEl) {
+        phoneEl.textContent = order.phone || 'Not provided';
+        phoneEl.href = order.phone ? `tel:${order.phone}` : '#';
+      }
+      document.getElementById('detail-cust-address').textContent = order.address || 'Standard Delivery';
+
+      // 4. PAYMENT CARD
+      const payMethodPill = document.getElementById('detail-pay-method-pill');
+      if (payMethodPill) {
+        payMethodPill.textContent = (isPaid ? 'RAZORPAY ONLINE PAYMENT' : String(order.paymentMethod || 'ONLINE PAYMENT')).toUpperCase();
+      }
+      const payStatusPill = document.getElementById('detail-pay-status-pill');
+      if (payStatusPill) {
+        payStatusPill.textContent = isPaid ? 'PAID' : 'PENDING';
+        payStatusPill.className = isPaid 
+          ? 'text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider'
+          : 'text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full uppercase tracking-wider';
+      }
+      document.getElementById('detail-pay-amount-val').textContent = `₹${Number(order.totalAmount || 0).toLocaleString('en-IN')}`;
+
+      // 5. DELIVERY CARD
+      document.getElementById('detail-delivery-address-text').textContent = order.address || 'STANDARD DELIVERY';
+
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Update Timeline Visuals
+    function updateTimelineMilestones(order) {
+      const cur = canonicalStatus(order.status);
+      const placedDate = order.dateLong || 'Recently';
+
+      // Level 1: Placed (always done)
+      setMilestoneActive(1, true, placedDate);
+
+      // Level 2: Accepted
+      const isAccepted = ['Accepted', 'Packing', 'Shipped', 'Out for Delivery', 'Delivered'].includes(cur);
+      setMilestoneActive(2, isAccepted, isAccepted ? placedDate : '-');
+
+      // Level 3: Packing
+      const isPacking = ['Packing', 'Shipped', 'Out for Delivery', 'Delivered'].includes(cur);
+      setMilestoneActive(3, isPacking, isPacking ? 'In Progress' : '-');
+
+      // Level 4: Shipped
+      const isShipped = ['Shipped', 'Out for Delivery', 'Delivered'].includes(cur);
+      setMilestoneActive(4, isShipped, isShipped ? 'In Transit' : '-');
+
+      // Level 5: Out for Delivery
+      const isOut = ['Out for Delivery', 'Delivered'].includes(cur);
+      setMilestoneActive(5, isOut, isOut ? 'With Courier' : '-');
+
+      // Level 6: Delivered
+      const isDelivered = (cur === 'Delivered');
+      setMilestoneActive(6, isDelivered, isDelivered ? 'Order Completed' : '-');
     }
 
-    // Update Status Handler with instant feedback
-    window.updateOrderStatus = async function(orderId, newStatus) {
-      const order = window.liveOrders.find(o => o.id === orderId);
+    function setMilestoneActive(stepNum, isCompleted, timeText) {
+      const node = document.getElementById(`step-node-${stepNum}`);
+      const line = document.getElementById(`step-line-${stepNum}`);
+      const timeEl = document.getElementById(`time-step-${stepNum}`);
+
+      if (timeEl) timeEl.textContent = timeText;
+
+      if (node) {
+        if (isCompleted) {
+          node.className = 'w-6 h-6 rounded-full bg-emerald-50 border-2 border-emerald-500 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0';
+          node.textContent = '✓';
+        } else {
+          node.className = 'w-6 h-6 rounded-full bg-white border-2 border-slate-300 text-transparent flex items-center justify-center font-bold text-xs shrink-0';
+          node.textContent = '○';
+        }
+      }
+
+      if (line) {
+        line.className = isCompleted ? 'w-0.5 bg-emerald-500 h-9' : 'w-0.5 bg-slate-200 h-9';
+      }
+    }
+
+    // Close Detail View and Return to Table
+    window.closeOrderDetail = function() {
+      window.currentViewingOrderId = null;
+      document.getElementById('order-detail-view').classList.add('hidden');
+      document.getElementById('orders-table-view').classList.remove('hidden');
+
+      try {
+        window.history.pushState({}, '', window.location.pathname);
+      } catch (_) {}
+
+      renderTableView();
+    };
+
+    // ACTION HANDLER: ACCEPT, PACK, SHIP, DELIVER
+    window.performAction = async function(newStatus) {
+      const orderId = window.currentViewingOrderId;
+      if (!orderId) return;
+
+      const order = window.liveOrders.find(o => String(o.id) === String(orderId));
       if (order) {
         order.status = newStatus;
         order.orderStatus = newStatus;
-        applyOrderFilters();
         setCachedOrders(window.liveOrders, COMPANY_ID);
+        window.openOrderDetail(orderId);
       }
 
       try {
-        const res = await setOrderStatus(orderId, newStatus, COMPANY_ID);
-        if (res && res.success === false) {
-          console.warn('[Orders Admin] Status update warning:', res.error);
-        }
-        showStatusToast(`Order #${orderId} status set to ${newStatus}`);
+        await setOrderStatus(orderId, newStatus, COMPANY_ID);
+      } catch (err) {
+        console.warn('Status update warning:', err);
+      }
+    };
+
+    // Cancel Order
+    window.cancelCurrentOrder = async function() {
+      const orderId = window.currentViewingOrderId;
+      if (!orderId) return;
+
+      if (!confirm(`Are you sure you want to cancel order #${orderId}?`)) return;
+
+      const order = window.liveOrders.find(o => String(o.id) === String(orderId));
+      if (order) {
+        order.status = 'Cancelled';
+        order.orderStatus = 'Cancelled';
+        setCachedOrders(window.liveOrders, COMPANY_ID);
+        window.openOrderDetail(orderId);
+      }
+
+      try {
+        await setOrderStatus(orderId, 'Cancelled', COMPANY_ID);
+      } catch (err) {
+        console.warn('Cancel order warning:', err);
+      }
+    };
+
+    // Delete Single Order
+    window.confirmDeleteOrder = async function(orderId, event) {
+      if (event) event.stopPropagation();
+      if (!confirm(`Are you sure you want to permanently delete order #${orderId}? This cannot be undone.`)) return;
+
+      window.liveOrders = window.liveOrders.filter(o => String(o.id) !== String(orderId));
+      renderTableView();
+
+      try {
+        await deleteOnlineOrder(orderId, COMPANY_ID);
       } catch (e) {
-        console.warn('Order status update notice:', e);
+        console.warn('Delete warning:', e);
       }
     };
 
-    function showStatusToast(msg) {
-      try {
-        const toast = document.getElementById('new-order-toast');
-        const title = document.getElementById('toast-order-title');
-        const desc = document.getElementById('toast-order-desc');
-        if (toast && title) {
-          title.textContent = 'Status Updated!';
-          if (desc) desc.textContent = msg;
-          toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
-          setTimeout(() => {
-            toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
-          }, 3500);
-        }
-      } catch(_) {}
-    }
-
-    // Helper to match order with date scope
-    function isOrderDateMatch(order, scope) {
-      if (scope === 'all') return true;
-      const ts = order.createdAtTimestamp || (order.createdAt?.seconds ? order.createdAt.seconds * 1000 : 0) || (order.createdAt ? new Date(order.createdAt).getTime() : 0);
-      if (!ts) return scope === 'all';
-
-      const orderDate = new Date(ts);
-      const now = new Date();
-      
-      if (scope === 'today') {
-        return orderDate.getDate() === now.getDate() &&
-               orderDate.getMonth() === now.getMonth() &&
-               orderDate.getFullYear() === now.getFullYear();
-      }
-      
-      if (scope === 'yesterday') {
-        const yest = new Date(now);
-        yest.setDate(now.getDate() - 1);
-        return orderDate.getDate() === yest.getDate() &&
-               orderDate.getMonth() === yest.getMonth() &&
-               orderDate.getFullYear() === yest.getFullYear();
-      }
-      
-      if (scope === 'week') {
-        const startOfWeek = new Date(now);
-        const day = startOfWeek.getDay();
-        const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
-        startOfWeek.setDate(diff);
-        startOfWeek.setHours(0, 0, 0, 0);
-        return orderDate >= startOfWeek;
+    // Delete All Filtered Orders
+    window.confirmDeleteAllOrders = async function() {
+      const filtered = getFilteredOrders();
+      if (filtered.length === 0) {
+        alert('No orders in the current queue to delete.');
+        return;
       }
 
-      return true;
-    }
+      if (!confirm(`CAUTION: Are you sure you want to delete ALL ${filtered.length} order(s) in this view?`)) return;
 
-    // Date Scope Filter Switcher
-    window.setDateScopeFilter = function(scope) {
-      window.activeDateScope = scope;
-      
-      document.querySelectorAll('.date-scope-btn').forEach(btn => {
-        btn.classList.remove('bg-black', 'text-white', 'font-bold', 'shadow-2xs');
-        btn.classList.add('bg-slate-100', 'text-slate-600', 'font-medium');
+      const idsToDelete = filtered.map(o => o.id);
+      window.liveOrders = window.liveOrders.filter(o => !idsToDelete.includes(o.id));
+      renderTableView();
+
+      for (const id of idsToDelete) {
+        try {
+          await deleteOnlineOrder(id, COMPANY_ID);
+        } catch (_) {}
+      }
+    };
+
+    // Export Orders to CSV (Real data)
+    window.exportOrdersToCSV = function() {
+      const filtered = getFilteredOrders();
+      if (filtered.length === 0) {
+        alert('No orders available to export.');
+        return;
+      }
+
+      let csv = 'Order ID,Date,Customer Name,Phone,Products,Amount,Payment Method,Status,Delivery Address\n';
+      filtered.forEach(o => {
+        const cleanProd = (o.productsSummary || '').replace(/"/g, '""');
+        const cleanAddr = (o.address || '').replace(/"/g, '""');
+        csv += `"${o.id}","${o.dateLong}","${o.customerName}","${o.phone}","${cleanProd}",${o.totalAmount},"${o.paymentMethod}","${o.status}","${cleanAddr}"\n`;
       });
 
-      const active = document.getElementById(`date-scope-${scope}`);
-      if (active) {
-        active.classList.remove('bg-slate-100', 'text-slate-600', 'font-medium');
-        active.classList.add('bg-black', 'text-white', 'font-bold', 'shadow-2xs');
-      }
-
-      applyOrderFilters();
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `orders_export_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
     };
 
-    // View Mode Switcher: Grid View vs List View
-    window.setViewMode = function(mode) {
-      window.activeViewMode = mode;
-      const gridBtn = document.getElementById('view-mode-grid-btn');
-      const listBtn = document.getElementById('view-mode-list-btn');
+    // Trigger Import
+    window.triggerImportOrders = function() {
+      alert('Order import: To add new orders seamlessly, use the manual order creation tool.');
+      window.location.href = 'create-order.html';
+    };
 
-      if (mode === 'grid') {
-        if (gridBtn) {
-          gridBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-2xs';
-        }
-        if (listBtn) {
-          listBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-500 hover:text-slate-900';
-        }
+    // Print Invoice
+    window.printOrderInvoice = function() {
+      const order = window.liveOrders.find(o => String(o.id) === String(window.currentViewingOrderId));
+      if (!order) return;
+
+      const printArea = document.getElementById('print-invoice-area');
+      if (!printArea) return;
+
+      printArea.innerHTML = `
+        <div style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; color: #111;">
+          <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px;">
+            <div>
+              <h1 style="font-size: 20px; font-weight: bold; margin: 0;">The Baniyan Company</h1>
+              <p style="font-size: 11px; color: #666; margin: 2px 0 0 0;">Official Order Tax Invoice</p>
+            </div>
+            <div style="text-align: right;">
+              <p style="font-size: 13px; font-weight: bold; margin: 0;">#${order.id}</p>
+              <p style="font-size: 11px; color: #666; margin: 2px 0 0 0;">${order.dateLong}</p>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px; font-size: 12px;">
+            <p style="margin: 0;"><strong>Billed To:</strong> ${order.customerName}</p>
+            <p style="margin: 2px 0;"><strong>Phone:</strong> ${order.phone}</p>
+            <p style="margin: 2px 0;"><strong>Address:</strong> ${order.address}</p>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px;">
+            <thead>
+              <tr style="border-bottom: 1px solid #ddd; text-align: left;">
+                <th style="padding: 6px 0;">Item</th>
+                <th style="padding: 6px 0; text-align: center;">Size</th>
+                <th style="padding: 6px 0; text-align: center;">Qty</th>
+                <th style="padding: 6px 0; text-align: right;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(order.items || []).map(i => `
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 8px 0;">${i.name}</td>
+                  <td style="padding: 8px 0; text-align: center;">${i.size}</td>
+                  <td style="padding: 8px 0; text-align: center;">${i.qty}</td>
+                  <td style="padding: 8px 0; text-align: right;">₹${i.price}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div style="text-align: right; font-size: 13px; margin-top: 10px;">
+            <p style="margin: 2px 0;">Subtotal: <strong>₹${order.subtotal}</strong></p>
+            <p style="margin: 2px 0;">Delivery: <strong>₹${order.deliveryCharge}</strong></p>
+            <p style="font-size: 16px; margin: 6px 0; font-weight: bold;">Grand Total: ₹${order.totalAmount}</p>
+            <p style="font-size: 11px; color: #666;">Payment: ${order.paymentMethod} (${order.paymentStatus})</p>
+          </div>
+        </div>
+      `;
+
+      printArea.classList.remove('hidden');
+      window.print();
+      setTimeout(() => {
+        printArea.classList.add('hidden');
+      }, 1000);
+    };
+
+    // Print Shipping Label
+    window.printShippingLabel = function() {
+      const order = window.liveOrders.find(o => String(o.id) === String(window.currentViewingOrderId));
+      if (!order) return;
+
+      const printArea = document.getElementById('print-invoice-area');
+      if (!printArea) return;
+
+      printArea.innerHTML = `
+        <div style="font-family: sans-serif; padding: 24px; border: 2px dashed #000; max-width: 450px; margin: 20px auto; border-radius: 8px;">
+          <h2 style="margin: 0 0 6px 0; font-size: 18px; font-weight: bold;">SHIP TO:</h2>
+          <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: bold; text-transform: uppercase;">${order.customerName}</h3>
+          <p style="margin: 0 0 4px 0; font-size: 13px;">📞 ${order.phone}</p>
+          <p style="margin: 0 0 16px 0; font-size: 12px; line-height: 1.5;">${order.address}</p>
+          
+          <div style="border-top: 1px solid #000; padding-top: 10px; display: flex; justify-content: space-between; font-size: 12px;">
+            <span>PKG: <strong>${(order.items || []).length} Item(s)</strong></span>
+            <span>ORDER: <strong>#${order.id}</strong></span>
+          </div>
+        </div>
+      `;
+
+      printArea.classList.remove('hidden');
+      window.print();
+      setTimeout(() => {
+        printArea.classList.add('hidden');
+      }, 1000);
+    };
+
+    // Contact Customer
+    window.contactCustomer = function() {
+      const order = window.liveOrders.find(o => String(o.id) === String(window.currentViewingOrderId));
+      if (!order || !order.phone) {
+        alert('Customer phone number not available.');
+        return;
+      }
+      const cleanPhone = String(order.phone).replace(/[^0-9]/g, '');
+      const choice = confirm(`Contact ${order.customerName} (${order.phone})?\n\nClick OK to open WhatsApp, or Cancel to Dial.`);
+      if (choice) {
+        window.open(`https://wa.me/91${cleanPhone}?text=Hi%20${encodeURIComponent(order.customerName)},%20regarding%20your%20order%20%23${order.id}%20at%20The%20Baniyan%20Company`, '_blank');
       } else {
-        if (gridBtn) {
-          gridBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-slate-500 hover:text-slate-900';
-        }
-        if (listBtn) {
-          listBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-2xs';
-        }
-      }
-
-      applyOrderFilters();
-    };
-
-    // Filter Logic
-    window.applyOrderFilters = function() {
-      const statusFilter = (window.activeOrderStatusFilter || 'all').trim().toLowerCase();
-      const dateScope = window.activeDateScope || 'today';
-      const search = (window.activeOrderSearch || '').trim().toLowerCase();
-      const paymentFilter = document.getElementById('order-payment-filter')?.value || 'all';
-      const sortFilter = document.getElementById('order-sort-filter')?.value || 'newest';
-
-      const baseOrders = [...window.liveOrders];
-
-      // Update counters
-      updateDateAndTabCounters();
-
-      // 1. Date Scope Filter (Today's orders by default!)
-      let filtered = baseOrders.filter(o => isOrderDateMatch(o, dateScope));
-
-      const emptyBanner = document.getElementById('today-empty-banner');
-      if (emptyBanner) {
-        if (dateScope === 'today' && filtered.length === 0 && baseOrders.length > 0) {
-          emptyBanner.classList.remove('hidden');
-          const bannerCount = document.getElementById('banner-all-count');
-          if (bannerCount) bannerCount.textContent = baseOrders.length;
-        } else {
-          emptyBanner.classList.add('hidden');
-        }
-      }
-
-      // 2. Status Filter
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(o => {
-          return canonicalStatus(o.status || o.orderStatus).toLowerCase() === statusFilter;
-        });
-      }
-
-      // 3. Search
-      if (search) {
-        filtered = filtered.filter(o => 
-          String(o.id || '').toLowerCase().includes(search) ||
-          String(o.customerName || '').toLowerCase().includes(search) ||
-          String(o.phone || '').includes(search) ||
-          String(o.city || '').toLowerCase().includes(search)
-        );
-      }
-
-      // 4. Payment
-      if (paymentFilter !== 'all') {
-        if (paymentFilter === 'paid') filtered = filtered.filter(o => String(o.paymentStatus || '').toLowerCase() === 'paid' || String(o.paymentMethod || '').toLowerCase().includes('razorpay'));
-        else if (paymentFilter === 'cod') filtered = filtered.filter(o => String(o.paymentMethod || '').toLowerCase().includes('cod') || String(o.paymentStatus || '').toLowerCase() !== 'paid');
-        else if (paymentFilter === 'whatsapp') filtered = filtered.filter(o => String(o.paymentMethod || '').toLowerCase().includes('whatsapp'));
-      }
-
-      // 5. Sort
-      if (sortFilter === 'newest') filtered.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
-      else if (sortFilter === 'oldest') filtered.sort((a, b) => (a.createdAtTimestamp || 0) - (b.createdAtTimestamp || 0));
-      else if (sortFilter === 'amount_high') filtered.sort((a, b) => (b.totalAmount || 0) - (a.totalAmount || 0));
-      else if (sortFilter === 'amount_low') filtered.sort((a, b) => (a.totalAmount || 0) - (b.totalAmount || 0));
-
-      renderOrdersView(filtered);
-    };
-
-    function updateDateAndTabCounters() {
-      const all = window.liveOrders;
-      const todayCount = all.filter(o => isOrderDateMatch(o, 'today')).length;
-      const allCount = all.length;
-
-      const setBadge = (id, val) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = val;
-      };
-
-      setBadge('badge-today-count', todayCount);
-      setBadge('badge-all-count', allCount);
-
-      // Status counters for active date scope
-      const scopeOrders = all.filter(o => isOrderDateMatch(o, window.activeDateScope || 'today'));
-      const countFor = (st) => scopeOrders.filter(o => {
-        return canonicalStatus(o.status || o.orderStatus).toLowerCase() === st;
-      }).length;
-
-      setBadge('count-all', scopeOrders.length);
-      setBadge('count-pending', countFor('pending'));
-      setBadge('count-accepted', countFor('accepted'));
-      setBadge('count-packing', countFor('packing'));
-      setBadge('count-shipped', countFor('shipped'));
-      setBadge('count-delivered', countFor('delivered'));
-      setBadge('count-cancelled', countFor('cancelled'));
-      setBadge('count-returned', countFor('returned'));
-    }
-
-    window.setOrderStatusFilter = function(status) {
-      window.activeOrderStatusFilter = status || 'all';
-      try {
-        const targetStatus = window.activeOrderStatusFilter.toLowerCase();
-        const newUrl = targetStatus === 'all' ? 'orders.html' : `orders.html?status=${targetStatus}`;
-        window.history.replaceState({ status: targetStatus }, '', newUrl);
-      } catch (_) {}
-
-      document.querySelectorAll('.order-tab-btn').forEach(btn => {
-        btn.classList.remove('bg-black', 'text-white', 'font-semibold');
-        btn.classList.add('bg-slate-100', 'text-slate-600', 'font-medium');
-      });
-
-      const active = document.getElementById(`btn-status-${status}`);
-      if (active) {
-        active.classList.remove('bg-slate-100', 'text-slate-600', 'font-medium');
-        active.classList.add('bg-black', 'text-white', 'font-semibold');
-      }
-
-      applyOrderFilters();
-    };
-
-    window.handleSearchOrders = function(val) {
-      window.activeOrderSearch = val;
-      const t = document.getElementById('table-order-search');
-      if (t && t.value !== val) t.value = val;
-      applyOrderFilters();
-    };
-
-    window.refreshOrdersFeed = async function() {
-      const shimmer = document.getElementById('orders-shimmer-container');
-      const container = document.getElementById('orders-cards-container');
-      if (shimmer) shimmer.classList.remove('hidden');
-      if (container) container.innerHTML = '';
-      await syncOrders(true);
-    };
-
-    window.toggleMobileSidebar = function() {
-      const sidebar = document.getElementById('admin-sidebar');
-      const backdrop = document.getElementById('sidebar-backdrop');
-      if (!sidebar) return;
-      if (sidebar.classList.contains('-translate-x-full')) {
-        sidebar.classList.remove('-translate-x-full');
-        if (backdrop) backdrop.classList.remove('hidden');
-      } else {
-        sidebar.classList.add('-translate-x-full');
-        if (backdrop) backdrop.classList.add('hidden');
+        window.location.href = `tel:${cleanPhone}`;
       }
     };
 
-    window.logoutAdmin = function() {
-      localStorage.removeItem('tbc_admin_authed');
-      window.location.href = 'admin.html';
-    };
+    // App Initialization
+    async function startApp() {
+      // 1. Instant Cache Hydration
+      loadCached();
 
-    // Robust Application Startup
-    function startOrdersApp() {
-      try {
-        const cachedLogo = localStorage.getItem('onespace_shop_logo') || localStorage.getItem('tbc_shop_logo');
-        if (cachedLogo && document.getElementById('sidebar-shop-logo-img')) document.getElementById('sidebar-shop-logo-img').src = cachedLogo;
-        const cachedName = localStorage.getItem('onespace_shop_name');
-        if (cachedName && document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = cachedName;
-      } catch(e) {}
-
-      // 0. Parse initial URL status query (e.g. ?status=pending)
-      const urlParams = new URLSearchParams(window.location.search);
-      const initialStatus = urlParams.get('status') || urlParams.get('filter') || 'all';
-      setOrderStatusFilter(initialStatus);
-
-      // Initialize view mode state button styles
-      setViewMode(window.activeViewMode);
-
-      // 1. Instantly load from cache in 0ms (no waiting, no network lag)
-      loadCachedOrders();
-
-      // 2. Real-time Firestore streaming across orders collections
+      // 2. Real-time Firestore Stream
       subscribeToOnlineOrders(orders => {
         if (!Array.isArray(orders)) return;
         const normalized = orders.map(o => normalizeOrderDoc(o.id, o));
-        normalized.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
-
-        // Detect newly placed orders
-        const previousIds = new Set(window.liveOrders.map(o => o.id));
-        const newArrivals = normalized.filter(o => !previousIds.has(o.id));
-
+        normalized.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         window.liveOrders = normalized;
-        applyOrderFilters();
+        renderTableView();
 
-        lastSyncTimestamp = Date.now();
-        const nowTimeStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-        updateSyncUI(`Live Stream · ${nowTimeStr}`, false);
-
-        // Alert user if newly placed orders arrived
-        if (newArrivals.length > 0 && previousIds.size > 0) {
-          notifyNewOrderArrival(newArrivals[0]);
+        if (window.currentViewingOrderId) {
+          window.openOrderDetail(window.currentViewingOrderId);
         }
       });
 
-      // 3. Fallback direct sync
-      syncOrders(false);
+      // 3. Fresh Network Fetch
+      await syncOrders();
 
-      // 4. Tab focus & visibility change listener
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          if (Date.now() - lastSyncTimestamp >= 60000) {
-            syncOrders(false);
-          }
+      // 4. Handle initial URL deep link (?id=ORD-...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetId = urlParams.get('id') || urlParams.get('orderId');
+      if (targetId) {
+        setTimeout(() => {
+          window.openOrderDetail(targetId);
+        }, 150);
+      }
+
+      // 5. Back/Forward Navigation Handler
+      window.addEventListener('popstate', (e) => {
+        const id = e.state?.orderId;
+        if (id) {
+          window.openOrderDetail(id);
+        } else {
+          window.closeOrderDetail();
         }
-      });
-
-      // 5. Cross-tab storage listeners for instant updates when checkout completes
-      window.addEventListener('storage', (e) => {
-        if (e.key === `tbc_cache_orders_${COMPANY_ID}`) {
-          loadCachedOrders();
-        }
-      });
-
-      window.addEventListener('tbc_orders_updated', () => {
-        loadCachedOrders();
-      });
-
-      // 6. Browser popstate navigation
-      window.addEventListener('popstate', () => {
-        const p = new URLSearchParams(window.location.search);
-        const st = p.get('status') || p.get('filter') || 'all';
-        setOrderStatusFilter(st);
       });
     }
 
-    // Never miss execution: if DOM is already parsed (typical with module scripts), run immediately!
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', startOrdersApp);
+      document.addEventListener('DOMContentLoaded', startApp);
     } else {
-      startOrdersApp();
+      startApp();
     }
   </script>
-    </div>
-  </div>
 </body>
 </html>

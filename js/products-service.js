@@ -28,6 +28,7 @@ import {
   addDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   query,
   where,
   orderBy,
@@ -2268,6 +2269,31 @@ export async function setOrderStatus(invoiceId, status, companyId = COMPANY_ID) 
     return { success: true };
   } catch (err) {
     console.error('[TBC] setOrderStatus error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Delete an order from companies/{companyId}/orders and invoices.
+ * @param {string} invoiceId
+ * @param {string} [companyId]
+ * @returns {Promise<{ success: boolean }>}
+ */
+export async function deleteOnlineOrder(invoiceId, companyId = COMPANY_ID) {
+  if (!invoiceId) return { success: false, error: 'No invoiceId provided.' };
+  try {
+    const ref1 = doc(db, `companies/${companyId}/orders`, invoiceId);
+    const ref2 = doc(db, `companies/${companyId}/invoices`, invoiceId);
+    await Promise.allSettled([
+      deleteDoc(ref1),
+      deleteDoc(ref2)
+    ]);
+    const current = getCachedOrders(companyId);
+    const updated = current.filter(o => String(o.id) !== String(invoiceId));
+    setCachedOrders(updated, companyId);
+    return { success: true };
+  } catch (err) {
+    console.warn('[TBC Orders] Delete order notice:', err);
     return { success: false, error: err.message };
   }
 }
