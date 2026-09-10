@@ -83,6 +83,24 @@
 
 <body class="bg-[#fafafa] text-slate-900 antialiased min-h-screen">
 
+  <!-- Full-Screen Page Loader -->
+  <div id="page-loader" class="fixed inset-0 z-[100] bg-[#0b0d13] flex flex-col items-center justify-center transition-opacity duration-300">
+    <div class="flex flex-col items-center gap-4">
+      <div class="relative flex items-center justify-center">
+        <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl">
+          <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce" class="w-10 h-10 object-contain animate-pulse" onerror="this.src='assets/tbclogo.jpeg';">
+        </div>
+        <div class="absolute -inset-2.5 rounded-3xl border-2 border-emerald-500/20 border-t-emerald-400 animate-spin"></div>
+      </div>
+      <div class="text-center space-y-1">
+        <div class="flex items-center gap-1 text-sm font-semibold tracking-tight text-white">
+          <span>OneSpace</span><span class="text-emerald-400">Commerce</span>
+        </div>
+        <p class="text-[10px] text-slate-400 uppercase tracking-widest font-medium">LOADING BANNERS WORKSPACE...</p>
+      </div>
+    </div>
+  </div>
+
   <div class="min-h-screen flex flex-col md:flex-row">
 
     <!-- Mobile Drawer Backdrop -->
@@ -729,6 +747,19 @@
       window.location.href = 'admin.html';
     };
 
+    // Hide Page Loader Helper (Ultra Fast 150ms)
+    window.hidePageLoader = function() {
+      const loader = document.getElementById('page-loader');
+      if (loader && loader.style.display !== 'none') {
+        loader.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          loader.style.display = 'none';
+        }, 150);
+      }
+    };
+    setTimeout(window.hidePageLoader, 150);
+
     window.addEventListener('DOMContentLoaded', () => {
       try {
         const cachedLogo = localStorage.getItem('onespace_shop_logo') || localStorage.getItem('tbc_shop_logo');
@@ -737,6 +768,7 @@
         if (cachedName && document.getElementById('sidebar-shop-name')) document.getElementById('sidebar-shop-name').textContent = cachedName;
       } catch(e) {}
       loadBanners();
+      window.hidePageLoader();
     });
   </script>
 </body>

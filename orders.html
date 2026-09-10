@@ -98,6 +98,24 @@
 
 <body class="bg-[#f6f8fa] text-slate-900 antialiased min-h-screen">
 
+  <!-- Full-Screen Page Loader -->
+  <div id="page-loader" class="fixed inset-0 z-[100] bg-[#0b0d13] flex flex-col items-center justify-center transition-opacity duration-300">
+    <div class="flex flex-col items-center gap-4">
+      <div class="relative flex items-center justify-center">
+        <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl">
+          <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce" class="w-10 h-10 object-contain animate-pulse" onerror="this.src='assets/tbclogo.jpeg';">
+        </div>
+        <div class="absolute -inset-2.5 rounded-3xl border-2 border-emerald-500/20 border-t-emerald-400 animate-spin"></div>
+      </div>
+      <div class="text-center space-y-1">
+        <div class="flex items-center gap-1 text-sm font-semibold tracking-tight text-white">
+          <span>OneSpace</span><span class="text-emerald-400">Commerce</span>
+        </div>
+        <p class="text-[10px] text-slate-400 uppercase tracking-widest font-medium">LOADING ORDERS WORKSPACE...</p>
+      </div>
+    </div>
+  </div>
+
   <div class="min-h-screen flex flex-col md:flex-row">
 
     <!-- Mobile Drawer Backdrop -->
@@ -312,6 +330,16 @@
         >
           <span class="material-symbols-outlined text-[16px] text-rose-500">delete</span>
           <span>DELETE ALL</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="markAllOrdersSeen()"
+          class="bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0"
+          title="Mark all orders in view as read/seen"
+        >
+          <span class="material-symbols-outlined text-[16px] text-blue-600">done_all</span>
+          <span>MARK ALL SEEN</span>
         </button>
 
         <!-- Status Queue Pills (Matching Screenshot 1) -->
@@ -815,11 +843,48 @@
       deleteOnlineOrder
     } from './js/products-service.js';
 
-    // Application State
+    // Application State & Seen Orders Tracking
     window.liveOrders = [];
     window.activeQueueFilter = 'all';
     window.searchQuery = '';
     window.currentViewingOrderId = null;
+    window.seenOrderIds = new Set(JSON.parse(localStorage.getItem('tbc_seen_orders') || '[]'));
+
+    window.isOrderSeen = function(id) {
+      return window.seenOrderIds.has(String(id));
+    };
+
+    window.markOrderSeen = function(id) {
+      window.seenOrderIds.add(String(id));
+      try {
+        localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
+      } catch (_) {}
+      renderTableView();
+    };
+
+    window.toggleOrderSeen = function(id, event) {
+      if (event) event.stopPropagation();
+      const strId = String(id);
+      if (window.seenOrderIds.has(strId)) {
+        window.seenOrderIds.delete(strId);
+      } else {
+        window.seenOrderIds.add(strId);
+      }
+      try {
+        localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
+      } catch (_) {}
+      renderTableView();
+    };
+
+    window.markAllOrdersSeen = function() {
+      const filtered = getFilteredOrders();
+      if (!filtered || filtered.length === 0) return;
+      filtered.forEach(o => window.seenOrderIds.add(String(o.id)));
+      try {
+        localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
+      } catch (_) {}
+      renderTableView();
+    };
 
     // Universal status mapper to canonical stages
     function canonicalStatus(rawStatus) {
@@ -1056,11 +1121,11 @@
       const filtered = getFilteredOrders();
       if (queueBadge) queueBadge.textContent = filtered.length;
 
-      // Update Sidebar pending counter
+      // Update Sidebar counter (Unseen orders count)
       const sideBadge = document.getElementById('sidebar-order-badge');
       if (sideBadge) {
-        const pendingCount = (window.liveOrders || []).filter(o => canonicalStatus(o.status) === 'Pending').length;
-        sideBadge.textContent = pendingCount;
+        const unseenCount = (window.liveOrders || []).filter(o => !window.isOrderSeen(o.id)).length;
+        sideBadge.textContent = unseenCount;
       }
 
       if (!filtered || filtered.length === 0) {
@@ -1078,14 +1143,22 @@
           const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
           const payLabel = isPaid ? 'RAZORPAY ONLINE PAYMENT' : (String(o.paymentMethod || '').toUpperCase().includes('COD') ? 'CASH ON DELIVERY (COD)' : 'ONLINE PAYMENT');
           const curStatus = canonicalStatus(o.status).toUpperCase();
+          const seen = window.isOrderSeen(o.id);
+          const unseenBadge = !seen ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-blue-500 text-white animate-pulse"><span class="w-1.5 h-1.5 rounded-full bg-white"></span>UNSEEN</span>` : '';
+          const rowBg = !seen ? 'bg-blue-50/40 font-semibold' : '';
 
           return `
-            <tr onclick="openOrderDetail('${o.id}')" class="hover:bg-slate-50/70 transition-colors cursor-pointer group">
+            <tr onclick="openOrderDetail('${o.id}')" class="hover:bg-slate-50/70 transition-colors cursor-pointer group ${rowBg}">
               <td class="py-4 px-4 text-center" onclick="event.stopPropagation()">
-                <span class="w-3.5 h-3.5 rounded-full border border-slate-300 inline-block group-hover:border-slate-400"></span>
+                <button type="button" onclick="toggleOrderSeen('${o.id}', event)" class="focus:outline-none" title="${seen ? 'Mark as Unseen' : 'Mark as Seen'}">
+                  <span class="w-3.5 h-3.5 rounded-full border ${seen ? 'border-slate-300 bg-transparent' : 'border-blue-500 bg-blue-500 ring-2 ring-blue-200'} inline-block"></span>
+                </button>
               </td>
               <td class="py-4 px-4 font-mono font-bold text-slate-800 whitespace-nowrap">
-                #${o.id}
+                <div class="flex items-center gap-1.5">
+                  <span>#${o.id}</span>
+                  ${unseenBadge}
+                </div>
               </td>
               <td class="py-4 px-4 text-slate-400 whitespace-nowrap font-medium">
                 ${o.dateShort}
@@ -1112,6 +1185,9 @@
               </td>
               <td class="py-4 px-4 text-right pr-6 whitespace-nowrap" onclick="event.stopPropagation()">
                 <div class="flex items-center justify-end gap-2">
+                  <button type="button" onclick="toggleOrderSeen('${o.id}', event)" class="text-[10px] font-bold ${seen ? 'text-slate-400 hover:text-slate-600' : 'text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md'} transition cursor-pointer">
+                    ${seen ? 'UNMARK' : 'MARK SEEN'}
+                  </button>
                   <button type="button" onclick="confirmDeleteOrder('${o.id}', event)" class="text-rose-400 hover:text-rose-600 p-1 transition cursor-pointer" title="Delete Order">
                     <span class="material-symbols-outlined text-[18px]">delete</span>
                   </button>
@@ -1125,12 +1201,13 @@
         }).join('');
       }
 
-      // 2. POPULATE GRID VIEW
+      // 2. POPULATE GRID VIEW (Equal Heights & Uniform Alignment)
       if (gridContainer) {
         gridContainer.innerHTML = filtered.map(o => {
           const isPaid = (String(o.paymentStatus || '').toLowerCase() === 'paid') || String(o.paymentMethod || '').toLowerCase().includes('razorpay');
           const payLabel = isPaid ? 'RAZORPAY ONLINE' : (String(o.paymentMethod || '').toUpperCase().includes('COD') ? 'CASH ON DELIVERY' : 'ONLINE PAYMENT');
           const curStatus = canonicalStatus(o.status).toUpperCase();
+          const seen = window.isOrderSeen(o.id);
 
           const statusColor = (curStatus === 'DELIVERED') 
             ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
@@ -1138,14 +1215,25 @@
               ? 'bg-rose-50 text-rose-700 border-rose-200' 
               : 'bg-slate-50 text-slate-700 border-slate-200');
 
+          const unseenBadge = !seen ? `<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-blue-500 text-white shrink-0 animate-pulse">● UNSEEN</span>` : '';
+          const cardBorder = !seen ? 'border-t-4 border-t-blue-500 border-slate-200' : 'border-slate-200/90';
+
+          const itemImgs = (o.items || []).slice(0, 3).map(i => `
+            <img src="${i.imageUrl || 'https://placehold.co/80x100?text=Product'}" alt="${i.name}" class="w-7 h-8 object-cover rounded-md border border-slate-200 bg-white shrink-0">
+          `).join('');
+
           return `
-            <div onclick="openOrderDetail('${o.id}')" class="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-400 p-4.5 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-3.5 group">
-              <!-- Header -->
+            <div onclick="openOrderDetail('${o.id}')" class="bg-white rounded-2xl border ${cardBorder} hover:border-slate-400 p-4.5 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between h-full min-h-[300px] space-y-3 group">
+              
+              <!-- Header Strip -->
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                  <span class="font-mono font-bold text-xs text-slate-800 group-hover:text-blue-600 transition block truncate">
-                    #${o.id}
-                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-mono font-bold text-xs text-slate-800 group-hover:text-blue-600 transition truncate">
+                      #${o.id}
+                    </span>
+                    ${unseenBadge}
+                  </div>
                   <span class="text-[10px] text-slate-400 font-medium tracking-wide uppercase block mt-0.5">
                     ${o.dateShort}
                   </span>
@@ -1155,9 +1243,9 @@
                 </span>
               </div>
 
-              <!-- Customer Details -->
+              <!-- Customer Details Pill -->
               <div class="flex items-center gap-2.5 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
-                <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 font-bold text-[11px] flex items-center justify-center shrink-0">
+                <div class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 border border-slate-300">
                   ${(o.customerName || 'C').charAt(0).toUpperCase()}
                 </div>
                 <div class="min-w-0 flex-1">
@@ -1166,16 +1254,21 @@
                 </div>
               </div>
 
-              <!-- Items Summary -->
-              <div class="space-y-0.5">
-                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">ITEMS</span>
-                <p class="text-xs font-semibold text-slate-700 uppercase line-clamp-2" title="${o.productsSummary}">
+              <!-- Items List & Image Previews -->
+              <div class="space-y-1.5 flex-1 flex flex-col justify-center">
+                <div class="flex items-center justify-between">
+                  <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">ITEMS (${(o.items || []).length})</span>
+                  <div class="flex items-center gap-1">
+                    ${itemImgs}
+                  </div>
+                </div>
+                <p class="text-xs font-semibold text-slate-700 uppercase" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.25rem;" title="${o.productsSummary}">
                   ${o.productsSummary}
                 </p>
               </div>
 
-              <!-- Price & Payment -->
-              <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+              <!-- Price & Payment Badge -->
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
                 <div>
                   <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">TOTAL</span>
                   <span class="text-sm font-extrabold text-blue-600 block">
@@ -1187,16 +1280,22 @@
                 </span>
               </div>
 
-              <!-- Bottom Actions -->
-              <div class="flex items-center justify-between pt-1" onclick="event.stopPropagation()">
-                <button type="button" onclick="confirmDeleteOrder('${o.id}', event)" class="text-rose-400 hover:text-rose-600 p-1 rounded-md hover:bg-rose-50 transition cursor-pointer" title="Delete Order">
-                  <span class="material-symbols-outlined text-[17px]">delete</span>
-                </button>
+              <!-- Bottom Actions Bar -->
+              <div class="flex items-center justify-between pt-1 border-t border-slate-100" onclick="event.stopPropagation()">
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="confirmDeleteOrder('${o.id}', event)" class="text-rose-400 hover:text-rose-600 p-1 rounded-md hover:bg-rose-50 transition cursor-pointer" title="Delete Order">
+                    <span class="material-symbols-outlined text-[17px]">delete</span>
+                  </button>
+                  <button type="button" onclick="toggleOrderSeen('${o.id}', event)" class="text-[10px] font-bold ${seen ? 'text-slate-400 hover:text-slate-600' : 'text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md'} transition cursor-pointer">
+                    ${seen ? 'UNMARK' : 'MARK SEEN'}
+                  </button>
+                </div>
                 <button type="button" onclick="openOrderDetail('${o.id}')" class="text-xs font-bold text-slate-700 hover:text-black flex items-center gap-1 group-hover:translate-x-0.5 transition cursor-pointer">
                   <span>Milestones</span>
                   <span class="font-bold text-sm">&gt;</span>
                 </button>
               </div>
+
             </div>
           `;
         }).join('');
@@ -1244,6 +1343,9 @@
       if (!order) return;
 
       window.currentViewingOrderId = order.id;
+
+      // Mark order as seen when opened
+      window.markOrderSeen(order.id);
 
       // Toggle views
       document.getElementById('orders-table-view').classList.add('hidden');
@@ -1541,9 +1643,9 @@
             </div>
             <div style="text-align: right;">
               <div style="display: flex; align-items: center; gap: 6px; justify-content: flex-end; margin-bottom: 8px;">
-                <span style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase;">Powered By</span>
+                <span style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase;">POWERED BY</span>
+                <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" style="height: 22px; width: 22px; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact;" onerror="this.src='assets/onespace-commerce-logo.png';">
                 <span style="font-size: 11px; font-weight: 800; color: #0f172a;">OneSpace <span style="color:#10b981;">Commerce</span></span>
-                <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce" style="height: 22px; width: 22px; object-fit: contain;">
               </div>
               <p style="font-size: 14px; font-weight: 800; margin: 0;">#${order.id}</p>
               <p style="font-size: 11px; color: #666; margin: 2px 0 0 0;">${order.dateLong}</p>
@@ -1593,6 +1695,18 @@
       }, 1000);
     };
 
+    // Hide Page Loader Helper (Instant & Ultra-Fast Transition)
+    window.hidePageLoader = function() {
+      const loader = document.getElementById('page-loader');
+      if (loader && loader.style.display !== 'none') {
+        loader.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          loader.style.display = 'none';
+        }, 150);
+      }
+    };
+
     // Print Shipping Label
     window.printShippingLabel = function() {
       const order = window.liveOrders.find(o => String(o.id) === String(window.currentViewingOrderId));
@@ -1610,28 +1724,26 @@
               <p style="margin: 2px 0 0 0; font-size: 10px; font-weight: 800; color: #64748b; tracking-wider: 1px; uppercase">SHIPPING LABEL</p>
             </div>
             <div style="text-align: right; display: flex; align-items: center; gap: 6px; justify-content: flex-end;">
-              <div style="text-align: right;">
-                <span style="font-size: 9px; color: #64748b; font-weight: 700; display: block; text-transform: uppercase;">Powered By</span>
-                <span style="font-size: 11px; font-weight: 800; color: #0f172a;">OneSpace <span style="color:#10b981;">Commerce</span></span>
-              </div>
-              <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" style="height: 24px; width: 24px; object-fit: contain;">
+              <span style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase;">POWERED BY</span>
+              <img src="assets/onespace-commerce-logo.png" alt="OneSpace Commerce Logo" style="height: 24px; width: 24px; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact;" onerror="this.src='assets/onespace-commerce-logo.png';">
+              <span style="font-size: 12px; font-weight: 800; color: #0f172a;">OneSpace <span style="color:#10b981;">Commerce</span></span>
             </div>
           </div>
 
-          <!-- SHIP FROM Box -->
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 11px; line-height: 1.5;">
-            <p style="margin: 0; font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">SHIP FROM:</p>
+          <!-- SHIP TO Box (RECIPIENT FIRST) -->
+          <div style="background: #f8fafc; border: 2px solid #0f172a; padding: 12px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 12px; line-height: 1.5;">
+            <p style="margin: 0; font-size: 10px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">SHIP TO (RECIPIENT):</p>
+            <h3 style="margin: 3px 0 0 0; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #000;">${order.customerName}</h3>
+            <p style="margin: 3px 0 0 0; font-weight: 800; color: #000; font-size: 13px;">📞 ${order.phone || 'N/A'}</p>
+            <p style="margin: 4px 0 0 0; color: #1e293b; font-size: 12px; line-height: 1.5; font-weight: 600;">${order.address}</p>
+          </div>
+
+          <!-- SHIP FROM Box (SENDER BELOW SHIP TO) -->
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 11px; line-height: 1.5;">
+            <p style="margin: 0; font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">SHIP FROM (SENDER):</p>
             <p style="margin: 2px 0 0 0; font-weight: 800; font-size: 12px; color: #0f172a;">THE BANIYAN COMPANY</p>
             <p style="margin: 1px 0 0 0; font-weight: 700; color: #1e293b;">📞 +91 8110061611</p>
             <p style="margin: 1px 0 0 0; color: #334155;">No: 164, Kamarajar Road, Coimbatore 641015, Tamil Nadu, India</p>
-          </div>
-
-          <!-- SHIP TO Box -->
-          <div style="margin-bottom: 16px; font-size: 12px; line-height: 1.5; padding: 4px 0;">
-            <p style="margin: 0; font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">SHIP TO:</p>
-            <h3 style="margin: 2px 0 0 0; font-size: 16px; font-weight: 800; text-transform: uppercase; color: #000;">${order.customerName}</h3>
-            <p style="margin: 2px 0 0 0; font-weight: 700; color: #000;">📞 ${order.phone || 'N/A'}</p>
-            <p style="margin: 4px 0 0 0; color: #1e293b; font-size: 12px; line-height: 1.5; font-weight: 500;">${order.address}</p>
           </div>
 
           <!-- Order Summary Footer -->
@@ -1669,6 +1781,7 @@
     async function startApp() {
       // 1. Instant Cache Hydration
       loadCached();
+      window.hidePageLoader();
 
       // 2. Real-time Firestore Stream
       subscribeToOnlineOrders(orders => {
@@ -1677,6 +1790,7 @@
         normalized.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         window.liveOrders = normalized;
         renderTableView();
+        window.hidePageLoader();
 
         if (window.currentViewingOrderId) {
           window.openOrderDetail(window.currentViewingOrderId);
@@ -1685,6 +1799,7 @@
 
       // 3. Fresh Network Fetch
       await syncOrders();
+      window.hidePageLoader();
 
       // 4. Handle initial URL deep link (?id=ORD-...)
       const urlParams = new URLSearchParams(window.location.search);
@@ -1705,6 +1820,9 @@
         }
       });
     }
+
+    // Safety fallback timer to ensure loader disappears within 600ms
+    setTimeout(window.hidePageLoader, 600);
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', startApp);
