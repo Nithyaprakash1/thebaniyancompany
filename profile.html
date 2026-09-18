@@ -800,15 +800,59 @@
     localStorage.removeItem('tbc_user_profile');
     localStorage.removeItem('tbc_customer_phone');
     localStorage.removeItem('tbc_customer_email');
+    localStorage.removeItem('tbc_local_orders');
+    if (window._customerOrdersUnsub) {
+      try { window._customerOrdersUnsub(); } catch(e) {}
+    }
     alert('Signed out successfully.');
     window.location.reload();
   };
 
-  function renderCustomerOrders(liveOrders) {
+  function renderCustomerOrders(liveOrders, identifier = '') {
+    const rawId = String(identifier || '').trim();
+    const cleanPhone = rawId.replace(/\D/g, '').slice(-10);
+    const cleanEmail = rawId.toLowerCase();
+
+    // If no valid identifier exists, present empty state
+    if ((!cleanPhone || cleanPhone.length < 7) && (!cleanEmail || !cleanEmail.includes('@'))) {
+      window.currentCustomerOrders = [];
+      const container = document.getElementById('recent-orders-container');
+      const statOrdersEl = document.getElementById('stat-orders-count');
+      const navOrderStatusEl = document.getElementById('nav-order-status');
+      const statSavedEl = document.getElementById('stat-saved-amount');
+
+      if (statOrdersEl) statOrdersEl.textContent = '0';
+      if (navOrderStatusEl) navOrderStatusEl.textContent = '0 active';
+      if (statSavedEl) statSavedEl.textContent = '₹0';
+
+      if (container) {
+        container.innerHTML = `
+          <div class="bg-white p-6 rounded-2xl border border-black/5 text-center space-y-2">
+            <p class="text-xs font-bold text-primary">Please log in to view your orders</p>
+          </div>`;
+      }
+      return;
+    }
+
     let localOrders = [];
     try {
       localOrders = JSON.parse(localStorage.getItem('tbc_local_orders') || '[]');
     } catch(e) {}
+
+    // Strictly filter localOrders by current user identifier (phone or email)
+    localOrders = localOrders.filter(o => {
+      if (!o) return false;
+      const p1 = String(o.customerPhoneNumber || o.customerPhone || o.phone || o.customerDetails?.phone || o.customer?.phone || o.shippingAddress?.phone || '').replace(/\D/g, '').slice(-10);
+      const e1 = String(o.customerEmail || o.customerDetails?.email || o.customer?.email || o.email || '').toLowerCase().trim();
+
+      if (cleanPhone && cleanPhone.length >= 7 && p1 && p1.length >= 7) {
+        if (p1 === cleanPhone || p1.endsWith(cleanPhone) || cleanPhone.endsWith(p1)) return true;
+      }
+      if (cleanEmail && cleanEmail.includes('@') && e1 && e1.includes('@')) {
+        if (e1 === cleanEmail) return true;
+      }
+      return false;
+    });
 
     const combinedMap = new Map();
     (liveOrders || []).forEach(o => { if (o && o.id) combinedMap.set(String(o.id), o); });
@@ -923,9 +967,14 @@
     if (emailEl) emailEl.textContent = cleanPhone ? `📱 +91 ${cleanPhone} · ${displayEmail}` : displayEmail;
     if (avatarEl) avatarEl.textContent = (name || 'U').charAt(0).toUpperCase();
 
-    // Pure real-time stream subscription for customer orders
-    subscribeToCustomerOrders(identifier, (liveOrders) => {
-      renderCustomerOrders(liveOrders);
+    // Clean up any existing stream before creating a new subscription
+    if (window._customerOrdersUnsub) {
+      try { window._customerOrdersUnsub(); } catch(e) {}
+    }
+
+    // Pure real-time stream subscription strictly scoped to logged-in user identifier
+    window._customerOrdersUnsub = subscribeToCustomerOrders(identifier, (liveOrders) => {
+      renderCustomerOrders(liveOrders, identifier);
     });
   }
 

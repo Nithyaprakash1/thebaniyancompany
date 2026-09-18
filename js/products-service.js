@@ -1785,7 +1785,7 @@ export async function decrementStockForOrder(items = [], branchId = BRANCH_ID) {
 export async function getCustomerOrders(phoneNumber, companyId = COMPANY_ID) {
   if (!phoneNumber) return [];
   const cleanPhone = String(phoneNumber).replace(/\D/g, '').slice(-10);
-  if (!cleanPhone) return [];
+  if (!cleanPhone || cleanPhone.length < 7) return [];
 
   try {
     const q1 = query(collection(db, `companies/${companyId}/invoices`), where('customerPhoneNumber', '==', cleanPhone));
@@ -1804,7 +1804,10 @@ export async function getCustomerOrders(phoneNumber, companyId = COMPANY_ID) {
           const data = d.data();
           const id = data.id || d.id;
           if (!orderMap.has(id)) {
-            orderMap.set(id, { id, ...data });
+            const p1 = String(data.customerPhoneNumber || data.customerPhone || data.phone || data.customerDetails?.phone || data.shippingAddress?.phone || '').replace(/\D/g, '').slice(-10);
+            if (p1 && p1.length >= 7 && (p1 === cleanPhone || p1.endsWith(cleanPhone) || cleanPhone.endsWith(p1))) {
+              orderMap.set(id, { id, ...data });
+            }
           }
         });
       }
@@ -1830,6 +1833,11 @@ export async function getCustomerOrders(phoneNumber, companyId = COMPANY_ID) {
 export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMPANY_ID) {
   if (typeof onUpdate !== 'function') return () => {};
 
+  if (!identifier || String(identifier).trim() === '') {
+    onUpdate([]);
+    return () => {};
+  }
+
   try {
     const ref2 = collection(db, `companies/${companyId}/invoices`);
     const ref3 = collection(db, `companies/${companyId}/orders`);
@@ -1838,34 +1846,46 @@ export function subscribeToCustomerOrders(identifier, onUpdate, companyId = COMP
     const docsMap3 = new Map();
 
     const combineAndNotify = () => {
-      if (!identifier) {
+      const rawId = String(identifier).trim();
+      const cleanPhone = rawId.replace(/\D/g, '').slice(-10);
+      const cleanEmail = rawId.toLowerCase();
+
+      if ((!cleanPhone || cleanPhone.length < 7) && (!cleanEmail || !cleanEmail.includes('@'))) {
         onUpdate([]);
         return;
       }
-
-      const cleanPhone = String(identifier).replace(/\D/g, '').slice(-10);
-      const cleanEmail = String(identifier).toLowerCase().trim();
 
       const combinedMap = new Map([...docsMap2, ...docsMap3]);
       const allDocs = Array.from(combinedMap.values());
 
       const matched = allDocs.filter(doc => {
+        if (!doc) return false;
+
         const p1 = String(doc.customerPhoneNumber || '').replace(/\D/g, '').slice(-10);
         const p2 = String(doc.customerPhone || '').replace(/\D/g, '').slice(-10);
         const p3 = String(doc.customerDetails?.phone || doc.phone || '').replace(/\D/g, '').slice(-10);
-        const p4 = String(doc.customer?.phone || doc.shippingAddress?.phone || '').replace(/\D/g, '').slice(-10);
-        const e1 = String(doc.customerEmail || doc.customerDetails?.email || doc.customer?.email || doc.email || '').toLowerCase().trim();
+        const p4 = String(doc.customer?.phone || doc.shippingAddress?.phone || doc.billingAddress?.phone || '').replace(/\D/g, '').slice(-10);
+        const e1 = String(doc.customerEmail || doc.customerDetails?.email || doc.customer?.email || doc.email || doc.shippingAddress?.email || '').toLowerCase().trim();
 
+        // Phone check: Requires at least 7 digits on BOTH target and doc phone
         if (cleanPhone && cleanPhone.length >= 7) {
-          if (p1 === cleanPhone || p2 === cleanPhone || p3 === cleanPhone || p4 === cleanPhone ||
-              p1.includes(cleanPhone) || p2.includes(cleanPhone) || p3.includes(cleanPhone) || p4.includes(cleanPhone) ||
-              cleanPhone.includes(p1) || cleanPhone.includes(p4)) {
+          const matchPhone = (p) => {
+            if (!p || p.length < 7) return false;
+            return p === cleanPhone || p.endsWith(cleanPhone) || cleanPhone.endsWith(p);
+          };
+
+          if (matchPhone(p1) || matchPhone(p2) || matchPhone(p3) || matchPhone(p4)) {
             return true;
           }
         }
-        if (cleanEmail && cleanEmail.includes('@') && e1 === cleanEmail) {
-          return true;
+
+        // Email check: Strict exact equality for non-empty emails containing '@'
+        if (cleanEmail && cleanEmail.includes('@') && e1 && e1.includes('@')) {
+          if (e1 === cleanEmail) {
+            return true;
+          }
         }
+
         return false;
       });
 
