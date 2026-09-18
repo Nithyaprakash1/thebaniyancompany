@@ -916,12 +916,34 @@
         resultEl.classList.remove('hidden');
         return;
       }
-      // Simple TN detection
+
+      let deliveryTnPrice = 0;
+      let deliveryNonTnPrice = 60;
+      let freeShippingMin = 999;
+      let isFreeShippingEnabled = true;
+      try {
+        const raw = localStorage.getItem('tbc_cache_company');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const comp = parsed.data || parsed;
+          if (comp?.deliveryTnPrice !== undefined) deliveryTnPrice = Number(comp.deliveryTnPrice);
+          if (comp?.deliveryNonTnPrice !== undefined) deliveryNonTnPrice = Number(comp.deliveryNonTnPrice);
+          if (comp?.freeShippingMin !== undefined) freeShippingMin = Number(comp.freeShippingMin);
+          if (comp?.isFreeShippingEnabled !== undefined) isFreeShippingEnabled = Boolean(comp.isFreeShippingEnabled);
+          else if (comp?.freeShippingEnabled !== undefined) isFreeShippingEnabled = Boolean(comp.freeShippingEnabled);
+        }
+      } catch (e) {}
+
+      const price = Number(window.currentProductData?.price || 0);
+      const isFree = isFreeShippingEnabled && price >= freeShippingMin;
+
       const tnPins = ['600', '601', '602', '603', '604', '605', '606', '607', '608', '609', '610', '611', '612', '613', '614', '615', '616', '617', '618', '619', '620', '621', '622', '623', '624', '625', '626', '627', '628', '629', '630', '631', '632', '633', '634', '635', '636', '637', '638', '639', '640', '641', '642', '643', '644', '645', '646', '647', '648'];
       const isTN = tnPins.some(p => pin.startsWith(p));
-      resultEl.textContent = isTN
-        ? '✓ Free delivery! Estimated 2–4 business days.'
-        : '✓ Delivery available. Estimated 4–7 business days.';
+      const fee = isFree ? 0 : (isTN ? deliveryTnPrice : deliveryNonTnPrice);
+
+      resultEl.textContent = fee === 0
+        ? '✓ Free Delivery! Estimated 2–4 business days.'
+        : `✓ Delivery Fee: ₹${fee}. Estimated ${isTN ? '2–4' : '4–7'} business days.`;
       resultEl.className = 'text-xs font-medium text-emerald-600';
       resultEl.classList.remove('hidden');
     };

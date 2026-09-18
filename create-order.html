@@ -231,6 +231,10 @@
 
     // Load Catalog with Shimmer and Cache Fallback
     async function initPage() {
+      if (localStorage.getItem('tbc_admin_authed') !== 'true') {
+        window.location.href = 'admin.html';
+        return;
+      }
       const shimmerEl = document.getElementById('products-shimmer');
       const boxEl = document.getElementById('products-box');
       const badgeEl = document.getElementById('catalog-loading-badge');

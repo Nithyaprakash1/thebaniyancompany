@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -470,7 +470,7 @@
     <div class="bg-surface-container/60 p-4 rounded-2xl space-y-2 text-xs">
       <div class="flex justify-between text-secondary">
         <span>Delivery Charge</span>
-        <span class="font-bold text-emerald-600">FREE</span>
+        <span id="modal-order-delivery" class="font-bold text-emerald-600">Free Delivery</span>
       </div>
       <div class="flex justify-between font-bold text-sm text-primary pt-2 border-t border-black/10">
         <span>Total Amount</span>
@@ -969,6 +969,13 @@
 
     const modalAddr = document.getElementById('modal-order-address');
     if (modalAddr) modalAddr.textContent = `${o.customerAddress || ''}, ${o.city || ''}, ${o.state || ''} - ${o.pincode || ''}`;
+
+    const modalDelivery = document.getElementById('modal-order-delivery');
+    if (modalDelivery) {
+      const devFee = Number(o.deliveryCharge || 0);
+      modalDelivery.textContent = devFee > 0 ? `₹${devFee.toLocaleString('en-IN')}` : 'Free Delivery';
+      modalDelivery.className = devFee > 0 ? 'font-bold text-primary' : 'font-bold text-emerald-600';
+    }
 
     const modalTotal = document.getElementById('modal-order-total');
     if (modalTotal) modalTotal.textContent = `₹${(o.totalAmount || 0).toLocaleString('en-IN')}`;

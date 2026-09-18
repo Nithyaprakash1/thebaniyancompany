@@ -352,79 +352,99 @@
           <span>MARK ALL SEEN</span>
         </button>
 
-        <!-- Status Queue Pills (Matching Screenshot 1) -->
-        <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-1">
-          <button
-            type="button"
-            onclick="setQueueFilter('all')"
-            id="tab-queue-all"
-            class="queue-tab-btn bg-[#0f172a] text-white font-bold rounded-full px-4 py-1.5 text-xs shadow-xs shrink-0 transition"
-          >
-            ALL QUEUE
-          </button>
+        <!-- Status Queue Filter Dropdown & Pills -->
+        <div class="flex items-center gap-2 overflow-x-auto custom-scrollbar py-1 flex-wrap sm:flex-nowrap">
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">FILTER:</span>
+            <select
+              id="queue-filter-select"
+              onchange="setQueueFilter(this.value)"
+              class="bg-white border border-slate-200 text-slate-800 font-bold rounded-full px-3.5 py-1.5 text-xs shadow-2xs cursor-pointer outline-none focus:border-slate-400 uppercase tracking-wider"
+            >
+              <option value="all">ALL QUEUE</option>
+              <option value="awaiting_acceptance">AWAITING ACCEPTANCE</option>
+              <option value="processing">PROCESSING</option>
+              <option value="packed">PACKED</option>
+              <option value="shipped">SHIPPED</option>
+              <option value="out_for_delivery">OUT FOR DELIVERY</option>
+              <option value="delivered">DELIVERED</option>
+              <option value="cancelled">CANCELLED</option>
+            </select>
+          </div>
 
-          <button
-            type="button"
-            onclick="setQueueFilter('awaiting_acceptance')"
-            id="tab-queue-awaiting_acceptance"
-            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
-          >
-            AWAITING ACCEPTANCE
-          </button>
+          <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
+            <button
+              type="button"
+              onclick="setQueueFilter('all')"
+              id="tab-queue-all"
+              class="queue-tab-btn bg-[#0f172a] text-white font-bold rounded-full px-4 py-1.5 text-xs shadow-xs shrink-0 transition"
+            >
+              ALL QUEUE
+            </button>
 
-          <button
-            type="button"
-            onclick="setQueueFilter('processing')"
-            id="tab-queue-processing"
-            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
-          >
-            PROCESSING
-          </button>
+            <button
+              type="button"
+              onclick="setQueueFilter('awaiting_acceptance')"
+              id="tab-queue-awaiting_acceptance"
+              class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+            >
+              AWAITING ACCEPTANCE
+            </button>
 
-          <button
-            type="button"
-            onclick="setQueueFilter('packed')"
-            id="tab-queue-packed"
-            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
-          >
-            PACKED
-          </button>
+            <button
+              type="button"
+              onclick="setQueueFilter('processing')"
+              id="tab-queue-processing"
+              class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+            >
+              PROCESSING
+            </button>
 
-          <button
-            type="button"
-            onclick="setQueueFilter('shipped')"
-            id="tab-queue-shipped"
-            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
-          >
-            SHIPPED
-          </button>
+            <button
+              type="button"
+              onclick="setQueueFilter('packed')"
+              id="tab-queue-packed"
+              class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+            >
+              PACKED
+            </button>
 
-          <button
-            type="button"
-            onclick="setQueueFilter('out_for_delivery')"
-            id="tab-queue-out_for_delivery"
-            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
-          >
-            OUT FOR DELIVERY
-          </button>
+            <button
+              type="button"
+              onclick="setQueueFilter('shipped')"
+              id="tab-queue-shipped"
+              class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+            >
+              SHIPPED
+            </button>
 
-          <button
-            type="button"
-            onclick="setQueueFilter('delivered')"
-            id="tab-queue-delivered"
-            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
-          >
-            DELIVERED
-          </button>
+            <button
+              type="button"
+              onclick="setQueueFilter('out_for_delivery')"
+              id="tab-queue-out_for_delivery"
+              class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+            >
+              OUT FOR DELIVERY
+            </button>
 
-          <button
-            type="button"
-            onclick="setQueueFilter('cancelled')"
-            id="tab-queue-cancelled"
-            class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
-          >
-            CANCELLED
-          </button>
+            <button
+              type="button"
+              onclick="setQueueFilter('delivered')"
+              id="tab-queue-delivered"
+              class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+            >
+              DELIVERED
+            </button>
+
+            <button
+              type="button"
+              onclick="setQueueFilter('cancelled')"
+              id="tab-queue-cancelled"
+              class="queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition"
+            >
+              CANCELLED
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -450,6 +470,8 @@
           <div class="flex items-center gap-2 text-xs font-bold text-slate-400 tracking-wider uppercase shrink-0">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>QUEUE: <span id="queue-count-badge" class="text-slate-700">0</span> ITEMS</span>
+            <span class="text-slate-300">|</span>
+            <span class="text-indigo-600 font-extrabold bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">LABEL COUNT: <span id="label-count-badge">0</span></span>
           </div>
 
           <!-- View Mode Switcher: List vs Grid -->
@@ -864,11 +886,12 @@
 
     window.isOrderSeen = function(id) {
       const strId = String(id);
+      if (window.seenOrderIds.has(strId)) return true;
       const order = (window.liveOrders || []).find(o => String(o.id) === strId);
-      if (order && order.isSeen !== undefined) {
-        return Boolean(order.isSeen);
+      if (order && (order.isSeen === true || order.seen === true)) {
+        return true;
       }
-      return window.seenOrderIds.has(strId);
+      return false;
     };
 
     window.markOrderSeen = async function(id) {
@@ -881,6 +904,7 @@
       }
       try {
         localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
+        setCachedOrders(window.liveOrders, COMPANY_ID);
       } catch (_) {}
       renderTableView();
 
@@ -901,7 +925,7 @@
       if (event) event.stopPropagation();
       const strId = String(id);
       const order = (window.liveOrders || []).find(o => String(o.id) === strId);
-      const currentSeen = order && order.isSeen !== undefined ? Boolean(order.isSeen) : window.seenOrderIds.has(strId);
+      const currentSeen = window.isOrderSeen(strId);
       const newSeenState = !currentSeen;
 
       if (order) {
@@ -915,6 +939,7 @@
       }
       try {
         localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
+        setCachedOrders(window.liveOrders, COMPANY_ID);
       } catch (_) {}
       renderTableView();
 
@@ -943,6 +968,7 @@
       });
       try {
         localStorage.setItem('tbc_seen_orders', JSON.stringify(Array.from(window.seenOrderIds)));
+        setCachedOrders(window.liveOrders, COMPANY_ID);
       } catch (_) {}
       renderTableView();
 
@@ -1033,7 +1059,8 @@
       const subtotal = Number(data.pricing?.subtotal ?? (total - delivery));
       const discount = Number(data.pricing?.discountAmount ?? data.discount ?? 0);
 
-      const isSeenVal = data.isSeen !== undefined ? Boolean(data.isSeen) : (data.seen !== undefined ? Boolean(data.seen) : window.seenOrderIds.has(String(docId || data.id)));
+      const cleanDocId = String(docId || data.id || data.orderId || data.invoiceId || '');
+      const isSeenVal = window.seenOrderIds.has(cleanDocId) || Boolean(data.isSeen) || Boolean(data.seen);
 
       return {
         ...data,
@@ -1148,9 +1175,9 @@
     window.currentOrdersDisplayMode = localStorage.getItem('tbc_orders_display_mode') || 'list';
 
     window.setOrdersDisplayMode = function(mode) {
-      window.currentOrdersDisplayMode = mode;
+      window.currentOrdersDisplayMode = mode || 'list';
       try {
-        localStorage.setItem('tbc_orders_display_mode', mode);
+        localStorage.setItem('tbc_orders_display_mode', window.currentOrdersDisplayMode);
       } catch (_) {}
 
       const btnList = document.getElementById('view-toggle-list-btn');
@@ -1158,7 +1185,7 @@
       const tableContainer = document.getElementById('orders-table-container');
       const gridContainer = document.getElementById('orders-grid-container');
 
-      if (mode === 'grid') {
+      if (window.currentOrdersDisplayMode === 'grid') {
         if (btnGrid) {
           btnGrid.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-[#0f172a] text-white shadow-xs';
         }
@@ -1190,12 +1217,22 @@
       const tableContainer = document.getElementById('orders-table-container');
       const emptyState = document.getElementById('table-empty-state');
       const queueBadge = document.getElementById('queue-count-badge');
+      const labelBadge = document.getElementById('label-count-badge');
 
       if (shimmer) shimmer.classList.add('hidden');
       if (wrapper) wrapper.classList.remove('hidden');
 
       const filtered = getFilteredOrders();
       if (queueBadge) queueBadge.textContent = filtered.length;
+
+      // Update Label Count (all active orders requiring shipping labels)
+      if (labelBadge) {
+        const labelCount = (window.liveOrders || []).filter(o => {
+          const st = canonicalStatus(o.status);
+          return st !== 'Cancelled' && st !== 'Returned';
+        }).length;
+        labelBadge.textContent = labelCount;
+      }
 
       // Update Sidebar counter (Unseen orders count)
       const sideBadge = document.getElementById('sidebar-order-badge');
@@ -1395,6 +1432,11 @@
     window.setQueueFilter = function(queueKey) {
       window.activeQueueFilter = queueKey;
 
+      const sel = document.getElementById('queue-filter-select');
+      if (sel && sel.value !== queueKey) {
+        sel.value = queueKey;
+      }
+
       document.querySelectorAll('.queue-tab-btn').forEach(btn => {
         btn.className = 'queue-tab-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-full px-3.5 py-1.5 text-xs shrink-0 transition';
       });
@@ -1477,7 +1519,8 @@
       }
 
       document.getElementById('detail-subtotal-val').textContent = `₹${Number(order.subtotal || order.totalAmount || 0).toLocaleString('en-IN')}`;
-      document.getElementById('detail-delivery-val').textContent = `₹${Number(order.deliveryCharge || 0).toLocaleString('en-IN')}`;
+      const devFee = Number(order.deliveryCharge || 0);
+      document.getElementById('detail-delivery-val').textContent = devFee > 0 ? `₹${devFee.toLocaleString('en-IN')}` : 'Free Delivery';
       document.getElementById('detail-total-val').textContent = `₹${Number(order.totalAmount || 0).toLocaleString('en-IN')}`;
 
       const discRow = document.getElementById('detail-discount-row');
@@ -1801,36 +1844,58 @@
       if (!printArea) return;
 
       printArea.innerHTML = `
-        <div style="font-family: sans-serif; padding: 24px; border: 2px solid #000; max-width: 480px; margin: 20px auto; border-radius: 12px; background: #ffffff; color: #000;">
-          <!-- Top Header Strip: Brand + Powered by OneSpace Commerce in Top Right -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px;">
+        <style>
+          @media screen {
+            .shipping-label-card {
+              max-width: 520px;
+              width: 100%;
+              margin: 16px auto;
+              box-sizing: border-box;
+            }
+          }
+          @media print {
+            body * { visibility: hidden; }
+            #print-invoice-area, #print-invoice-area * { visibility: visible; }
+            #print-invoice-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .shipping-label-card {
+              max-width: 100% !important;
+              width: 100% !important;
+              margin: 0 !important;
+              box-sizing: border-box !important;
+              border: 2.5px solid #000 !important;
+            }
+          }
+        </style>
+        <div class="shipping-label-card" style="font-family: system-ui, -apple-system, sans-serif; padding: 20px; border: 2.5px solid #000; max-width: 520px; width: 100%; margin: 16px auto; border-radius: 14px; background: #ffffff; color: #000; box-sizing: border-box;">
+          <!-- Top Header Strip: Brand + Bigger Powered by OneSpace Commerce Logo in Top Right -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #000; padding-bottom: 14px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
             <div>
-              <h2 style="margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 0.5px;">THE BANIYAN COMPANY</h2>
-              <p style="margin: 2px 0 0 0; font-size: 10px; font-weight: 800; color: #64748b; uppercase">SHIPPING LABEL</p>
+              <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; line-height: 1.2;">THE BANIYAN COMPANY</h2>
+              <p style="margin: 3px 0 0 0; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">SHIPPING LABEL</p>
             </div>
-            <div style="text-align: right; display: flex; align-items: center; justify-content: flex-end;">
-              <img src="assets/textlogo.png" alt="Powered by OneSpace Commerce" style="height: 28px; width: auto; max-width: 180px; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact;" onerror="this.src='assets/onespace-commerce-logo.png';">
+            <div style="text-align: right; display: flex; align-items: center; justify-content: flex-end; shrink-0: 0;">
+              <img src="assets/textlogo.png" alt="Powered by OneSpace Commerce" style="height: 42px; width: auto; max-width: 220px; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; display: block;" onerror="this.src='assets/onespace-commerce-logo.png';">
             </div>
           </div>
 
           <!-- SHIP TO Box (RECIPIENT FIRST) -->
-          <div style="background: #f8fafc; border: 2px solid #0f172a; padding: 12px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 12px; line-height: 1.5;">
-            <p style="margin: 0; font-size: 10px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">SHIP TO (RECIPIENT):</p>
-            <h3 style="margin: 3px 0 0 0; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #000;">${order.customerName || 'Valued Customer'}</h3>
-            <p style="margin: 3px 0 0 0; font-weight: 800; color: #000; font-size: 13px;">📞 ${order.phone || 'N/A'}</p>
-            <p style="margin: 4px 0 0 0; color: #1e293b; font-size: 12px; line-height: 1.5; font-weight: 600;">${order.address || 'Address on file'}</p>
+          <div style="background: #f8fafc; border: 2.5px solid #0f172a; padding: 14px 16px; border-radius: 10px; margin-bottom: 14px; font-size: 13px; line-height: 1.5; word-break: break-word;">
+            <p style="margin: 0; font-size: 11px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">SHIP TO (RECIPIENT):</p>
+            <h3 style="margin: 4px 0 0 0; font-size: 18px; font-weight: 800; text-transform: uppercase; color: #000;">${order.customerName || 'Valued Customer'}</h3>
+            <p style="margin: 4px 0 0 0; font-weight: 800; color: #000; font-size: 14px;">📞 ${order.phone || 'N/A'}</p>
+            <p style="margin: 5px 0 0 0; color: #1e293b; font-size: 13px; line-height: 1.5; font-weight: 600;">${order.address || 'Address on file'}</p>
           </div>
 
           <!-- SHIP FROM Box (SENDER BELOW SHIP TO) -->
-          <div style="background: #ffffff; border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 11px; line-height: 1.5;">
-            <p style="margin: 0; font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">SHIP FROM (SENDER):</p>
-            <p style="margin: 2px 0 0 0; font-weight: 800; font-size: 12px; color: #0f172a;">THE BANIYAN COMPANY</p>
-            <p style="margin: 1px 0 0 0; font-weight: 700; color: #1e293b;">📞 +91 8110061611</p>
-            <p style="margin: 1px 0 0 0; color: #334155;">No: 164, Kamarajar Road, Coimbatore 641015, Tamil Nadu, India</p>
+          <div style="background: #ffffff; border: 1.5px solid #cbd5e1; padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; font-size: 12px; line-height: 1.5; word-break: break-word;">
+            <p style="margin: 0; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">SHIP FROM (SENDER):</p>
+            <p style="margin: 3px 0 0 0; font-weight: 800; font-size: 13px; color: #0f172a;">THE BANIYAN COMPANY</p>
+            <p style="margin: 2px 0 0 0; font-weight: 700; color: #1e293b;">📞 +91 8110061611</p>
+            <p style="margin: 2px 0 0 0; color: #334155;">No: 164, Kamarajar Road, Coimbatore 641015, Tamil Nadu, India</p>
           </div>
 
           <!-- Order Summary Footer -->
-          <div style="border-top: 2px solid #000; padding-top: 10px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 800;">
+          <div style="border-top: 2.5px solid #000; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 800; flex-wrap: wrap; gap: 8px;">
             <span>PKG: ${(order.items || []).length} Item(s)</span>
             <span>ORDER: #${order.id}</span>
           </div>
@@ -1867,7 +1932,12 @@
 
     // App Initialization
     async function startApp() {
-      // 0. Hydrate Company Logo from localStorage & Firestore
+      if (localStorage.getItem('tbc_admin_authed') !== 'true') {
+        window.location.href = 'admin.html';
+        return;
+      }
+      // 0. Hydrate Display Mode & Company Logo
+      window.setOrdersDisplayMode(window.currentOrdersDisplayMode);
       try {
         const cachedLogo = localStorage.getItem('onespace_shop_logo') || localStorage.getItem('tbc_shop_logo');
         if (cachedLogo && document.getElementById('sidebar-shop-logo-img')) document.getElementById('sidebar-shop-logo-img').src = cachedLogo;

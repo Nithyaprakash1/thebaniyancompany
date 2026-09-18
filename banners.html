@@ -764,6 +764,10 @@
     setTimeout(window.hidePageLoader, 150);
 
     window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('tbc_admin_authed') !== 'true') {
+        window.location.href = 'admin.html';
+        return;
+      }
       try {
         const cachedLogo = localStorage.getItem('onespace_shop_logo') || localStorage.getItem('tbc_shop_logo');
         if (cachedLogo && document.getElementById('sidebar-shop-logo-img')) document.getElementById('sidebar-shop-logo-img').src = cachedLogo;

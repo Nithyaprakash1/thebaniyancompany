@@ -115,9 +115,14 @@ class CartStore {
     const itemCount = this.cart.reduce((sum, item) => sum + item.quantity, 0);
     const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    // Check company settings for GST activation
+    // Check company settings for GST activation and shipping configuration
     let isGstEnabled = false;
     let gstPct = 0;
+    let deliveryTnPrice = 0;
+    let deliveryNonTnPrice = 60;
+    let freeShippingMin = 999;
+    let isFreeShippingEnabled = true;
+
     try {
       const raw = localStorage.getItem('tbc_cache_company');
       if (raw) {
@@ -128,11 +133,16 @@ class CartStore {
           isGstEnabled = true;
           gstPct = Number(exp.cgstPercentage || comp?.cgstPercentage || comp?.gstPercentage || 5);
         }
+        if (comp?.deliveryTnPrice !== undefined) deliveryTnPrice = Number(comp.deliveryTnPrice);
+        if (comp?.deliveryNonTnPrice !== undefined) deliveryNonTnPrice = Number(comp.deliveryNonTnPrice);
+        if (comp?.freeShippingMin !== undefined) freeShippingMin = Number(comp.freeShippingMin);
+        if (comp?.isFreeShippingEnabled !== undefined) isFreeShippingEnabled = Boolean(comp.isFreeShippingEnabled);
+        else if (comp?.freeShippingEnabled !== undefined) isFreeShippingEnabled = Boolean(comp.freeShippingEnabled);
       }
     } catch (e) {}
 
     const tax = isGstEnabled ? Math.round(subtotal * (gstPct / 100)) : 0;
-    const shipping = 0; // FREE Express Shipping
+    const shipping = (isFreeShippingEnabled && subtotal >= freeShippingMin) ? 0 : deliveryTnPrice;
     const grandTotal = subtotal + tax + shipping;
 
     return {

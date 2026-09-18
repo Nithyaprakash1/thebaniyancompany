@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -170,7 +170,7 @@
             </div>
             <div class="flex justify-between items-center text-secondary">
               <span>Express Shipping 🚚</span>
-              <span class="text-emerald-700 font-extrabold text-xs uppercase bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">FREE 🎉</span>
+              <span id="shipping-val" class="text-emerald-700 font-extrabold text-xs uppercase bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">Free Delivery</span>
             </div>
             <div id="tax-row" class="flex justify-between items-center text-secondary pb-3.5 border-b border-black/10 hidden">
               <span>Estimated Taxes (GST) 🧾</span>
@@ -319,8 +319,19 @@
       `).join('');
     }
 
-    if (subtotalEl) subtotalEl.textContent = `₹${totals.subtotal.toLocaleString()}`;
-    if (taxEl) taxEl.textContent = `₹${totals.tax.toLocaleString()}`;
+    if (subtotalEl) subtotalEl.textContent = `₹${totals.subtotal.toLocaleString('en-IN')}`;
+    if (taxEl) taxEl.textContent = `₹${totals.tax.toLocaleString('en-IN')}`;
+
+    const shippingEl = document.getElementById('shipping-val');
+    if (shippingEl) {
+      if (totals.shipping > 0) {
+        shippingEl.textContent = `₹${totals.shipping.toLocaleString('en-IN')}`;
+        shippingEl.className = 'text-slate-900 font-bold text-xs';
+      } else {
+        shippingEl.textContent = 'Free Delivery';
+        shippingEl.className = 'text-emerald-700 font-extrabold text-xs uppercase bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200';
+      }
+    }
 
     if (taxRowEl) {
       if (totals.isGstEnabled && totals.tax > 0) {
