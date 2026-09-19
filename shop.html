@@ -1098,6 +1098,8 @@
   }
 
   function safeImage(p) {
+    if (p.thumbnail) return p.thumbnail;
+    if (Array.isArray(p.thumbnailUrls) && p.thumbnailUrls[0]) return p.thumbnailUrls[0];
     if (Array.isArray(p.imageUrls) && p.imageUrls[0]) return p.imageUrls[0];
     if (Array.isArray(p.images)    && p.images[0])    return p.images[0];
     if (typeof p.imageUrl === 'string' && p.imageUrl)  return p.imageUrl;

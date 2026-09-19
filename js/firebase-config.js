@@ -43,9 +43,26 @@ const db = getFirestore(app);
 window.tbcFirebaseApp = app;
 window.tbcDb = db;
 
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+// Initialize Firebase Storage
+const storage = getStorage(app);
+window.tbcStorage = storage;
+
 export {
   app,
   db,
+  storage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject,
   collection,
   doc,
   getDocs,

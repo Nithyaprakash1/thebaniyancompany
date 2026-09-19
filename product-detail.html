@@ -1762,24 +1762,34 @@
           }
         }
 
+        const thumbnails = (Array.isArray(product.thumbnailUrls) && product.thumbnailUrls.length > 0)
+          ? product.thumbnailUrls
+          : images;
+
         // Update Thumbnail Row (desktop)
         const thumbRow = document.getElementById('thumb-row');
         if (thumbRow && images.length > 0) {
-          thumbRow.innerHTML = images.map((imgSrc, i) => `
+          thumbRow.innerHTML = images.map((imgSrc, i) => {
+            const thumbSrc = thumbnails[i] || imgSrc;
+            return `
           <button onclick="changeImage('${imgSrc}', this, ${i})" class="thumb-btn aspect-square rounded-xl overflow-hidden border-2 ${i === 0 ? 'border-primary' : 'border-transparent'}">
-            <img class="w-full h-full object-cover" src="${imgSrc}" alt="${product.name || 'View'} ${i + 1}">
+            <img class="w-full h-full object-cover" loading="lazy" src="${thumbSrc}" alt="${product.name || 'View'} ${i + 1}">
           </button>
-        `).join('');
+          `;
+          }).join('');
         }
 
         // Build mobile side thumbnail strip
         const sideThumbsEl = document.getElementById('side-thumbs');
         if (sideThumbsEl && images.length > 1) {
-          sideThumbsEl.innerHTML = images.map((imgSrc, i) => `
+          sideThumbsEl.innerHTML = images.map((imgSrc, i) => {
+            const thumbSrc = thumbnails[i] || imgSrc;
+            return `
           <button onclick="changeImage('${imgSrc}', this, ${i})" class="side-thumb-btn ${i === 0 ? 'active' : ''}">
-            <img src="${imgSrc}" alt="${product.name || ''} view ${i + 1}">
+            <img src="${thumbSrc}" loading="lazy" alt="${product.name || ''} view ${i + 1}">
           </button>
-        `).join('');
+          `;
+          }).join('');
         }
 
         // Update Title & Category label

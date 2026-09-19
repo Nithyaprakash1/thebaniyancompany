@@ -255,6 +255,11 @@ export function normalizeProduct(id, data = {}) {
   else if (typeof data.imageUrl === 'string' && data.imageUrl)      imageUrls = [data.imageUrl];
   else if (typeof data.image   === 'string' && data.image)          imageUrls = [data.image];
 
+  let thumbnailUrls = [];
+  if (Array.isArray(data.thumbnailUrls) && data.thumbnailUrls.length) thumbnailUrls = data.thumbnailUrls.filter(Boolean);
+  else if (Array.isArray(data.thumbnails) && data.thumbnails.length)    thumbnailUrls = data.thumbnails.filter(Boolean);
+  else if (typeof data.thumbnailUrl === 'string' && data.thumbnailUrl)  thumbnailUrls = [data.thumbnailUrl];
+
   const name = data.name || data.title || 'Unnamed Product';
   const pricing = getProductPricing({ ...data, variants });
   const totalStock = getProductTotalStock({ ...data, variants });
@@ -266,6 +271,8 @@ export function normalizeProduct(id, data = {}) {
   const tag = typeof data.tag === 'string'
     ? data.tag
     : Array.isArray(data.tags) ? (data.tags[0] ?? '') : '';
+
+  const thumbnail = thumbnailUrls[0] || imageUrls[0] || '';
 
   return {
     ...data,
@@ -279,7 +286,8 @@ export function normalizeProduct(id, data = {}) {
     tag,
     category,
     imageUrls,
-    thumbnail:      imageUrls[0] || '',         // ← first image, ready for UI
+    thumbnailUrls:  thumbnailUrls.length > 0 ? thumbnailUrls : imageUrls,
+    thumbnail,      // ← thumbnail ready for grid UI
     variants,
     price:          pricing.price,
     originalPrice:  pricing.mrp,
@@ -291,6 +299,7 @@ export function normalizeProduct(id, data = {}) {
     showInEcom:     data.showInEcom !== false, // Strict E-commerce visibility flag (defaults to true unless explicitly false)
   };
 }
+
 
 /**
  * Normalise a raw Firestore category document.
