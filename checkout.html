@@ -1104,7 +1104,7 @@
       
       const deliveryInfo = getOrderDeliveryInfo(cust.state, totals.subtotal);
       const deliveryFee = deliveryInfo.deliveryFee;
-      const grandTotal = totals.grandTotal + deliveryFee;
+      const grandTotal = totals.subtotal + totals.tax + deliveryFee;
 
       pendingConfirmedOrderAction = actionType;
 
@@ -1587,12 +1587,11 @@
       document.querySelectorAll('input[name="pay-method"]').forEach(radio => {
         radio.addEventListener('change', () => {
           const payBtn = document.getElementById('pay-submit-btn');
-          if (!payBtn) return;
-          const totals = window.tbcCart ? window.tbcCart.getCartTotals() : { grandTotal: 0 };
+          const totals = window.tbcCart ? window.tbcCart.getCartTotals() : { grandTotal: 0, subtotal: 0, tax: 0 };
           const stateStr = (document.getElementById('cust-state')?.value || 'Tamil Nadu').trim();
-          const isTN = stateStr.toLowerCase().includes('tamil nadu');
-          const fee = isTN ? deliveryTnPrice : deliveryNonTnPrice;
-          const tot = totals.grandTotal + fee;
+          const deliveryInfo = getOrderDeliveryInfo(stateStr, totals.subtotal);
+          const fee = deliveryInfo.deliveryFee;
+          const tot = totals.subtotal + (totals.tax || 0) + fee;
 
           if (radio.value === 'COD') {
             payBtn.innerHTML = `Place COD Order: ₹${tot.toLocaleString('en-IN')} <span class="material-symbols-outlined text-[18px]">local_shipping</span>`;
