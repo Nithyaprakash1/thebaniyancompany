@@ -4817,12 +4817,12 @@
             localStorage.setItem('tbc_shop_logo', comp.logo);
           } catch(e) {}
         }
-        if (document.getElementById('ctrl-delivery-tn')) document.getElementById('ctrl-delivery-tn').value = comp.deliveryTnPrice !== undefined ? comp.deliveryTnPrice : (comp.deliveryTnFee !== undefined ? comp.deliveryTnFee : 0);
+        if (document.getElementById('ctrl-delivery-tn')) document.getElementById('ctrl-delivery-tn').value = comp.deliveryTnPrice !== undefined ? comp.deliveryTnPrice : (comp.deliveryTnFee !== undefined ? comp.deliveryTnFee : 60);
         if (document.getElementById('ctrl-delivery-non-tn')) document.getElementById('ctrl-delivery-non-tn').value = comp.deliveryNonTnPrice !== undefined ? comp.deliveryNonTnPrice : (comp.deliveryFee !== undefined ? comp.deliveryFee : 60);
         if (document.getElementById('ctrl-free-shipping-min') && comp.freeShippingMin !== undefined) document.getElementById('ctrl-free-shipping-min').value = comp.freeShippingMin;
         const freeShippingToggle = document.getElementById('ctrl-free-shipping-toggle');
         if (freeShippingToggle) {
-          freeShippingToggle.checked = comp.isFreeShippingEnabled !== undefined ? Boolean(comp.isFreeShippingEnabled) : (comp.freeShippingEnabled !== undefined ? Boolean(comp.freeShippingEnabled) : true);
+          freeShippingToggle.checked = comp.isFreeShippingEnabled !== undefined ? Boolean(comp.isFreeShippingEnabled) : (comp.freeShippingEnabled !== undefined ? Boolean(comp.freeShippingEnabled) : false);
           window.updateFreeShippingToggle(freeShippingToggle);
         }
         if (document.getElementById('ctrl-courier-partner') && comp.courierPartner) document.getElementById('ctrl-courier-partner').value = comp.courierPartner;
@@ -5338,14 +5338,17 @@
 
     document.getElementById('shipping-settings-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const deliveryTnPrice = Number(document.getElementById('ctrl-delivery-tn')?.value || 0);
+      const deliveryTnPrice = Number(document.getElementById('ctrl-delivery-tn')?.value || 60);
       const deliveryNonTnPrice = Number(document.getElementById('ctrl-delivery-non-tn')?.value || 60);
       const freeShippingMin = Number(document.getElementById('ctrl-free-shipping-min')?.value || 999);
-      const isFreeShippingEnabled = document.getElementById('ctrl-free-shipping-toggle')?.checked ?? true;
+      const isFreeShippingEnabled = document.getElementById('ctrl-free-shipping-toggle')?.checked ?? false;
 
       const res = await updateCompanySettings({
         deliveryTnPrice,
+        deliveryTnFee: deliveryTnPrice,
         deliveryNonTnPrice,
+        deliveryFee: deliveryNonTnPrice,
+        shippingCharge: deliveryNonTnPrice,
         freeShippingMin,
         isFreeShippingEnabled,
         freeShippingEnabled: isFreeShippingEnabled
