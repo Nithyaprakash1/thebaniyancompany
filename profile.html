@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>My Account — THE BANIYAN COMPANY</title>
@@ -7,10 +8,14 @@
   <link rel="shortcut icon" href="assets/onespace-commerce-logo.png">
   <link rel="apple-touch-icon" href="assets/onespace-commerce-logo.png">
   <meta name="description" content="Sleek, mobile-optimized user account profile screen for THE BANIYAN COMPANY.">
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    name="viewport">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script id="tailwind-config">
     tailwind.config = {
@@ -46,16 +51,40 @@
       text-transform: none !important;
     }
 
-    @layer base { body { -webkit-tap-highlight-color: transparent; } }
-    ::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @layer base {
+      body {
+        -webkit-tap-highlight-color: transparent;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
 
     #loading-screen {
-      position: fixed; inset: 0; background: #121212; z-index: 9999;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+      position: fixed;
+      inset: 0;
+      background: #121212;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
       transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s ease;
     }
-    #loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
     .loading-bar-wrap {
       width: 160px;
       height: 3.5px;
@@ -65,6 +94,7 @@
       position: relative;
       margin-top: 14px;
     }
+
     .loading-bar-fill {
       height: 100%;
       width: 0%;
@@ -75,837 +105,925 @@
     }
   </style>
 </head>
+
 <body class="bg-background text-on-surface font-sans antialiased pb-20">
 
-<!-- Loading Screen with Progression Bar & Percentage -->
-<div id="loading-screen">
-  <div class="flex flex-col items-center text-center">
-    <img id="loading-company-logo" alt="OneSpaceCommerce Logo" class="h-12 object-contain" src="assets/onespace-commerce-logo.png" onerror="this.src='assets/Onespace Commerce Logo PNG.png'">
-    <span class="text-[11px] font-bold uppercase tracking-[0.28em] text-neutral-300 mt-3">THE BANIYAN COMPANY</span>
-    <div class="loading-bar-wrap">
-      <div class="loading-bar-fill" id="loading-bar-fill"></div>
+  <!-- Loading Screen with Progression Bar & Percentage -->
+  <div id="loading-screen">
+    <div class="flex flex-col items-center text-center">
+      <img id="loading-company-logo" alt="OneSpaceCommerce Logo" class="h-12 object-contain"
+        src="assets/onespace-commerce-logo.png" onerror="this.src='assets/Onespace Commerce Logo PNG.png'">
+      <span class="text-[11px] font-bold uppercase tracking-[0.28em] text-neutral-300 mt-3">THE BANIYAN COMPANY</span>
+      <div class="loading-bar-wrap">
+        <div class="loading-bar-fill" id="loading-bar-fill"></div>
+      </div>
+      <span id="loading-pct" class="text-[11px] font-semibold font-mono tracking-wider text-neutral-400 mt-2">0%</span>
     </div>
-    <span id="loading-pct" class="text-[11px] font-semibold font-mono tracking-wider text-neutral-400 mt-2">0%</span>
   </div>
-</div>
 
-<!-- SECTION 1: HEADER & QUICK STATS (DARK THEME TOP SECTION #121212) -->
-<div class="bg-[#121212] text-white pt-safe pb-8 px-4 md:px-8 shadow-xl rounded-b-[2.5rem]">
-  <div class="max-w-2xl mx-auto space-y-6 pt-4">
-    
-    <!-- Top Bar with Logo & Wishlist/Cart Icons -->
-    <div class="flex items-center justify-between pb-2 border-b border-white/10">
-      <a href="home" class="flex items-center gap-2.5">
-        <img id="nav-company-logo" alt="The Baniyan Company" class="h-8 w-8 object-cover rounded-full border border-white/20" src="assets/tbclogo.jpeg" onerror="this.src='assets/tbclogo.jpeg'">
-        <span class="font-normal tracking-[0.12em] text-xs text-white uppercase">THE BANIYAN COMPANY</span>
-      </a>
-      <div class="flex items-center gap-2">
-        <a href="whislist" aria-label="Wishlist" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-          <span class="material-symbols-outlined text-[20px] text-white">favorite_border</span>
+  <!-- SECTION 1: HEADER & QUICK STATS (DARK THEME TOP SECTION #121212) -->
+  <div class="bg-[#121212] text-white pt-safe pb-8 px-4 md:px-8 shadow-xl rounded-b-[2.5rem]">
+    <div class="max-w-2xl mx-auto space-y-6 pt-4">
+
+      <!-- Top Bar with Logo & Wishlist/Cart Icons -->
+      <div class="flex items-center justify-between pb-2 border-b border-white/10">
+        <a href="home" class="flex items-center gap-2.5">
+          <img id="nav-company-logo" alt="The Baniyan Company"
+            class="h-8 w-8 object-cover rounded-full border border-white/20" src="assets/tbclogo.jpeg"
+            onerror="this.src='assets/tbclogo.jpeg'">
+          <span class="font-normal tracking-[0.12em] text-xs text-white uppercase">THE BANIYAN COMPANY</span>
         </a>
-        <a href="cart" aria-label="Cart" class="relative w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-          <span class="material-symbols-outlined text-[20px] text-white">shopping_bag</span>
-          <span class="cart-badge-count absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm">0</span>
+        <div class="flex items-center gap-2">
+          <a href="whislist" aria-label="Wishlist"
+            class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+            <span class="material-symbols-outlined text-[20px] text-white">favorite_border</span>
+          </a>
+          <a href="cart" aria-label="Cart"
+            class="relative w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+            <span class="material-symbols-outlined text-[20px] text-white">shopping_bag</span>
+            <span
+              class="cart-badge-count absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm">0</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- User Info Header -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <!-- Circular Avatar with User Initial -->
+          <div id="profile-avatar"
+            class="w-14 h-14 rounded-full bg-amber-500 text-black font-extrabold text-xl flex items-center justify-center shadow-lg border-2 border-amber-300/40 select-none flex-shrink-0">
+            U
+          </div>
+          <div>
+            <h1 id="profile-name" class="text-xl font-extrabold text-white tracking-tight">Guest User</h1>
+            <p id="profile-email" class="text-xs text-neutral-400 font-medium">guest@thebaniyancompany.com</p>
+          </div>
+        </div>
+        <button onclick="openEditModal()" aria-label="Edit Profile"
+          class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+          <span class="material-symbols-outlined text-[18px]">edit</span>
+        </button>
+      </div>
+
+      <!-- Quick Stats Card (3 Key Metrics Horizontally) -->
+      <div
+        class="bg-[#1e1e1e] p-4 rounded-2xl border border-white/10 flex items-center justify-between text-center divide-x divide-white/10 shadow-inner">
+        <div class="flex-1 px-2">
+          <span id="stat-orders-count" class="block text-xl font-extrabold text-white">0</span>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Orders</span>
+        </div>
+        <div class="flex-1 px-2">
+          <span id="stat-wishlist-count" class="block text-xl font-extrabold text-white">0</span>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Wishlist</span>
+        </div>
+        <div class="flex-1 px-2">
+          <span id="stat-saved-amount" class="block text-xl font-extrabold text-amber-400">₹0</span>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Saved</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-2xl mx-auto px-4 md:px-8 mt-6 space-y-6">
+
+    <!-- SECTION 2: RECENT ORDERS SECTION -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between px-1">
+        <h2 class="text-lg font-extrabold text-primary flex items-center gap-2">
+          Recent Orders 📦
+        </h2>
+        <a href="#orders-list" onclick="scrollToOrders()"
+          class="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-0.5">
+          View all <span class="text-sm">→</span>
         </a>
       </div>
-    </div>
 
-    <!-- User Info Header -->
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <!-- Circular Avatar with User Initial -->
-        <div id="profile-avatar" class="w-14 h-14 rounded-full bg-amber-500 text-black font-extrabold text-xl flex items-center justify-center shadow-lg border-2 border-amber-300/40 select-none flex-shrink-0">
-          U
+      <!-- Active Recent Order Cards Container -->
+      <div id="recent-orders-container" class="space-y-3">
+        <!-- Fallback Skeleton / Empty State -->
+        <div
+          class="bg-white p-6 rounded-2xl shadow-sm border border-black/5 text-center flex flex-col items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[36px] text-neutral-300">inventory_2</span>
+          <p class="text-xs font-bold text-primary">No recent orders yet</p>
+          <p class="text-[11px] text-secondary">Your active purchases and live tracking will show here.</p>
+          <a href="shop"
+            class="mt-1 bg-black text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider">Start
+            Shopping</a>
         </div>
-        <div>
-          <h1 id="profile-name" class="text-xl font-extrabold text-white tracking-tight">Guest User</h1>
-          <p id="profile-email" class="text-xs text-neutral-400 font-medium">guest@thebaniyancompany.com</p>
-        </div>
-      </div>
-      <button onclick="openEditModal()" aria-label="Edit Profile" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
-        <span class="material-symbols-outlined text-[18px]">edit</span>
-      </button>
-    </div>
-
-    <!-- Quick Stats Card (3 Key Metrics Horizontally) -->
-    <div class="bg-[#1e1e1e] p-4 rounded-2xl border border-white/10 flex items-center justify-between text-center divide-x divide-white/10 shadow-inner">
-      <div class="flex-1 px-2">
-        <span id="stat-orders-count" class="block text-xl font-extrabold text-white">0</span>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Orders</span>
-      </div>
-      <div class="flex-1 px-2">
-        <span id="stat-wishlist-count" class="block text-xl font-extrabold text-white">0</span>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Wishlist</span>
-      </div>
-      <div class="flex-1 px-2">
-        <span id="stat-saved-amount" class="block text-xl font-extrabold text-amber-400">₹0</span>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Saved</span>
       </div>
     </div>
 
-  </div>
-</div>
+    <!-- SECTION 4: ACCOUNT NAVIGATION LINKS LIST -->
+    <div class="space-y-2">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-secondary px-1">Account &amp; Activity</h3>
+      <div class="bg-white rounded-2xl shadow-sm border border-black/10 overflow-hidden divide-y divide-black/5">
 
-<!-- MAIN CONTENT CONTAINER -->
-<main class="max-w-2xl mx-auto px-4 md:px-8 mt-6 space-y-6">
-
-  <!-- SECTION 2: RECENT ORDERS SECTION -->
-  <div class="space-y-3">
-    <div class="flex items-center justify-between px-1">
-      <h2 class="text-lg font-extrabold text-primary flex items-center gap-2">
-        Recent Orders 📦
-      </h2>
-      <a href="#orders-list" onclick="scrollToOrders()" class="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-0.5">
-        View all <span class="text-sm">→</span>
-      </a>
-    </div>
-
-    <!-- Active Recent Order Cards Container -->
-    <div id="recent-orders-container" class="space-y-3">
-      <!-- Fallback Skeleton / Empty State -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-black/5 text-center flex flex-col items-center justify-center gap-2">
-        <span class="material-symbols-outlined text-[36px] text-neutral-300">inventory_2</span>
-        <p class="text-xs font-bold text-primary">No recent orders yet</p>
-        <p class="text-[11px] text-secondary">Your active purchases and live tracking will show here.</p>
-        <a href="shop" class="mt-1 bg-black text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider">Start Shopping</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECTION 4: ACCOUNT NAVIGATION LINKS LIST -->
-  <div class="space-y-2">
-    <h3 class="text-xs font-bold uppercase tracking-wider text-secondary px-1">Account &amp; Activity</h3>
-    <div class="bg-white rounded-2xl shadow-sm border border-black/10 overflow-hidden divide-y divide-black/5">
-      
-      <!-- Menu Item 1: My Orders -->
-      <a href="#orders" onclick="scrollToOrders()" class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
-        <div class="flex items-center gap-3.5">
-          <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0">
-            <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+        <!-- Menu Item 1: My Orders -->
+        <a href="#orders" onclick="scrollToOrders()"
+          class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
+          <div class="flex items-center gap-3.5">
+            <div
+              class="w-9 h-9 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+            </div>
+            <span class="text-xs font-bold text-primary">My Orders</span>
           </div>
-          <span class="text-xs font-bold text-primary">My Orders</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-secondary">
-          <span id="nav-order-status" class="text-xs font-semibold text-amber-600">0 active</span>
-          <span class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
-        </div>
-      </a>
-
-      <!-- Menu Item 2: Wishlist -->
-      <a href="whislist" class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
-        <div class="flex items-center gap-3.5">
-          <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0">
-            <span class="material-symbols-outlined text-[20px]">favorite</span>
+          <div class="flex items-center gap-1.5 text-secondary">
+            <span id="nav-order-status" class="text-xs font-semibold text-amber-600">0 active</span>
+            <span
+              class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
           </div>
-          <span class="text-xs font-bold text-primary">Wishlist</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-secondary">
-          <span id="nav-wishlist-status" class="text-xs font-semibold">Saved items</span>
-          <span class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
-        </div>
-      </a>
+        </a>
 
-      <!-- Menu Item 3: Saved Addresses -->
-      <button onclick="openAddressModal()" class="w-full text-left flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
-        <div class="flex items-center gap-3.5">
-          <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
-            <span class="material-symbols-outlined text-[20px]">location_on</span>
+        <!-- Menu Item 2: Wishlist -->
+        <a href="whislist" class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
+          <div class="flex items-center gap-3.5">
+            <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[20px]">favorite</span>
+            </div>
+            <span class="text-xs font-bold text-primary">Wishlist</span>
           </div>
-          <span class="text-xs font-bold text-primary">Saved Addresses</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-secondary">
-          <span id="nav-address-status" class="text-xs font-semibold">1 address</span>
-          <span class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
-        </div>
-      </button>
-
-      <!-- Menu Item 4: Notifications -->
-      <button onclick="showNotificationToast()" class="w-full text-left flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
-        <div class="flex items-center gap-3.5">
-          <div class="w-9 h-9 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
-            <span class="material-symbols-outlined text-[20px]">notifications</span>
+          <div class="flex items-center gap-1.5 text-secondary">
+            <span id="nav-wishlist-status" class="text-xs font-semibold">Saved items</span>
+            <span
+              class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
           </div>
-          <span class="text-xs font-bold text-primary">Notifications</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-secondary">
-          <span class="text-xs font-semibold text-emerald-600">Updates Active</span>
-          <span class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
-        </div>
+        </a>
+
+        <!-- Menu Item 3: Saved Addresses -->
+        <button onclick="openAddressModal()"
+          class="w-full text-left flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
+          <div class="flex items-center gap-3.5">
+            <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[20px]">location_on</span>
+            </div>
+            <span class="text-xs font-bold text-primary">Saved Addresses</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-secondary">
+            <span id="nav-address-status" class="text-xs font-semibold">1 address</span>
+            <span
+              class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+          </div>
+        </button>
+
+        <!-- Menu Item 4: Notifications -->
+        <button onclick="showNotificationToast()"
+          class="w-full text-left flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
+          <div class="flex items-center gap-3.5">
+            <div
+              class="w-9 h-9 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[20px]">notifications</span>
+            </div>
+            <span class="text-xs font-bold text-primary">Notifications</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-secondary">
+            <span class="text-xs font-semibold text-emerald-600">Updates Active</span>
+            <span
+              class="material-symbols-outlined text-[18px] text-neutral-400 group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+          </div>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- SECTION 5: CUSTOMER SUPPORT SECTION -->
+    <div class="bg-slate-100 p-5 rounded-2xl space-y-3.5 border border-black/5">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px] text-amber-600">headset_mic</span> Customer Support
+        </h3>
+        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">24/7
+          Assistance</span>
+      </div>
+
+      <!-- 2x2 Grid of White Rounded Action Buttons with Colorful Icons -->
+      <div class="grid grid-cols-2 gap-3">
+
+        <!-- WhatsApp -->
+        <a href="https://wa.me/918110061911?text=Hi%20TBC%20Support%2C%20I%20need%20assistance" target="_blank"
+          class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
+          <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 fill-[#25D366]" viewBox="0 0 24 24">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z">
+              </path>
+            </svg>
+          </div>
+          <div>
+            <span class="block text-xs font-bold text-primary">WhatsApp</span>
+            <span class="text-[10px] text-secondary">Instant Chat</span>
+          </div>
+        </a>
+
+        <!-- Call Us -->
+        <a href="tel:+918110061611"
+          class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
+          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[18px]">call</span>
+          </div>
+          <div>
+            <span class="block text-xs font-bold text-primary">Call Us</span>
+            <span class="text-[10px] text-secondary">Direct Line</span>
+          </div>
+        </a>
+
+        <!-- Email -->
+        <a href="mailto:thebaniyancompanycbe@gmail.com"
+          class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
+          <div class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[18px]">mail</span>
+          </div>
+          <div>
+            <span class="block text-xs font-bold text-primary">Email</span>
+            <span class="text-[10px] text-secondary">Send Mail</span>
+          </div>
+        </a>
+
+        <!-- FAQ -->
+        <a href="faqs"
+          class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
+          <div
+            class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[18px]">help</span>
+          </div>
+          <div>
+            <span class="block text-xs font-bold text-primary">FAQ</span>
+            <span class="text-[10px] text-secondary">Quick Answers</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- SECTION 6: FOOTER ACTIONS (SIGN OUT / LOGIN BUTTONS) -->
+    <div class="pt-2 text-center space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <button type="button" onclick="openAuthModal()"
+          class="w-full py-3.5 bg-black text-white font-bold text-xs uppercase tracking-wider rounded-2xl hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 shadow-md">
+          <span class="material-symbols-outlined text-[18px]">key</span> Login / Account 🔑
+        </button>
+        <button type="button" onclick="handleAuthAction()"
+          class="w-full py-3.5 bg-rose-50 text-rose-600 font-bold text-xs uppercase tracking-wider rounded-2xl hover:bg-rose-100 transition-colors flex items-center justify-center gap-2 border border-rose-200">
+          <span class="material-symbols-outlined text-[18px]">logout</span> Sign Out
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ACCOUNT AUTHENTICATION & PASSWORD RESET MODAL -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
+    <div
+      class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 relative animate-scale-up border border-black/10">
+      <button onclick="closeAuthModal()"
+        class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold hover:bg-slate-200">✕</button>
+
+      <div class="text-center space-y-1.5 pt-2">
+        <h3 class="font-bold text-lg text-primary">Account Access 🔑</h3>
+        <p class="text-xs text-secondary">Sign in with Google or Email to save your profile &amp; orders.</p>
+      </div>
+
+      <!-- Google Login Button -->
+      <button onclick="loginWithGoogle()"
+        class="w-full bg-white hover:bg-slate-50 text-slate-800 font-bold py-3 px-4 rounded-xl border border-slate-300 shadow-sm flex items-center justify-center gap-3 text-xs uppercase tracking-wider transition-all">
+        <svg class="w-4 h-4" viewBox="0 0 24 24">
+          <path fill="#4285F4"
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+          <path fill="#34A853"
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+          <path fill="#FBBC05"
+            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+          <path fill="#EA4335"
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+        </svg>
+        Continue with Google
       </button>
 
+      <div class="flex items-center my-3">
+        <div class="flex-grow border-t border-slate-200"></div>
+        <span class="px-3 text-[10px] uppercase font-bold text-slate-400">or Email</span>
+        <div class="flex-grow border-t border-slate-200"></div>
+      </div>
+
+      <!-- Email & Password Form -->
+      <form onsubmit="event.preventDefault(); window.handleEmailAuthForm();" class="space-y-3">
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-secondary mb-1">Email Address</label>
+          <input required type="email" id="auth-email-input" placeholder="name@domain.com"
+            class="w-full bg-slate-100 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-secondary mb-1">Password</label>
+          <input required type="password" id="auth-pass-input" placeholder="••••••••"
+            class="w-full bg-slate-100 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+        </div>
+
+        <div class="flex justify-between items-center text-[10px]">
+          <button type="button" onclick="sendResetPassword(document.getElementById('auth-email-input').value)"
+            class="text-amber-600 font-bold hover:underline">Forgot Password?</button>
+          <button type="button" onclick="window.toggleAuthMode()" id="auth-toggle-btn"
+            class="text-slate-600 font-bold hover:underline">Need an account? Register</button>
+        </div>
+
+        <button type="submit" id="auth-submit-btn"
+          class="w-full bg-black text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-800 transition-all shadow-md">
+          Sign In ⚡
+        </button>
+      </form>
     </div>
   </div>
 
-  <!-- SECTION 5: CUSTOMER SUPPORT SECTION -->
-  <div class="bg-slate-100 p-5 rounded-2xl space-y-3.5 border border-black/5">
-    <div class="flex items-center justify-between">
-      <h3 class="text-xs font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-[18px] text-amber-600">headset_mic</span> Customer Support
-      </h3>
-      <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">24/7 Assistance</span>
-    </div>
-
-    <!-- 2x2 Grid of White Rounded Action Buttons with Colorful Icons -->
-    <div class="grid grid-cols-2 gap-3">
-      
-      <!-- WhatsApp -->
-      <a href="https://wa.me/918110061911?text=Hi%20TBC%20Support%2C%20I%20need%20assistance" target="_blank" class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
-        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-          <svg class="w-4 h-4 fill-[#25D366]" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
+  <!-- EDIT PERSONAL DETAILS MODAL -->
+  <div id="edit-profile-modal"
+    class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex justify-between items-center pb-3 border-b border-black/10">
+        <h3 class="font-bold text-base text-primary">Edit Personal &amp; Delivery Details</h3>
+        <button onclick="closeEditModal()"
+          class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-secondary hover:text-black">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+      <form onsubmit="event.preventDefault(); saveProfileDetails();" class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Full Name *</label>
+          <input id="modal-field-name" type="text" required
+            class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
         </div>
         <div>
-          <span class="block text-xs font-bold text-primary">WhatsApp</span>
-          <span class="text-[10px] text-secondary">Instant Chat</span>
-        </div>
-      </a>
-
-      <!-- Call Us -->
-      <a href="tel:+918110061611" class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
-        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
-          <span class="material-symbols-outlined text-[18px]">call</span>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Email Address</label>
+          <input id="modal-field-email" type="email"
+            class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
         </div>
         <div>
-          <span class="block text-xs font-bold text-primary">Call Us</span>
-          <span class="text-[10px] text-secondary">Direct Line</span>
-        </div>
-      </a>
-
-      <!-- Email -->
-      <a href="mailto:thebaniyancompanycbe@gmail.com" class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
-        <div class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center flex-shrink-0">
-          <span class="material-symbols-outlined text-[18px]">mail</span>
-        </div>
-        <div>
-          <span class="block text-xs font-bold text-primary">Email</span>
-          <span class="text-[10px] text-secondary">Send Mail</span>
-        </div>
-      </a>
-
-      <!-- FAQ -->
-      <a href="faqs" class="bg-white p-3.5 rounded-2xl shadow-sm border border-black/5 flex items-center gap-3 hover:bg-slate-50 transition-colors">
-        <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
-          <span class="material-symbols-outlined text-[18px]">help</span>
-        </div>
-        <div>
-          <span class="block text-xs font-bold text-primary">FAQ</span>
-          <span class="text-[10px] text-secondary">Quick Answers</span>
-        </div>
-      </a>
-
-    </div>
-  </div>
-
-  <!-- SECTION 6: FOOTER ACTIONS (SIGN OUT / LOGIN BUTTONS) -->
-  <div class="pt-2 text-center space-y-3">
-    <div class="grid grid-cols-2 gap-3">
-      <button type="button" onclick="openAuthModal()" class="w-full py-3.5 bg-black text-white font-bold text-xs uppercase tracking-wider rounded-2xl hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 shadow-md">
-        <span class="material-symbols-outlined text-[18px]">key</span> Login / Account 🔑
-      </button>
-      <button type="button" onclick="handleAuthAction()" class="w-full py-3.5 bg-rose-50 text-rose-600 font-bold text-xs uppercase tracking-wider rounded-2xl hover:bg-rose-100 transition-colors flex items-center justify-center gap-2 border border-rose-200">
-        <span class="material-symbols-outlined text-[18px]">logout</span> Sign Out
-      </button>
-    </div>
-  </div>
-
-</main>
-
-<!-- ACCOUNT AUTHENTICATION & PASSWORD RESET MODAL -->
-<div id="auth-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
-  <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-5 relative animate-scale-up border border-black/10">
-    <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold hover:bg-slate-200">✕</button>
-    
-    <div class="text-center space-y-1.5 pt-2">
-      <h3 class="font-bold text-lg text-primary">Account Access 🔑</h3>
-      <p class="text-xs text-secondary">Sign in with Google or Email to save your profile &amp; orders.</p>
-    </div>
-
-    <!-- Google Login Button -->
-    <button onclick="loginWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-800 font-bold py-3 px-4 rounded-xl border border-slate-300 shadow-sm flex items-center justify-center gap-3 text-xs uppercase tracking-wider transition-all">
-      <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-      Continue with Google
-    </button>
-
-    <div class="flex items-center my-3">
-      <div class="flex-grow border-t border-slate-200"></div>
-      <span class="px-3 text-[10px] uppercase font-bold text-slate-400">or Email</span>
-      <div class="flex-grow border-t border-slate-200"></div>
-    </div>
-
-    <!-- Email & Password Form -->
-    <form onsubmit="event.preventDefault(); window.handleEmailAuthForm();" class="space-y-3">
-      <div>
-        <label class="block text-[10px] font-bold uppercase tracking-wider text-secondary mb-1">Email Address</label>
-        <input required type="email" id="auth-email-input" placeholder="name@domain.com" class="w-full bg-slate-100 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
-      </div>
-      <div>
-        <label class="block text-[10px] font-bold uppercase tracking-wider text-secondary mb-1">Password</label>
-        <input required type="password" id="auth-pass-input" placeholder="••••••••" class="w-full bg-slate-100 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
-      </div>
-
-      <div class="flex justify-between items-center text-[10px]">
-        <button type="button" onclick="sendResetPassword(document.getElementById('auth-email-input').value)" class="text-amber-600 font-bold hover:underline">Forgot Password?</button>
-        <button type="button" onclick="window.toggleAuthMode()" id="auth-toggle-btn" class="text-slate-600 font-bold hover:underline">Need an account? Register</button>
-      </div>
-
-      <button type="submit" id="auth-submit-btn" class="w-full bg-black text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-800 transition-all shadow-md">
-        Sign In ⚡
-      </button>
-    </form>
-  </div>
-</div>
-
-<!-- EDIT PERSONAL DETAILS MODAL -->
-<div id="edit-profile-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
-  <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
-    <div class="flex justify-between items-center pb-3 border-b border-black/10">
-      <h3 class="font-bold text-base text-primary">Edit Personal &amp; Delivery Details</h3>
-      <button onclick="closeEditModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-secondary hover:text-black">
-        <span class="material-symbols-outlined text-[18px]">close</span>
-      </button>
-    </div>
-    <form onsubmit="event.preventDefault(); saveProfileDetails();" class="space-y-3">
-      <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Full Name *</label>
-        <input id="modal-field-name" type="text" required class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
-      </div>
-      <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Email Address</label>
-        <input id="modal-field-email" type="email" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
-      </div>
-      <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Phone Number *</label>
-        <div class="flex items-center bg-slate-50 rounded-xl overflow-hidden border border-black/10 focus-within:ring-2 focus-within:ring-black">
-          <span class="px-3 py-2.5 text-xs font-bold text-slate-700 bg-black/5 border-r border-black/10 select-none">🇮🇳 +91</span>
-          <input id="modal-field-phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" placeholder="10-digit mobile" class="w-full bg-transparent px-3 py-2.5 text-xs font-bold outline-none text-primary">
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-2.5">
-        <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Door / Flat No *</label>
-          <input id="modal-field-door" type="text" required placeholder="e.g. 4B / Flat 302" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Street / Area *</label>
-          <input id="modal-field-street" type="text" required placeholder="e.g. MG Road, Anna Nagar" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
-        </div>
-      </div>
-      <div>
-        <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Landmark (Optional)</label>
-        <input id="modal-field-landmark" type="text" placeholder="e.g. Near Studio Central Park" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
-      </div>
-      <div>
-        <div class="flex justify-between items-center mb-1">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary">Pincode *</label>
-          <span class="text-[9px] text-slate-400 font-bold uppercase">6-Digit India Pincode</span>
-        </div>
-        <div class="relative">
-          <input id="modal-field-pincode" type="tel" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required oninput="handleProfilePincodeInput(this.value)" placeholder="e.g. 680001 or 600001" class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-black">
-          <div id="profile-pincode-loader" class="absolute right-3 top-1/2 -translate-y-1/2 hidden flex items-center gap-1 text-[11px] text-slate-600">
-            <span class="material-symbols-outlined animate-spin text-[14px]">motion_photos_on</span>
-            <span>Fetching...</span>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Phone Number *</label>
+          <div
+            class="flex items-center bg-slate-50 rounded-xl overflow-hidden border border-black/10 focus-within:ring-2 focus-within:ring-black">
+            <span
+              class="px-3 py-2.5 text-xs font-bold text-slate-700 bg-black/5 border-r border-black/10 select-none">🇮🇳
+              +91</span>
+            <input id="modal-field-phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required
+              oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" placeholder="10-digit mobile"
+              class="w-full bg-transparent px-3 py-2.5 text-xs font-bold outline-none text-primary">
           </div>
         </div>
-        <p id="profile-pincode-status" class="text-[10px] font-semibold mt-1 hidden"></p>
-      </div>
-      <div class="grid grid-cols-2 gap-2.5">
-        <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">State *</label>
-          <input id="modal-field-state" type="text" required placeholder="State" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Door / Flat No
+              *</label>
+            <input id="modal-field-door" type="text" required placeholder="e.g. 4B / Flat 302"
+              class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Street / Area
+              *</label>
+            <input id="modal-field-street" type="text" required placeholder="e.g. MG Road, Anna Nagar"
+              class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+          </div>
         </div>
         <div>
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">City / District *</label>
-          <input id="modal-field-city" type="text" required placeholder="City / District" class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">Landmark
+            (Optional)</label>
+          <input id="modal-field-landmark" type="text" placeholder="e.g. Near Studio Central Park"
+            class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
         </div>
-      </div>
-      <div class="flex gap-2 pt-2">
-        <button type="button" onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 font-bold text-xs text-primary rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
-        <button type="submit" class="flex-1 py-3 bg-black font-bold text-xs text-white rounded-xl shadow-md hover:bg-neutral-800 transition-colors">Save Changes</button>
-      </div>
-    </form>
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary">Pincode *</label>
+            <span class="text-[9px] text-slate-400 font-bold uppercase">6-Digit India Pincode</span>
+          </div>
+          <div class="relative">
+            <input id="modal-field-pincode" type="tel" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required
+              oninput="handleProfilePincodeInput(this.value)" placeholder="e.g. 680001 or 600001"
+              class="w-full bg-slate-50 border border-black/10 px-4 py-2.5 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-black">
+            <div id="profile-pincode-loader"
+              class="absolute right-3 top-1/2 -translate-y-1/2 hidden flex items-center gap-1 text-[11px] text-slate-600">
+              <span class="material-symbols-outlined animate-spin text-[14px]">motion_photos_on</span>
+              <span>Fetching...</span>
+            </div>
+          </div>
+          <p id="profile-pincode-status" class="text-[10px] font-semibold mt-1 hidden"></p>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">State *</label>
+            <input id="modal-field-state" type="text" required placeholder="State"
+              class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">City / District
+              *</label>
+            <input id="modal-field-city" type="text" required placeholder="City / District"
+              class="w-full bg-slate-50 border border-black/10 px-3.5 py-2.5 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-black">
+          </div>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeEditModal()"
+            class="flex-1 py-3 bg-slate-100 font-bold text-xs text-primary rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
+          <button type="submit"
+            class="flex-1 py-3 bg-black font-bold text-xs text-white rounded-xl shadow-md hover:bg-neutral-800 transition-colors">Save
+            Changes</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
-<!-- VIEW ORDER DETAILS MODAL -->
-<div id="view-order-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
-  <div class="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative space-y-5 max-h-[90vh] overflow-y-auto">
-    <div class="flex justify-between items-center pb-3 border-b border-black/10">
+  <!-- VIEW ORDER DETAILS MODAL -->
+  <div id="view-order-modal"
+    class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
+    <div
+      class="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative space-y-5 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-3 border-b border-black/10">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-secondary">Order Invoice</span>
+          <h3 class="font-bold text-lg text-primary" id="modal-order-id">#Order</h3>
+        </div>
+        <button onclick="closeOrderModal()"
+          class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:text-black">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Order Status & Method -->
+      <div class="bg-surface-container/60 p-4 rounded-2xl flex justify-between items-center text-xs">
+        <div>
+          <span class="text-secondary uppercase block text-[10px] font-bold">Payment Method</span>
+          <span class="font-bold text-primary" id="modal-order-method">Razorpay</span>
+        </div>
+        <div class="text-right">
+          <span class="text-secondary uppercase block text-[10px] font-bold">Order Status</span>
+          <span class="font-bold text-emerald-600 uppercase" id="modal-order-status">Confirmed</span>
+        </div>
+      </div>
+
+      <!-- Purchased Items List -->
       <div>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-secondary">Order Invoice</span>
-        <h3 class="font-bold text-lg text-primary" id="modal-order-id">#Order</h3>
+        <h4 class="text-xs font-bold uppercase tracking-wider text-secondary mb-2">Purchased Items</h4>
+        <div id="modal-order-items" class="space-y-2.5">
+          <!-- Rendered dynamically -->
+        </div>
       </div>
-      <button onclick="closeOrderModal()" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:text-black">
-        <span class="material-symbols-outlined text-[20px]">close</span>
-      </button>
-    </div>
 
-    <!-- Order Status & Method -->
-    <div class="bg-surface-container/60 p-4 rounded-2xl flex justify-between items-center text-xs">
-      <div>
-        <span class="text-secondary uppercase block text-[10px] font-bold">Payment Method</span>
-        <span class="font-bold text-primary" id="modal-order-method">Razorpay</span>
+      <!-- Shipping Address -->
+      <div class="bg-surface-container/40 p-4 rounded-2xl space-y-1 text-xs border border-black/5">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-secondary block">Delivery Address</span>
+        <p class="font-semibold text-primary" id="modal-order-customer">Customer Name</p>
+        <p class="text-secondary" id="modal-order-address">Address details</p>
+        <p class="text-secondary" id="modal-order-phone">Phone number</p>
       </div>
-      <div class="text-right">
-        <span class="text-secondary uppercase block text-[10px] font-bold">Order Status</span>
-        <span class="font-bold text-emerald-600 uppercase" id="modal-order-status">Confirmed</span>
-      </div>
-    </div>
 
-    <!-- Purchased Items List -->
-    <div>
-      <h4 class="text-xs font-bold uppercase tracking-wider text-secondary mb-2">Purchased Items</h4>
-      <div id="modal-order-items" class="space-y-2.5">
-        <!-- Rendered dynamically -->
+      <!-- Pricing Summary -->
+      <div class="bg-surface-container/60 p-4 rounded-2xl space-y-2 text-xs">
+        <div class="flex justify-between text-secondary">
+          <span>Delivery Charge</span>
+          <span id="modal-order-delivery" class="font-bold text-emerald-600">Free Delivery</span>
+        </div>
+        <div class="flex justify-between font-bold text-sm text-primary pt-2 border-t border-black/10">
+          <span>Total Amount</span>
+          <span id="modal-order-total" class="text-base text-black">₹0</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Shipping Address -->
-    <div class="bg-surface-container/40 p-4 rounded-2xl space-y-1 text-xs border border-black/5">
-      <span class="text-[10px] font-bold uppercase tracking-wider text-secondary block">Delivery Address</span>
-      <p class="font-semibold text-primary" id="modal-order-customer">Customer Name</p>
-      <p class="text-secondary" id="modal-order-address">Address details</p>
-      <p class="text-secondary" id="modal-order-phone">Phone number</p>
-    </div>
-
-    <!-- Pricing Summary -->
-    <div class="bg-surface-container/60 p-4 rounded-2xl space-y-2 text-xs">
-      <div class="flex justify-between text-secondary">
-        <span>Delivery Charge</span>
-        <span id="modal-order-delivery" class="font-bold text-emerald-600">Free Delivery</span>
-      </div>
-      <div class="flex justify-between font-bold text-sm text-primary pt-2 border-t border-black/10">
-        <span>Total Amount</span>
-        <span id="modal-order-total" class="text-base text-black">₹0</span>
+      <div class="flex gap-3 pt-2">
+        <a id="modal-whatsapp-link" href="#" target="_blank"
+          class="flex-1 bg-[#25D366] text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md">
+          Track on WhatsApp
+        </a>
+        <button onclick="closeOrderModal()"
+          class="px-5 py-3.5 bg-surface-container text-primary rounded-xl font-bold text-xs uppercase hover:bg-black/10 transition-colors">
+          Close
+        </button>
       </div>
     </div>
+  </div>
 
-    <div class="flex gap-3 pt-2">
-      <a id="modal-whatsapp-link" href="#" target="_blank" class="flex-1 bg-[#25D366] text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md">
-        Track on WhatsApp
+  <!-- SECTION 6: FIXED BOTTOM NAVIGATION BAR -->
+  <div class="fixed bottom-[5px] left-1/2 -translate-x-1/2 z-50 max-w-lg w-[92%] sm:w-auto">
+    <nav
+      class="bg-black/90 backdrop-blur-xl text-white rounded-full px-6 py-3 shadow-2xl border border-white/15 flex items-center justify-between gap-5 md:gap-8">
+      <a href="home"
+        class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">home</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Home</span>
       </a>
-      <button onclick="closeOrderModal()" class="px-5 py-3.5 bg-surface-container text-primary rounded-xl font-bold text-xs uppercase hover:bg-black/10 transition-colors">
-        Close
-      </button>
-    </div>
+      <a href="reels"
+        class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">video_library</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Reels</span>
+      </a>
+      <a href="shop"
+        class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">grid_view</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Shop</span>
+      </a>
+      <a href="cart"
+        class="relative flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+        <span
+          class="cart-badge-count absolute -top-1 right-2.5 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm border border-black">0</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Cart</span>
+      </a>
+      <a href="profile"
+        class="flex flex-col items-center gap-0.5 text-white font-bold transition-transform active:scale-90">
+        <span class="material-symbols-outlined text-[20px]">person</span>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Profile</span>
+      </a>
+    </nav>
   </div>
-</div>
 
-<!-- SECTION 6: FIXED BOTTOM NAVIGATION BAR -->
-<div class="fixed bottom-[5px] left-1/2 -translate-x-1/2 z-50 max-w-lg w-[92%] sm:w-auto">
-  <nav class="bg-black/90 backdrop-blur-xl text-white rounded-full px-6 py-3 shadow-2xl border border-white/15 flex items-center justify-between gap-5 md:gap-8">
-    <a href="home" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
-      <span class="material-symbols-outlined text-[20px]">home</span>
-      <span class="text-[10px] font-semibold tracking-wider uppercase">Home</span>
-    </a>
-    <a href="reels" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
-      <span class="material-symbols-outlined text-[20px]">video_library</span>
-      <span class="text-[10px] font-semibold tracking-wider uppercase">Reels</span>
-    </a>
-    <a href="shop" class="flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
-      <span class="material-symbols-outlined text-[20px]">grid_view</span>
-      <span class="text-[10px] font-semibold tracking-wider uppercase">Shop</span>
-    </a>
-    <a href="cart" class="relative flex flex-col items-center gap-0.5 text-white/70 hover:text-white transition-colors active:scale-90">
-      <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
-      <span class="cart-badge-count absolute -top-1 right-2.5 bg-red-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm border border-black">0</span>
-      <span class="text-[10px] font-semibold tracking-wider uppercase">Cart</span>
-    </a>
-    <a href="profile" class="flex flex-col items-center gap-0.5 text-white font-bold transition-transform active:scale-90">
-      <span class="material-symbols-outlined text-[20px]">person</span>
-      <span class="text-[10px] font-semibold tracking-wider uppercase">Profile</span>
-    </a>
-  </nav>
-</div>
-
-<script>
-  window.addEventListener('load', () => {
-    if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
-    else document.getElementById('loading-screen')?.classList.add('hidden');
-  });
-
-  function scrollToOrders() {
-    const el = document.getElementById('recent-orders-container');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  function openEditModal() {
-    const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
-    if (document.getElementById('modal-field-name')) document.getElementById('modal-field-name').value = stored.name || document.getElementById('profile-name')?.textContent || '';
-    if (document.getElementById('modal-field-email')) document.getElementById('modal-field-email').value = stored.email || document.getElementById('profile-email')?.textContent || '';
-    if (document.getElementById('modal-field-phone')) document.getElementById('modal-field-phone').value = stored.phone || localStorage.getItem('tbc_customer_phone') || '';
-    if (document.getElementById('modal-field-door')) document.getElementById('modal-field-door').value = stored.doorNo || '';
-    if (document.getElementById('modal-field-street')) document.getElementById('modal-field-street').value = stored.streetName || '';
-    if (!document.getElementById('modal-field-door')?.value && !document.getElementById('modal-field-street')?.value && stored.address) {
-      const parts = stored.address.split(',');
-      if (document.getElementById('modal-field-door') && parts.length > 0) document.getElementById('modal-field-door').value = parts[0].trim();
-      if (document.getElementById('modal-field-street') && parts.length > 1) document.getElementById('modal-field-street').value = parts.slice(1).join(',').trim();
-    }
-    if (document.getElementById('modal-field-landmark')) document.getElementById('modal-field-landmark').value = stored.landmark || '';
-    if (document.getElementById('modal-field-pincode')) document.getElementById('modal-field-pincode').value = stored.pincode || '';
-    if (document.getElementById('modal-field-state')) document.getElementById('modal-field-state').value = stored.state || '';
-    if (document.getElementById('modal-field-city')) document.getElementById('modal-field-city').value = stored.city || '';
-
-    if (stored.pincode && String(stored.pincode).length === 6 && typeof window.handleProfilePincodeInput === 'function') {
-      window.handleProfilePincodeInput(stored.pincode);
-    }
-    
-    const m = document.getElementById('edit-profile-modal');
-    if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
-  }
-
-  function closeEditModal() {
-    const m = document.getElementById('edit-profile-modal');
-    if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
-  }
-
-  function saveProfileDetails() {
-    const name = document.getElementById('modal-field-name')?.value.trim() || '';
-    const email = document.getElementById('modal-field-email')?.value.trim() || '';
-    const phone = document.getElementById('modal-field-phone')?.value.replace(/\D/g, '').slice(-10) || '';
-    const door = document.getElementById('modal-field-door')?.value.trim() || '';
-    const street = document.getElementById('modal-field-street')?.value.trim() || '';
-    const landmark = document.getElementById('modal-field-landmark')?.value.trim() || '';
-    const pincode = document.getElementById('modal-field-pincode')?.value.trim() || '';
-    const state = document.getElementById('modal-field-state')?.value.trim() || '';
-    const city = document.getElementById('modal-field-city')?.value.trim() || '';
-
-    if (!name) {
-      alert('Full Name is required.');
-      document.getElementById('modal-field-name')?.focus();
-      return;
-    }
-    if (!phone || phone.length !== 10) {
-      alert('Valid 10-digit Phone Number is required.');
-      document.getElementById('modal-field-phone')?.focus();
-      return;
-    }
-    if (!door) {
-      alert('Door / Flat / House No is required.');
-      document.getElementById('modal-field-door')?.focus();
-      return;
-    }
-    if (!street) {
-      alert('Street Name / Area is required.');
-      document.getElementById('modal-field-street')?.focus();
-      return;
-    }
-    if (!pincode || !/^\d{6}$/.test(pincode)) {
-      alert('Valid 6-digit Indian Pincode is required.');
-      document.getElementById('modal-field-pincode')?.focus();
-      return;
-    }
-    if (!state) {
-      alert('State is required.');
-      document.getElementById('modal-field-state')?.focus();
-      return;
-    }
-    if (!city) {
-      alert('City / District is required.');
-      document.getElementById('modal-field-city')?.focus();
-      return;
-    }
-
-    const fullAddress = `${door}, ${street}`;
-    const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
-    stored.name = name;
-    stored.email = email;
-    stored.phone = phone;
-    stored.doorNo = door;
-    stored.streetName = street;
-    stored.address = fullAddress;
-    stored.landmark = landmark;
-    stored.pincode = pincode;
-    stored.state = state;
-    stored.city = city;
-
-    localStorage.setItem('tbc_user_profile', JSON.stringify(stored));
-    if (phone) localStorage.setItem('tbc_customer_phone', phone);
-    if (email) localStorage.setItem('tbc_customer_email', email);
-
-    if (document.getElementById('profile-name')) document.getElementById('profile-name').textContent = name || 'Valued Customer';
-    if (document.getElementById('profile-email')) document.getElementById('profile-email').textContent = email || 'customer@thebaniyancompany.com';
-    if (document.getElementById('profile-avatar')) document.getElementById('profile-avatar').textContent = (name || 'U').charAt(0).toUpperCase();
-
-    closeEditModal();
-    alert('Profile & delivery address updated successfully!');
-  }
-
-  function openAddressModal() {
-    openEditModal();
-  }
-
-  function showNotificationToast() {
-    alert('🔔 Order and promotional notification alerts are active for your account!');
-  }
-</script>
-
-<!-- Dynamic Firebase Auth & Orders Integration -->
-<script type="module">
-  import { auth } from './js/firebase-config.js';
-  import {
-    onAuthStateChanged,
-    signOut,
-    GoogleAuthProvider,
-    signInWithPopup,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    sendPasswordResetEmail
-  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getCustomerOrders, subscribeToCustomerOrders, getCompany } from './js/products-service.js';
-  import { fetchIndiaPincodeDetails } from './js/pincode-service.js';
-
-  window.handleProfilePincodeInput = function(val) {
-    const clean = String(val || '').replace(/\D/g, '').slice(0, 6);
-    const pinInput = document.getElementById('modal-field-pincode');
-    if (pinInput) pinInput.value = clean;
-
-    const loader = document.getElementById('profile-pincode-loader');
-    const statusText = document.getElementById('profile-pincode-status');
-
-    if (clean.length < 6) {
-      if (statusText) { statusText.classList.add('hidden'); statusText.textContent = ''; }
-      if (loader) loader.classList.add('hidden');
-      return;
-    }
-
-    if (loader) loader.classList.remove('hidden');
-    if (statusText) {
-      statusText.className = 'text-[10px] font-semibold text-slate-500 mt-1';
-      statusText.textContent = '🔄 Auto-detecting location...';
-      statusText.classList.remove('hidden');
-    }
-
-    fetchIndiaPincodeDetails(clean).then(result => {
-      if (loader) loader.classList.add('hidden');
-      const stateInput = document.getElementById('modal-field-state');
-      const cityInput = document.getElementById('modal-field-city');
-
-      if (result.success) {
-        if (stateInput) { stateInput.value = result.state; stateInput.readOnly = true; stateInput.classList.add('bg-slate-100'); }
-        if (cityInput) { cityInput.value = result.city; cityInput.readOnly = true; cityInput.classList.add('bg-slate-100'); }
-        if (statusText) {
-          statusText.className = 'text-[10px] font-bold text-emerald-700 mt-1';
-          statusText.innerHTML = `✓ Auto-filled: ${result.city}, ${result.state}`;
-          statusText.classList.remove('hidden');
-        }
-      } else {
-        if (stateInput) { stateInput.readOnly = false; stateInput.classList.remove('bg-slate-100'); }
-        if (cityInput) { cityInput.readOnly = false; cityInput.classList.remove('bg-slate-100'); }
-        if (statusText) {
-          statusText.className = 'text-[10px] font-bold text-amber-700 mt-1 block';
-          statusText.textContent = result.message || '⚠️ Unable to fetch location. Please enter manually below.';
-          statusText.classList.remove('hidden');
-        }
-      }
+  <script>
+    window.addEventListener('load', () => {
+      if (typeof window.finishPageLoading === 'function') window.finishPageLoading();
+      else document.getElementById('loading-screen')?.classList.add('hidden');
     });
-  };
 
-  getCompany().then(comp => {
-    if (comp?.logo) {
-      try { localStorage.setItem('onespace_shop_logo', comp.logo); } catch (_) {}
-      const el = document.getElementById('nav-company-logo');
-      if (el) el.src = comp.logo;
-      const lEl = document.getElementById('loading-company-logo');
-      if (lEl) lEl.src = comp.logo;
+    function scrollToOrders() {
+      const el = document.getElementById('recent-orders-container');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
-    if (comp?.name) {
-      try { localStorage.setItem('onespace_shop_name', comp.name); } catch (_) {}
+
+    function openEditModal() {
+      const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+      if (document.getElementById('modal-field-name')) document.getElementById('modal-field-name').value = stored.name || document.getElementById('profile-name')?.textContent || '';
+      if (document.getElementById('modal-field-email')) document.getElementById('modal-field-email').value = stored.email || document.getElementById('profile-email')?.textContent || '';
+      if (document.getElementById('modal-field-phone')) document.getElementById('modal-field-phone').value = stored.phone || localStorage.getItem('tbc_customer_phone') || '';
+      if (document.getElementById('modal-field-door')) document.getElementById('modal-field-door').value = stored.doorNo || '';
+      if (document.getElementById('modal-field-street')) document.getElementById('modal-field-street').value = stored.streetName || '';
+      if (!document.getElementById('modal-field-door')?.value && !document.getElementById('modal-field-street')?.value && stored.address) {
+        const parts = stored.address.split(',');
+        if (document.getElementById('modal-field-door') && parts.length > 0) document.getElementById('modal-field-door').value = parts[0].trim();
+        if (document.getElementById('modal-field-street') && parts.length > 1) document.getElementById('modal-field-street').value = parts.slice(1).join(',').trim();
+      }
+      if (document.getElementById('modal-field-landmark')) document.getElementById('modal-field-landmark').value = stored.landmark || '';
+      if (document.getElementById('modal-field-pincode')) document.getElementById('modal-field-pincode').value = stored.pincode || '';
+      if (document.getElementById('modal-field-state')) document.getElementById('modal-field-state').value = stored.state || '';
+      if (document.getElementById('modal-field-city')) document.getElementById('modal-field-city').value = stored.city || '';
+
+      if (stored.pincode && String(stored.pincode).length === 6 && typeof window.handleProfilePincodeInput === 'function') {
+        window.handleProfilePincodeInput(stored.pincode);
+      }
+
+      const m = document.getElementById('edit-profile-modal');
+      if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
     }
-  }).catch(() => {});
 
-  window.openAuthModal = function() {
-    const modal = document.getElementById('auth-modal');
-    if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
-  };
-
-  window.closeAuthModal = function() {
-    const modal = document.getElementById('auth-modal');
-    if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
-  };
-
-  let isRegisterMode = false;
-  window.toggleAuthMode = function() {
-    isRegisterMode = !isRegisterMode;
-    const btn = document.getElementById('auth-submit-btn');
-    const toggleBtn = document.getElementById('auth-toggle-btn');
-    if (isRegisterMode) {
-      if (btn) btn.textContent = 'Create Account ⚡';
-      if (toggleBtn) toggleBtn.textContent = 'Already have an account? Sign In';
-    } else {
-      if (btn) btn.textContent = 'Sign In ⚡';
-      if (toggleBtn) toggleBtn.textContent = 'Need an account? Register';
+    function closeEditModal() {
+      const m = document.getElementById('edit-profile-modal');
+      if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
     }
-  };
 
-  window.loginWithGoogle = async function() {
-    try {
-      const provider = new GoogleAuthProvider();
-      const res = await signInWithPopup(auth, provider);
-      const user = res.user;
-      const profile = {
-        name: user.displayName || user.email.split('@')[0],
-        email: user.email,
-        phone: user.phoneNumber || ''
-      };
-      localStorage.setItem('tbc_user_profile', JSON.stringify(profile));
-      if (user.phoneNumber) localStorage.setItem('tbc_customer_phone', user.phoneNumber.replace(/\D/g,'').slice(-10));
-      alert(`Welcome, ${user.displayName || 'User'}!`);
-      closeAuthModal();
+    function saveProfileDetails() {
+      const name = document.getElementById('modal-field-name')?.value.trim() || '';
+      const email = document.getElementById('modal-field-email')?.value.trim() || '';
+      const phone = document.getElementById('modal-field-phone')?.value.replace(/\D/g, '').slice(-10) || '';
+      const door = document.getElementById('modal-field-door')?.value.trim() || '';
+      const street = document.getElementById('modal-field-street')?.value.trim() || '';
+      const landmark = document.getElementById('modal-field-landmark')?.value.trim() || '';
+      const pincode = document.getElementById('modal-field-pincode')?.value.trim() || '';
+      const state = document.getElementById('modal-field-state')?.value.trim() || '';
+      const city = document.getElementById('modal-field-city')?.value.trim() || '';
+
+      if (!name) {
+        alert('Full Name is required.');
+        document.getElementById('modal-field-name')?.focus();
+        return;
+      }
+      if (!phone || phone.length !== 10) {
+        alert('Valid 10-digit Phone Number is required.');
+        document.getElementById('modal-field-phone')?.focus();
+        return;
+      }
+      if (!door) {
+        alert('Door / Flat / House No is required.');
+        document.getElementById('modal-field-door')?.focus();
+        return;
+      }
+      if (!street) {
+        alert('Street Name / Area is required.');
+        document.getElementById('modal-field-street')?.focus();
+        return;
+      }
+      if (!pincode || !/^\d{6}$/.test(pincode)) {
+        alert('Valid 6-digit Indian Pincode is required.');
+        document.getElementById('modal-field-pincode')?.focus();
+        return;
+      }
+      if (!state) {
+        alert('State is required.');
+        document.getElementById('modal-field-state')?.focus();
+        return;
+      }
+      if (!city) {
+        alert('City / District is required.');
+        document.getElementById('modal-field-city')?.focus();
+        return;
+      }
+
+      const fullAddress = `${door}, ${street}`;
+      const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+      stored.name = name;
+      stored.email = email;
+      stored.phone = phone;
+      stored.doorNo = door;
+      stored.streetName = street;
+      stored.address = fullAddress;
+      stored.landmark = landmark;
+      stored.pincode = pincode;
+      stored.state = state;
+      stored.city = city;
+
+      localStorage.setItem('tbc_user_profile', JSON.stringify(stored));
+      if (phone) localStorage.setItem('tbc_customer_phone', phone);
+      if (email) localStorage.setItem('tbc_customer_email', email);
+
+      if (document.getElementById('profile-name')) document.getElementById('profile-name').textContent = name || 'Valued Customer';
+      if (document.getElementById('profile-email')) document.getElementById('profile-email').textContent = email || 'customer@thebaniyancompany.com';
+      if (document.getElementById('profile-avatar')) document.getElementById('profile-avatar').textContent = (name || 'U').charAt(0).toUpperCase();
+
+      closeEditModal();
+      alert('Profile & delivery address updated successfully!');
+    }
+
+    function openAddressModal() {
+      openEditModal();
+    }
+
+    function showNotificationToast() {
+      alert('🔔 Order and promotional notification alerts are active for your account!');
+    }
+  </script>
+
+  <!-- Dynamic Firebase Auth & Orders Integration -->
+  <script type="module">
+    import { auth } from './js/firebase-config.js';
+    import {
+      onAuthStateChanged,
+      signOut,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getCustomerOrders, subscribeToCustomerOrders, getCompany } from './js/products-service.js';
+    import { fetchIndiaPincodeDetails } from './js/pincode-service.js';
+
+    window.handleProfilePincodeInput = function (val) {
+      const clean = String(val || '').replace(/\D/g, '').slice(0, 6);
+      const pinInput = document.getElementById('modal-field-pincode');
+      if (pinInput) pinInput.value = clean;
+
+      const loader = document.getElementById('profile-pincode-loader');
+      const statusText = document.getElementById('profile-pincode-status');
+
+      if (clean.length < 6) {
+        if (statusText) { statusText.classList.add('hidden'); statusText.textContent = ''; }
+        if (loader) loader.classList.add('hidden');
+        return;
+      }
+
+      if (loader) loader.classList.remove('hidden');
+      if (statusText) {
+        statusText.className = 'text-[10px] font-semibold text-slate-500 mt-1';
+        statusText.textContent = '🔄 Auto-detecting location...';
+        statusText.classList.remove('hidden');
+      }
+
+      fetchIndiaPincodeDetails(clean).then(result => {
+        if (loader) loader.classList.add('hidden');
+        const stateInput = document.getElementById('modal-field-state');
+        const cityInput = document.getElementById('modal-field-city');
+
+        if (result.success) {
+          if (stateInput) { stateInput.value = result.state; stateInput.readOnly = true; stateInput.classList.add('bg-slate-100'); }
+          if (cityInput) { cityInput.value = result.city; cityInput.readOnly = true; cityInput.classList.add('bg-slate-100'); }
+          if (statusText) {
+            statusText.className = 'text-[10px] font-bold text-emerald-700 mt-1';
+            statusText.innerHTML = `✓ Auto-filled: ${result.city}, ${result.state}`;
+            statusText.classList.remove('hidden');
+          }
+        } else {
+          if (stateInput) { stateInput.readOnly = false; stateInput.classList.remove('bg-slate-100'); }
+          if (cityInput) { cityInput.readOnly = false; cityInput.classList.remove('bg-slate-100'); }
+          if (statusText) {
+            statusText.className = 'text-[10px] font-bold text-amber-700 mt-1 block';
+            statusText.textContent = result.message || '⚠️ Unable to fetch location. Please enter manually below.';
+            statusText.classList.remove('hidden');
+          }
+        }
+      });
+    };
+
+    getCompany().then(comp => {
+      if (comp?.logo) {
+        try { localStorage.setItem('onespace_shop_logo', comp.logo); } catch (_) { }
+        const el = document.getElementById('nav-company-logo');
+        if (el) el.src = comp.logo;
+        const lEl = document.getElementById('loading-company-logo');
+        if (lEl) lEl.src = comp.logo;
+      }
+      if (comp?.name) {
+        try { localStorage.setItem('onespace_shop_name', comp.name); } catch (_) { }
+      }
+    }).catch(() => { });
+
+    window.openAuthModal = function () {
+      const modal = document.getElementById('auth-modal');
+      if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+    };
+
+    window.closeAuthModal = function () {
+      const modal = document.getElementById('auth-modal');
+      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    };
+
+    let isRegisterMode = false;
+    window.toggleAuthMode = function () {
+      isRegisterMode = !isRegisterMode;
+      const btn = document.getElementById('auth-submit-btn');
+      const toggleBtn = document.getElementById('auth-toggle-btn');
+      if (isRegisterMode) {
+        if (btn) btn.textContent = 'Create Account ⚡';
+        if (toggleBtn) toggleBtn.textContent = 'Already have an account? Sign In';
+      } else {
+        if (btn) btn.textContent = 'Sign In ⚡';
+        if (toggleBtn) toggleBtn.textContent = 'Need an account? Register';
+      }
+    };
+
+    window.loginWithGoogle = async function () {
+      try {
+        const provider = new GoogleAuthProvider();
+        const res = await signInWithPopup(auth, provider);
+        const user = res.user;
+        const profile = {
+          name: user.displayName || user.email.split('@')[0],
+          email: user.email,
+          phone: user.phoneNumber || ''
+        };
+        localStorage.setItem('tbc_user_profile', JSON.stringify(profile));
+        if (user.phoneNumber) localStorage.setItem('tbc_customer_phone', user.phoneNumber.replace(/\D/g, '').slice(-10));
+        alert(`Welcome, ${user.displayName || 'User'}!`);
+        closeAuthModal();
+        window.location.reload();
+      } catch (err) {
+        alert(err.message || 'Google authentication failed.');
+      }
+    };
+
+    window.handleEmailAuthForm = async function () {
+      const email = document.getElementById('auth-email-input')?.value.trim();
+      const pass = document.getElementById('auth-pass-input')?.value.trim();
+      if (!email || !pass) { alert('Please enter both Email and Password.'); return; }
+
+      if (isRegisterMode) {
+        try {
+          const res = await createUserWithEmailAndPassword(auth, email, pass);
+          const user = res.user;
+          const profile = { name: user.email.split('@')[0], email: user.email };
+          localStorage.setItem('tbc_user_profile', JSON.stringify(profile));
+          alert('Account created & signed in!');
+          closeAuthModal();
+          window.location.reload();
+        } catch (err) { alert(err.message || 'Registration failed.'); }
+      } else {
+        try {
+          const res = await signInWithEmailAndPassword(auth, email, pass);
+          const user = res.user;
+          const profile = { name: user.displayName || user.email.split('@')[0], email: user.email };
+          localStorage.setItem('tbc_user_profile', JSON.stringify(profile));
+          alert('Signed in successfully!');
+          closeAuthModal();
+          window.location.reload();
+        } catch (err) { alert(err.message || 'Authentication failed.'); }
+      }
+    };
+
+    window.sendResetPassword = async function (email) {
+      const targetEmail = email || prompt("Please enter your account email to receive a password reset link:");
+      if (!targetEmail || !targetEmail.trim()) return;
+      try {
+        await sendPasswordResetEmail(auth, targetEmail.trim());
+        alert(`Password reset email sent to ${targetEmail.trim()}! Please check your inbox.`);
+      } catch (err) {
+        alert(err.message || 'Unable to send password reset email.');
+      }
+    };
+
+    window.handleAuthAction = async function () {
+      try { await signOut(auth); } catch (e) { }
+      localStorage.removeItem('tbc_user_profile');
+      localStorage.removeItem('tbc_customer_phone');
+      localStorage.removeItem('tbc_customer_email');
+      localStorage.removeItem('tbc_local_orders');
+      if (window._customerOrdersUnsub) {
+        try { window._customerOrdersUnsub(); } catch (e) { }
+      }
+      alert('Signed out successfully.');
       window.location.reload();
-    } catch(err) {
-      alert(err.message || 'Google authentication failed.');
-    }
-  };
+    };
 
-  window.handleEmailAuthForm = async function() {
-    const email = document.getElementById('auth-email-input')?.value.trim();
-    const pass = document.getElementById('auth-pass-input')?.value.trim();
-    if (!email || !pass) { alert('Please enter both Email and Password.'); return; }
+    function renderCustomerOrders(liveOrders, identifier = '') {
+      const rawId = String(identifier || '').trim();
+      const cleanPhone = rawId.replace(/\D/g, '').slice(-10);
+      const cleanEmail = rawId.toLowerCase();
 
-    if (isRegisterMode) {
+      // If no valid identifier exists, present empty state
+      if ((!cleanPhone || cleanPhone.length < 7) && (!cleanEmail || !cleanEmail.includes('@'))) {
+        window.currentCustomerOrders = [];
+        const container = document.getElementById('recent-orders-container');
+        const statOrdersEl = document.getElementById('stat-orders-count');
+        const navOrderStatusEl = document.getElementById('nav-order-status');
+        const statSavedEl = document.getElementById('stat-saved-amount');
+
+        if (statOrdersEl) statOrdersEl.textContent = '0';
+        if (navOrderStatusEl) navOrderStatusEl.textContent = '0 active';
+        if (statSavedEl) statSavedEl.textContent = '₹0';
+
+        if (container) {
+          container.innerHTML = `
+          <div class="bg-white p-6 rounded-2xl border border-black/5 text-center space-y-2">
+            <p class="text-xs font-bold text-primary">Please log in to view your orders</p>
+          </div>`;
+        }
+        return;
+      }
+
+      let localOrders = [];
       try {
-        const res = await createUserWithEmailAndPassword(auth, email, pass);
-        const user = res.user;
-        const profile = { name: user.email.split('@')[0], email: user.email };
-        localStorage.setItem('tbc_user_profile', JSON.stringify(profile));
-        alert('Account created & signed in!');
-        closeAuthModal();
-        window.location.reload();
-      } catch(err) { alert(err.message || 'Registration failed.'); }
-    } else {
-      try {
-        const res = await signInWithEmailAndPassword(auth, email, pass);
-        const user = res.user;
-        const profile = { name: user.displayName || user.email.split('@')[0], email: user.email };
-        localStorage.setItem('tbc_user_profile', JSON.stringify(profile));
-        alert('Signed in successfully!');
-        closeAuthModal();
-        window.location.reload();
-      } catch(err) { alert(err.message || 'Authentication failed.'); }
-    }
-  };
+        localOrders = JSON.parse(localStorage.getItem('tbc_local_orders') || '[]');
+      } catch (e) { }
 
-  window.sendResetPassword = async function(email) {
-    const targetEmail = email || prompt("Please enter your account email to receive a password reset link:");
-    if (!targetEmail || !targetEmail.trim()) return;
-    try {
-      await sendPasswordResetEmail(auth, targetEmail.trim());
-      alert(`Password reset email sent to ${targetEmail.trim()}! Please check your inbox.`);
-    } catch(err) {
-      alert(err.message || 'Unable to send password reset email.');
-    }
-  };
+      // Strictly filter localOrders by current user identifier (phone or email)
+      localOrders = localOrders.filter(o => {
+        if (!o) return false;
+        const p1 = String(o.customerPhoneNumber || o.customerPhone || o.phone || o.customerDetails?.phone || o.customer?.phone || o.shippingAddress?.phone || '').replace(/\D/g, '').slice(-10);
+        const e1 = String(o.customerEmail || o.customerDetails?.email || o.customer?.email || o.email || '').toLowerCase().trim();
 
-  window.handleAuthAction = async function() {
-    try { await signOut(auth); } catch(e){}
-    localStorage.removeItem('tbc_user_profile');
-    localStorage.removeItem('tbc_customer_phone');
-    localStorage.removeItem('tbc_customer_email');
-    localStorage.removeItem('tbc_local_orders');
-    if (window._customerOrdersUnsub) {
-      try { window._customerOrdersUnsub(); } catch(e) {}
-    }
-    alert('Signed out successfully.');
-    window.location.reload();
-  };
+        if (cleanPhone && cleanPhone.length >= 7 && p1 && p1.length >= 7) {
+          if (p1 === cleanPhone || p1.endsWith(cleanPhone) || cleanPhone.endsWith(p1)) return true;
+        }
+        if (cleanEmail && cleanEmail.includes('@') && e1 && e1.includes('@')) {
+          if (e1 === cleanEmail) return true;
+        }
+        return false;
+      });
 
-  function renderCustomerOrders(liveOrders, identifier = '') {
-    const rawId = String(identifier || '').trim();
-    const cleanPhone = rawId.replace(/\D/g, '').slice(-10);
-    const cleanEmail = rawId.toLowerCase();
+      const combinedMap = new Map();
+      (liveOrders || []).forEach(o => { if (o && o.id) combinedMap.set(String(o.id), o); });
+      (localOrders || []).forEach(o => { if (o && o.id && !combinedMap.has(String(o.id))) combinedMap.set(String(o.id), o); });
 
-    // If no valid identifier exists, present empty state
-    if ((!cleanPhone || cleanPhone.length < 7) && (!cleanEmail || !cleanEmail.includes('@'))) {
-      window.currentCustomerOrders = [];
+      const allOrders = Array.from(combinedMap.values());
+      allOrders.sort((a, b) => {
+        const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.timestamp || 0);
+        const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.timestamp || 0);
+        return timeB - timeA;
+      });
+
+      window.currentCustomerOrders = allOrders;
       const container = document.getElementById('recent-orders-container');
       const statOrdersEl = document.getElementById('stat-orders-count');
       const navOrderStatusEl = document.getElementById('nav-order-status');
       const statSavedEl = document.getElementById('stat-saved-amount');
 
-      if (statOrdersEl) statOrdersEl.textContent = '0';
-      if (navOrderStatusEl) navOrderStatusEl.textContent = '0 active';
-      if (statSavedEl) statSavedEl.textContent = '₹0';
+      if (statOrdersEl) statOrdersEl.textContent = allOrders.length;
+      if (navOrderStatusEl) navOrderStatusEl.textContent = `${allOrders.length} active`;
 
-      if (container) {
-        container.innerHTML = `
-          <div class="bg-white p-6 rounded-2xl border border-black/5 text-center space-y-2">
-            <p class="text-xs font-bold text-primary">Please log in to view your orders</p>
-          </div>`;
-      }
-      return;
-    }
-
-    let localOrders = [];
-    try {
-      localOrders = JSON.parse(localStorage.getItem('tbc_local_orders') || '[]');
-    } catch(e) {}
-
-    // Strictly filter localOrders by current user identifier (phone or email)
-    localOrders = localOrders.filter(o => {
-      if (!o) return false;
-      const p1 = String(o.customerPhoneNumber || o.customerPhone || o.phone || o.customerDetails?.phone || o.customer?.phone || o.shippingAddress?.phone || '').replace(/\D/g, '').slice(-10);
-      const e1 = String(o.customerEmail || o.customerDetails?.email || o.customer?.email || o.email || '').toLowerCase().trim();
-
-      if (cleanPhone && cleanPhone.length >= 7 && p1 && p1.length >= 7) {
-        if (p1 === cleanPhone || p1.endsWith(cleanPhone) || cleanPhone.endsWith(p1)) return true;
-      }
-      if (cleanEmail && cleanEmail.includes('@') && e1 && e1.includes('@')) {
-        if (e1 === cleanEmail) return true;
-      }
-      return false;
-    });
-
-    const combinedMap = new Map();
-    (liveOrders || []).forEach(o => { if (o && o.id) combinedMap.set(String(o.id), o); });
-    (localOrders || []).forEach(o => { if (o && o.id && !combinedMap.has(String(o.id))) combinedMap.set(String(o.id), o); });
-
-    const allOrders = Array.from(combinedMap.values());
-    allOrders.sort((a, b) => {
-      const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.timestamp || 0);
-      const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.timestamp || 0);
-      return timeB - timeA;
-    });
-
-    window.currentCustomerOrders = allOrders;
-    const container = document.getElementById('recent-orders-container');
-    const statOrdersEl = document.getElementById('stat-orders-count');
-    const navOrderStatusEl = document.getElementById('nav-order-status');
-    const statSavedEl = document.getElementById('stat-saved-amount');
-
-    if (statOrdersEl) statOrdersEl.textContent = allOrders.length;
-    if (navOrderStatusEl) navOrderStatusEl.textContent = `${allOrders.length} active`;
-
-    let totalSaved = 0;
-    allOrders.forEach(o => {
-      (o.items || []).forEach(i => {
-        const orig = Number(i.originalPrice || i.mrp || 0);
-        const sel = Number(i.price || 0);
-        const qty = Number(i.qty || i.quantity || 1);
-        if (orig > sel) {
-          totalSaved += (orig - sel) * qty;
-        }
+      let totalSaved = 0;
+      allOrders.forEach(o => {
+        (o.items || []).forEach(i => {
+          const orig = Number(i.originalPrice || i.mrp || 0);
+          const sel = Number(i.price || 0);
+          const qty = Number(i.qty || i.quantity || 1);
+          if (orig > sel) {
+            totalSaved += (orig - sel) * qty;
+          }
+        });
+        if (o.discountAmount) totalSaved += Number(o.discountAmount);
       });
-      if (o.discountAmount) totalSaved += Number(o.discountAmount);
-    });
-    if (statSavedEl) statSavedEl.textContent = `₹${totalSaved.toLocaleString('en-IN')}`;
+      if (statSavedEl) statSavedEl.textContent = `₹${totalSaved.toLocaleString('en-IN')}`;
 
-    if (container && allOrders.length > 0) {
-      container.innerHTML = allOrders.map(o => {
-        const items = o.items || [];
-        const itemCount = items.reduce((acc, i) => acc + (i.qty || i.quantity || 1), 0);
-        const dateStr = o.createdAt?.seconds 
-          ? new Date(o.createdAt.seconds * 1000).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
-          : (o.orderDateStr || 'Recently');
-        
-        const isDelivered = o.status === 'Delivered';
-        const badgeClass = isDelivered 
-          ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
-          : 'bg-amber-100 text-amber-800 border-amber-200';
+      if (container && allOrders.length > 0) {
+        container.innerHTML = allOrders.map(o => {
+          const items = o.items || [];
+          const itemCount = items.reduce((acc, i) => acc + (i.qty || i.quantity || 1), 0);
+          const dateStr = o.createdAt?.seconds
+            ? new Date(o.createdAt.seconds * 1000).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+            : (o.orderDateStr || 'Recently');
 
-        const itemsListHtml = items.length > 0 ? items.map(i => {
-          const img = i.image || i.imageUrl || (i.imageUrls && i.imageUrls[0]) || 'https://placehold.co/200x250/f0f0f0/999?text=Product';
-          const qty = i.qty || i.quantity || 1;
-          const itemPrice = Number(i.price || 0);
-          return `
+          const isDelivered = o.status === 'Delivered';
+          const badgeClass = isDelivered
+            ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+            : 'bg-amber-100 text-amber-800 border-amber-200';
+
+          const itemsListHtml = items.length > 0 ? items.map(i => {
+            const img = i.image || i.imageUrl || (i.imageUrls && i.imageUrls[0]) || 'https://placehold.co/200x250/f0f0f0/999?text=Product';
+            const qty = i.qty || i.quantity || 1;
+            const itemPrice = Number(i.price || 0);
+            return `
             <div class="flex items-center gap-3 bg-surface-container/70 p-2.5 rounded-xl border border-black/5">
               <img src="${img}" alt="${i.name || 'Product'}" class="w-12 h-14 object-cover rounded-lg bg-white border border-black/10 flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f0f0f0/999?text=Product'">
               <div class="flex-1 min-w-0">
@@ -915,11 +1033,11 @@
               </div>
             </div>
           `;
-        }).join('') : `
+          }).join('') : `
           <div class="text-xs text-secondary italic p-2 bg-slate-50 rounded-xl">Standard merchandise package</div>
         `;
 
-        return `
+          return `
           <div onclick="viewOrderDetails('${o.id}')" class="bg-white p-4 rounded-2xl shadow-sm border border-black/10 hover:border-black/30 transition-all cursor-pointer space-y-3">
             <div class="flex items-center justify-between border-b border-black/5 pb-2">
               <span class="text-[11px] font-extrabold uppercase tracking-wider text-black bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
@@ -939,106 +1057,106 @@
               <span class="font-extrabold text-sm text-black">Total: ₹${(o.totalAmount || 0).toLocaleString('en-IN')}</span>
             </div>
           </div>`;
-      }).join('');
-    } else if (container) {
-      container.innerHTML = `
+        }).join('');
+      } else if (container) {
+        container.innerHTML = `
         <div class="bg-white p-6 rounded-2xl border border-black/5 text-center space-y-2">
           <p class="text-xs font-bold text-primary">No recent orders yet</p>
           <a href="shop" class="inline-block text-[11px] font-bold text-emerald-600 hover:underline uppercase tracking-wider">Start Shopping Now →</a>
         </div>`;
-    }
-  }
-
-  function loadAndInitProfile(user = null) {
-    const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
-    const phone = localStorage.getItem('tbc_customer_phone') || stored.phone || user?.phoneNumber || '';
-    const cleanPhone = String(phone).replace(/\D/g, '').slice(-10);
-    const email = stored.email || user?.email || '';
-    const identifier = cleanPhone || email || '';
-
-    const name = stored.name || user?.displayName || (email ? email.split('@')[0] : '') || (cleanPhone ? `Customer (${cleanPhone})` : 'Valued Customer');
-    const displayEmail = email || (cleanPhone ? `+91 ${cleanPhone}` : 'customer@thebaniyancompany.com');
-
-    const nameEl = document.getElementById('profile-name');
-    const emailEl = document.getElementById('profile-email');
-    const avatarEl = document.getElementById('profile-avatar');
-
-    if (nameEl) nameEl.textContent = name;
-    if (emailEl) emailEl.textContent = cleanPhone ? `📱 +91 ${cleanPhone} · ${displayEmail}` : displayEmail;
-    if (avatarEl) avatarEl.textContent = (name || 'U').charAt(0).toUpperCase();
-
-    // Clean up any existing stream before creating a new subscription
-    if (window._customerOrdersUnsub) {
-      try { window._customerOrdersUnsub(); } catch(e) {}
+      }
     }
 
-    // Pure real-time stream subscription strictly scoped to logged-in user identifier
-    window._customerOrdersUnsub = subscribeToCustomerOrders(identifier, (liveOrders) => {
-      renderCustomerOrders(liveOrders, identifier);
+    function loadAndInitProfile(user = null) {
+      const stored = JSON.parse(localStorage.getItem('tbc_user_profile') || '{}');
+      const phone = localStorage.getItem('tbc_customer_phone') || stored.phone || user?.phoneNumber || '';
+      const cleanPhone = String(phone).replace(/\D/g, '').slice(-10);
+      const email = stored.email || user?.email || '';
+      const identifier = cleanPhone || email || '';
+
+      const name = stored.name || user?.displayName || (email ? email.split('@')[0] : '') || (cleanPhone ? `Customer (${cleanPhone})` : 'Valued Customer');
+      const displayEmail = email || (cleanPhone ? `+91 ${cleanPhone}` : 'customer@thebaniyancompany.com');
+
+      const nameEl = document.getElementById('profile-name');
+      const emailEl = document.getElementById('profile-email');
+      const avatarEl = document.getElementById('profile-avatar');
+
+      if (nameEl) nameEl.textContent = name;
+      if (emailEl) emailEl.textContent = cleanPhone ? `📱 +91 ${cleanPhone} · ${displayEmail}` : displayEmail;
+      if (avatarEl) avatarEl.textContent = (name || 'U').charAt(0).toUpperCase();
+
+      // Clean up any existing stream before creating a new subscription
+      if (window._customerOrdersUnsub) {
+        try { window._customerOrdersUnsub(); } catch (e) { }
+      }
+
+      // Pure real-time stream subscription strictly scoped to logged-in user identifier
+      window._customerOrdersUnsub = subscribeToCustomerOrders(identifier, (liveOrders) => {
+        renderCustomerOrders(liveOrders, identifier);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Load Wishlist count
+      try {
+        const rawWish = localStorage.getItem('tbc_wishlist_items');
+        const wishList = rawWish ? JSON.parse(rawWish) : [];
+        const wishCountEl = document.getElementById('stat-wishlist-count');
+        const wishNavEl = document.getElementById('nav-wishlist-status');
+        if (wishCountEl) wishCountEl.textContent = wishList.length > 0 ? `${wishList.length} Item${wishList.length > 1 ? 's' : ''}` : '0 Items';
+        if (wishNavEl) wishNavEl.textContent = wishList.length > 0 ? `${wishList.length} saved items` : 'Saved items';
+      } catch (e) { }
+
+      // Instant load from localStorage & Firebase Auth state
+      loadAndInitProfile();
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) loadAndInitProfile(user);
+      });
     });
-  }
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    // Load Wishlist count
-    try {
-      const rawWish = localStorage.getItem('tbc_wishlist_items');
-      const wishList = rawWish ? JSON.parse(rawWish) : [];
-      const wishCountEl = document.getElementById('stat-wishlist-count');
-      const wishNavEl = document.getElementById('nav-wishlist-status');
-      if (wishCountEl) wishCountEl.textContent = wishList.length > 0 ? `${wishList.length} Item${wishList.length > 1 ? 's' : ''}` : '0 Items';
-      if (wishNavEl) wishNavEl.textContent = wishList.length > 0 ? `${wishList.length} saved items` : 'Saved items';
-    } catch (e) {}
+    window.viewOrderDetails = function (id) {
+      const o = (window.currentCustomerOrders || []).find(item => item.id === id);
+      if (!o) return;
 
-    // Instant load from localStorage & Firebase Auth state
-    loadAndInitProfile();
+      const modalId = document.getElementById('modal-order-id');
+      if (modalId) modalId.textContent = `#${o.id}`;
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) loadAndInitProfile(user);
-    });
-  });
+      const modalMethod = document.getElementById('modal-order-method');
+      if (modalMethod) modalMethod.textContent = String(o.paymentMethod || 'Razorpay').toUpperCase();
 
-  window.viewOrderDetails = function(id) {
-    const o = (window.currentCustomerOrders || []).find(item => item.id === id);
-    if (!o) return;
+      const modalStatus = document.getElementById('modal-order-status');
+      if (modalStatus) modalStatus.textContent = o.status || 'Confirmed';
 
-    const modalId = document.getElementById('modal-order-id');
-    if (modalId) modalId.textContent = `#${o.id}`;
+      const modalCust = document.getElementById('modal-order-customer');
+      if (modalCust) modalCust.textContent = o.customerName || 'Valued Customer';
 
-    const modalMethod = document.getElementById('modal-order-method');
-    if (modalMethod) modalMethod.textContent = String(o.paymentMethod || 'Razorpay').toUpperCase();
+      const modalPhone = document.getElementById('modal-order-phone');
+      if (modalPhone) modalPhone.textContent = o.customerPhoneNumber ? `Phone: +91 ${o.customerPhoneNumber}` : '';
 
-    const modalStatus = document.getElementById('modal-order-status');
-    if (modalStatus) modalStatus.textContent = o.status || 'Confirmed';
+      const modalAddr = document.getElementById('modal-order-address');
+      if (modalAddr) modalAddr.textContent = `${o.customerAddress || ''}, ${o.city || ''}, ${o.state || ''} - ${o.pincode || ''}`;
 
-    const modalCust = document.getElementById('modal-order-customer');
-    if (modalCust) modalCust.textContent = o.customerName || 'Valued Customer';
+      const modalDelivery = document.getElementById('modal-order-delivery');
+      if (modalDelivery) {
+        const devFee = Number(o.deliveryFee ?? o.deliveryCharge ?? o.shippingCharge ?? o.pricing?.deliveryCharge ?? 0);
+        modalDelivery.textContent = devFee > 0 ? `₹${devFee.toLocaleString('en-IN')}` : 'Free Delivery';
+        modalDelivery.className = devFee > 0 ? 'font-bold text-primary' : 'font-bold text-emerald-600';
+      }
 
-    const modalPhone = document.getElementById('modal-order-phone');
-    if (modalPhone) modalPhone.textContent = o.customerPhoneNumber ? `Phone: +91 ${o.customerPhoneNumber}` : '';
+      const modalTotal = document.getElementById('modal-order-total');
+      if (modalTotal) modalTotal.textContent = `₹${(o.totalAmount || 0).toLocaleString('en-IN')}`;
 
-    const modalAddr = document.getElementById('modal-order-address');
-    if (modalAddr) modalAddr.textContent = `${o.customerAddress || ''}, ${o.city || ''}, ${o.state || ''} - ${o.pincode || ''}`;
+      const modalWa = document.getElementById('modal-whatsapp-link');
+      if (modalWa) modalWa.href = `https://wa.me/918110061911?text=Hi%20TBC%20Support%2C%20tracking%20update%20for%20Order%20%23${o.id}`;
 
-    const modalDelivery = document.getElementById('modal-order-delivery');
-    if (modalDelivery) {
-      const devFee = Number(o.deliveryFee ?? o.deliveryCharge ?? o.shippingCharge ?? o.pricing?.deliveryCharge ?? 0);
-      modalDelivery.textContent = devFee > 0 ? `₹${devFee.toLocaleString('en-IN')}` : 'Free Delivery';
-      modalDelivery.className = devFee > 0 ? 'font-bold text-primary' : 'font-bold text-emerald-600';
-    }
-
-    const modalTotal = document.getElementById('modal-order-total');
-    if (modalTotal) modalTotal.textContent = `₹${(o.totalAmount || 0).toLocaleString('en-IN')}`;
-
-    const modalWa = document.getElementById('modal-whatsapp-link');
-    if (modalWa) modalWa.href = `https://wa.me/918110061911?text=Hi%20TBC%20Support%2C%20tracking%20update%20for%20Order%20%23${o.id}`;
-
-    const itemsContainer = document.getElementById('modal-order-items');
-    if (itemsContainer) {
-      const items = o.items || [];
-      if (items.length === 0) {
-        itemsContainer.innerHTML = `<p class="text-xs text-secondary">Standard merchandise order package</p>`;
-      } else {
-        itemsContainer.innerHTML = items.map(item => `
+      const itemsContainer = document.getElementById('modal-order-items');
+      if (itemsContainer) {
+        const items = o.items || [];
+        if (items.length === 0) {
+          itemsContainer.innerHTML = `<p class="text-xs text-secondary">Standard merchandise order package</p>`;
+        } else {
+          itemsContainer.innerHTML = items.map(item => `
           <div class="bg-surface-container/60 p-3 rounded-xl flex items-center gap-3">
             <img src="${item.image || item.imageUrl || 'https://placehold.co/200x250/f0f0f0/999?text=Item'}" alt="${item.name || 'Product'}" class="w-12 h-14 object-cover rounded-lg border border-black/10 bg-white flex-shrink-0" onerror="this.src='https://placehold.co/200x250/f0f0f0/999?text=Item'">
             <div class="flex-1 min-w-0">
@@ -1048,38 +1166,39 @@
             </div>
           </div>
         `).join('');
+        }
       }
-    }
 
-    const modal = document.getElementById('view-order-modal');
-    if (modal) {
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-  };
+      const modal = document.getElementById('view-order-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    };
 
-  window.closeOrderModal = function() {
-    const modal = document.getElementById('view-order-modal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-  };
-</script>
+    window.closeOrderModal = function () {
+      const modal = document.getElementById('view-order-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    };
+  </script>
 
-<!-- Nav Interceptor -->
-<script>
-  document.addEventListener('click', function(e) {
-    const a = e.target.closest('a[href]');
-    if (!a) return;
-    const href = a.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('//')) return;
-    const page = href.split('?')[0];
-    if (!page.endsWith('.html')) return;
-    if (page === 'loading.html') return;
-    e.preventDefault();
-    window.location.href = 'loading.html?next=' + encodeURIComponent(href);
-  });
-</script>
+  <!-- Nav Interceptor -->
+  <script>
+    document.addEventListener('click', function (e) {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('//')) return;
+      const page = href.split('?')[0];
+      if (!page.endsWith('.html')) return;
+      if (page === 'loading.html') return;
+      e.preventDefault();
+      window.location.href = 'loading.html?next=' + encodeURIComponent(href);
+    });
+  </script>
 </body>
+
 </html>
