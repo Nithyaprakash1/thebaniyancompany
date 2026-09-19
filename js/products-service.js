@@ -1364,11 +1364,11 @@ export async function createInvoice(orderData = {}) {
   }
 
   const subtotal = Number(orderData.subtotal || 0);
-  const deliveryFee = Number(orderData.deliveryFee || orderData.shippingCharge || 0);
+  const deliveryFee = Number(orderData.deliveryFee ?? orderData.deliveryCharge ?? orderData.shippingCharge ?? 0);
   const discountAmount = Number(orderData.discountAmount || 0);
   const cgstAmount = Number(orderData.cgstAmount || 0);
   const sgstAmount = Number(orderData.sgstAmount || 0);
-  const totalAmount = Number(orderData.totalAmount || (subtotal + deliveryFee + cgstAmount + sgstAmount - discountAmount));
+  const totalAmount = Number(orderData.totalAmount ?? (subtotal + deliveryFee + cgstAmount + sgstAmount - discountAmount));
 
   const rawItems = Array.isArray(orderData.items) ? orderData.items : [];
   const sanitizedItems = rawItems.map(item => {

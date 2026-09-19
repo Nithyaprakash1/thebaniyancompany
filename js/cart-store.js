@@ -118,10 +118,10 @@ class CartStore {
     // Check company settings for GST activation and shipping configuration
     let isGstEnabled = false;
     let gstPct = 0;
-    let deliveryTnPrice = 0;
+    let deliveryTnPrice = 60;
     let deliveryNonTnPrice = 60;
     let freeShippingMin = 999;
-    let isFreeShippingEnabled = true;
+    let isFreeShippingEnabled = false;
 
     try {
       const raw = localStorage.getItem('tbc_cache_company');
@@ -134,10 +134,16 @@ class CartStore {
           gstPct = Number(exp.cgstPercentage || comp?.cgstPercentage || comp?.gstPercentage || 5);
         }
         if (comp?.deliveryTnPrice !== undefined) deliveryTnPrice = Number(comp.deliveryTnPrice);
+        else if (comp?.deliveryTnFee !== undefined) deliveryTnPrice = Number(comp.deliveryTnFee);
+
         if (comp?.deliveryNonTnPrice !== undefined) deliveryNonTnPrice = Number(comp.deliveryNonTnPrice);
+        else if (comp?.deliveryFee !== undefined) deliveryNonTnPrice = Number(comp.deliveryFee);
+
         if (comp?.freeShippingMin !== undefined) freeShippingMin = Number(comp.freeShippingMin);
+
         if (comp?.isFreeShippingEnabled !== undefined) isFreeShippingEnabled = Boolean(comp.isFreeShippingEnabled);
         else if (comp?.freeShippingEnabled !== undefined) isFreeShippingEnabled = Boolean(comp.freeShippingEnabled);
+        else isFreeShippingEnabled = false;
       }
     } catch (e) {}
 
@@ -152,6 +158,10 @@ class CartStore {
       isGstEnabled,
       gstPct,
       shipping,
+      deliveryTnPrice,
+      deliveryNonTnPrice,
+      freeShippingMin,
+      isFreeShippingEnabled,
       grandTotal
     };
   }
